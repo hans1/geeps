@@ -6,36 +6,9 @@
  <!-- jwm menu for puppy Linux -->
  <RootMenu label="Menu" labeled="false" height="24" onroot="3">
  
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-desktop.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-system.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-setup.menu
-
-  <Separator/>
-
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-utility.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-filesystem.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-graphic.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-document.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-calculate.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-personal.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-network.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-internet.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-multimedia.menu
-  PUPPYMENU jwm-xdgmenu /etc/xdg/menus/puppy-fun.menu
-
-  <Separator/>
-
-  <Program label="Help" icon="help24.png">exec defaulthtmlviewer file:///usr/share/doc/index.html</Program>
-
-  <Menu label="Shutdown" icon="shutdown24.png" height="16">
-   <!-- <Exit confirm="false" label="Exit to prompt" icon="prompt16.xpm" /> -->
-   <Program label="Exit to prompt" icon="prompt16.xpm">exec wmexit</Program>
-   <Program label="Reboot computer" icon="mini-turn.xpm">exec wmreboot</Program>
-   <Program label="Power-off computer" icon="mini-stop.xpm">exec wmpoweroff</Program>
-   <Program label="Restart X server" icon="mini-x.xpm">restartwm</Program>
-   <Restart label="Restart JWM" icon="mini-windows.xpm"/>
-  <!-- <Program label="Change Window Manager" icon="mini-windows.xpm">changewm.sh</Program> -->
-  </Menu>
+  <Program label="Start" icon="help24.png">exec urxvt -e sh -c 'echo "The file manager frontend will be here."; read'</Program>
+  <Program label="Wipe Drive" icon="help24.png">exec urxvt -e sh -c 'echo "What should happen?"; read'</Program>
+  <Program label="Quit" icon="mini-stop.xpm">exec wmpoweroff</Program>
 
  </RootMenu>
 

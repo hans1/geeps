@@ -4,7 +4,7 @@
 		<!-- Additional TrayButton attribute: label -->
 		<TrayButton label="" icon="logo-mini.png">root:3</TrayButton>
 
-		<TrayButton popup="browse" icon="/usr/local/lib/X11/pixmaps/www48.png">exec:defaultbrowser</TrayButton>
+		<!-- <TrayButton popup="browse" icon="/usr/local/lib/X11/pixmaps/www48.png">exec:defaultbrowser</TrayButton> -->
 		<TrayButton popup="Show Desktop" icon="mini-desktop.xpm">showdesktop</TrayButton>
 
 		<!-- Additional Pager attributes; width, height -->
