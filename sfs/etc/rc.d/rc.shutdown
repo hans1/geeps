@@ -269,7 +269,7 @@ fi
 killall udevd > /dev/null 2>&1 #100615
 
 #first time booted puppy, there may not have been any persistent storage...
-if [ $PUPMODE -eq 5 ];then #ifpupmode5
+if false; then # [ $PUPMODE -eq 5 ];then #ifpupmode5
 
  #110919 code moved out to /usr/sbin/shutdownconfig.
  #note, shutdownconfig normally called via /usr/bin/wmreboot or wmpoweroff when want shutdown from X.
