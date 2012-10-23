@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <pinboard>
   <backdrop style="Stretched">/usr/share/backgrounds/default.jpg</backdrop>
-  <icon x="288" y="32" label="console">/usr/bin/urxvt</icon>
 <!--
+  <icon x="288" y="32" label="console">/usr/bin/urxvt</icon>
   <icon x="288" y="128" label="play">/usr/local/bin/defaultmediaplayer</icon>
   <icon x="160" y="32" label="install">/usr/sbin/dotpup</icon>
   <icon x="96" y="224" label="email">/usr/local/bin/defaultemail</icon>
