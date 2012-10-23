@@ -8,7 +8,7 @@
  
   <Program label="Start" icon="help24.png">exec urxvt -e sh -c 'echo "The file manager frontend will be here."; read'</Program>
   <Program label="Wipe Drive" icon="help24.png">exec urxvt -e sh -c 'echo "What should happen?"; read'</Program>
-  <Menu label="Shutdown" icon="utility24.png" height="16">
+  <Menu label="Extras" icon="utility24.png" height="16">
    <Program label="SeaMonkey web browser" icon="seamonkey16.xpm">seamonkey</Program>
    <Program label="Urxvt terminal emulator" icon="mini-sh.xpm">urxvt</Program>
   </Menu>
