@@ -1,0 +1,251 @@
+#!/bin/bash
+# Script for Puppy Linux 4 (dingo) using Curlftpd and mpscan to create a samba-like file sharing app.
+# Curlftpd --- http://curlftpfs.sourceforge.net/
+# mpsacn  --- http://mpscan.sourceforge.net/
+
+setupserver()
+{
+# start Pure-ftpd 
+SERVERTYPE="`Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --separator "|" --menubox "Please choose from the following:" 550x140 5 Anonymous "No password required for others to connect." Password "A user name and password will be required for others to connect."`"
+if  [ "$?" = "1" ] ;then  
+./AppRun
+exit
+fi
+if [ "$SERVERTYPE" = "Anonymous" ] ; then
+OPT="-e"
+else
+OPT="-E"
+fi
+SERVER="`Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --separator "|" --menubox "Please choose from the following:" 459x159 5 Onetime "Start the file server this one time." Everytime "Start the file server now and everytime we boot."`"
+if  [ "$?" = "1" ] ;then  
+./AppRun
+exit
+fi
+if [ "$SERVER" = "Everytime" ] ; then
+PSP=$(cat /etc/rc.d/rc.local | grep pure-ftpd)
+ if [ "$PSP" = "" ] ; then
+echo "pure-ftpd -zMbBADHk 90 $OPT -U 022:022" >> /etc/rc.d/rc.local
+fi
+fi
+if [ "$(ps | grep $(cat /var/run/pure-ftpd.pid) | grep pure-ftpd)" != "" ] ; then
+kill -9 $(cat /var/run/pure-ftpd.pid)
+fi
+pure-ftpd -zMbBADHk 90 $OPT -U 022:022
+if [ "$SERVERTYPE" = "Anonymous" ] ; then
+ln -s $(cat /etc/passwd | grep ftp | cut -d ":" -f 6) /root/File-Sharing/Your-shared-folder
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "The FTP server has been started. \n The shared folder is $(cat /etc/passwd | grep ftp | cut -d ":" -f 6)" 0 0 90000
+else
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "The FTP server has been started. \n The shared folder will be the user's home directory. \n You should change the root user's password from the default of woofwoof." 0 0 90000
+fi
+}
+
+setupclient()
+{
+# find a ftp server on the network or manually specify and make a one-click rox-app
+
+SUB=$(ifconfig | grep inet | grep -v 127. | cut -d " " -f 12 | cut -d ":" -f 2 | cut -n -d "." -f 1-3)
+SUBN=$(echo $SUB | cut -d " " -f 1) #just in case we have more than one IP
+if [ "$SUBN" = "" ] ; then
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "It dosen't seem like you are connected to your network. \n You need to be on a network to share files. \n Try using the Network Wizard first." 0 0 90000
+exit
+fi
+SETUP="`Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --separator "|" --menubox "Please choose from the following:" 480x156 5 Scan "Search your local network for a connection." Manual "Enter an IP address. Optional User name and Password"`"
+RETVAL=$?
+case $RETVAL in
+ 0) #ok
+  echo $SETUP
+  if [ "$SETUP" = "Manual" ] ; then 
+
+# Specify a ftp server to connect to 
+
+MN=`Xdialog	--stdout --separator "|" --title "CurlFtpFS Mount" --3inputsbox "Enter Connection information. \n Just leave Username and Password blank if not needed." 20 60 \
+			     "Username:" "" \
+			     "Password:" "" \
+			     "IP address" ""`
+RETVAL=$?
+USER="$(echo $MN | cut -d "|" -f 1)"
+PASS="$(echo $MN | cut -d "|" -f 2)"
+IPT="$(echo $MN | cut -d "|" -f 3)"
+if [ "$IPT" = "" ] ; then
+./AppRun
+exit
+fi
+case $RETVAL in
+ 0) #ok  
+ # make the rox app
+rm -r /root/File-Sharing/Shared_$USER-$IPT
+mkdir /root/File-Sharing/Shared_$USER-$IPT
+cp /root/File-Sharing/Setup-Sharing/icon/.DirIcon /root/File-Sharing/Shared_$USER-$IPT/
+cp /root/File-Sharing/Setup-Sharing/scripts/part1 /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "mkdir /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "chmod 777 /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+if [ "$PASS" != "" ] ; then 
+echo "curlftpfs ftp://$USER:$PASS@$IPT /root/File-Sharing/Shared_$USER-$IPT/.$IPT &> /tmp/curlftpfs.error" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+else
+echo "curlftpfs ftp://$IPT /root/File-Sharing/Shared_$USER-$IPT/.$IPT &> /tmp/curlftpfs.error" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+fi
+cat /root/File-Sharing/Setup-Sharing/scripts/part2 >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "rox -n /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "fusermount -u /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+chmod 755 /root/File-Sharing/Shared_$USER-$IPT/AppRun
+  exit  
+  ;;
+ 1) #cancel
+ ./AppRun
+  exit
+  ;;
+ *)
+ echo "EXIT"
+  exit
+  ;;
+esac
+
+  else  
+  
+#scan for ftp servers to connect to
+
+  Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --no-buttons --infobox "Scanning Network, Please wait.." 0 0 3000 &
+
+IPP=$(ifconfig | grep inet | grep -v 127. | cut -d " " -f 12 | cut -d ":" -f 2)
+IP=$(echo $IPP | cut -d " " -f 1) #just in case we have more than one IP
+IPS=$(mpscan -p 21 $SUBN.1 - $SUBN.255 | grep -v $IP | cut -d " " -f 2)
+IPS2=$(echo $IPS | sed 's/ / - \\ /g')' - \ '
+if [ "$IPS" = "" ] ; then
+IPS2='No_servers_found "-" \ '
+else
+I=0 ; rm /tmp/ftpscan
+while true ; do  # This loop checks if anonymous connections are allowed
+I=$[$I+1] ; rm /tmp/ftperror 
+IPST=$(echo $IPS | cut -d " " -f $I)
+IPST2=$(echo $IPS | cut -d " " -f $[$I+1])
+if [ "$IPST" = "" ] ; then
+break
+fi
+ftpget $IPST FAKETESTFILE99 FAKETESTFILE99 &> /tmp/ftperror
+AN=$(cat /tmp/ftperror | grep 530)
+if [ "$AN" = "" ] ; then
+echo $IPST 'no-password-required \' >> /tmp/ftpscan
+else 
+echo $IPST 'password-required \' >> /tmp/ftpscan
+fi
+if [ "$IPST" = "$IPST2" ] ; then
+break
+fi
+done
+IPS2=$(cat /tmp/ftpscan)
+fi
+IPT="`Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --separator "|" --radiolist "Your computer's IP address is $IP \n Please choose the IP address to connect to: " 459x159 5 $IPS2`"
+
+if [ "$?" = "1" ] ;then  
+./AppRun
+exit
+fi
+if [ "$IPT" = "No_servers_found" ] ; then
+./AppRun
+exit
+fi
+ANT=$(cat /tmp/ftpscan | grep $IPT | grep "no")
+if [ "$ANT" != "" ] ; then 
+
+# make the anonymous connection rox-app
+
+rm -r /root/File-Sharing/Shared_on-$IPT
+mkdir /root/File-Sharing/Shared_on-$IPT
+cp /root/File-Sharing/Setup-Sharing/icon/.DirIcon /root/File-Sharing/Shared_on-$IPT/
+cp /root/File-Sharing/Setup-Sharing/scripts/part1 /root/File-Sharing/Shared_on-$IPT/AppRun
+echo "mkdir /root/File-Sharing/Shared_on-$IPT/.$IPT" >> /root/File-Sharing/Shared_on-$IPT/AppRun
+echo "chmod 777 /root/File-Sharing/Shared_on-$IPT/.$IPT" >> /root/File-Sharing/Shared_on-$IPT/AppRun
+echo "curlftpfs ftp://$IPT /root/File-Sharing/Shared_on-$IPT/.$IPT &> /tmp/curlftpfs.error" >> /root/File-Sharing/Shared_on-$IPT/AppRun
+cat /root/File-Sharing/Setup-Sharing/scripts/part2 >> /root/File-Sharing/Shared_on-$IPT/AppRun
+echo "rox -n /root/File-Sharing/Shared_on-$IPT/.$IPT" >> /root/File-Sharing/Shared_on-$IPT/AppRun
+echo "fusermount -u /root/File-Sharing/Shared_on-$IPT/.$IPT" >> /root/File-Sharing/Shared_on-$IPT/AppRun
+chmod 755 /root/File-Sharing/Shared_on-$IPT/AppRun
+else 
+
+# ask for user name and password to make rox-app
+
+MN=`Xdialog	--stdout --separator "|" --title "CurlFtpFS Mount" --2inputsbox "Enter user name and password for $IPT " 20 60 \
+			     "Username:" "" \
+			     "Password:" "" `
+RETVAL=$?
+USER="$(echo $MN | cut -d "|" -f 1)"
+PASS="$(echo $MN | cut -d "|" -f 2)"
+if [ "$USER" = "" ] ; then
+exit
+fi
+case $RETVAL in
+ 0) #ok  
+ # make the rox app
+rm -r /root/File-Sharing/Shared_$USER-$IPT
+mkdir /root/File-Sharing/Shared_$USER-$IPT
+cp /root/File-Sharing/Setup-Sharing/icon/.DirIcon /root/File-Sharing/Shared_$USER-$IPT/
+cp /root/File-Sharing/Setup-Sharing/scripts/part1 /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "mkdir /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "chmod 777 /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+if [ "$PASS" != "" ] ; then 
+echo "curlftpfs ftp://$USER:$PASS@$IPT /root/File-Sharing/Shared_$USER-$IPT/.$IPT &> /tmp/curlftpfs.error" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+else
+echo "curlftpfs ftp://$IPT /root/File-Sharing/Shared_$USER-$IPT/.$IPT &> /tmp/curlftpfs.error" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+fi
+cat /root/File-Sharing/Setup-Sharing/scripts/part2 >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "rox -n /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+echo "fusermount -u /root/File-Sharing/Shared_$USER-$IPT/.$IPT" >> /root/File-Sharing/Shared_$USER-$IPT/AppRun
+chmod 755 /root/File-Sharing/Shared_$USER-$IPT/AppRun
+
+;;
+ 1) #cancel
+ ./AppRun
+  exit
+  ;;
+ *)
+  exit
+  ;;
+esac
+fi
+fi
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "The short-cut (a ROX app) to the shared folder is in /root/File-Sharing. \n You can drag it to the desktop if you like." 0 0 90000    
+./AppRun
+exit
+  ;;
+ 1) #cancel
+ ./AppRun
+  exit
+  ;;
+ *)
+  exit
+  ;;
+esac
+
+}
+
+# main menu
+
+
+SETUP="`Xdialog --wmclass "mini-hammer" --title "Setup File Sharing" --stdout --cancel-label "Exit" --separator "|" --help "" --menubox "Please choose from the following:" 405x156 5 Client "Find a shared folder on another computer." Server "Share a folder from this computer "`"
+RETVAL=$?
+case $RETVAL in
+ 0) #ok
+  if [ "$SETUP" = "Server" ] ; then 
+  setupserver
+  ./AppRun
+  exit 
+  else
+  setupclient
+  ./AppRun
+  exit
+  fi
+  
+  exit
+  ;;
+ 1) #cancel
+  exit
+  ;;
+ 2) #help
+  defaulttexteditor /root/File-Sharing/Setup-Sharing/Puppy-File-Sharing.txt &
+ ./AppRun
+  exit 
+  ;;
+ *)
+  exit
+  ;;
+esac

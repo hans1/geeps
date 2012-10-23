@@ -1,0 +1,16 @@
+/etc
+/etc/acpi
+/etc/acpi/actions
+ acpi_poweroff.sh
+ powerbtn.sh
+ suspend.sh
+/etc/acpi/events
+ acpid-conf
+ lid-conf
+ sleep-conf
+/root
+/root/Startup
+ acpi
+/usr
+/usr/sbin
+ acpid

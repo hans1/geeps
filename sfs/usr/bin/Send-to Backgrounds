@@ -1,0 +1,5 @@
+#!/bin/sh
+killall pwallpaper
+cp -rf "$1" /usr/share/backgrounds 
+sleep 2
+pwallpaper

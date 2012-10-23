@@ -1,0 +1,26 @@
+#!/bin/sh
+#PupControl 1.8.8
+#Launch wrapper
+
+[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
+
+WORKDIR="/usr/local/PupControl"
+EXIT_STATUS1=`cat $WORKDIR/pupcontrol.rc | grep -a EXIT | tail -n 1 | cut -d "=" -f 2 | sed 's/\"//g'`
+EXIT_STATUS2=`cat $WORKDIR/desktops.rc | grep -a EXIT | tail -n 1 | cut -d "=" -f 2 | sed 's/\"//g'`
+
+if   [ "$EXIT_STATUS1" = "abort" -o "$EXIT_STATUS1" = "" ]; then cp -f $WORKDIR/pupcontrol2.rc $WORKDIR/pupcontrol.rc &
+else cp -f $WORKDIR/pupcontrol.rc $WORKDIR/pupcontrol2.rc &
+fi
+
+if   [ "$EXIT_STATUS2" = "abort" -o "$EXIT_STATUS2" = "" ]; then cp -f $WORKDIR/desktops2.rc $WORKDIR/desktops.rc &
+else cp -f $WORKDIR/desktops.rc $WORKDIR/desktops2.rc &
+fi
+
+if [ "`pidof PC-pref`" ]; then
+	sleep .8
+	[ "`pidof PC-pref`" ] && Xdialog --title Alert --beep --msgbox "  Another instance of PupControl will not  \n  run when the Preferences dialog is active.  " 0 0 && exit 0
+fi
+
+$WORKDIR/PupControl-bin &
+
+#end

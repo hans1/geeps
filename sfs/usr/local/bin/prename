@@ -1,0 +1,498 @@
+#! /bin/bash
+
+VERSION=0.7 ##by Jason Pline 2008-04-26
+
+##find a suitable version of gtkdialog (needs 0.7.20 or greater) currently (as of puppy 4 and maybe before)
+##the executable is named gtkdialog3. Exit with a warning incase gtkdialog isn't found.
+GTKDIALOG=""
+if [ "`which gtkdialog3`" != "" ]; then
+GTKDIALOG=gtkdialog3
+elif [ "`which gtkdialog`" != "" ]; then
+GTKDIALOG=gtkdialog
+elif [ "$GTKDIALOG" = "" ]; then
+echo "you need to install gtkdialog"
+exit 0
+fi
+
+if ! [ -d $HOME/.config ]; then
+mkdir $HOME/.config
+fi
+if ! [ -d $HOME/.config/tmp ]; then
+mkdir $HOME/.config/tmp
+fi
+if ! [ -d $HOME/.config/tmp/prename ]; then
+mkdir $HOME/.config/tmp/prename
+fi
+if ! [ -f $HOME/.config/tmp/prename/dir ]; then
+touch $HOME/.config/tmp/prename/dir
+fi
+if ! [ -f $HOME/.config/tmp/prename/old ]; then
+touch $HOME/.config/tmp/prename/old
+fi
+if ! [ -f $HOME/.config/tmp/prename/new ]; then
+touch $HOME/.config/tmp/prename/new
+fi
+if ! [ -f $HOME/.config/tmp/prename/new1 ]; then
+touch $HOME/.config/tmp/prename/new1
+fi
+if ! [ -f $HOME/.config/tmp/prename/c1 ]; then
+echo true > $HOME/.config/tmp/prename/c1
+fi
+if ! [ -f $HOME/.config/tmp/prename/c2 ]; then
+echo false > $HOME/.config/tmp/prename/c2
+fi
+if ! [ -f $HOME/.config/tmp/prename/c3 ]; then
+echo false > $HOME/.config/tmp/prename/c3
+fi
+if ! [ -f $HOME/.config/tmp/prename/c4 ]; then
+echo false > $HOME/.config/tmp/prename/c4
+fi
+if ! [ -f $HOME/.config/tmp/prename/c5 ]; then
+echo false > $HOME/.config/tmp/prename/c5
+fi
+if ! [ -f $HOME/.config/tmp/prename/r1 ]; then
+echo true > $HOME/.config/tmp/prename/r1
+fi
+if ! [ -f $HOME/.config/tmp/prename/r2 ]; then
+echo false > $HOME/.config/tmp/prename/r2
+fi
+if ! [ -f $HOME/.config/tmp/prename/r3 ]; then
+echo true > $HOME/.config/tmp/prename/r3
+fi
+if ! [ -f $HOME/.config/tmp/prename/r4 ]; then
+echo false > $HOME/.config/tmp/prename/r4
+fi
+if ! [ -f $HOME/.config/tmp/prename/r5 ]; then
+echo true > $HOME/.config/tmp/prename/r5
+fi
+if ! [ -f $HOME/.config/tmp/prename/r6 ]; then
+echo false > $HOME/.config/tmp/prename/r6
+fi
+if ! [ -f $HOME/.config/tmp/prename/r7 ]; then
+echo false > $HOME/.config/tmp/prename/r7
+fi
+if ! [ -f $HOME/.config/tmp/prename/r8 ]; then
+echo true > $HOME/.config/tmp/prename/r8
+fi
+if ! [ -f $HOME/.config/tmp/prename/r9 ]; then
+echo false > $HOME/.config/tmp/prename/r9
+fi
+
+if [ "`cat $HOME/.config/tmp/prename/c1`" = true ]; then
+echo enabled > $HOME/.config/tmp/prename/c1v
+else
+echo disabled > $HOME/.config/tmp/prename/c1v
+fi
+if [ "`cat $HOME/.config/tmp/prename/c2`" = true ]; then
+echo enabled > $HOME/.config/tmp/prename/c2v
+else
+echo disabled > $HOME/.config/tmp/prename/c2v
+fi
+if [ "`cat $HOME/.config/tmp/prename/c3`" = true ]; then
+echo enabled > $HOME/.config/tmp/prename/c3v
+else
+echo disabled > $HOME/.config/tmp/prename/c3v
+fi
+if [ "`cat $HOME/.config/tmp/prename/c4`" = true ]; then
+echo enabled > $HOME/.config/tmp/prename/c4v
+else
+echo disabled > $HOME/.config/tmp/prename/c4v
+fi
+if [ "`cat $HOME/.config/tmp/prename/c5`" = true ]; then
+echo enabled > $HOME/.config/tmp/prename/c5v
+else
+echo disabled > $HOME/.config/tmp/prename/c5v
+fi
+NEWDIR="`pwd`"
+if ! [ -f $HOME/.config/tmp/prename/directory2 ]; then
+echo "$NEWDIR" > $HOME/.config/tmp/prename/directory2
+fi
+if ! [ -d "`cat $HOME/.config/tmp/prename/directory2`" ]; then
+echo "$NEWDIR" > $HOME/.config/tmp/prename/directory2
+fi
+if ! [ -f $HOME/.config/tmp/prename/dir ]; then
+echo / > $HOME/.config/tmp/prename/dir
+fi
+
+OLDDIR="`cat $HOME/.config/tmp/prename/dir`"
+if [ -d "$OLDDIR" ]; then
+cd "$OLDDIR" 2>/dev/null
+else
+echo "$NEWDIR" > $HOME/.config/tmp/prename/dir
+fi
+
+export MAIN_DIALOG="
+<window title=\"PRename-$VERSION \"icon-name=\"gtk-edit\">
+<hbox>
+<frame contents of selected directory:>
+    <edit>
+      <variable>INFO</variable>
+      <input file>$HOME/.config/tmp/prename/directory2</input>
+      <width>300</width>
+      <height>160</height>
+    </edit>
+</frame>
+<vbox>
+	<frame Select a directory to work with>
+	<hbox>
+      <entry accept=\"directory\">
+        <label>Select a Directory</label>
+        <variable>DIR</variable>
+			<input>cat \$HOME/.config/tmp/prename/dir</input>
+			<action>echo cd \$DIR | tee \$HOME/.config/tmp/prename/directory</action>
+			<action>echo ls -F -A | tee -a \$HOME/.config/tmp/prename/directory</action>
+			<action>chmod a+x \$HOME/.config/tmp/prename/directory</action>
+			<action>ls -F -A \"\$DIR\" | tee \$HOME/.config/tmp/prename/directory2</action>
+			<action>refresh:INFO</action>
+      </entry>
+      <button>
+        <input file stock=\"gtk-open\"></input>
+        <variable>FILE_BROWSE_DIRECTORY</variable>
+        <action type=\"fileselect\">DIR</action>
+      </button>
+  </hbox>
+  </frame>
+  
+	<frame Replace text strings>
+    <checkbox>
+      <label>Enable/Disable option</label>
+      <variable>CHECKBOX1</variable>
+      <default>`cat \$HOME/.config/tmp/prename/c1`</default>
+      <action>if false disable:NEW</action>
+      <action>if false disable:OLD</action>
+      <action>if true enable:NEW</action>
+      <action>if true enable:OLD</action>
+    </checkbox>
+    <hbox>
+    <vbox>
+      <text><label>Text string to replace:</label></text>
+      <entry>
+        <variable>OLD</variable>
+			<input>cat \$HOME/.config/tmp/prename/old</input>
+			<visible>`cat \$HOME/.config/tmp/prename/c1v`</visible>
+      </entry>
+		</vbox>
+		
+		<vbox>
+      <text><label>New text string:</label></text>
+      <entry>
+        <variable>NEW</variable>
+			<input>cat \$HOME/.config/tmp/prename/new</input>
+			<visible>`cat \$HOME/.config/tmp/prename/c1v`</visible>
+      </entry>
+      </vbox>
+		</hbox>  
+		</frame>
+
+	<frame Append to filename>
+    <checkbox>
+      <label>Enable/Disable option</label>
+      <variable>CHECKBOX5</variable>
+      <default>`cat \$HOME/.config/tmp/prename/c5`</default>
+      <action>if false disable:NEW1</action>
+      <action>if true enable:NEW1</action>
+    </checkbox>
+    <hbox>
+    <vbox>
+      <text><label>text to append:</label></text>
+      <entry>
+        <variable>NEW1</variable>
+			<input>cat \$HOME/.config/tmp/prename/new1</input>
+			<visible>`cat \$HOME/.config/tmp/prename/c5v`</visible>
+      </entry>
+		</vbox>
+	   </hbox>  
+		</frame>
+
+	<frame Change case>
+    <checkbox>
+      <label>Enable/Disable option</label>
+      <variable>CHECKBOX2</variable>
+      <default>`cat \$HOME/.config/tmp/prename/c2`</default>
+      <action>if false disable:RADIOBUTTON1</action>
+      <action>if false disable:RADIOBUTTON2</action>
+      <action>if true enable:RADIOBUTTON1</action>
+      <action>if true enable:RADIOBUTTON2</action>
+    </checkbox>
+	<hbox>
+    <radiobutton>
+      <label>Convert to lower case:</label>
+      <variable>RADIOBUTTON1</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r1`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c2v`</visible>
+    </radiobutton>
+    <radiobutton>
+      <label>Convert to upper case:</label>
+      <variable>RADIOBUTTON2</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r2`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c2v`</visible>
+    </radiobutton>
+	</hbox>
+	</frame>
+	
+	<frame Only rename files/directories (default is all)>
+    <checkbox>
+      <label>Enable/Disable option</label>
+      <variable>CHECKBOX3</variable>
+      <default>`cat \$HOME/.config/tmp/prename/c3`</default>
+      <action>if false disable:RADIOBUTTON3</action>
+      <action>if false disable:RADIOBUTTON4</action>
+      <action>if true enable:RADIOBUTTON3</action>
+      <action>if true enable:RADIOBUTTON4</action>
+    </checkbox>
+	<hbox>
+    <radiobutton>
+      <label>Only rename files:     </label>
+      <variable>RADIOBUTTON3</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r3`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c3v`</visible>
+    </radiobutton>
+    <radiobutton>
+      <label>Only rename directories:</label>
+      <variable>RADIOBUTTON4</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r4`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c3v`</visible>
+    </radiobutton>
+	</hbox>
+	</frame>
+	
+	<frame Convert spaces to:>
+    <checkbox>
+      <label>Enable/Disable option</label>
+      <variable>CHECKBOX4</variable>
+      <default>`cat \$HOME/.config/tmp/prename/c4`</default>
+      <action>if false disable:RADIOBUTTON5</action>
+      <action>if false disable:RADIOBUTTON6</action>
+      <action>if false disable:RADIOBUTTON7</action>
+      <action>if true enable:RADIOBUTTON5</action>
+      <action>if true enable:RADIOBUTTON6</action>
+      <action>if true enable:RADIOBUTTON7</action>
+    </checkbox>
+	<hbox>
+    <radiobutton>
+      <label>hyphen(-)  </label>
+      <variable>RADIOBUTTON5</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r5`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c4v`</visible>
+    </radiobutton>
+    <radiobutton>
+      <label>underscore(_) </label>
+      <variable>RADIOBUTTON6</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r6`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c4v`</visible>
+    </radiobutton>
+    <radiobutton>
+      <label>remove spaces</label>
+      <variable>RADIOBUTTON7</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r7`</default>
+      <visible>`cat \$HOME/.config/tmp/prename/c4v`</visible>
+    </radiobutton>
+	</hbox>
+	</frame>
+	
+	<frame hidden files>
+	<hbox>
+    <radiobutton>
+      <label>Don't rename hidden files         </label>
+      <variable>RADIOBUTTON8</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r8`</default>
+    </radiobutton>
+    <radiobutton>
+      <label>rename hidden files too</label>
+      <variable>RADIOBUTTON9</variable>
+      <default>`cat \$HOME/.config/tmp/prename/r9`</default>
+    </radiobutton>
+    </hbox>
+    </frame>
+
+  <hbox>
+    <button>
+       <input file stock=\"gtk-edit\"></input>
+      <label>Rename</label>
+      <action>echo \$DIR | tee \$HOME/.config/tmp/prename/dir</action>
+      <action>echo \$RADIOBUTTON1 | tee \$HOME/.config/tmp/prename/r1</action>
+      <action>echo \$RADIOBUTTON2 | tee \$HOME/.config/tmp/prename/r2</action>
+      <action>echo \$RADIOBUTTON3 | tee \$HOME/.config/tmp/prename/r3</action>
+      <action>echo \$RADIOBUTTON4 | tee \$HOME/.config/tmp/prename/r4</action>
+      <action>echo \$RADIOBUTTON5 | tee \$HOME/.config/tmp/prename/r5</action>
+      <action>echo \$RADIOBUTTON6 | tee \$HOME/.config/tmp/prename/r6</action>
+      <action>echo \$RADIOBUTTON7 | tee \$HOME/.config/tmp/prename/r7</action>
+      <action>echo \$RADIOBUTTON8 | tee \$HOME/.config/tmp/prename/r8</action>
+      <action>echo \$RADIOBUTTON9 | tee \$HOME/.config/tmp/prename/r9</action>
+      <action>echo \$CHECKBOX1 | tee \$HOME/.config/tmp/prename/c1</action>
+      <action>echo \$CHECKBOX2 | tee \$HOME/.config/tmp/prename/c2</action>
+      <action>echo \$CHECKBOX3 | tee \$HOME/.config/tmp/prename/c3</action>
+      <action>echo \$CHECKBOX4 | tee \$HOME/.config/tmp/prename/c4</action>
+      <action>echo \$CHECKBOX5 | tee \$HOME/.config/tmp/prename/c5</action>
+      <action>echo \$OLD | tee \$HOME/.config/tmp/prename/old</action>
+      <action>echo \$NEW | tee \$HOME/.config/tmp/prename/new</action>
+      <action>echo \$NEW1 | tee \$HOME/.config/tmp/prename/new1</action>
+      <action type=\"exit\">Exit by button</action>
+    </button>
+		<button>
+			<input file stock=\"gtk-quit\"></input>
+        <label>QUIT</label>
+        <action type=\"exit\">EXIT_NOW</action>
+      </button>
+	</hbox>
+  </vbox>
+  </hbox>
+  </window>
+"
+  
+RESULTS="`$GTKDIALOG --program=MAIN_DIALOG --center`"
+
+###exit the program if the X button is pushed
+if [ "`echo $RESULTS | grep abort`" != "" ]; then
+exit 0
+fi
+
+##incase quit was selected, let's exit the program
+if [ "`echo $RESULTS | grep EXIT_NOW`" != "" ]; then
+exit 0
+fi
+
+RENAME="sed \"s/ / /g\""
+if [ "`cat $HOME/.config/tmp/prename/c1`" = true ]; then
+OLD=`cat $HOME/.config/tmp/prename/old`
+NEW=`cat $HOME/.config/tmp/prename/new`
+if [ "$OLD" = "" ]; then
+OLD="$NEW"
+fi
+RENAME="sed \"s/$OLD/$NEW/g\""
+fi
+
+APPEND="sed 's/^//'"
+if [ "`cat $HOME/.config/tmp/prename/c5`" = true ]; then
+APPEND="sed 's/^/`cat $HOME/.config/tmp/prename/new1`/'"
+fi
+
+CASE="sed \"s/ / /g\""
+if [ "`cat $HOME/.config/tmp/prename/c2`" = true ]; then
+if [ "`cat $HOME/.config/tmp/prename/r1`" = true ]; then
+CASE="sed \"y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/\""
+else
+CASE="sed \"y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/\""
+fi
+fi
+
+LIST="-F | sed 's/*//g' | sed 's/@//g'"
+if [ "`cat $HOME/.config/tmp/prename/c3`" = true ]; then
+if [ "`cat $HOME/.config/tmp/prename/r3`" = true ]; then
+LIST="-F | sed 's/*//g' | grep -v \"@\" | grep -v \"/\""
+else
+LIST='-d */'
+fi
+fi
+
+SPACE="sed \"s/ / /g\""
+if [ "`cat $HOME/.config/tmp/prename/c4`" = true ]; then
+if [ "`cat $HOME/.config/tmp/prename/r5`" = true ]; then
+SPACE="sed \"s/ /-/g\""
+fi
+if [ "`cat $HOME/.config/tmp/prename/r6`" = true ]; then
+SPACE="sed \"s/ /_/g\""
+fi
+if [ "`cat $HOME/.config/tmp/prename/r7`" = true ]; then
+SPACE="sed \"s/ //g\""
+fi
+fi
+
+if [ "`cat $HOME/.config/tmp/prename/r8`" = true ]; then
+HIDDEN="-1"
+else
+HIDDEN="-A"
+fi
+
+echo ls "$HIDDEN" "$LIST" > $HOME/.config/tmp/prename/prenamelist
+chmod a+x $HOME/.config/tmp/prename/prenamelist
+
+cd "`cat $HOME/.config/tmp/prename/dir`"
+
+rm -f $HOME/.config/tmp/prename/prenametemp2
+
+$HOME/.config/tmp/prename/prenamelist > $HOME/.config/tmp/prename/prenamelist2
+NUM=`cat $HOME/.config/tmp/prename/prenamelist2 | wc -l | sed 's/ //g'`
+a=1
+b=`expr "$NUM" + 1`
+
+export MAIN_DIALOG2="
+<window title=\"PRename-results \"icon-name=\"gtk-file\">
+ <vbox>
+ <frame This is just a preview. If you are happy with the results click on the Rename button to finalize.>
+  <table>
+    <width>900</width><height>500</height>
+    <variable>TABLE</variable>
+    <label>Current list                                                                                         |Revised list</label>"
+while [ "$a" != "$b" ]; do
+TYPES=`cat $HOME/.config/tmp/prename/prenamelist2 | sed -n "$a"p`
+echo "echo \""$TYPES"\" | "$APPEND" | "$RENAME" | "$CASE" | "$SPACE"" > $HOME/.config/tmp/prename/prenametemp2
+chmod a+x $HOME/.config/tmp/prename/prenametemp2
+TYPES2=`$HOME/.config/tmp/prename/prenametemp2`
+MAIN_DIALOG2="$MAIN_DIALOG2
+	<item>$TYPES | $TYPES2</item>"
+a=`expr "$a" + 1`
+done
+MAIN_DIALOG2="$MAIN_DIALOG2
+
+    <action>echo $TABLE</action>
+  </table>
+  <hbox>
+    <button>
+       <input file stock=\"gtk-edit\"></input>
+      <label>Rename</label>
+      <action type=\"exit\">Exit by button</action>
+    </button>
+		<button>
+			<input file stock=\"gtk-go-back\"></input>
+        <label>BACK</label>
+        <action type=\"exit\">GO_BACK</action>
+      </button>
+		<button>
+			<input file stock=\"gtk-quit\"></input>
+        <label>QUIT</label>
+        <action type=\"exit\">EXIT_NOW</action>
+      </button>
+  </hbox>
+  </frame>
+ </vbox>
+ </window>
+"
+
+RESULTS=`$GTKDIALOG --program=MAIN_DIALOG2 --center`
+
+if [ "`echo "$RESULTS" | grep GO_BACK`" != "" ]; then
+/usr/local/bin/prename &
+exit 0
+fi
+
+###exit the program if the X button is pushed
+if [ "`echo $RESULTS | grep abort`" != "" ]; then
+exit 0
+fi
+
+##incase quit was selected, let's exit the program
+if [ "`echo $RESULTS | grep EXIT_NOW`" != "" ]; then
+exit 0
+fi
+
+FILES=""
+$HOME/.config/tmp/prename/prenamelist | while read FILES
+do
+if [ "`echo "$FILES" | grep '/'`" != "" ]; then
+FILES="`echo "$FILES" | sed 's/\///g'`"
+fi
+echo "echo \""$FILES"\" | "$APPEND" | "$RENAME" | "$CASE" | "$SPACE"" > $HOME/.config/tmp/prename/newname
+chmod a+x $HOME/.config/tmp/prename/newname
+NEWFILE=`$HOME/.config/tmp/prename/newname`
+if [ "$FILES" != "$NEWFILE" ]; then
+if [ "`echo "$NEWFILE" | grep '/'`" != "" ]; then
+NEWFILE="`echo "$NEWFILE" | sed 's/\///g'`"
+fi
+mv "$FILES" "$NEWFILE"
+fi
+done
+
+/usr/local/bin/prename &
+
+exit 0

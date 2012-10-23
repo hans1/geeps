@@ -1,0 +1,9 @@
+/usr
+/usr/lib
+/usr/lib/codecs
+ cook.so
+ drvc.so
+ dspr.so.6.0
+ sipr.so.6.0
+ tokf.so.6.0
+ tokr.so.6.0

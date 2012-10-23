@@ -1,0 +1,16 @@
+/usr
+/usr/etc
+ dhcpcd.conf
+/usr/libexec
+/usr/libexec/dhcpcd-hooks
+ 01-test
+ 02-dump
+ 10-mtu
+ 20-resolv.conf
+ 29-lookup-hostname
+ 30-hostname
+/usr/sbin
+ dhcpcd
+/usr/share
+/var
+/var/db

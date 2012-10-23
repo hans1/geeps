@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ sdl-config
+/usr/lib
+ libSDL-1.2.so.0
+ libSDL-1.2.so.0.11.3
+ libSDL.so

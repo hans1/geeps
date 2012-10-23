@@ -1,0 +1,7 @@
+/usr
+/usr/lib
+ hug.so
+/usr/share
+/usr/share/BaCon
+ bacon.lang
+ bacon.vim

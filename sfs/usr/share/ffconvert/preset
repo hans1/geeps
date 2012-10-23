@@ -1,0 +1,89 @@
+Ac3 DVD - 192kbps Stereo, -f ac3 -acodec ac3 -ab 192kb -ar 48000 -ac 2
+Ac3 DVD - 384kbps Stereo, -f ac3 -acodec ac3 -ab 384kb -ar 48000 -ac 2
+Blackberry Curve Fullscreen, -f mp4 -vcodec mpeg4 -b 400k -r 24 -s 320x240 -aspect 4:3 -acodec libfaac -ar 22050 -ac 2 -ab 48kb
+Blackberry Curve Widescreen, -f mp4 -vcodec mpeg4 -b 400kb -r 24 -s 320x180 -aspect 16:9 -acodec libfaac -ar 22050 -ac 2 -ab 48kb
+Blackberry Music, -f mp3 -acodec libmp3lame -ab 160kb -ac 2 -ar 44100
+Blackberry Video Fullscreen, -f mp4 -r 24 -vcodec libx264 -s 240x180 -aspect 4:3 -maxrate 800kb -bufsize 80k -b 400kb -acodec libfaac -ar 44100 -ab 80kb -ac 2
+Blackberry Video Widescreen, -f mp4 -r 24 -vcodec libx264 -s 320x180 -aspect 16:9 -maxrate 800kb -bufsize 80k -b 400kb -acodec libfaac -ar 44100 -ab 80kb -ac 2
+CDMA Phone Audio (3g2), -f 3g2 -ar 22050 -ab 128kb -acodec libfaac -s qcif -r 14.985 -vn
+Flash Video (flv) for Web use Fullscreen, -vcodec flv -f flv -r 29.97 -s 320x240 -aspect 4:3 -b 300kb -g 160 -cmp dct -subcmp dct -mbd 2 -flags +aic+cbp+mv0+mv4 -trellis 1 -ac 1 -ar 22050 -ab 56kb
+Flash: Video (flv) for Web use Widescreen, -vcodec flv -f flv -r 29.97 -s 320x180 -aspect 16:9 -b 300kb -g 160 -cmp dct -subcmp dct -mbd 2 -flags +aic+cbp+mv0+mv4 -trellis 1 -ac 1 -ar 22050 -ab 56kb
+LG Chocolate, -f mp4 -s 240x192 -r 11.988 -b 192kb -ab 56kb -vcodec libxvid -acodec libfaac
+MP3 Audio(Mono), -f mp3 -vn -acodec libmp3lame -ab 32kb -ac 1 -ar 22050
+MP3 Audio, -f mp3 -vn -acodec libmp3lame -ab 160kb -ac 2 -ar 44100
+MP4 Audio, -f mp4 -vn -acodec libfaac -ab 112kb -ac 2
+MP4 Fullscreen, -f mp4 -r 29.97 -vcodec libx264 -s 640x480 -b 1000kb -aspect 4:3 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -b 1250k -maxrate 1500k -bufsize 4M -bt 256k -refs 1 -bf 3 -coder 1 -me_method umh -me_range 16 -subq 7 -partitions +parti4x4+parti8x8+partp8x8+partb8x8 -g 250 -keyint_min 25 -level 30 -qmin 10 -qmax 51 -qcomp 0.6 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+MP4 Widescreen, -f mp4 -r 29.97 -vcodec libx264 -s 704x384 -b 1000kb -aspect 16:9 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -b 1250k -maxrate 1500k -bufsize 4M -bt 256k -refs 1 -bf 3 -coder 1 -me_method umh -me_range 16 -subq 7 -partitions +parti4x4+parti8x8+partp8x8+partb8x8 -g 250 -keyint_min 25 -level 30 -qmin 10 -qmax 51 -qcomp 0.6 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+MPEG4-AVC, -f mp4 -vcodec libx264  -b 1000k -acodec libfaac -ab 128k
+MS Compatible AVI, -f avi -acodec libmp3lame -vcodec msmpeg4 -ab 192kb -b 1000kb -s 640x480 -ar 44100
+NTSC DVD Fast (LQ), -f dvd -target ntsc-dvd -b 5000kb -r 29.97 -s 720x480 -ar 48000 -ab 384kb
+NTSC DVD Fullscreen, -f dvd -vcodec mpeg2video -r 29.97 -s 352x480 -aspect 4:3 -b 4000kb -mbd rd -trellis -mv0 -cmp 2 -subcmp 2 -acodec mp2 -ab 192kb -ar 48000 -ac 2
+NTSC DVD HQ Fullscreen, -f dvd -target ntsc-dvd -r 29.97 -s 720x480 -aspect 4:3 -b 8000kb -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+NTSC DVD HQ Widescreen, -f dvd -target ntsc-dvd -r 29.97 -s 720x480 -aspect 16:9 -b 8000kb -g 12 -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+NTSC DVD Widescreen, -f dvd -vcodec mpeg2video -r 29.97 -s 352x480 -aspect 16:9 -b 4000kb -mbd rd -trellis -mv0 -cmp 2 -subcmp 2 -acodec mp2 -ab 192kb -ar 48000 -ac 2
+NTSC VCD (HQ), -f vcd -target ntsc-vcd -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+Neuros HQ NTSC Fullscreen, -f mp4 -r 29.97 -vcodec libxvid -s 640x480 -aspect 4:3 -maxrate 2500kb -b 2000kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 48000 -ab 128kb -ac 2
+Neuros HQ NTSC Widescreen, -f mp4 -r 29.97 -vcodec libxvid -s 704x384 -aspect 16:9 -maxrate 3000kb -b 2500kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -bf 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 48000 -ab 128kb -ac 2
+Neuros HQ PAL Fullscreen, -f mp4 -r 25 -vcodec libxvid -s 640x480 -aspect 4:3 -maxrate 2500kb -b 2000kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 48000 -ab 128kb -ac 2
+Neuros HQ PAL Widescreen, -f mp4 -r 25 -vcodec libxvid -s 704x384 -aspect 16:9 -maxrate 3000kb -b 2500kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -bf 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 48000 -ab 128kb -ac 2
+Neuros Small File NTSC Fullscreen, -f mp4 -b 800kb -r 29.97 -s 320x240 -aspect 4:3 -vcodec libxvid -ar 48000 -ab 80kb -ac 2 -acodec libfaac
+Neuros Small File NTSC Widescreen, -f mp4 -b 800kb -r 29.97 -s 352x240 -aspect 16:9 -vcodec libxvid -ar 48000 -ab 80kb -ac 2 -acodec libfaac
+Neuros Small File PAL Fullscreen, -f mp4 -b 800kb -r 25 -s 320x240 -aspect 4:3 -vcodec libxvid -ar 48000 -ab 80kb -ac 2 -acodec libfaac
+Neuros Small File PAL Widescreen, -f mp4 -b 800kb -r 25 -s 352x240 -aspect 16:9 -vcodec libxvid -ar 48000 -ab 80kb -ac 2 -acodec libfaac
+OGG theora vorbis, -f ogg -vcodec libtheora -b 1000k -acodec libvorbis -ab 128k
+OGG vorvis Audio, -f ogg -acodec libvorbis -aq 60 -vn -ac 2
+PAL DVD Fast (LQ), -f dvd -target pal-dvd -b 5000kb -r 25 -s 720x576 -ar 48000 -ab 384kb
+PAL DVD Fullscreen, -f dvd -vcodec mpeg2video -r 25.00 -s 352x576 -aspect 4:3 -b 4000kb -mbd rd -trellis -mv0 -cmp 2 -subcmp 2 -acodec mp2 -ab 192kb -ar 48000 -ac 2
+PAL DVD HQ Fullscreen, -f dvd -target pal-dvd -aspect 4:3 -b 8000kb -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+PAL DVD HQ Widescreen, -f dvd -target pal-dvd -aspect 16:9 -b 8000kb -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+PAL DVD Widescreen, -f dvd -vcodec mpeg2video -r 25.00 -s 352x576 -aspect 16:9 -b 4000kb -mbd rd -trellis -mv0 -cmp 2 -subcmp 2 -acodec mp2 -ab 192kb -ar 48000 -ac 2
+PAL VCD (HQ), -f vcd -target pal-vcd -mbd rd -trellis -mv0 -cmp 0 -subcmp 2
+PS3 720p Fullscreen, -f mp4 -r 23.976 -vcodec libx264 -s 1280x720 -b 3000kb -aspect 4:3 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -maxrate 3500k -bufsize 4M -bt 256k -refs 1 -bf 3 -coder 1 -me_method umh -me_range 16 -subq 7 -partitions +parti4x4+parti8x8+partp8x8+partb8x8 -g 250 -keyint_min 25 -level 30 -qmin 10 -qmax 51 -qcomp 0.6 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 384kb -ar 48000 -ac 2
+PS3 720p Widescreen, -f mp4 -r 23.976 -vcodec libx264 -s 1280x720 -b 3000kb -aspect 16:9 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -maxrate 3500k -bufsize 4M -bt 256k -refs 1 -bf 3 -coder 1 -me_method umh -me_range 16 -subq 7 -partitions +parti4x4+parti8x8+partp8x8+partb8x8 -g 250 -keyint_min 25 -level 30 -qmin 10 -qmax 51 -qcomp 0.6 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -acodec libfaac -ab 384kb -ar 48000 -ac 2
+PSP Fullscreen, -f mp4 -r 29.97 -vcodec libx264 -s 640x480 -aspect 4:3 -b 1250kb -maxrate 4M -bufsize 4M -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -me_method umh -subq 6 -trellis 1 -refs 2 -bf 1 -coder 1 -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 1250k -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 21 -acodec libfaac -ab 128kb -ar 48000 -ac 2
+PSP Widescreen, -f mp4 -r 29.97 -vcodec libx264 -s 480x272 -aspect 16:9 -b 1250kb -maxrate 4M -bufsize 4M -flags +loop -cmp +chroma -partitions +parti4x4+partp8x8+partb8x8 -me_method umh -subq 6 -trellis 1 -refs 2 -bf 1 -coder 1 -me_range 16 -g 300 -keyint_min 25 -sc_threshold 40 -i_qfactor 0.71 -bt 1250k -qcomp 0.6 -qmin 10 -qmax 51 -qdiff 4 -level 21 -acodec libfaac -ab 128kb -ar 48000 -ac 2
+Palm Fullscreen, -f mp4 -r 29.97 -vcodec libxvid -s 428x320 -aspect 4:3 -maxrate 550kb -b 500kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 44100 -ab 80kb -ac 2
+Palm Widescreen, -f mp4 -r 29.97 -vcodec libxvid -s 480x320 -aspect 3:2 -maxrate 450kb -b 430kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libfaac -ar 44100 -ab 80kb -ac 2
+Power Point, -f wmv -vcodec wmv2 -acodec wmav2 -aspect 4:3 -b 500k -ab 32k -ac 1 -ar 22050 -s 320x240
+Quicktime MOV, -f mov -acodec libfaac -b 1250kb -r 25 -ab 128kb -s 640x480 -ac 2
+RB Apple iPod Nano Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 176x128 -b 256kb -strict -1
+RB Apple iPod Nano Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 176x128 -b 256kb -strict -1
+RB Apple iPod Photo/Color Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 224x176 -b 320kb -r 15 -strict -1
+RB Apple iPod Photo/Color Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 224x128 -b 320kb -r 24 -strict -1
+RB Apple iPod Video Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 320x240 -b 400kb -strict -1
+RB Apple iPod Video Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 320x176 -b 400kb -strict -1
+RB Cowon iAudio X5 Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 160x128 -b 176kb -r 15 -strict -1
+RB Cowon iAudio X5 Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 160x96 -b 224kb -r 24 -strict -1
+RB Sandisk Sansa e200 Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 224x176 -b 320kb -strict -1
+RB Sandisk Sansa e200 Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 224x128 -b 320kb -strict -1
+RB Toshiba Gigabeat F/X Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 320x240 -b 600kb -strict -1
+RB Toshiba Gigabeat F/X Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 320x176 -b 600kb -strict -1
+RB iRiver H10 20GB Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 160x128 -b 224kb -strict -1
+RB iRiver H10 20GB Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 160x96 -b 224kb -strict -1
+RB iRiver H10 5/6GB Fullscreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 128x96 -b 224kb -strict -1
+RB iRiver H10 5/6GB Widescreen, -f mpeg -acodec libmp3lame -ab 128kb -ar 44100 -vcodec mpeg2video -s 128x80 -b 224kb -strict -1
+RB iRiver H300 Fullscreen, -f mpeg -acodec libmp3lame -ab 96kb -ar 44100 -vcodec mpeg2video -s 224x176 -b 224kb -r 10 -strict -1
+RB iRiver H300 Widescreen, -f mpeg -acodec libmp3lame -ab 96kb -ar 44100 -vcodec mpeg2video -s 224x128 -b 256kb -r 15 -strict -1
+Raw DV for NTSC Fullscreen, -target ntsc-dv -aspect 4:3 -f dv
+Raw DV for PAL Fullscreen, -target pal-dv -aspect 4:3 -f dv
+WMA, -f wma -vn -acodec wmav2 -ab 160kb
+WMV for Web Use, -f wmv -vcodec wmv2 -acodec wmav2 -b 640kb -ab 128kb -r 29.97 -s 320x240
+WMV2 Generic, -f wmv -vcodec wmv2 -acodec wmav2 -b 1000kb -ab 1411k -r 25
+WalkmanMP4 16:9, -f mp4 -vcodec mpeg4 -s 320x180 -aspect 16:9 -b 1250k -ab 80k 
+WalkmanMP4 4:3, -f mp4 -vcodec mpeg4 -s 320x240 -aspect 4:3 -b 1250k -ab 80k 
+Wav Audio for CD, -f wav -vn -acodec pcm_s16le -ab 160k -ar 44100 -ac 2 
+Xbox 360, -f wmv -vcodec wmv2 -acodec wmav2 -b 1200kb -ab 160kb -r 25 -s 720x480
+XviD FullScreen, -f avi -r 29.97 -vcodec libxvid -vtag XVID -s 640x480 -aspect 4:3 -maxrate 1800kb -b 1500kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -bf 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libmp3lame -ar 48000 -ab 128kb -ac 2
+XviD Widescreen Anamorphic, -f avi -r 29.97 -croptop 58 -cropbottom 62 -vcodec libxvid -vtag XVID -s 640x272 -aspect 2.35 -maxrate 1800kb -b 1500kb -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -bf 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libmp3lame -ar 48000 -ab 128kb -ac 2
+XviD Widescreen, -f avi -r 29.97 -vcodec libxvid -vtag XVID -s 704x384 -aspect 16:9 -maxrate 1800k -b 1500k -qmin 3 -qmax 5 -bufsize 4096 -mbd 2 -bf 2 -flags +4mv -trellis -aic -cmp 2 -subcmp 2 -g 300 -acodec libmp3lame -ar 48000 -ab 128k -ac 2
+Zen Fullscreen, -f avi -r 29.97 -vcodec libxvid -vtag XVID -s 320x240 -aspect 4:3 -maxrate 1800kb -b 1500k -acodec libmp3lame -ar 48000 -ab 128kb -ac 2
+Zen Widescreen, -f avi -r 29.97 -vcodec libxvid -vtag XVID -s 320x240 -aspect 16:9 -maxrate 1800kb -b 1500kb -acodec libmp3lame -ar 48000 -ab 128kb -ac 2
+Zune, -f wmv -vcodec wmv2 -acodec wmav2 -b 640kb -ab 128kb -r 23.97 -s 320x240
+iPod Small Converted to WideScreen, -f mp4 -r 29.97 -croptop 64 -cropbottom 64 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 320x176 -aspect 16:9 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod Small Fullscreen, -f mp4 -r 29.97 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 320x240 -aspect 4:3 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod Small WideScreen Anamorphic, -f mp4 -r 29.97 -croptop 60 -cropbottom 60 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 320x144 -aspect 2.35 -acodec libfaac -ab 112k -ar 48000 -ac 2
+iPod Small WideScreen, -f mp4 -r 29.97 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 320x176 -aspect 16:9 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod TV Out Converted to Widescreen, -f mp4 -r 29.97 -croptop 64 -cropbottom 64 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 640x352 -aspect 16:9 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod TV Out Fullscreen, -f mp4 -r 29.97 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 512x384 -aspect 4:3 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod TV Out Widescreen Anamorphic, -f mp4 -r 29.97 -croptop 60 -cropbottom 60 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 640x272 -aspect 2.35 -acodec libfaac -ab 112kb -ar 48000 -ac 2
+iPod TV Out Widescreen, -f mp4 -r 29.97 -vcodec libx264 -flags +loop -cmp +chroma -deblockalpha 0 -deblockbeta 0 -crf 21 -bt 256k -refs 1 -coder 0 -me_method full -me_range 16 -subq 5 -partitions +parti4x4+parti8x8+partp8x8 -g 250 -keyint_min 25 -level 30 -trellis 2 -sc_threshold 40 -i_qfactor 0.71 -s 624x352 -aspect 16:9 -acodec libfaac -ab 112kb -ar 48000 -ac 2

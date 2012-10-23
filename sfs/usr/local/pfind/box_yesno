@@ -1,0 +1,31 @@
+#!/bin/bash
+
+if [ -z "$FRAME" ]; then FRAME="$LOC_INFO"; fi
+export yesno_box="
+<window title=\"Pfind\" icon-name=\"gtk-find\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <text><label>\"$TXT2\"</label></text>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-no\"></input>
+    <label>$LOC_NO</label>
+    <action type=\"exit\">no</action>
+   </button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-yes\"></input>
+    <label>$LOC_YES</label>
+    <action type=\"exit\">yes</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=yesno_box --class=jwm-ontop --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+TXT1=""; TXT2=""; IMG=""; FRAME="" #reset to avoid alien values in next box

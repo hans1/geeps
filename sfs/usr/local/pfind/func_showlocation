@@ -1,0 +1,18 @@
+#!/bin/bash
+
+FILE=`echo "$*" | cut -b 2-`
+if [ -z "$FILE" ]; then TXT1="<b>$LOC710</b>"
+	. "$PROGPATH"box_ok
+	exit 0
+else
+	echo > /tmp/pfind-error$PROGPID
+	if [ $FILEMANAGER = rox ]; then
+		exec rox -s "$FILE" 2> /tmp/pfind-error$PROGPID
+	else
+		exec $FILEMANAGER "${FILE%/*}/" 2> /tmp/pfind-error$PROGPID
+	fi
+	TXT1=`cat /tmp/pfind-error$PROGPID`
+	if [ -n "$TXT1" ]; then . "$PROGPATH"box_ok; fi #error
+fi
+
+

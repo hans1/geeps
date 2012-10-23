@@ -1,0 +1,50 @@
+/etc
+/etc/gtk-2.0
+ gtkrc
+/etc/gtk-2.0/i486-slackware-linux
+ gtk.immodules
+/usr
+/usr/bin
+ gtk-builder-convert
+ gtk-query-immodules-2.0
+ gtk-query-immodules-2.0-32
+ gtk-update-icon-cache
+ update-gtk-immodules
+ update-gtk-immodules-2.0
+/usr/lib
+/usr/lib/gtk-2.0
+/usr/lib/gtk-2.0/2.10.0
+/usr/lib/gtk-2.0/2.10.0/engines
+ libpixmap.so
+/usr/lib/gtk-2.0/2.10.0/immodules
+ im-am-et.so
+ im-cedilla.so
+ im-cyrillic-translit.so
+ im-inuktitut.so
+ im-ipa.so
+ im-multipress.so
+ im-thai.so
+ im-ti-er.so
+ im-ti-et.so
+ im-viqr.so
+ im-xim.so
+/usr/lib/gtk-2.0/2.10.0/loaders
+/usr/lib/gtk-2.0/2.10.0/printbackends
+ libprintbackend-cups.so
+ libprintbackend-file.so
+ libprintbackend-lpr.so
+/usr/lib/gtk-2.0/modules
+ libferret.so
+ libgail.so
+/usr/share
+/usr/share/gtk-2.0
+/usr/share/themes
+/usr/share/themes/Default
+/usr/share/themes/Default/gtk-2.0
+ gtkrc
+/usr/share/themes/Emacs
+/usr/share/themes/Emacs/gtk-2.0
+ gtkrc
+/usr/share/themes/Raleigh
+/usr/share/themes/Raleigh/gtk-2.0
+ gtkrc

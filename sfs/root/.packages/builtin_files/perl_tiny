@@ -1,0 +1,245 @@
+/usr
+/usr/bin
+ perl
+ perl5.12.3
+ perlbug
+ perldoc
+ perlivp
+ perlthanks
+/usr/lib
+/usr/lib/perl5
+/usr/lib/perl5/5.12.3
+ AutoLoader.pm
+ Benchmark.pm
+ bytes.pm
+ Carp.pm
+/usr/lib/perl5/5.12.3/CGI
+ Apache.pm
+ Carp.pm
+ Cookie.pm
+ Pretty.pm
+ Push.pm
+ Switch.pm
+ Util.pm
+/usr/lib/perl5/5.12.3/CPAN
+ HandleConfig.pm
+/usr/lib/perl5/5.12.3/CPANPLUS
+ Config.pm
+/usr/lib/perl5/5.12.3/encoding
+ warnings.pm
+/usr/lib/perl5/5.12.3/Exporter
+ Heavy.pm
+/usr/lib/perl5/5.12.3/ExtUtils
+/usr/lib/perl5/5.12.3/ExtUtils/MakeMaker
+ Config.pm
+/usr/lib/perl5/5.12.3/File
+ Basename.pm
+ CheckTree.pm
+ Compare.pm
+ Copy.pm
+ DosGlob.pm
+ Fetch.pm
+ Find.pm
+ GlobMapper.pm
+ Path.pm
+ stat.pm
+ Temp.pm
+/usr/lib/perl5/5.12.3/Getopt
+ Long.pm
+ Std.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/Cwd
+ Cwd.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/Data
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/Data/Dumper
+ Dumper.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/DynaLoader
+ autosplit.ix
+ dl_expandspec.al
+ dl_findfile.al
+ dl_find_symbol_anywhere.al
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/Fcntl
+ Fcntl.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/File
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/File/Glob
+ Glob.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/IO
+ IO.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/POSIX
+ abs.al
+ alarm.al
+ assert.al
+ atan2.al
+ atexit.al
+ atof.al
+ atoi.al
+ atol.al
+ autosplit.ix
+ bsearch.al
+ calloc.al
+ chdir.al
+ chmod.al
+ chown.al
+ clearerr.al
+ closedir.al
+ cos.al
+ creat.al
+ div.al
+ errno.al
+ execl.al
+ execle.al
+ execlp.al
+ execv.al
+ execve.al
+ execvp.al
+ exit.al
+ exp.al
+ fabs.al
+ fclose.al
+ fcntl.al
+ fdopen.al
+ feof.al
+ ferror.al
+ fflush.al
+ fgetc.al
+ fgetpos.al
+ fgets.al
+ fileno.al
+ fopen.al
+ fork.al
+ fprintf.al
+ fputc.al
+ fputs.al
+ fread.al
+ free.al
+ freopen.al
+ fscanf.al
+ fseek.al
+ fsetpos.al
+ fstat.al
+ fsync.al
+ ftell.al
+ fwrite.al
+ getc.al
+ getchar.al
+ getegid.al
+ getenv.al
+ geteuid.al
+ getgid.al
+ getgrgid.al
+ getgrnam.al
+ getgroups.al
+ getlogin.al
+ getpgrp.al
+ getpid.al
+ getppid.al
+ getpwnam.al
+ getpwuid.al
+ gets.al
+ getuid.al
+ gmtime.al
+ isatty.al
+ kill.al
+ labs.al
+ ldiv.al
+ link.al
+ load_imports.al
+ localtime.al
+ log.al
+ longjmp.al
+ malloc.al
+ memchr.al
+ memcmp.al
+ memcpy.al
+ memmove.al
+ memset.al
+ mkdir.al
+ offsetof.al
+ opendir.al
+ perror.al
+ POSIX.so
+ pow.al
+ printf.al
+ putc.al
+ putchar.al
+ puts.al
+ qsort.al
+ raise.al
+ rand.al
+ readdir.al
+ realloc.al
+ redef.al
+ remove.al
+ rename.al
+ rewind.al
+ rewinddir.al
+ rmdir.al
+ scanf.al
+ setbuf.al
+ setjmp.al
+ setvbuf.al
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/POSIX/SigAction
+ flags.al
+ handler.al
+ mask.al
+ new.al
+ safe.al
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/POSIX/SigRt
+ _check.al
+ CLEAR.al
+ _croak.al
+ DELETE.al
+ _exist.al
+ EXISTS.al
+ FETCH.al
+ _getsig.al
+ _init.al
+ new.al
+ SCALAR.al
+ STORE.al
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/auto/Socket
+ Socket.so
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/Data
+ Dumper.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/Encode
+ Config.pm
+ Symbol.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/File
+ Glob.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/File/Spec
+ Cygwin.pm
+ Epoc.pm
+ Functions.pm
+ Mac.pm
+ OS2.pm
+ Unix.pm
+ VMS.pm
+ Win32.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/Hash
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/Hash/Util
+ FieldHash.pm
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi/IO
+ Dir.pm
+ File.pm
+ Handle.pm
+ Pipe.pm
+ Poll.pm
+ Seekable.pm
+ Select.pm
+ Socket.pm
+/usr/lib/perl5/5.12.3/IO
+ Zlib.pm
+/usr/lib/perl5/5.12.3/Log
+/usr/lib/perl5/5.12.3/Log/Message
+ Config.pm
+/usr/lib/perl5/5.12.3/Module
+/usr/lib/perl5/5.12.3/Module/Build
+ Config.pm
+/usr/lib/perl5/5.12.3/Net
+ Config.pm
+/usr/lib/perl5/5.12.3/Tie
+/usr/lib/perl5/5.12.3/Tie/Hash
+ NamedCapture.pm
+/usr/lib/perl5/5.12.3/warnings
+ register.pm

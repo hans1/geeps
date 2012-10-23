@@ -1,0 +1,117 @@
+#!/bin/bash
+#this is what you edit 
+#you can delete all of this and have just ;'drivers' and 'news' tabs
+#or you can have 0, 1, 2 or 3 fields with whichever vars you want out of the 3, PETLIST, NETLIST or MOREPETS
+#if you change this be sure to fix the notetabs in 'qpet.conf'
+#get package names out of ~/.packages/Packages-*-official, just the name only, case insensitive
+#setting up icon var #don't forget to choose an icon
+if [ -d /usr/local/quickpet/icons ];then #MINIICONDIR="/root/.quickpet/icons"
+		MINIICONDIR="/usr/local/quickpet/icons"
+	else MINIICONDIR="/usr/local/lib/X11/mini-icons"
+fi
+export MINIICONDIR
+PETLIST="<vbox>
+  <text><label>$LOC_316</label></text>
+ <hbox>
+  <text><label>\"$LOC_320\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/Gimp.png</input>
+   <action>echo \"Gimp\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_321\"</label></text>                        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/phone.png</input>
+   <action>echo \"Psip32\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_322f\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/flash.png</input>
+   <action>echo \"flash-player\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_323p\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/pupsave.png</input>
+   <action>echo \"pupsaveconfig\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_324\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/wine_logo.png</input>
+   <action>echo \"Wine\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_327\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/gnotravex.xpm</input>
+   <action>echo \"gnome_games_Lite\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+</vbox>"
+########################################################################
+NETLIST="<vbox>
+  <text><label>$LOC_317</label></text>
+ <hbox>
+  <text><label>\"$LOC_501\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/Firefox.png</input>
+   <action>echo \"Firefox\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_502\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/dillo.png</input>
+   <action>echo \"dillo\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_503\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/chromium-browser.png</input>
+   <action>echo \"Chromium\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_504\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/Opera.png</input>
+   <action>echo \"Opera\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_TOR\"</label></text>        
+  <button relief=\"2\">                                              
+   <input file>$MINIICONDIR/tor.png</input>
+   <action>echo \"tor-browser\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+ <hbox>
+  <text><label>\"$LOC_508\"</label></text>
+  <button relief=\"2\" tooltip-text=\"$LOC_012\">
+   <input file>$MINIICONDIR/pidgin24.png</input>
+   <action>echo \"Pidgin\" > /tmp/thepet</action>
+   <action>exit:getpet</action>
+  </button>
+ </hbox>
+</vbox>"
+
+########################################################################

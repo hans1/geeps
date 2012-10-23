@@ -1,0 +1,10 @@
+/usr
+/usr/bin
+ curl
+/usr/lib
+ libcurl.so
+ libcurl.so.4
+ libcurl.so.4.2.0
+/usr/share
+/usr/share/curl
+ ca-bundle.crt

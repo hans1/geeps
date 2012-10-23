@@ -1,0 +1,73 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Set hotkeys
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+case "$1" in
+
+-pupcontrol_hotkey)
+#IceWM hotkey
+	if [ "`ls $HOME/.icewm/keys-bak`" = "" ]; then
+	 cp $HOME/.icewm/keys $HOME/.icewm/keys-bak
+	fi
+	if [ "`ls $HOME/.icewm/keys`" ]; then
+	 sed '/key "Ctrl+Shift+c"		PupControl/d' $HOME/.icewm/keys > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.icewm/keys
+	fi
+	if [ "`ls $HOME/.icewm/keys`" ]; then cat $HOME/.icewm/keys | sed '$a key "Ctrl+Shift+c"		PupControl' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.icewm/keys
+	elif [ "`ls /usr/share/icewm/keys`" ]; then cat /usr/share/icewm/keys | sed '$a key "Ctrl+Shift+c"		PupControl' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.icewm/keys
+	fi
+#Fluxbox hotkey
+	if [ "`ls $HOME/.fluxbox/keys-bak`" = "" ]; then
+	 cp $HOME/.fluxbox/keys $HOME/.fluxbox/keys-bak
+	fi
+	if [ "`ls $HOME/.fluxbox/keys`" ]; then
+	 sed '/Control Shift C :Exec PupControl/d' $HOME/.fluxbox/keys > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.fluxbox/keys
+	fi
+	if [ "`ls $HOME/.fluxbox/keys`" ]; then
+	 cat $HOME/.fluxbox/keys | sed '$aControl Shift C :Exec PupControl' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.fluxbox/keys
+	fi
+#JWM hotkey
+	if [ "`ls $HOME/.jwm/jwmrc-personal-bak`" = "" ]; then
+	 cp $HOME/.jwm/jwmrc-personal $HOME/.jwm/jwmrc-personal-bak
+	fi
+	if [ "`ls $HOME/.jwm/jwmrc-personal`" ]; then
+	 cat $HOME/.jwm/jwmrc-personal | sed '/<Key mask="CS" key="c">exec:PupControl<\/Key>/d' $HOME/.jwm/jwmrc-personal > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.jwm/jwmrc-personal
+	 cat $HOME/.jwm/jwmrc-personal | sed '39i<Key mask="CS" key="c">exec:PupControl</Key>' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.jwm/jwmrc-personal
+	fi
+#Openbox hotkey
+	if [ ! -f $HOME/.config/openbox/rc.xml ] && [ -f /etc/xdg/openbox/rc.xml ]; then
+		if [ ! -d  $HOME/.config/openbox/ ]; then
+		 mkdir -p $HOME/.config/openbox/
+		fi
+	 cp -f /etc/xdg/openbox/rc.xml $HOME/.config/openbox/rc.xml &
+	fi
+	if [ ! -f $HOME/.config/openbox/menu.xml ] && [ -f /etc/xdg/openbox/menu.xml ]; then
+	 cp -f /etc/xdg/openbox/menu.xml $HOME/.config/openbox/menu.xml &
+	fi
+
+	if [ "`ls $HOME/.config/openbox/rc.xml-bak`" = "" ]; then
+	 cp $HOME/.config/openbox/rc.xml $HOME/.config/openbox/rc.xml-bak
+	fi
+	if [ ! "`cat $HOME/.config/openbox/rc.xml | grep "<\!-- Keybindings for running applications -->"`" ]; then
+	 cat $HOME/.config/openbox/rc.xml | sed 's/^.*<keyboard>.*$/  <keyboard>\n    <\!-- Keybindings for running applications -->/' > /tmp/tmpfile && mv -f /tmp/tmpfile $HOME/.config/openbox/rc.xml
+	fi
+	if [ "`ls $HOME/.config/openbox/rc.xml`" ]; then
+	 sed '/    <keybind key=\"C-S-c\">/,/    <\/keybind>/ d' $HOME/.config/openbox/rc.xml > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.config/openbox/rc.xml
+	 awk '/    <!-- Keybindings for running applications -->/{p=1;print;print "    <keybind key=\"C-S-c\">\n      <action name=\"Execute\">\n        <command>PupControl run</command>\n      </action>\n    </keybind>"}/    <keybind/{p=0}!p' $HOME/.config/openbox/rc.xml > /tmp/rc.xml.tmp
+	 mv -f /tmp/rc.xml.tmp $HOME/.config/openbox/rc.xml
+	fi
+#Lxde/Lxpanel hotkey
+	if [ "`ls $HOME/.config/openbox/lxde-rc.xml-bak`" = "" ]; then
+	 cp $HOME/.config/openbox/lxde-rc.xml $HOME/.config/openbox/lxde-rc.xml-bak
+	fi
+	if [ "`ls $HOME/.config/openbox/lxde-rc.xml`" ]; then
+	 sed '/    <keybind key=\"C-S-c\">/,/    <\/keybind>/ d' $HOME/.config/openbox/lxde-rc.xml > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.config/openbox/lxde-rc.xml
+	 awk '/    <!-- Keybindings for running applications -->/{p=1;print;print "    <keybind key=\"C-S-c\">\n      <action name=\"Execute\">\n        <command>PupControl run</command>\n      </action>\n    </keybind>"}/    <keybind/{p=0}!p' $HOME/.config/openbox/lxde-rc.xml > /tmp/lxde-rc.xml.tmp
+	 mv -f /tmp/lxde-rc.xml.tmp $HOME/.config/openbox/lxde-rc.xml
+	fi
+#Hotkey restored
+	Xdialog --title Alert --beep --msgbox " The PupControl hotkey binding has been restored. \n\n Please restart the window manager. "  0 0 &
+	;;
+
+esac

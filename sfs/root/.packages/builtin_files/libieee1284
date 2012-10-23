@@ -1,0 +1,10 @@
+/usr
+/usr/bin
+ libieee1284_test
+/usr/lib
+ libieee1284.so
+ libieee1284.so.3
+ libieee1284.so.3.2.2
+/usr/lib/python2.6
+/usr/lib/python2.6/site-packages
+ ieee1284module.so

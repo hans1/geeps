@@ -1,0 +1,315 @@
+#!/bin/bash
+
+if [ "$1" = "-width" ]; then
+	WIDTH_ARTWORK="<width>$2</width>"
+	WIDTH_BOX=' width-request="'$2'"'
+fi
+
+ID3_GENRES=""
+while read I; do
+	ID3_GENRES="$ID3_GENRES <menuitem><label>"$I"</label><action>echo '"$I"' > $WORKDIR/trackinfo${MYPID}_ID3_GENRE</action><action>refresh:ID3_GENRE</action></menuitem>"
+done < $APPDIR/txt_id3genre
+
+echo '
+<window default_width="600" default_height="400" title="Pmusic - '$LOC660'" icon-name="pmusic">
+ <vbox>
+  <text><label>'$LOC661'</label></text>
+  <tree exported_column="2">
+   <label>'$LOC_ARTIST'|'$LOC_TITLE'|'$LOC_ALBUM'</label>
+   <variable>trackinfo_ALT</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_alterantives</input>
+   <action type="exit">tag</action>
+  </tree>
+ <hbox>
+  <button>
+   <label>'$LOC662'</label>
+   <input file stock="gtk-save"></input>
+   <action>. '$APPDIR'/func_trackinfo '${MYPID}' -tag</action>
+   <action>EXIT:exit</action>
+  </button>
+  </hbox>
+ </vbox>
+</window>' > $WORKDIR/xml_Pmusic_trackinfo_alternativ_id3
+
+
+GUI_TRACKINFO_UPDATE='
+<checkbox visible="false">
+ <variable>UPDATE_TRACKINFO</variable>
+ <label>a</label>
+ <input>cat '$WORKDIR'/UPDATE_TRACKINFO</input>
+ <action>refresh:ID3_ARTIST</action>
+ <action>refresh:ID3_TITLE</action>
+ <action>refresh:ID3_ALBUM</action>
+ <action>refresh:ID3_YEAR</action>
+ <action>refresh:ID3_TRACK</action>
+ <action>refresh:ID3_GENRE</action>
+ <action>refresh:ICON_ID3_ARTIST</action>
+ <action>refresh:ICON_ID3_TITLE</action>
+ <action>refresh:ICON_ID3_ALBUM</action>
+ <action>refresh:ICON_ID3_YEAR</action>
+ <action>refresh:ICON_ID3_TRACK</action>
+ <action>refresh:EDIT_LYRICS</action>
+ <action>refresh:LYRICS_SOURCE</action>
+ <action>refresh:ALBUMART</action>
+ <action>refresh:ALBUMART_SOURCE</action>
+ <action>refresh:EDIT_ALBUM</action>
+ <action>refresh:TXT_ID3_INFO</action>
+ <action>refresh:ARTWORK</action>
+ <action>refresh:EDIT_DISCOGRAPHY</action>
+ <action>refresh:TREE_URLS</action>
+ <action>refresh:RATING</action>
+ <action>refresh:STREAMINFO</action>
+ <action>refresh:NOWPLAYING</action>
+ <action>if true echo false > '$WORKDIR'/UPDATE_TRACKINFO</action>
+ <action>if true refresh:UPDATE_TRACKINFO</action>
+</checkbox>'
+
+
+S='
+<frame '$LOC840'>
+ <hbox space-expand="false" space-fill="false">
+  <button tooltip-text="'$LOC190'" space-expand="false" space-fill="false">
+   <input file stock="gtk-help"></input>
+   <action>'$APPDIR'/func_trackinfo -help_id3 &</action>
+  </button>
+  <hbox space-expand="true" space-fill="true"><text><label>""</label></text></hbox>
+  <button tooltip-text="'$LOC252'">
+   '$SAVE_BUTTON_VISIBLE'
+   <input file stock="gtk-clear"></input>
+   <action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -clear_tags</action>'
+   [ "$MYPID" ] && S=$S'<action>exit:EXIT</action>'
+  S=$S'</button>
+  <button tooltip-text="'$LOC650'">
+   <input file stock="gtk-find"></input>
+   <label>"'$LOC651' "</label>
+   <action>'$APPDIR'/func_trackinfo "'${MYPID}'" -search_alternatives</action>
+   <action>gtkdialog -f '$WORKDIR'/xml_Pmusic_trackinfo_alternativ_id3 &</action>
+  </button>
+  <button can-default="true" has-default="true" tooltip-text="'$LOC649'">
+   <label>'$LOC_SAVE'</label>
+   '$SAVE_BUTTON_VISIBLE'
+   <input file stock="gtk-save"></input>
+   <action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -save_tags</action>'
+   [ "$MYPID" ] && S=$S'<action>exit:EXIT</action>'
+  S=$S'</button>
+ </hbox>
+
+ <hseparator></hseparator>
+ <text><label>""</label></text>
+ 
+ <hbox>
+  <text width-request="100"><label>'$LOC_ARTIST'</label></text>
+  <entry activates-default="true">
+   <variable>ID3_ARTIST</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_ARTIST</input>
+   <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+  </entry>
+  <pixmap>
+   <variable>ICON_ID3_ARTIST</variable>
+   <width>20</width>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_icon_id3_artist.png</input>
+  </pixmap>
+ </hbox>
+ <hbox>
+  <text width-request="100"><label>'$LOC_TITLE'</label></text>
+  <entry activates-default="true">
+   <variable>ID3_TITLE</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_TITLE</input>
+   <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+  </entry>
+  <pixmap>
+   <variable>ICON_ID3_TITLE</variable>
+   <width>20</width>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_icon_id3_title.png</input>
+  </pixmap>
+ </hbox>
+ <text><label>""</label></text>
+ <hbox>
+  <text width-request="100"><label>'$LOC_ALBUM'</label></text>
+  <entry activates-default="true">
+   <variable>ID3_ALBUM</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_ALBUM</input>
+   <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+  </entry>
+  <pixmap>
+   <variable>ICON_ID3_ALBUM</variable>
+   <width>20</width>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_icon_id3_album.png</input>
+  </pixmap>
+ </hbox>
+ <hbox>
+  <text width-request="100"><label>'$LOC_YEAR'</label></text>
+  <entry activates-default="true">
+   <variable>ID3_YEAR</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_YEAR</input>
+   <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+  </entry>
+  <pixmap>
+   <variable>ICON_ID3_YEAR</variable>
+   <width>20</width>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_icon_id3_year.png</input>
+  </pixmap>
+ </hbox>
+ <hbox>
+  <text width-request="100"><label>'$LOC_TRACK' '$LOC_NR'</label></text>
+  <entry activates-default="true">
+   <variable>ID3_TRACK</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_TRACK</input>
+   <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+  </entry>
+  <pixmap>
+   <variable>ICON_ID3_TRACK</variable>
+   <width>20</width>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_icon_id3_track.png</input>
+  </pixmap>
+ </hbox>
+ <hbox>
+  <vbox space-expand="false" space-fill="false">
+   <text><label>'$LOC_GENRE'</label></text>
+  </vbox>
+  <vbox space-expand="true" space-fill="true">
+   <text><label>""</label></text>
+  </vbox>
+  <vbox space-expand="false" space-fill="false">
+   <entry activates-default="true">
+    <variable>ID3_GENRE</variable>
+    <input>cat '$WORKDIR'/trackinfo'${MYPID}'_ID3_GENRE</input>
+    <action signal="focus-in-event">'$APPDIR'/func_kill -trackinfo &</action>
+   </entry>
+  </vbox>
+  <hbox width-request="20">
+  <menubar>
+   <menu>
+   '$ID3_GENRES'
+   <label>..</label>
+   </menu>
+  </menubar>
+  
+  </hbox>
+ </hbox>
+ <vbox space-expand="true" space-fill="true">
+  <text'$WIDTH_BOX'>
+   <variable>TXT_ID3_INFO</variable>
+   <input file>'$WORKDIR'/trackinfo'${MYPID}'_ID3_info</input>
+  </text>
+ </vbox>
+</frame>'
+GUI_TRACKINFO_ID3="$S"
+
+GUI_TRACKINFO_LYRICS='
+<frame>
+ <hbox>
+  <entry editable="false" progress-fraction="1">
+   <variable>LYRICS_SOURCE</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_lyrics_source</input>
+  </entry>
+  <button tooltip-text="'$LOC850'">
+   <input file stock="gtk-preferences"></input>
+   <action>'$APPDIR'/func_config -preferences -lyrics</action>
+  </button>
+ </hbox>
+ <edit name="lyrics" editable="false" left_margin="10" cursor-visible="false">
+  <variable>EDIT_LYRICS</variable>
+  <input file>'$WORKDIR'/trackinfo'${MYPID}'_lyrics</input>
+ </edit>
+</frame>'
+
+
+GUI_TRACKINFO_ALBUMART='
+<frame>
+ <hbox>
+  <entry editable="false" progress-fraction="1">
+   <variable>ALBUMART_SOURCE</variable>
+   <input>cat '$WORKDIR'/trackinfo'${MYPID}'_albumart_source</input>
+  </entry>
+  <button tooltip-text="'$LOC_SAVE'">
+   <variable>ALBUMART_SAVE</variable>
+   <input file stock="gtk-save"></input>
+   <action>'$APPDIR'/func_trackinfo -save_albumart</action>
+  </button>
+  <button tooltip-text="'$LOC850'">
+   <input file stock="gtk-preferences"></input>
+   <action>'$APPDIR'/func_config -preferences -lyrics</action>
+  </button>
+ </hbox>
+ <pixmap space-expand="true" space-fill="true">
+  <variable>ALBUMART</variable>
+  <input file>'$WORKDIR'/trackinfo'${MYPID}'_albumart.jpg</input>
+  '$WIDTH_ARTWORK'
+ </pixmap>
+</frame>'
+
+
+GUI_TRACKINFO_ALBUM='
+<frame>
+ <edit editable="false" left_margin="10" cursor-visible="false">
+  <variable>EDIT_ALBUM</variable>
+  <input file>'$WORKDIR'/trackinfo'${MYPID}'_album</input>
+ </edit>
+</frame>'
+
+
+GUI_TRACKINFO_ARTIST='
+<frame>
+ <text use-markup="true"><label>"<b>'$LOC654'</b>"</label></text>
+ <edit editable="false" left_margin="10" cursor-visible="false">
+  <variable>EDIT_DISCOGRAPHY</variable>
+  <input file>'$WORKDIR'/trackinfo'${MYPID}'_discography</input>
+ </edit>
+ <text use-markup="true"><label>"'$LOC655'"</label></text>
+ <tree exported_column="1">
+  <label>'$LOC656'|URL</label>
+  <variable>TREE_URLS</variable>
+  <input>cat '$WORKDIR'/trackinfo'${MYPID}'_urls</input>
+  <action>defaultbrowser $TREE_URLS &</action>
+ </tree>
+</frame>'
+
+
+GUI_TRACKINFO_STREAM='
+<frame>
+ <edit editable="false" left_margin="10" cursor-visible="false">
+  <variable>STREAMINFO</variable>
+  <input file>'$WORKDIR'/trackinfo'${MYPID}'_stream</input>
+ </edit>
+</frame>'
+
+
+GUI_TRACKINFO_MISC='
+<vbox>
+ <frame '$LOC226'>
+  <hbox homogeneous="true">
+   <vbox>
+    <text><label>""</label></text>
+    <button><label>+1</label><action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -rate +1</action><action>refresh:RATING</action></button>
+    <button><label>+10</label><action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -rate +10</action><action>refresh:RATING</action></button>
+    <entry editable="false" space-expand="false" space-fill="false" width-request="30">
+     <variable>RATING</variable>
+     <input>cat '$WORKDIR'/trackinfo'${MYPID}'_rating</input>
+    </entry>
+    <button><label>-1</label><action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -rate -1</action><action>refresh:RATING</action></button>
+    <button><label>-10</label><action>. '$APPDIR'/func_trackinfo "'${MYPID}'" -rate -10</action><action>refresh:RATING</action></button>
+   </vbox>
+  </hbox>
+ </frame>
+ <frame>
+  <button>
+   <label>'$LOC657'</label>
+   <action>'$APPDIR'/func -search_for_song_in_playlists</action>
+  </button>
+ </frame>
+</vbox>'
+
+ echo '
+<notebook page="'$TABNR'" labels="'$LOC_TRACK'|'$LOC_LYRICS'|'$LOC_ALBUM'|'$LOC670'|'$LOC_ARTIST'|'$LOC671'|'$LOC_MISC'" space-expand="true" space-fill="true">
+ '$GUI_TRACKINFO_ID3'
+ '$GUI_TRACKINFO_LYRICS'
+ '$GUI_TRACKINFO_ALBUM'
+ '$GUI_TRACKINFO_ALBUMART'
+ '$GUI_TRACKINFO_ARTIST'
+ '$GUI_TRACKINFO_STREAM'
+ '$GUI_TRACKINFO_MISC'
+</notebook>
+<vbox height-request="1" space-expand="false" space-fill="false">
+ '$GUI_TRACKINFO_UPDATE'
+</vbox>' > $WORKDIR/xml_Pmusic_trackinfo

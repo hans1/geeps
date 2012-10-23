@@ -1,0 +1,18 @@
+/root
+/root/Choices
+/root/Choices/MIME-types
+ application_x-ext4-image
+/root/Choices/ROX-Filer
+ globicons
+ PuppyPin
+ README.txt
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+ bcrypt
+ inkscapelite
+ libreoffice
+ mtpaint
+ pupzip
+/root/.config/rox.sourceforge.net/SendTo
+/root/.config/tmp

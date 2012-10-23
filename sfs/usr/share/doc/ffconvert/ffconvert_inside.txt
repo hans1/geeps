@@ -1,0 +1,44 @@
+FFConvert is a frontend of FFmpeg, the multimedia converter.
+
+ABOUT PRESET
+
+  FFConvert seach the preset files from
+  1) $HOME/.config/ffconvert/preset directory
+  2) /usr/share/ffconvert/preset.d directory
+  3) /usr/share/ffconvert/preset file
+  
+  In the 1) and 2) directory, each preset is saved as a file with the name of the preset
+  and contains ffmpeg options in 1 line.
+  For example, /usr/share/ffconvert/preset.d/MS_Compatible_AVI_mspmeg4v2(the preset name is 'MS Compatible AVI mspmeg4v2'):
+  -f avi -vcodec msmpeg4v2  -b 1000k     -acodec libmp3lame -ab 192k -ar 44100 
+  
+  In the 3) file has multiple presets line by line. Each line has the name of the preset,
+  then comma(','), and follows the ffmpeg options. They are thanks to Technosaurus.
+  For example, a line for 'NTSC DVD Fullscreen':
+  NTSC DVD Fullscreen, -f dvd -vcodec mpeg2video -r 29.97 -s 352x480 -aspect 4:3 -b 4000kb -mbd rd -trellis -mv0 -cmp 2 -subcmp 2 -acodec mp2 -ab 192kb -ar 48000 -ac 2
+
+  The files 1) can be manipurated by the GUI of FFConvert. All 1)-3) files are plain texts,
+  so you can edit them manually using text editors. 
+  
+ABOUT NLS
+
+  FFConvert is i18n'ed thanks to the gettext system. The catalogue is used by ffconvert and ffplay.sh.
+  The .pot file is at /usr/share/doc/nls/ffconvert, or you can make new one with next command(DEVX sfs required): 
+  xgettext --lang=shell -o ffconvert.pot /usr/bin/ffconvert
+  
+  Use proper editors like Poedit to make the translations. Place the .mo file with name 'ffconvert.mo'
+  at /usr/share/locale/*/LC_MESSAGES, where '*' is the language code.
+
+  FFConvert help file is at /usr/share/doc/ffconvert/ffconvert.html and ffconvert_inside.txt(this file).
+  You can put the translated help file at /usr/share/doc/help/*/ffconvert/ffconvert.html and ffconvert_inside.txt with images, where '*' is the language code.
+
+FEED BACK
+
+  Visit the fourum topic:
+  http://www.murga-linux.com/puppy/viewtopic.php?t=54056
+  
+Enjoy!
+9 Apr 2010 shinobar <shino@pos.to>
+  
+
+  

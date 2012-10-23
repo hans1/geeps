@@ -1,0 +1,93 @@
+/lib
+ libncurses.so.5
+ libncurses.so.5.9
+ libncursesw.so.5
+ libncursesw.so.5.9
+/usr
+/usr/bin
+ captoinfo
+ clear
+ infocmp
+ infotocap
+ reset
+ tabs
+ tic
+ toe
+ tput
+ tset
+/usr/include
+/usr/include/ncurses
+/usr/include/ncursesw
+/usr/lib
+ libcurses.so
+ libcursesw.so
+ libform.so
+ libform.so.5
+ libform.so.5.9
+ libformw.so
+ libformw.so.5
+ libformw.so.5.9
+ libmenu.so
+ libmenu.so.5
+ libmenu.so.5.9
+ libmenuw.so
+ libmenuw.so.5
+ libmenuw.so.5.9
+ libncurses.so
+ libncursesw.so
+ libpanel.so
+ libpanel.so.5
+ libpanel.so.5.9
+ libpanelw.so
+ libpanelw.so.5
+ libpanelw.so.5.9
+/usr/lib/terminfo
+/usr/man
+/usr/man/man1
+/usr/man/man3
+/usr/share
+ README-terminfo.txt
+/usr/share/tabset
+ std
+ stdcrt
+ vt100
+ vt300
+/usr/share/terminfo
+/usr/share/terminfo/l
+ linux
+ linux-c
+ linux-c-nc
+ linux-koi8
+ linux-koi8r
+ linux-lat
+ linux-m
+ linux-nic
+/usr/share/terminfo/r
+ rxvt
+ rxvt-basic
+ rxvt-unicode
+/usr/share/terminfo/v
+ vt100
+ vt102
+ vt125
+ vt131
+ vt132
+ vt200
+ vt220
+ vt52
+/usr/share/terminfo/x
+ xterm
+ xterm-color
+ xterm-mono
+ xterm-new
+ xterm-nic
+ xterm-nrc
+ xterm-r5
+ xterm-redhat
+ xterm-rep
+ xterms
+ xterms-sun
+ xterm-sun
+ xterm-vi
+ xterm-vt220
+ xterm-xfree86

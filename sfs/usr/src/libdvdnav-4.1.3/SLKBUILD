@@ -1,0 +1,29 @@
+#Maintainer: Thorsten Muehlfelder <thenktor@gmx.de>
+#Maintainer: George Vlahavas (vlahavas~at~gmail~dot~com)
+
+pkgname=libdvdnav
+pkgver=4.1.3
+pkgrel=1tm
+arch=i686
+source=(http://www2.mplayerhq.hu/MPlayer/releases/dvdnav/libdvdnav-4.1.3.tar.bz2)
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo" "maintainers")
+url=http://www2.mplayerhq.hu/MPlayer/releases/dvdnav/
+sourcetemplate=http://thenktor.dyndns.org/packages/$pkgname/
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"libdvdnav - DVD navigation library"
+"libdvdnav is a library that allows easy use of sophisticated DVD"
+"navigation features such as DVD menus, multiangle playback and even"
+"interactive DVD games."
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	sed -i "s/-O3/-O2 -march=i686 -mtune=i686/" configure2
+	./configure2 --prefix=/usr --disable-static
+	make || return 1
+	make install DESTDIR=$startdir/pkg
+} 

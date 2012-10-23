@@ -1,0 +1,10 @@
+/usr
+/usr/lib
+ libschroedinger-1.0.so
+ libschroedinger-1.0.so.0
+ libschroedinger-1.0.so.0.10.0
+/usr/share
+/usr/share/doc
+/usr/src
+/usr/src/schroedinger-1.0.10
+ SLKBUILD

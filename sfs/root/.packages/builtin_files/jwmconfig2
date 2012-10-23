@@ -1,0 +1,68 @@
+/etc
+/etc/xdg
+/etc/xdg/templates
+ _root_.jwmrc
+/root
+/root/.jwm
+ jwmrc-personal
+ jwmrc-personal2
+ .jwmrc-tray
+/root/.jwm/themes
+ Black-vg-colors
+ Black-vg-jwmrc
+ Black-vg-tray.png
+ Black-vg-window.png
+ bluegum-colors
+ bluegum-jwmrc
+ bluegum-tray.png
+ bluegum-window.png
+ DarkGradient-colors
+ DarkGradient-jwmrc
+ DarkGradient-tray.png
+ DarkGradient-window.png
+ Gradient-blueish-colors
+ Gradient-blueish-jwmrc
+ Gradient-blueish-tray.png
+ Gradient-blueish-window.png
+ Gradient-grey-colors
+ Gradient-grey-jwmrc
+ Gradient-grey-tray.png
+ Gradient-grey-window.png
+ puppeee-blue-colors
+ puppeee-blue-jwmrc
+ puppeee-blue-tray.png
+ puppeee-blue-window.png
+/usr
+/usr/local
+/usr/local/jwmconfig2
+ addShortcut
+ changeKey
+ confirmKey
+ file-selector
+ focusModel
+ gtk2jwm
+ jwmConfigMgr
+ keyboard
+ keyConfigHelp
+ listShortcuts
+ panel-buttons
+ taskbar
+ taskbarConfig
+ taskbarHeight
+ taskbariconify
+ taskbarPlace
+ theme_switcher
+ trayInsert
+ virtualDesk
+ virtualDesknew
+ virtualDeskwrapper
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ logo-mini.png
+ mini-desktop.xpm
+/usr/sbin
+ jwmconfig
+/usr/share
+/usr/share/applications
+ JWM-configuration.desktop

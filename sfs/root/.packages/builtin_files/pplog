@@ -1,0 +1,23 @@
+/root
+/root/Web-Server
+/root/Web-Server/blog
+ bg.gif
+/root/Web-Server/blog/comments
+/root/Web-Server/blog/posts
+ 00000.ppl
+ hits.ppl.hits
+ online.ppl.uo
+/root/Web-Server/blog/smilies
+ cool.gif
+ cry.png
+ doh.gif
+ happy.gif
+ n_n.png
+ Thumbs.db
+ worried.gif
+/usr
+/usr/sbin
+ pplog_gui
+/usr/share
+/usr/share/applications
+ pplog-blog.desktop

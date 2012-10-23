@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ defaults-chooser
+/usr/local
+/usr/local/bin
+ defaults-changer
+/usr/share
+/usr/share/applications
+ defaults-chooser.desktop

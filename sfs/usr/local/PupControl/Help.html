@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="Content-Type">
+    <title>PupControl Help</title>
+    <style type="text/css">
+    h1 {font-weight: bold; color: rgb(50, 114, 192);}
+    h3 {font-weight: bold; color: rgb(50, 114, 192);}
+    body {font-family: sans-serif;}
+    .property {font-weight: bold; color: rgb(50, 114, 192);}
+    </style>
+</head>
+<body>
+<h1>PupControl-1.8.8</h1>
+
+<h2>Recommended OS</h2>
+<p>Puppy Linux 4.3.1 and above</p>
+
+<h2>Purpose and Base Features</h2>
+<p>PupControl Panel is a graphical control panel which permits menu-like access to more than sixty Puppy control functions, and is similar to the companion program, PupApps Launcher, which permits quick access to most Puppy programs (applications).
+The control panel is a standalone program but will integrate seamlessly with <a href="http://www.murga-linux.com/puppy/viewtopic.php?p=467159">PupApps</a>, <a href="http://www.murga-linux.com/puppy/viewtopic.php?t=56077">PupShutdown</a>, <a href="http://www.murga-linux.com/puppy/viewtopic.php?t=61633">PupClockset</a> and <a href="http://www.murga-linux.com/puppy/viewtopic.php?t=61361">PupSnap</a>.</span>
+The tab interface of PupControl sorts all programs and utilities into nine broad categories, and common functions that one may use routinely are available in the lower panel tray. The optimal display for the panel GUI is automatically configured based on the active window manager and current global screen dpi.
+</p>
+
+<h2>Caveats</h2>
+<ol>
+    <li>A blue information button is available in the top-right corner of each page of the main user interface, providing quick access to Help resources.</li>
+    <li>When first installed, the PupControl GUI displays applications that are standard in most Puppy versions. Alternate programs may be selected in the "Set" tab->PupControl Preferences.
+    If a desired application is not listed, you can enter the name of the executable, including the path and switches if needed, then select Save to set your new option.
+    The MyControl module provides an option to add user-selectable favorite applications to the PupControl GUI.</li>
+    <li>The category icons in the main GUI, and program options in the Preferences drop-down lists, change dynamically as applications are installed and uninstalled.
+    After uninstalling an application, the name of that program remains in the Preferences drop-down list until you select and save a different application in that category.
+    If only one application remains in a drop-down list and you wish to remove it, simply highlight that name with the mouse cursor and click the delete key on your keyboard, then select Save in Preferences.</li>
+    <li>Quick program access is by Puppy Menu-&gt;Utility-&gt;PupControl, or by the default Ctrl+Shift+C keyboard shortcut, which is configured for IceWm, JWM, Openbox, Fluxbox, LXDE and LXPanel.
+    If the Xfce window manager is currently active, the hotkey can be set manually in the PupControl "Set" tab as follows: Window Manager Settings-&gt;Xfce Settings-&gt;Keyboard-&gt;Application Shortcuts.</li>
+    <li>PupControl auto-configures many panel options based on the name of the current window manager logged in /etc/windowmanager. Puppy will update this file automatically when starting a new window manager from the command prompt,
+    but some programs that change the window manager in real time may fail to update properly. Consequently, when you change to a different window manager, if PupControl does not display properly, or command functions are inoperative,
+    please exit to the command prompt and type in the appropriate start command such as xwin icewm, or xwin jwm, or xwin lxsession, or xwin startxfce4.</li>
+    <li>The panel is compliant with the Stardust desktop environment (DuDe), but Stardust uses a proprietary jwmrc-personal file which may overwrite the PupControl hotkey entry. This is easily restored in the PupControl Preferences manager.</li>
+    <li>PupControl-1.8.8 supports screen fonts as large as 108 dpi in standard Puppy derivatives, and up to 144 dpi in Lighthouse Pup, in 6-dpi increments only.
+    Font metrics of the Fluppy and Puppeee derivatives are no longer supported.</li>
+</ol>
+
+<h2>Programs</h2>
+<p>Desktop options and configuration settings may vary depending on the current window manager. PupControl is configured to call the programs appropriate for the active window manager.
+In addition to more than sixty standard Puppy functions, the control panel features an expanded version of the IPinfo utility, which provides useful information about your internet connection, and the new Pup-SysInfo provides quick access to system information.
+If installed, the PupClockset module facilitates changing the time format of the tray clock, based on locale-specific strftime specifications. In JWM, PupClockset works well with standard tray files,
+but not with the proprietary tray files of Stardust, in which case the call defaults to Ptray.</br>
+</br>
+In the Utility section of PupControl, the SS-Control program facilitates screensaver management, which is useful for those who enjoy a favorite video without screensaver interruption.
+When activated, this program calls the xset preference utility which enables or disables the XScreensaver, and controls the Power Save Mode of DPMS compliant monitors and video cards.
+Furthermore, SS-Control installs or deletes Startup-folder executables (ss-on and ss-off), which automatically enable or disable the screensaver and DPMS with each reboot of the PC.
+Since other programs may control the screensaver by a similar action in the Startup folder, you should use only one such program to avoid conflicting calls to the xset utility.</p>
+</ol>
+
+<h2>Availability</h2>
+<p>The current version of PupControl is available&nbsp;<a href="http://www.murga-linux.com/puppy/viewtopic.php?t=61961">here</a>.</p>
+
+<h2>License</h2>
+<p>GNU GPLv3, Copyright 2012, Roger D. Grider</p>
+
+</body>
+</html>

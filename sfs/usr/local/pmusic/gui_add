@@ -1,0 +1,179 @@
+#!/bin/bash
+
+[ ! -s $WORKDIR/filebrowser_dir ] && echo $HOME > $WORKDIR/filebrowser_dir
+export BROWSER_DIR=($(<"$WORKDIR/filebrowser_dir"))
+echo 0 > $WORKDIR/tab_search #default tab in <notebook>
+
+searchfield(){
+	case $1 in
+		show_opt) #show search options
+			ICON='secondary-icon-stock="gtk-find" secondary-icon-tooltip-text="'$LOC407'"'
+			ACTION='<action signal="secondary-icon-release">'$APPDIR'/func -window_search_options &</action>'
+			;;
+	esac
+	echo '
+	<entry height-request="30" activates-default="true" is-focus="true" '$ICON' tooltip-text="'"$LOC406"'" space-expand="true" space-fill="true">
+	 <variable>SEARCH</variable>
+	 <input file>'$WORKDIR'/filebrowser_dir</input>
+	 <action signal="activate">'$APPDIR'/func -search_refresh</action>
+	 <action signal="activate">clear:SOURCE</action>
+	 <action signal="activate">refresh:SOURCE</action>
+	 '$ACTION''
+	 [ $SEARCH_WHILE_TYPING = true ] && echo '<action signal="key-press-event">'$APPDIR'/func -search &</action>'
+	 echo "$ACTION
+	</entry>
+	"
+}
+
+gui_search_options (){
+	#run this inside a unique function to allow updates from the quick-menu (search field)
+	S='
+	<checkbox label="'$LOC228'" height-request="15">
+	 <variable>SEARCH_MYMUSIC</variable>
+	 <default>'$SEARCH_MYMUSIC'</default>'
+	 [ ! -f $HOME/.pmusic/index_alphabetic ] && S=$S'<sensitive>false</sensitive>'
+	 GUI_SEARCH_MYMUSIC=$S'
+	 <action>if true echo true > '$WORKDIR'/SEARCH_MYMUSIC</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_MYMUSIC</action>
+	 <action>if true enable:SEARCH_COLLECTONS</action>
+	 <action>if false disable:SEARCH_COLLECTONS</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	'
+
+	S='
+	<checkbox label="'$LOC224'" height-request="15">
+	 <variable>SEARCH_COLLECTONS</variable>
+	 <default>'$SEARCH_COLLECTIONS'</default>'
+	 if [ ! -f $HOME/.pmusic/index_playlists ] || [ "`grep -F false $WORKDIR/SEARCH_MYMUSIC 2> /dev/null`" ]; then S=$S'<sensitive>false</sensitive>'; fi
+	 GUI_SEARCH_COLLECTIONS=$S'
+	 <action>if true echo true > '$WORKDIR'/SEARCH_COLLECTIONS</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_COLLECTIONS</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	'
+
+	S='
+	<checkbox label="'$LOC229'" height-request="15">
+	 <variable>SEARCH_RADIOHITS</variable>
+	 <default>'$SEARCH_RADIOHITS'</default>'
+	 [ ! "`which streamripper`" ] && S=$S'<sensitive>false</sensitive>'
+	 GUI_SEARCH_RADIOHITS=$S'
+	 <action>if true echo true > '$WORKDIR'/SEARCH_RADIOHITS</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_RADIOHITS</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	'
+
+	S='
+	<checkbox label="'$LOC222'" height-request="15">
+	 <variable>SEARCH_RADIO</variable>
+	 <default>'$SEARCH_RADIO'</default>'
+	 [ ! -f $HOME/.pmusic/index_radio ] && S=$S'<sensitive>false</sensitive>'
+	 GUI_SEARCH_RADIO=$S'<action>if true echo true > '$WORKDIR'/SEARCH_RADIO</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_RADIO</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	'
+
+	GUI_SEARCH_WEBMUSIC='
+	<checkbox label="'$LOC221'" height-request="15">
+	 <variable>SEARCH_WEBMUSIC</variable>
+	 <default>'$SEARCH_WEBMUSIC'</default>
+	 <action>if true echo true > '$WORKDIR'/SEARCH_WEBMUSIC</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_WEBMUSIC</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	'
+
+	S='<hbox spacing="0">
+	<checkbox label="" height-request="15">
+	 <variable>SEARCH_FILES</variable>'
+	 [ ! `which pfilesearch` ] && S=$S'<sensitive>false</sensitive>'
+	 if [ ! -f $HOME/.pmusic/index_alphabetic ] && [ ! -f $HOME/.pmusic/index_webmusic ] && [ ! -f $HOME/.pmusic/index_radio ]; then
+		echo true > $WORKDIR/SEARCH_FILES
+		S=$S'<default>true</default>' #if nothing else to search in, activate filesearch
+	 else
+		S=$S'<default>'$SEARCH_FILES'</default>' #by default, this is set false
+	 fi
+	 S=$S'
+	 <action>if true echo true > '$WORKDIR'/SEARCH_FILES</action>
+	 <action>if false echo false > '$WORKDIR'/SEARCH_FILES</action>
+	 <action>'$APPDIR'/func -search_refresh</action>
+	</checkbox>
+	<entry height-request="15" width-request="100">
+	 <variable>SEARCHPATH</variable>
+	 <default>"'$SEARCHPATH'"</default>'
+	 [ ! `which pfilesearch` ] && S=$S'<sensitive>false</sensitive>'
+	S=$S'</entry>
+	</hbox>'
+	GUI_SEARCH_FILES="$S"
+
+	GUI_SEARCH_PREF='
+	<hbox>
+	 <button relief="2">
+	  <input file stock="gtk-preferences"></input>
+	  <action>'$APPDIR'/func_config -preferences -search &</action>
+	  <action>EXIT:exit</action>
+	 </button>
+	</hbox>'
+}
+
+gui_search_options
+
+[ "$2" = "-quick" ] && exit #call from '$AAPDIR/func -window_search_options', and we now got what we need
+
+S='
+<hbox spacing="5" tooltip-text="'$LOC407'">
+ <vbox spacing="0">
+  '$GUI_SEARCH_MYMUSIC'
+  '$GUI_SEARCH_COLLECTIONS'
+ </vbox>
+ <vbox spacing="0">
+  '$GUI_SEARCH_RADIOHITS'
+  '$GUI_SEARCH_RADIO'
+ </vbox>
+ <vbox spacing="0">
+  '$GUI_SEARCH_WEBMUSIC'
+  '$GUI_SEARCH_FILES'
+ </vbox>
+ <text width-request="15"><label>""</label></text>
+ <button height-request="12" tooltip-text="'$LOC103'" relief="2">
+  <input file stock="gtk-preferences"></input>
+  <action>'$APPDIR'/func_config -preferences -search &</action>
+ </button>
+</hbox>'
+GUI_SEARCH_OPTIONS="$S"
+
+GUI_BUTTON_OVERVIEW='
+<button tooltip-text="'$LOC170'">
+ <input file stock="gtk-about"></input>
+ <action>. '$APPDIR'/func -show_add_window -source</action>
+ <action>clear:SOURCE</action>
+ <action>refresh:SOURCE</action>
+</button>'
+
+GUI_ADD_SEARCH='
+<hbox>
+ <hbox space-expand="false" space-fill="false">
+  <text width-request="2"><label>""</label></text>
+  '$GUI_BUTTON_OVERVIEW'
+ </hbox>
+ <hbox space-expand="true" space-fill="true">
+  '"$(searchfield show_opt)"'
+ </hbox>
+</hbox>'
+GUI_ADD_SEARCH2="$(searchfield)"
+
+GUI_ADD_FIELD='
+<table>
+ <variable>SOURCE</variable>
+ <height>100</height><width>300</width>'"
+ <label>\"|$LOC_TITLE                                                                 |$LOC_ARTIST                        |Kb/s |$LOC_ALBUM                     |$LOC_NR  |$LOC_YEAR     |$LOC_GENRE               \"</label>
+ <input>cat $WORKDIR/sourcelist</input>
+ <action>$APPDIR/func -browse</action>
+ <action>$APPDIR/func_add -add</action>
+ <action>refresh:PLAYLIST</action>
+ <action>refresh:UPDATE_SOURCELIST2</action> ##<checkbox> that is true only if sourcelist should update
+</table>"
+

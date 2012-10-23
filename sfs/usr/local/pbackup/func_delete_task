@@ -1,0 +1,39 @@
+#!/bin/bash
+
+echo > $WORKDIR/pbackup-tmp
+for I in `find $HOME/.pbackup/profiles/ -type f -printf "%f "`; do
+	if [ "$I" = "$PROFILE" ]; then
+		echo "<item stock=\"gtk-media-record\">""$I     ---     $LOC408""</item>" >> $WORKDIR/pbackup-tmp
+	else
+		echo "<item stock=\"gtk-null\">""$I""</item>" >> $WORKDIR/pbackup-tmp
+	fi
+done
+sort --output=$WORKDIR/pbackup-tmp $WORKDIR/pbackup-tmp
+#move active task at bottom of list
+TMP=`grep media-record $WORKDIR/pbackup-tmp`
+grep -v media-record $WORKDIR/pbackup-tmp > $WORKDIR/pbackup-tmp2
+mv -f $WORKDIR/pbackup-tmp2 $WORKDIR/pbackup-tmp
+echo "$TMP" >> $WORKDIR/pbackup-tmp
+#--
+ITEMS=`cat $WORKDIR/pbackup-tmp`; FRAME="$LOC153"; IMG="delete"
+. "$PROG_PATH"box_list
+if [ $EXIT = 99 ]; then 
+	if [ "$TREE" = "$PROFILE" ]; then #try to delete active task
+		FRAME="Error"; TXT2="$LOC408"; IMG="dialog-error"
+		. "$PROG_PATH"box_ok
+	else
+		rm "$HOME/.pbackup/profiles/$TREE"
+		#remove from crontab
+		sed -i -e "s/*/{ð®STARđþ}/g" /var/spool/cron/crontabs"$HOME" #*			
+		TMP=`grep "\"$TREE\"" /var/spool/cron/crontabs"$HOME"`
+		sed -i -e "s%$TMP%%g" /var/spool/cron/crontabs"$HOME" > /dev/null 2>&1
+		sed -i -e "s/{ð®STARđþ}/*/g" /var/spool/cron/crontabs"$HOME"
+		#remove empty lines in file
+		grep -v "^$" /var/spool/cron/crontabs"$HOME" > $WORKDIR/pbackup-tmp
+		mv -f $WORKDIR/pbackup-tmp /var/spool/cron/crontabs"$HOME"
+		#---
+		killall -q crond; crond #restart cron
+		WRITE_RC="true"; SAVE_TASK="false"
+		. "$PROG_PATH"func_write_config #upgrade active task in case it's deleted
+	fi
+fi

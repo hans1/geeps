@@ -1,0 +1,152 @@
+#!/bin/bash
+#Pfind
+#version=4.24
+#language=english
+#translator:Native
+
+# |==================================|
+# | <b>text</b>            Bold text |
+# |==================================|
+
+LOC_SEARCH="Search"
+export LOC_OK="Ok"
+export LOC_CANCEL="Cancel"
+export LOC_INFO="Info"
+export LOC_ERROR="Error"
+export LOC_YES="Yes"
+export LOC_NO="No"
+export LOC_QUIT="Quit"
+LOC_SIMPLE="Simple"
+LOC_ADVANCED="Advanced"
+LOC_IN="in"
+LOC_FOR="for" #(search for)
+LOC_FROM="from"
+LOC_TO="to"
+LOC_BROWSE="Browse"
+LOC_VIEW="View"
+LOC_PLAY="Play"
+LOC_ACTION="Action"
+LOC_OPTIONS="Options"
+export LOC_INCLUDE="Include"
+export LOC_PATH="Path"
+export LOC_EXTENSION="Extension"
+LOC_MAX="Max"
+
+LOC_FILE="File"
+LOC_SYMLINK="Symlink"
+LOC_DIRECTORY="Directory"
+LOC_DOCUMENTS="Documents"
+LOC_PICTURES="Pictures"
+LOC_SOUNDFILES="Sound files"
+LOC_VIDEOS="Videos"
+LOC_MAILS="Mails"
+LOC_COMPRESSED="Compressed"
+LOC_CODEFILES="Code files"
+
+#Menus
+LOC100="File"
+LOC101="Search"
+LOC102="Configure"
+LOC109="Selection"
+LOC110="Open"
+export LOC111="Open with"
+LOC112="Open as text"
+LOC113="Show location"
+LOC114="Run program"
+export LOC115="Rename"
+export LOC116="Copy"
+export LOC117="Move"
+export LOC118="Link"
+export LOC119="Delete"
+export LOC120="Send to trash"
+LOC130="List"
+LOC131="Exclude files from list"
+LOC132="Find files in list"
+LOC133="Search for TEXT in files"
+LOC150="Sort"
+LOC151="Sort by filename"
+LOC152="Sort by extension"
+LOC153="Sort by size"
+LOC154="Sort by time"
+LOC140="Help"
+LOC141="About"
+
+#Header
+LOC200="Filename"
+LOC201="Path"
+LOC202="Size"
+LOC203="Last modified"
+LOC204="Permissions"
+LOC205="User"
+
+#configure
+LOC304="Pfind uses 'Pfilesearch' as its file-search-engine. All search settings are global, and will affect other programs that uses Pfilesearch."
+LOC305="Search options / MIME settings"
+LOC306="General" 
+LOC307="Settings"
+LOC308="Commands"
+LOC311="Language"
+LOC312="Choose language and restart Pfind"
+export LOC314="Short"
+export LOC315="Long"
+export LOC316="Hybrid"
+LOC317="Allow filenames with < or >. Trouble if not compatible with UTF-8"
+LOC318="Maximum number of hits in list (overview). Many hits takes time to render."
+LOC319="External programs"
+LOC320="Default File manager"
+LOC321="Default Text editor"
+
+#Profiles
+export LOC401="Show Overview"
+export LOC402="View in FileManager"
+export LOC403="Open files in TextEditor"
+export LOC404="Export list to TextEditor"
+export LOC405="Open with ImageBrowser"
+export LOC406="View images in Slideshow"
+export LOC407="Open with MusicPlayer"
+export LOC408="Open with VideoPlayer"
+export LOC409="Open with Burner"
+export LOC410="Copy files"
+export LOC411="Execute command"
+
+#Misc
+LOC500="Searching"
+export LOC501="Search text"
+LOC596="slow"
+LOC597="Where to search"
+LOC598="System files"
+LOC599="Personal files"
+LOC600="Current directory"
+LOC601="All files"
+LOC602="building hitlist"
+LOC603="Define (part of) filename"
+LOC604="Total"
+LOC605="SearchResult"
+export LOC606="Find files"
+export LOC607="<b>Find files</b> in list with defined searchtext. (Case sensitive)"
+export LOC608="<b>Remove</b> files from list with defined searchtext. (Case sensitive)"
+export LOC609="Search for <b>text</b> in files."
+export LOC610="Show list of filenames in default text editor."
+export LOC611="Copy to"
+export LOC612="Use original filenames"
+export LOC613="Pfind names files with both original filename and its path. Like this: info.txt   (-usr-local-pfind-). Using only original filename, will let files get the same name (info.txt). Copying will fail if another file with the same name exist."
+export LOC614="Execute command on files in list"
+export LOC615="Move every file in list to"
+export LOC616="Building symlinks...please wait"
+LOC617="Search result contains file(s) with < or > in name. As long as all filenames uses charset UTF-8 there is no risk, and you can configure Pfind to allow these chars. If filenames uses other charset than UTF-8 Pfind will fail. Pfind will now translate < and > to ?"
+LOC618="items in list.|See menuitem 'configure'.
+Complete hit-list is found in:"
+LOC619="Restart Pfind to activate new language."
+LOC620="Filenames in searchresult can be shown in 3 different ways:
+<b>Short</b> - Just filename (file.txt). Similar files (/tmp/file.txt and /root/file.txt) will be (file.txt) and (file~.txt).
+<b>Long</b> - Filename with path (-tmp-file.txt). Never similar files.
+<b>Hybrid</b> - As 'short', but 'long' when similar files."
+
+#Errors
+export LOC702="is not installed. Check config."
+export LOC710="No file is selected."
+export LOC711="Does not exist"
+
+#Tooltips
+export LOC800="Show only files in this category"
+export LOC801='You can search with the expressions: [AND] [OR] *'

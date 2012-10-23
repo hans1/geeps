@@ -1,0 +1,77 @@
+#!/bin/bash
+
+##---taskbar config for jwmConfigMgr--->>
+
+##-------variables------->>
+. /tmp/JWMCONFIGVARS
+
+##----------gui---------->>
+export TASKBAR_CFG="
+<window title=\"JWM Configuration Manager\" icon-name=\"gtk-preferences\">
+<vbox>
+ <frame Tray Configuration Options>
+  <hbox>
+    <text><label>Virtual Desktops</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/virtualDeskwrapper &</action>
+    </button>
+  </hbox>
+  <hbox>
+    <text><label>Tray Autohide Option</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/taskbarConfig &</action>
+    </button>
+  </hbox>
+  <hbox>
+    <text><label>Tray Height Option</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/taskbarHeight &</action>
+    </button>
+  </hbox>
+  <hbox>
+    <text><label>Tray Placement Option</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/taskbarPlace &</action>
+    </button>
+  </hbox>
+  <hbox>
+    <text><label>Program Insertion into Tray</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/trayInsert &</action>
+    </button>
+  </hbox>
+  <hbox>
+    <text><label>Iconify or Verbose in Pager</label></text>
+    <button>
+     <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+     <action>$SCRIPT_DIR/taskbariconify &</action>
+    </button>
+  </hbox>
+ </frame>
+ <frame Important>
+  <hbox>
+    <pixmap><input file>$MINI_ICONS_DIR/info16.xpm</input></pixmap>
+    <text><label>JWM must be restarted for changes to take effect</label></text>
+  </hbox>
+ </frame>
+ <hbox>
+   <button ok><action type=\"exit\">OK</action></button>
+ </hbox>
+</vbox>
+</window>
+"
+
+##---------run------------>>
+gtkdialog3 --program TASKBAR_CFG
+
+
+##------cleanup----------->>
+unset TASKBAR_CFG	
+clear	
+
+

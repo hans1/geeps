@@ -1,0 +1,6 @@
+/usr
+/usr/lib
+ libdvdplay.so
+ libdvdplay.so.0
+ libdvdplay.so.0.0.1
+/var

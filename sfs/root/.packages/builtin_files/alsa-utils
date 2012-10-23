@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ aconnect
+ alsamixer
+ amidi
+ amixer
+ aplay
+ aplaymidi
+ arecord
+ arecordmidi
+ aseqdump
+ aseqnet
+ iecset
+ speaker-test
+/usr/sbin
+ alsactl

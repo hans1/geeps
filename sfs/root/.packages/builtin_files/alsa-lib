@@ -1,0 +1,76 @@
+/usr
+/usr/bin
+ aserver
+/usr/lib
+/usr/lib/alsa-lib
+/usr/lib/alsa-lib/smixer
+ smixer-ac97.so
+ smixer-hda.so
+ smixer-python.so
+ smixer-sbase.so
+/usr/share
+/usr/share/alsa
+ alsa.conf
+/usr/share/alsa/cards
+ AACI.conf
+ aliases.alisp
+ aliases.conf
+ ATIIXP.conf
+ ATIIXP-MODEM.conf
+ ATIIXP-SPDMA.conf
+ AU8810.conf
+ AU8820.conf
+ AU8830.conf
+ Audigy2.conf
+ Audigy.conf
+ Aureon51.conf
+ Aureon71.conf
+ CA0106.conf
+ CMI8338.conf
+ CMI8338-SWIEC.conf
+ CMI8738-MC6.conf
+ CMI8738-MC8.conf
+ CMI8788.conf
+ CS46xx.conf
+ EMU10K1.conf
+ EMU10K1X.conf
+ ENS1370.conf
+ ENS1371.conf
+ ES1968.conf
+ FM801.conf
+ GUS.conf
+ HDA-Intel.conf
+ ICE1712.conf
+ ICE1724.conf
+ ICH4.conf
+ ICH.conf
+ ICH-MODEM.conf
+ Maestro3.conf
+ NFORCE.conf
+ PC-Speaker.conf
+ PMac.conf
+ PMacToonie.conf
+ PS3.conf
+ RME9636.conf
+ RME9652.conf
+ SB-XFi.conf
+/usr/share/alsa/cards/SI7018
+ sndoc-mixer.alisp
+ sndop-mixer.alisp
+/usr/share/alsa/pcm
+ center_lfe.conf
+ default.conf
+ dmix.conf
+ dpl.conf
+ dsnoop.conf
+ front.conf
+ hdmi.conf
+ iec958.conf
+ modem.conf
+ rear.conf
+ side.conf
+ surround40.conf
+ surround41.conf
+ surround50.conf
+ surround51.conf
+ surround71.conf

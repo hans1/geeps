@@ -1,0 +1,13 @@
+/usr
+/usr/lib
+ libdvdnavmini.so
+ libdvdnavmini.so.4
+ libdvdnavmini.so.4.1.3
+ libdvdnav.so
+ libdvdnav.so.3
+ libdvdnav.so.4
+ libdvdnav.so.4.1.3
+/usr/src
+/usr/src/libdvdnav-4.1.3
+ build-libdvdnav.sh
+ SLKBUILD

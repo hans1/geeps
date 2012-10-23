@@ -1,0 +1,5 @@
+/usr
+/usr/lib
+ libmad.so
+ libmad.so.0
+ libmad.so.0.2.1

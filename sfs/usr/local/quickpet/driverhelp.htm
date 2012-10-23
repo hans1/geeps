@@ -1,0 +1,95 @@
+<!--Content-type: text/html-->
+
+<HTML><HEAD><TITLE>Nvidia and ATI Driver Install Help</TITLE>
+</HEAD><BODY>
+<H1>Nvidia and ATI Proprietary Xorg driver</H1>
+
+<H2>Notice</H2>
+<H2>Radeon and ATI/AMD</H2>
+You will need to configure X server to activate fglrx driver: <br>
+If you did not follow the instructions when you installed the driver
+this may help.<br>
+<br>
+1. Exit from X to prompt  (see Shutdown menu).<br>
+2. Type &quot; aticonfig --initial &quot; (without the quotes).<br>
+4. Type &quot; xwin &quot;.<br>
+5. <span style="color:red">If this fails, and you get black screen, press, Ctrl, Alt, Backspace, wait a moment then type &quot; reboot &quot;</span> <br>
+6. On reboot test with &quot; report-video &quot; in a terminal emulator.<br>
+7. If the driver is not &quot; fglrx &quot; then see below.<br>
+<br>
+<H2>If that fails</H2>
+<br>
+1. Exit from X to prompt  (see Shutdown menu).<br>
+2. Type &quot; xorgwizard &quot; (without the quotes).<br>
+3. Select the &quot; Choose &quot; option.<br>
+4. Select &quot; fglrx &quot; from the list, hit ENTER.<br>
+5. Choose a desired resolution.<br>
+6. <span style="color:red">You are recommended to then choose &quot; Test &quot;</span> <br>
+7. Once you are done, Type &quot; xwin &quot; to restart X.<br>
+<br>
+NOTE: After you have finished you can test video with <br>
+&quot; Report Video &quot; in the &quot; File &quot; menu of Slickpet.<br>
+<br>
+<H2>Nvidia (nouveau driver loaded)</H2>
+You will need to configure X server to activate nvidia driver: <br>
+If you did not follow the instructions when you installed the driver
+this may help.<br>
+<br>
+1. Run &quot;xorgwizard&quot; from the Setup menu<br>
+2. A window will popup prompting you to reboot, unloading the nouveau driver<br>
+3. When your machine reboots, check the driver with &quot;report-video&quot; from command line or slickpet>file menu <br>
+4. <span style="color:red"><b>If you get "Out of Range" error on your monitor Press CTRL+ALT+BACKSPACE and run &quot;xorgwizard&quot; from the command line</b> </span><br>
+5. If the driver is &quot;nvidia&quot; you are good to go<br>
+6. If not, run &quot;xorgwizard&quot; again<br>
+7. You may need to select &quot;choose&quot; and then you will be confronted with a list<br>
+8. Choose the Nvidia card and next to it there are 3 choices, choose &quot;nvidia&quot;<br>
+9. <span style="color:red">You are recommended to then choose &quot; Test &quot;</span> <br>
+10. This will test X and give you results.<br>
+11. Once you are done, Type &quot; xwin &quot; to restart X if needed.<br>
+<br>
+<H2>Nvidia (nv driver loaded)</H2>
+You will need to configure X server to activate nvidia driver: <br>
+If you did not follow the instructions when you installed the driver
+this may help.<br>
+<br>
+1. Reboot Computer  (see Shutdown menu).<br>
+2. Check with &quot; repot-video &quot; or &quot; report-video-glx &quot; for your driver<br>
+3. If it's not &quot; nvidia &quot; exit to a prompt and type &quot; xorgwizard &quot; (without the quotes).<br>
+4. Try the &quot; Probe &quot; option first.<br>
+5. Choose a desired resolution.<br>
+6. <span style="color:red">You are recommended to then choose &quot; Test &quot;</span> <br>
+7. This will test X and give you results.<br>
+8. Once you are done, Type &quot; xwin &quot; to restart X.<br>
+<br>
+<H2>If that fails</H2>
+<br>
+1. Exit from X to prompt  (see Shutdown menu).<br>
+2. Type &quot; xorgwizard &quot; (without the quotes).<br>
+3. Select the &quot; Choose &quot; option.<br>
+4. Type &quot; nvidia &quot;in the box and hit ENTER.<br>
+5. Choose a desired resolution.<br>
+6. <span style="color:red">You are recommended to then choose &quot; Test &quot;</span> <br>
+7. Once you are done, Type &quot; xwin &quot; to restart X.<br>
+<br>
+NOTE: After you have finished you can test video with <br>
+&quot; Report Video &quot; in the &quot; File &quot; menu of Slickpet.<br>
+<br>
+<H2>If the driver completely fails</H2>
+<br>
+1. Exit from X to prompt  (see Shutdown menu).<br>
+2. Type &quot; xorgwizard &quot; (without the quotes).<br>
+3. Select the &quot; Choose &quot; option.<br>
+4. Type &quot; nv &quot; (for nvidia cards) or &quot; ati &quot; (for ATI cards)<br> 
+or you can try &quot; vesa &quot; in the box and hit ENTER.<br>
+5. Choose a desired resolution.<br>
+6. <span style="color:red">You are recommended to then choose &quot; Test &quot;</span> <br>
+7. Once you are done, Type &quot; xwin &quot; to restart X.<br>
+8. When you are back in X open Puppy Package Manager and uninstall the driver.<br>
+9. Reboot.<br>
+If you have an nvidia card you can try another version<br>
+<br>
+NOTE: After you have finished you can test video with <br>
+&quot; Report Video &quot; in the &quot; File &quot; menu of Slickpet.<br>
+<br>
+</BODY>
+</HTML>

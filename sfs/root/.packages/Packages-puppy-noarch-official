@@ -1,0 +1,105 @@
+align-1.7.1|align|1.7.1||BuildingBlock|40K||align-1.7.1.pet|+perl_tiny|align text into columns||||
+bones-0.2.2|bones|0.2.2||Develop|44K||bones-0.2.2.pet|+gtkdialog3,+openssh,+wget,+gftp,+xdelta3|simple project version control||||
+cpu-scaling-ondemand-1.3-3|cpu-scaling-ondemand|1.3-3||Setup|60K||cpu-scaling-ondemand-1.3-3.pet|+gtkdialog3|CPU Frequency Scaling Tool||||
+cups_pdf-0.8-1|cups_pdf|0.8-1||BuildingBlock|80K||cups_pdf-0.8-1.pet|+cups|print to pdf file||||
+defaults-chooser-0.8|defaults-chooser|0.8||Setup|56K||defaults-chooser-0.8.pet|+gtkdialog|Default Applications Chooser||||
+desk_icon_theme_area042-1|desk_icon_theme_area042|1||Desktop|492K||desk_icon_theme_area042-1.pet|+gtk+|black-white-brown line-art style icons||||
+desk_icon_theme_blue_moon-1|desk_icon_theme_blue_moon|1||Desktop|228K||desk_icon_theme_blue_moon-1.pet||desktop icon set, blue tinge||||
+desk_icon_theme_browndust-1|desk_icon_theme_browndust|1||Desktop|284K||desk_icon_theme_browndust-1.pet||desktop and menu icons||||
+desk_icon_theme_brown_marble-1|desk_icon_theme_brown_marble|1||Desktop|288K||desk_icon_theme_brown_marble-1.pet||desktop icons based on silver marble by steve_s||||
+desk_icon_theme_darkfire-1|desk_icon_theme_darkfire|1||Desktop|316K||desk_icon_theme_darkfire-1.pet||desktop and menu icons||||
+desk_icon_theme_jq8flat-2|desk_icon_theme_jq8flat|2||Desktop|236K||desk_icon_theme_jq8flat-2.pet||desktop and menu icons, flat grey lines||||
+desk_icon_theme_lagabluenight-1|desk_icon_theme_lagabluenight|1||Desktop|284K||desk_icon_theme_lagabluenight-1.pet||desktop icon theme, blackish with blue outline||||
+desk_icon_theme_original-1|desk_icon_theme_original|1||Desktop|252K||desk_icon_theme_original-1.pet||desktop and menu icons||||
+desk_icon_theme_silver_marble-1|desk_icon_theme_silver_marble|1||Desktop|304K||desk_icon_theme_silver_marble-1.pet||desktop icons||||
+desk_icon_theme_smooth_color-1|desk_icon_theme_smooth_color|1||Desktop|276K||desk_icon_theme_smooth_color-1.pet||desktop and menu icons||||
+desk_icon_theme_stardust-2|desk_icon_theme_stardust|2||Desktop|292K||desk_icon_theme_stardust-2.pet||desktop and menu icons||||
+desk_icon_theme_stark042-1|desk_icon_theme_stark042|1||Desktop|492K||desk_icon_theme_stark042-1.pet|+gtk+|black-white-orange line-art style icons, based on area042 icons||||
+ffconvert-1.2|ffconvert|1.2||Multimedia|240K||ffconvert-1.2.pet|+ffmpeg|FFConvert multimedia converter||||
+gtk_theme_citrus_cut-1.2|gtk_theme_citrus_cut|1.2||Desktop|172K||gtk_theme_citrus_cut-1.2.pet|+gtk+|gtk2 orangy theme||||
+gtk_theme_delicate_blue-1|gtk_theme_delicate_blue|1||Desktop|48K||gtk_theme_delicate_blue-1.pet|+gtk+|gtk theme, light blue/grey, graduated blue buttons||||
+gtk_theme_fishing_the_sky-0.4|gtk_theme_fishing_the_sky|0.4||Desktop|116K||gtk_theme_fishing_the_sky-0.4.pet|+gtk+|gtk theme, small grey||||
+gtk_theme_fishpie-0.11|gtk_theme_fishpie|0.11||Desktop|304K||gtk_theme_fishpie-0.11.pet|+gtk+|gtk theme||||
+gtk_theme_flatbluecontrast-1|gtk_theme_flatbluecontrast|1||Desktop|48K||gtk_theme_flatbluecontrast-1.pet|+gtk+|Theme for GTK, flat blue, contrasting shades||||
+gtk_theme_flat_grey-1|gtk_theme_flat_grey|1||Desktop|48K||gtk_theme_flat_grey-1.pet||gtk theme||||
+gtk_theme_flat_grey_rounded-1|gtk_theme_flat_grey_rounded|1||Desktop|48K||gtk_theme_flat_grey_rounded-1.pet|+gtk+|gtk theme, flat grey, buttons slightly rounded||||
+gtk_theme_gradient_brown-0.9|gtk_theme_gradient_brown|0.9||Desktop|32K||gtk_theme_gradient_brown-0.9.pet|+gtk+|gtk very basic theme||||
+gtk_theme_gradient_grey-1.2|gtk_theme_gradient_grey|1.2||Desktop|32K||gtk_theme_gradient_grey-1.2.pet|+gtk+|gtk very basic theme, gradient grey||||
+gtk_theme_m8darker-1.0|gtk_theme_m8darker|1.0||Desktop|156K||gtk_theme_m8darker-1.0.pet|+gtk+|gtk dark grey flat theme||||
+gtkthememaker-1.4|gtkthememaker|1.4||Desktop|68K||gtkthememaker-1.4.pet||GTK Theme Maker, design a theme for GTK windows||||
+gtk_theme_phacile_blue-1.3|gtk_theme_phacile_blue|1.3||Desktop|480K||gtk_theme_phacile_blue-1.3.pet|+gtk+|gtk blue-grey theme||||
+gtk_theme_polished_blue-1.2.3|gtk_theme_polished_blue|1.2.3||Desktop|156K||gtk_theme_polished_blue-1.2.3.pet|+gtk+|grey blue 3d gtk theme||||
+gtk_theme_stardust_zigbert-0.5|gtk_theme_stardust_zigbert|0.5||Desktop|45K||gtk_theme_stardust_zigbert-0.5.pet|+gtk+|gtk light blue 3d theme||||
+gtk_theme_stark-1|gtk_theme_stark|1||Desktop|48K||gtk_theme_stark-1.pet|+gtk+|stark black/white theme for gtk, with faint colours and bright orange splashes||||
+hunspell-en-us-2|hunspell-en-us|2||BuildingBlock|732K|pet_packages-quirky|hunspell-en-us-2.pet|+hunspell,+enchant|US English dictionary|||official|
+jwmconfig2-20111110|jwmconfig2|20111110||Desktop|256K||jwmconfig2-20111110.pet|+jwm2,+gtkdialog3|JWM configuration. note, theme font spec different from shinobars pet. note, designed to work with jwm 500+||||
+jwm_theme_bluevariety-1|jwm_theme_bluevariety|1||Desktop|32K||jwm_theme_bluevariety-1.pet|+jwm2|jwm window manager theme, many shades and gradients of blue||||
+jwm_theme_deepbluebold-1|jwm_theme_deepbluebold|1||Desktop|36K||jwm_theme_deepbluebold-1.pet|+jwm2|Theme for JWM window manager, deep blue, white bold text||||
+jwmthememaker-1.5|jwmthememaker|1.5||Desktop|36K||jwmthememaker-1.5.pet||JWM Theme Maker|ubuntu|lucid||
+jwm_theme_stark-1|jwm_theme_stark|1||Desktop|36K||jwm_theme_stark-1.pet|+jwm2|stark black-white with bits of colour theme for jwm window manager||||
+langpack_de-20120403|langpack_de|20120403||Setup|5457K||langpack_de-20120403.pet||German language-pack for Puppy Linux, for any Puppy built from Woof later than Feb. 28, 2012||||
+langpack_es-20120328|langpack_es|20120328||Setup|8988K||langpack_es-20120328.pet||es language-pack for Puppy Linux, for any Puppy built from Woof later than Feb. 28, 2012||||
+langpack_fr-20120330|langpack_fr|20120330||Setup|7596K||langpack_fr-20120330.pet||French language-pack for Puppy Linux, for any Puppy built from Woof later than Feb. 27, 2012. Created by esmourguit||||
+langpack_pl-20120403|langpack_pl|20120403||Setup|6412K||langpack_pl-20120403.pet||Polish langpack||||
+langpack_ru-20120403|langpack_ru|20120403||Setup|10000K||langpack_ru-20120403.pet||Russian language-pack for Puppy Linux, for any Puppy built from Woof later than Feb. 28, 2012||||
+lhp_sys_info-0.6|lhp_sys_info|0.6||System|156K||lhp_sys_info-0.6.pet||Hardware and Video Reporting Tool, created by tazoc||||
+linux_firewall-2.0rc9-puppy2|linux_firewall|2.0rc9-puppy2||Network|132K||linux_firewall-2.0rc9-puppy2.pet||Firewall||||
+linux_firmware_dvb-1.20|linux_firmware_dvb|1.20||BuildingBlock|48K||linux_firmware_dvb-1.20.pet||dvb usb kernel firmware||||
+mplayer_codecs_basic-20071007|mplayer_codecs_basic|20071007||Multimedia|612K||mplayer_codecs_basic-20071007.pet||minimum essential codecs||||
+mscw-2|mscw|2||Setup|36K||mscw-2.pet|+alsa-lib,+gtkdialog3|Multiple Sound Card Wizard||||
+net_setup-20111016|net_setup|20111016||Setup|352K||net_setup-20111016.pet|+gtkdialog3|Network Wizard||||
+partview-2.2-2|partview|2.2-2||Filesystem|40K||partview-2.2-2.pet||Partview free space in drives||||
+pawdioconverter-1.2|pawdioconverter|1.2||Multimedia|208K||pawdioconverter-1.2.pet|+gtkdialog3,+sox|PawdioConverter audio conversion||||
+pbackup-3.1.9|pbackup|3.1.9||Utility|240K||pbackup-3.1.9.pet|+xdialog,+gtkdialog3,+dvd+rwtools,+cdrkit,+curl|Pbackup Backup and Sync||||
+pburn-3.5.1|pburn|3.5.1||Multimedia|360K||pburn-3.5.1.pet|+gtkdialog,+core-utils,+cdrkit,+dvd+rw-tools,+ffmpeg,+pfilesearch,+dvdauthor,+vobcopy,+vamps,+vcdimager,+normalize,|Pburn CD/DVD/Blu-ray writer|||official|
+pcd-1.5|pcd|1.5||Multimedia|72K||pcd-1.5.pet|+gtkdialog3,+cdrkit|pCD CD-audio player||||
+pcdripper-3.9.3|pcdripper|3.9.3||Multimedia|96K||pcdripper-3.9.3.pet|+xdialog,+gtkdialog3,+cdrkit|Audio CD song ripper||||
+pctorrent-1.4|pctorrent|1.4||Internet|64K||pctorrent-1.4.pet|+ctorrent,+gtkdialog3|torrent client gui||||
+pdvdrsab-0.1|pdvdrsab|0.1||Multimedia|52K||pdvdrsab-0.1.pet|+gtkdialog3,+dvdauthor,+vobcopy,+vamps,+ffmpeg|dvd rip,shrink,author,burn||||
+peasypdf-1.4|peasypdf|1.4||Document|52K||peasypdf-1.4.pet||Build multi-page PDF documents||||
+peasyprint-1.8|peasyprint|1.8||Graphic|60K||peasyprint-1.8.pet|+gphotofs,+gtkdialog3|PeasyPrint graphic/photo printing||||
+peasyscan-1.7|peasyscan|1.7||Graphic|164K||peasyscan-1.7.pet|+sane-backends,+gtkdialog3|Peasyscan simple image scanner, created by rcrsn51||||
+pfilesearch-1.28|pfilesearch|1.28||BuildingBlock|84K||pfilesearch-1.28.pet|+gtkdialog|needed by pburn, pfind||||
+pfind-4.24|pfind|4.24||Filesystem|188K||pfind-4.24.pet|+gtkdialog3,+pfilesearch|Pfind file finder||||
+phash-2|phash|2||Desktop|24K||phash-2.pet|+rox_filer|adds to rox right-click menu, calc md5sum/sha1sum of a file||||
+pmetatagger-2.1|pmetatagger|2.1||Multimedia|80K||pmetatagger-2.1.pet|+gtkdialog3,+id3lib,+vorbis-tools|audio file tag editor||||
+pmirror-0.5|pmirror|0.5||Utility|44K||pmirror-0.5.pet|+gtkdialog3,+mirdir|Pmirror backup a directory||||
+pmirrorget-0.1.1|pmirrorget|0.1.1||Internet|28K||pmirrorget-0.1.1.pet|+gtkdialog3|Website File Grabber||||
+pmusic1-1.8.3-1|pmusic1|1.8.3-1||Multimedia|424K||pmusic1-1.8.3-1.pet|+gtkdialog3,+ffmpeg|Pmusic audio player, old version, works with gtkdialog3 in some less-recent puppies||||
+pmusic-2.5.3|pmusic|2.5.3||Multimedia|668K||pmusic-2.5.3.pet|+gtkdialog4,+ffmpeg,+cdrkit,+wget,+pschedule,+pburn,+streamripper,+pfilesearch|-Player -Manaager -Grabber|||official|
+pmusic_index_radio-2011.06.26-1|pmusic_index_radio|2011.06.26-1||Multimedia|544K||pmusic_index_radio-2011.06.26-1.pet|+pmusic|Pmusic radio index||||
+pnethood-0.6.8-2|pnethood|0.6.8-2||Network|100K||pnethood-0.6.8-2.pet|+nbtscan,+mountcifs,+gtkdialog4,+samba_client|connect to samba shares||||
+pplog-1.1.2-2|pplog|1.1.2-2||Personal|188K||pplog-1.1.2-2.pet|+perl_tiny,+hiawatha|PPLOG personal blog||||
+pprocess-2.2.4-1|pprocess|2.2.4-1||System|60K||pprocess-2.2.4-1.pet|+gtkdialog4|Pprocess process manager||||
+precord-7.0.1|precord|7.0.1||Multimedia|88K||precord-7.0.1.pet|+ffmpeg,+gtkdialog3,+vorbis-tools,+lame,+alsa-utils|Precord mp3 recorder/player||||
+prename-0.7|prename|0.7||Filesystem|48K||prename-0.7.pet|+gtkdialog3|batch file renamer||||
+programchooser-0.3|programchooser|0.3||BuildingBlock|76K||programchooser-0.3.pet|+gtkdialog3|used by wallpaper-setter||||
+pschedule-1.0.2|pschedule|1.0.2||System|84K||pschedule-1.0.2.pet|+gtkdialog3|Pschedule task on time||||
+pstopwatch-0.6|pstopwatch|0.6||Personal|76K||pstopwatch-0.6.pet||simple stop watch||||
+pstreamvid-1.3-2|pstreamvid|1.3-2||Multimedia|96K||pstreamvid-1.3-2.pet|+gxine,+gtkdialog3|Pstreamvid play streaming video||||
+psync-2.7-ul|psync|2.7-ul||Desktop|124K||psync-2.7-ul.pet||Psync time server synchronisation||||
+ptimer-0.2|ptimer|0.2||Personal|52K||ptimer-0.2.pet|+gtkdialog3|Ptimer StopWatch AlarmClock||||
+ptiming-0.8.1|ptiming|0.8.1||Personal|116K||ptiming-0.8.1.pet|+gtkdialog|pTiming event timer system|||official|
+ptooltips-0.2|ptooltips|0.2||BuildingBlock|16K||ptooltips-0.2.pet|+gtkdialog3,+yaf_splash,+getcurpos|display tooltips utility||||
+pupdvdtool-0.8|pupdvdtool|0.8||Multimedia|128K||pupdvdtool-0.8.pet|+vamps,+vobcopy,+ffmpeg,+dvdauthor,+gtkdialog|dvd ripper||||
+puppy-podcast-grabber-1.1|puppy-podcast-grabber|1.1||Internet|80K||puppy-podcast-grabber-1.1.pet||podcast grabber||||
+pupradio-0.14|pupradio|0.14||Multimedia|64K||pupradio-0.14.pet||pupRadio/pupTelly streaming media||||
+pupradio_NLS-0.14|pupradio_NLS|0.14||BuildingBlock|84K||pupradio_NLS-0.14.pet||pupradio translations||||
+puptv-0.3-1|puptv|0.3-1||Multimedia|96K||puptv-0.3-1.pet|+gxine|watch streaming television||||
+pupx-0.3|pupx|0.3||Desktop|48K||pupx-0.3.pet||Pupx X settings||||
+pwallpaper-1.1.2-1|pwallpaper|1.1.2-1||Desktop|72K||pwallpaper-1.1.2-1.pet|+gtk+|Set backdrop image||||
+pwget-0.2|pwget|0.2||Internet|56K||pwget-0.2.pet|+wget,+gtkdialog3|file downloader frontend for wget||||
+pwsget-0.1|pwsget|0.1||Internet|40K||pwsget-0.1.pet|+gtkdialog3|Pwsget secure file downloader||||
+pzchmview-1.0d-1|pzchmview|1.0d-1||Document|28K||pzchmview-1.0d-1.pet|+chmlib|PZCHMView CHM Viewer||||
+shared-mime-info-0.70-6|shared-mime-info|0.70-6||BuildingBlock|272K||shared-mime-info-0.70-6.pet||mime information||||
+shared-mime-info_DEV-0.70-6|shared-mime-info_DEV|0.70-6||BuildingBlock|3772K||shared-mime-info_DEV-0.70-6.pet|+shared-mime-info|mime information||||
+snap2-4.21|snap2|4.21||Utility|152K||snap2-4.21.pet|+rsync|Snap2 snapshot backup||||
+ssh_gui-0.7.1-1-p4|ssh_gui|0.7.1-1-p4||Internet|40K||ssh_gui-0.7.1-1-p4.pet|+gtk+,+openssh_client|secure telnet gui|puppy|4||
+usb-modeswitch-data-20111023|usb-modeswitch-data|20111023||BuildingBlock|892K||usb-modeswitch-data-20111023.pet||data for usb-modeswitch pkg||||
+wallpaper-0.6.1-1|wallpaper|0.6.1-1||Desktop|116K||wallpaper-0.6.1-1.pet|+gtkdialog4|Set backdrop image||||
+wcpufreq-0.8|wcpufreq|0.8||System|53K||wcpufreq-0.8.pet||CPU Frequency Scaling Tool||||
+woo-ff-0.1.1|woo-ff|0.1.1||Multimedia|48K||woo-ff-0.1.1.pet|+ffmpeg,+gtkdialog3|woo-ff - multimedia converter||||
+xlock_gui-0.2-6|xlock_gui|0.2-6||Desktop|68K||xlock_gui-0.2-6.pet|+xlockmore|screen lock and screensaver||||
+you2pup-2.1.4-520|you2pup|2.1.4-520||Internet|60K||you2pup-2.1.4-520.pet|+gtkdialog3,+urxvt|You2pup YouTube downloader||||
+z_geany_bacon_hack-1.4|z_geany_bacon_hack|1.4||Document|40K||z_geany_bacon_hack-1.4.pet|+geany|temp hack for geany text editor for BaCon highlighting, stealing Freebasic category, created by big_bass||||
+zz_t2_fixup-20120222|zz_t2_fixup|20120222||BuildingBlock|304K||zz_t2_fixup-20120222.pet||hack to get t2 pkgs to build a puppy, mostly workarounds for xorg in /usr/X11R7||||

@@ -1,0 +1,795 @@
+#!/bin/bash
+#Pfind - File finder
+#Copyright 2007,2008,2009,2010,2011,2012
+#Sigmund Berglund
+
+#------------------------------
+#This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 2.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+export VERSION="4.25"
+CURDIR="`pwd`"
+export PROGPID=$$ #every tmp-file gets a tail of PID. This seperates different instances of Pfind
+export PROGPATH=`dirname "$0"`"/"
+
+export ENABLE_BUTTONS='
+<action>enable:BUTTON_ALL</action>
+<action>enable:BUTTON_DOC</action>
+<action>enable:BUTTON_PIC</action>
+<action>enable:BUTTON_MUSIC</action>
+<action>enable:BUTTON_VIDEO</action>
+<action>enable:BUTTON_MAIL</action>
+<action>enable:BUTTON_ZIP</action>
+<action>enable:BUTTON_CODE</action>
+'
+
+overview (){
+TMP=`ps -eo pid,command`; TMP=`echo "$TMP" | grep 'box_splash'` #if no splash from search...
+if [ -z "$TMP" ]; then #...this is just a gui-update
+	echo "$LOC602" > /tmp/pfind-splashtext
+	echo 0 > /tmp/pfind-splash #reset progress bar
+	"$PROGPATH"box_splash &
+fi
+COUNTALL=`cat /tmp/pfind-files$PROGPID | wc -l`
+COUNTDOC=`grep -ic "('$EXTDOC')" /tmp/pfind-files$PROGPID`
+if [ $COUNTDOC -gt 0 ]; then GUIDOC="
+<hbox>
+ <text><label>$LOC_DOCUMENTS:</label></text>
+ <text width-request=\"30\"><label>$COUNTDOC</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-open\"></input>
+  <label>$LOC_BROWSE</label>
+  <action>$PROGPATH/func -exec_doc</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_DOC</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_doc; $PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_DOC</action>
+ </button>
+</hbox>"
+else GUIDOC=""; fi
+COUNTPIC=`grep -ic "('$EXTPIC')" /tmp/pfind-files$PROGPID`
+if [ $COUNTPIC -gt 0 ]; then GUIPIC="
+<hbox>
+ <text><label>$LOC_PICTURES:</label></text>
+ <text width-request=\"30\"><label>$COUNTPIC</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-select-color\"></input>
+  <label>$LOC_VIEW</label>
+  <action>$PROGPATH/func -exec_pic</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_PIC</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_pic</action>
+  <action>$PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_PIC</action>
+ </button>
+</hbox>"
+else GUIPIC=""; fi
+COUNTMUSIC=`grep -ic "('$EXTMUSIC')" /tmp/pfind-files$PROGPID`
+if [ $COUNTMUSIC -gt 0 ]; then GUIMUSIC="
+<hbox>
+ <text><label>$LOC_SOUNDFILES:</label></text>
+ <text width-request=\"30\"><label>$COUNTMUSIC</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-media-play\"></input>
+  <label>$LOC_PLAY</label>
+  <action>$PROGPATH/func -exec_music</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_MUSIC</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_music</action>
+  <action>$PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_MUSIC</action>
+ </button>
+</hbox>"
+else GUIMUSIC=""; fi
+COUNTVIDEO=`grep -ic "('$EXTVIDEO')" /tmp/pfind-files$PROGPID`
+if [ $COUNTVIDEO -gt 0 ]; then GUIVIDEO="
+<hbox>
+ <text><label>$LOC_VIDEOS:</label></text>
+ <text width-request=\"30\"><label>$COUNTVIDEO</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-media-play\"></input>
+  <label>$LOC_PLAY</label>
+  <action>$PROGPATH/func -exec_video</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_VIDEO</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_video</action>
+  <action>$PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_VIDEO</action>
+ </button>
+</hbox>"
+else GUIVIDEO=""; fi
+COUNTMAIL=`grep -ic "('$EXTMAIL')" /tmp/pfind-files$PROGPID`
+if [ $COUNTMAIL -gt 0 ]; then GUIMAIL="
+<hbox>
+ <text><label>$LOC_MAILS:</label></text>
+ <text width-request=\"30\"><label>$COUNTMAIL</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-open\"></input>
+  <label>$LOC_BROWSE</label>
+  <action>$PROGPATH/func -exec_mail</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_MAIL</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_mail</action>
+  <action>$PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_MAIL</action>
+ </button>
+</hbox>"
+else GUIMAIL=""; fi
+COUNTZIP=`grep -ic "('$EXTZIP')" /tmp/pfind-files$PROGPID`
+if [ $COUNTZIP -gt 0 ]; then GUIZIP="
+<hbox>
+ <text><label>$LOC_COMPRESSED:</label></text>
+ <text width-request=\"30\"><label>$COUNTZIP</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-open\"></input>
+  <label>$LOC_BROWSE</label>
+  <action>$PROGPATH/func -exec_zip</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_ZIP</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_zip; $PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_ZIP</action>
+ </button>
+</hbox>"
+else GUIZIP=""; fi
+COUNTCODE=`grep -ic "('$EXTCODE')" /tmp/pfind-files$PROGPID`
+if [ $COUNTCODE -gt 0 ]; then GUICODE="
+<hbox>
+ <text><label>$LOC_CODEFILES:</label></text>
+ <text width-request=\"30\"><label>$COUNTCODE</label></text>
+ <button width-request=\"100\">
+  <input file stock=\"gtk-open\"></input>
+  <label>$LOC_BROWSE</label>
+  <action>$PROGPATH/func -exec_code</action>
+ </button>
+ <button tooltip-text=\" $LOC800 \">
+  <variable>BUTTON_CODE</variable>
+  <input file stock=\"gtk-go-forward\"></input>
+  <action>$PROGPATH/func -view_code; $PROGPATH/func -build_treeitems</action>
+  <action>Refresh:TREE</action>
+  $ENABLE_BUTTONS
+  <action>disable:BUTTON_CODE</action>
+ </button>
+</hbox>"
+else GUICODE=""; fi
+. $PROGPATH/func -build_treeitems #build treeitems
+echo 100 > /tmp/pfind-splash #to end progressbar.
+#---
+export Pfind="<window title=\"Pfind\"icon-name=\"gtk-find\">
+<hbox>
+<vbox>
+ <menubar>
+  <menu>
+   <menuitem icon=\"gtk-preferences\">
+    <label>$LOC102</label>
+    <action type=\"exit\">98</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem icon=\"gtk-quit\">
+    <label>$LOC_QUIT</label>
+    <action type=\"exit\">*</action>
+   </menuitem>
+   <label>$LOC100</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-apply\">
+    <label>$LOC110</label>
+    <action>$PROGPATH/func -execute \$TREE &</action>
+   </menuitem>
+   <menuitem>
+    <label>$LOC111...</label>
+    <action>$PROGPATH/func_openwith -\$TREE &</action>
+   </menuitem>
+   <menuitem icon=\"gtk-edit\">
+    <label>$LOC112</label>
+    <action>$PROGPATH/func_openastext -\$TREE &</action>
+   </menuitem>
+   <menuitem icon=\"gtk-open\">
+    <label>$LOC113...</label>
+    <action>$PROGPATH/func_showlocation -\$TREE &</action>
+   </menuitem>
+   <menuitem icon=\"gtk-execute\">
+    <label>$LOC114</label>
+    <action>$PROGPATH/func_run -\$TREE &</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem icon=\"gtk-convert\">
+    <label>$LOC115</label>
+    <action>$PROGPATH/func -rename</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-copy\">
+    <label>$LOC116</label>
+    <action>. $PROGPATH/func -copy</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-ok\">
+    <label>$LOC117</label>
+    <action>. $PROGPATH/func -move</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-dnd-multiple\">
+    <label>$LOC118</label>
+    <action>. $PROGPATH/func -link</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem icon=\"gtk-cancel\">
+    <label>$LOC119</label>
+    <action>. $PROGPATH/func -delete</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-delete\">
+    <label>$LOC120</label>
+    <action>. $PROGPATH/func -trash</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <label>$LOC109</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-clear\">
+    <label>$LOC131</label>
+    <action>$PROGPATH/func_filter -Remove_files_from_list</action>
+    <action>$PROGPATH/func -build_treeitems</action>
+    <action>Refresh:TREE</action>
+  </menuitem>
+   <menuitem icon=\"gtk-find\">
+    <label>$LOC132</label>
+    <action>$PROGPATH/func_filter -Find_files_in_list</action>
+    <action>$PROGPATH/func -build_treeitems</action>
+    <action>Refresh:TREE</action>
+  </menuitem>
+   <menuitem icon=\"gtk-find\">
+    <label>$LOC133</label>
+    <action>$PROGPATH/func_filter -Search_for_TEXT_in_files</action>
+    <action>$PROGPATH/func -build_treeitems</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem icon=\"gtk-open\">
+    <label>$LOC402</label>
+    <action>$PROGPATH/func -view_in_filemanager</action>
+   </menuitem>
+   <menuitem icon=\"gtk-edit\">
+    <label>$LOC404...</label>
+    <action>$PROGPATH/func -export_list_to_texteditor</action>
+   </menuitem>
+   <menuitem icon=\"gtk-edit\">
+    <label>$LOC403</label>
+    <action>$PROGPATH/func -open_files_in_texteditor</action>
+   </menuitem>
+   <menuitem icon=\"gtk-select-color\">
+    <label>$LOC405</label>
+    <action>$PROGPATH/func -open_with_imagebrowser</action>
+   </menuitem>
+   <menuitem icon=\"gtk-select-color\">
+    <label>$LOC406</label>
+    <action>$PROGPATH/func -view_images_in_slideshow</action>
+   </menuitem>
+   <menuitem icon=\"gtk-execute\">
+    <label>$LOC407</label>
+    <action>$PROGPATH/func -open_with_musicplayer</action>
+   </menuitem>
+   <menuitem icon=\"gtk-execute\">
+    <label>$LOC408</label>
+    <action>$PROGPATH/func -open_with_videoplayer</action>
+   </menuitem>
+   <menuitem icon=\"gtk-cdrom\">
+    <label>$LOC409</label>
+    <action>$PROGPATH/func -open_with_burner</action>
+   </menuitem>
+   <menuitem icon=\"gtk-copy\">
+    <label>$LOC410</label>
+    <action>$PROGPATH/func -copy_files</action>
+   </menuitem>
+   <menuitem icon=\"gtk-execute\">
+    <label>$LOC411</label>
+    <action>$PROGPATH/func -execute_command</action>
+   </menuitem>
+   <label>$LOC130</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-sort-ascending\">
+    <label>$LOC151</label>
+    <action>$PROGPATH/func -sort_filename</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-sort-ascending\">
+    <label>$LOC152</label>
+    <action>$PROGPATH/func -sort_extension</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-sort-ascending\">
+    <label>$LOC153</label>
+    <action>$PROGPATH/func -sort_size</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <menuitem icon=\"gtk-sort-ascending\">
+    <label>$LOC154</label>
+    <action>$PROGPATH/func -sort_time</action>
+    <action>Refresh:TREE</action>
+   </menuitem>
+   <label>$LOC150</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-about\">
+    <label>$LOC141</label>
+    <action>$PROGPATH/func -about &</action>
+   </menuitem>
+   <label>$LOC140</label>
+  </menu>
+ </menubar>
+  <hbox homogeneous=\"true\">
+   <button tooltip-text=\"$LOC_SEARCH\" width-request=\"200\" height-request=\"80\">
+    <input file stock=\"gtk-find\"></input>
+    <action>pfind &</action>
+   </button>
+  </hbox>
+ <frame $LOC605>
+  <hbox>
+   <text use-markup=\"true\"><label>\"$LOC604:\"</label></text>
+   <text  width-request=\"35\" use-markup=\"true\"><label>\"<b>$COUNTALL</b>\"</label></text>
+   <button width-request=\"100\">
+    <input file stock=\"gtk-open\"></input>
+    <label>$LOC_BROWSE</label>
+    <action>$PROGPATH/func -exec_all</action>
+   </button>
+   <button tooltip-text=\" $LOC800 \">
+    <variable>BUTTON_ALL</variable>
+    <input file stock=\"gtk-go-forward\"></input>
+    <visible>disabled</visible>
+    <action>$PROGPATH/func -view_all; $PROGPATH/func -build_treeitems</action>
+    <action>Refresh:TREE</action>
+    $ENABLE_BUTTONS
+    <action>disable:BUTTON_ALL</action>
+   </button>
+  </hbox>
+  <text height-request=\"10\"><label>\"\"</label></text> 
+$GUIDOC
+$GUIPIC
+$GUIMUSIC
+$GUIVIDEO
+$GUIMAIL
+$GUIZIP
+$GUICODE
+ </frame>
+</vbox>
+ <tree rules_hint=\"true\" exported_column=\"1\"  headers-clickable=\"false\">
+  <label>$LOC200|$LOC201|$LOC202|$LOC203|$LOC204|$LOC205</label>
+  <input>cat /tmp/pfind-treeitems$PROGPID</input>
+  <variable>TREE</variable>
+  <height>100</height><width>400</width>
+  <action>$PROGPATH/func -execute \$TREE &</action>
+ </tree>
+</hbox>
+ <action signal=\"hide\">exit:Exit</action>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 -p Pfind); do
+	eval $STATEMENTS
+done
+IFS=$I
+case $EXIT in
+	0) echo;;
+	98) configure;;
+	*)	rm -dr /tmp/searchresult$PROGPID
+		rm /tmp/pfind*$PROGPID
+		exit;;
+esac
+overview
+}
+
+gui_advanced (){
+	$PROGPATH/func -pfilesearch
+	$PROGPATH/func -build_treeitems
+	overview
+}
+
+gui_simple (){
+export Pfind_simple='
+<window title="Pfind" icon-name="gtk-find">
+<vbox>
+ <hbox>
+  <frame '$LOC603'>
+   <vbox>
+    <text><label>""</label></text>
+    <entry activates-default="true" width-request="300" tooltip-text="'$LOC801'">
+     <variable>SEARCHSTRING</variable>
+     <input>echo "$SEARCHSTRING"</input>'"
+    </entry>
+    <text><label>\"\"</label></text>
+    <hbox>
+     <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+      <input file stock=\"gtk-find\"></input>
+      <label>$LOC_SEARCH</label>
+      <action>. $PROGPATH/func -search</action>
+      <action type=\"exit\">0</action>
+     </button>
+     <button>
+      <input file stock=\"gtk-fullscreen\"></input>
+      <label>$LOC_ADVANCED</label>
+      <action>$PROGPATH/func -pfilesearch</action>
+      <action type=\"exit\">0</action>
+     </button>
+     <button tooltip-text=\" $LOC102 \">
+      <input file stock=\"gtk-preferences\"></input>
+      <action type=\"exit\">98</action>
+     </button>
+    </hbox>
+   </vbox>
+  </frame>
+  <frame $LOC597>
+   <vbox>
+    <radiobutton tooltip-text=\"$PATH_PUPPY\">
+     <variable>RADIOBUTTON_PATH_PUPPY</variable>
+     <label>$LOC598</label>
+     <default>$RADIOBUTTON_PATH_PUPPY</default>
+    </radiobutton>
+    <radiobutton tooltip-text=\"$PATH_MNT\">
+     <variable>RADIOBUTTON_PATH_MNT</variable>
+     <label>$LOC599</label>
+     <default>$RADIOBUTTON_PATH_MNT</default>
+    </radiobutton>
+    <radiobutton tooltip-text=\"$CURDIR\">
+     <variable>RADIOBUTTON_PATH_CURRENT</variable>
+     <label>$LOC600</label>
+     <default>$RADIOBUTTON_PATH_CURRENT</default>
+    </radiobutton>
+    <radiobutton>
+     <variable>RADIOBUTTON_PATH_ALL</variable>
+     <label>$LOC601 ($LOC596)</label>
+     <default>$RADIOBUTTON_PATH_ALL</default>
+    </radiobutton>
+   </vbox>
+  </frame>
+ </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 -p Pfind_simple); do
+	eval $STATEMENTS
+done
+IFS=$I
+case $EXIT in
+	98) configure
+		gui_simple;;
+	abort) rm -dr /tmp/searchresult$PROGPID
+		rm /tmp/pfind*$PROGPID
+		exit 0;;
+esac
+#save last searchstring
+export SEARCHSTRING="$SEARCHSTRING"
+echo "$SEARCHSTRING" > $HOME/.pfind/SEARCHSTRING
+write_config #to save chosen preset
+#---
+if [ -s /tmp/pfind-view$PROGPID ]; then
+	overview
+else
+	pfind &
+fi
+}
+
+configure () {
+PROFILE=`grep PROFILE $HOME/.pfind/pfindrc | sed -e s/^.*\=//g`
+export Pfind_preferences="
+<window title=\"Pfind\"icon-name=\"gtk-find\">
+<vbox>
+ <notebook labels=\" $LOC306 | $LOC307 | $LOC308 \">
+  <vbox>
+   <frame $LOC305>
+     <hbox>
+      <button>
+       <input file stock=\"gtk-find\"></input>
+       <label>$LOC305</label>
+       <action>. pfilesearch -p</action>
+      </button>
+     </hbox>
+     <text><label>\"\"</label></text>
+     <text><label>$LOC304</label></text>
+   </frame>
+   <frame $LOC311>
+    <hbox>
+     <text><label>$LOC312</label></text>
+     <combobox>
+      <variable>NEW_LANGUAGE</variable>
+      <item>$LANGUAGE</item>
+      <item>auto</item>
+      $LANGUAGES
+     </combobox>
+    </hbox>
+   </frame>
+  </vbox>
+  <vbox>
+   <frame $LOC200>
+    <text use-markup=\"true\"><label>\"$LOC620\"</label></text>
+    <combobox>
+     <variable>FILENAME</variable>
+     <item>$FILENAME</item>
+     <item>$LOC314</item>
+     <item>$LOC315</item>
+     <item>$LOC316</item>
+    </combobox>
+   </frame>
+   <frame>
+    <checkbox>
+     <label>\"$LOC317\"</label>
+     <variable>ACCEPT_ARROW</variable>
+     <default>$ACCEPT_ARROW</default>
+    </checkbox>
+    <text><label>\"\"</label></text>
+    <hbox>
+     <text><label>$LOC318</label></text>
+     <entry><variable>MAX_LIST_ITEMS</variable><input>echo '$MAX_LIST_ITEMS'</input></entry>
+    </hbox>
+   </frame>
+   <frame $LOC319>
+    <hbox>
+     <text><label>$LOC320</label></text>
+     <entry><variable>FILEMANAGER</variable><input>echo '$FILEMANAGER'</input></entry>
+    </hbox>
+    <hbox>
+     <text><label>$LOC321</label></text>
+     <entry><variable>TEXTEDITOR</variable><input>echo '$TEXTEDITOR'</input></entry>
+    </hbox>
+   </frame>
+  </vbox>
+  <vbox>
+   <text><label>$LOC402</label></text>
+   <combobox>
+    <variable>EXEC_FILEMANAGER_X</variable>
+    <item>\"$EXEC_FILEMANAGER\"</item>
+    <item>\"rox /tmp/searchresult/\"</item>
+    <item>\"Thunar /tmp/searchresult/\"</item>
+   </combobox>
+   <text><label>$LOC403</label></text>
+   <combobox>
+    <variable>EXEC_TEXTEDITOR_X</variable>
+    <item>\"$EXEC_TEXTEDITOR\"</item>
+    <item>\"defaulttexteditor /tmp/searchresult/*\"</item>
+    <item>\"geany /tmp/searchresult/*\"</item>
+    <item>\"leafpad /tmp/searchresult/*\"</item>
+   </combobox>
+   <text><label>$LOC404</label></text>
+   <combobox>
+    <variable>EXEC_EXPORT_LIST_TO_TEXTEDITOR_X</variable>
+    <item>\"$EXEC_EXPORT_LIST_TO_TEXTEDITOR\"</item>
+    <item>\"defaulttexteditor /tmp/pfind-text\"</item>
+    <item>\"geany /tmp/pfind-text\"</item>
+    <item>\"leafpad /tmp/pfind-text\"</item>
+   </combobox>
+   <text><label>$LOC405</label></text>
+   <combobox>
+    <variable>EXEC_IMAGEBROWSER_X</variable>
+    <item>\"$EXEC_IMAGEBROWSER\"</item>
+    <item>\"fotoxx -i /tmp/searchresult\"</item>
+    <item>\"gimv -d /tmp/searchresult/\"</item>
+    <item>\"gpicview /tmp/searchresult/\"</item>
+    <item>\"gqview /tmp/searchresult/\"</item>
+    <item>\"gtksee -R /tmp/searchresult\"</item>
+    <item>\"viewnior /tmp/searchresult\"</item>
+   </combobox>
+   <text><label>$LOC406</label></text>
+   <combobox>
+    <variable>EXEC_SLIDESHOW_X</variable>
+    <item>\"$EXEC_SLIDESHOW\"</item>
+    <item>\"gimv -dS /tmp/searchresult/\"</item>
+    <item>\"qiv -ftsNF /tmp/pfind-view\"</item>
+    <item>\"gpicview /tmp/searchresult/\"</item>
+    <item>\"gqview -s /tmp/searchresult/\"</item>
+    <item>\"viewnior /tmp/searchresult\"</item>
+   </combobox>
+   <text><label>$LOC407</label></text>
+   <combobox>
+    <variable>EXEC_MUSICPLAYER_X</variable>
+    <item>\"$EXEC_MUSICPLAYER\"</item>
+    <item>\"aqualung /tmp/pfind-music.m3u\"</item>
+    <item>\"gmplayer -playlist /tmp/pfind-music.m3u\"</item>
+    <item>\"gxine /tmp/searchresult/*\"</item>
+    <item>\"pmusic /tmp/pfind-music.m3u\"</item>
+    <item>\"xine -P /tmp/pfind-music.m3u\"</item>
+    <item>\"xmms -p /tmp/pfind-music.m3u\"</item>
+   </combobox>
+   <text><label>$LOC408</label></text>
+   <combobox>
+    <variable>EXEC_VIDEOPLAYER_X</variable>
+    <item>\"$EXEC_VIDEOPLAYER\"</item>
+    <item>\"gmplayer -playlist /tmp/pfind-video.m3u\"</item>
+    <item>\"gxine /tmp/searchresult/*\"</item>
+    <item>\"xine -P /tmp/pfind-music.m3u\"</item>
+   </combobox>
+   <text><label>$LOC409</label></text>
+   <combobox>
+    <variable>EXEC_BURNER_X</variable>
+    <item>\"$EXEC_BURNER\"</item>
+    <item>\"grafburn -f /tmp/pfind-view\"</item>
+    <item>\"pburn -i /tmp/pfind-view\"</item>
+   </combobox>
+  </vbox>
+ </notebook>
+ <hbox>
+  <button><input file stock=\"gtk-cancel\"></input><label>$LOC_CANCEL</label></button>
+  <button><input file stock=\"gtk-ok\"></input><label>$LOC_OK</label><action type=\"exit\">OK</action></button>
+ </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 -p Pfind_preferences --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+if [ $EXIT = OK ]; then
+	if [ ! $LANGUAGE = $NEW_LANGUAGE ]; then
+		LANGUAGE="$NEW_LANGUAGE"
+		"$PROGPATH"/func -install
+		FRAME="Info"; IMG="dialog-info"; TXT1="$LOC619"
+		. "$PROGPATH"/box_ok
+		. "$PROGPATH"/locals/$LANGUAGE
+		SEARCHPATHS="/  ($LOC601)"
+		FILENAME="$LOC316"
+		write_config
+		exit
+	fi
+	EXEC_FILEMANAGER="$EXEC_FILEMANAGER_X"
+	EXEC_TEXTEDITOR="$EXEC_TEXTEDITOR_X"
+	EXEC_EXPORT_LIST_TO_TEXTEDITOR="$EXEC_EXPORT_LIST_TO_TEXTEDITOR_X"
+	EXEC_IMAGEBROWSER="$EXEC_IMAGEBROWSER_X"
+	EXEC_SLIDESHOW="$EXEC_SLIDESHOW_X"
+	EXEC_MUSICPLAYER="$EXEC_MUSICPLAYER_X"
+	EXEC_VIDEOPLAYER="$EXEC_VIDEOPLAYER_X"
+	EXEC_BURNER="$EXEC_BURNER_X"
+	write_config
+fi
+}
+
+write_config () {
+	[ $RADIOBUTTON_PATH_CURRENT = true ] && RADIOBUTTON_PATH_MNT=true
+	echo "export VERSION=$VERSION"							 > $HOME/.pfind/pfindrc
+	echo "export LANGUAGE=$LANGUAGE"						>> $HOME/.pfind/pfindrc
+	echo "export FILENAME=$FILENAME"						>> $HOME/.pfind/pfindrc
+	echo "ACCEPT_ARROW=$ACCEPT_ARROW" 						>> $HOME/.pfind/pfindrc
+	echo "PROFILE=\"$PROFILE\"" 							>> $HOME/.pfind/pfindrc
+	echo "export MAX_LIST_ITEMS=$MAX_LIST_ITEMS"			>> $HOME/.pfind/pfindrc
+	echo "export FILEMANAGER=\"$FILEMANAGER\""				>> $HOME/.pfind/pfindrc
+	echo "export TEXTEDITOR=\"$TEXTEDITOR\""				>> $HOME/.pfind/pfindrc
+	echo "export EXEC_FILEMANAGER=\"$EXEC_FILEMANAGER\""	>> $HOME/.pfind/pfindrc
+	echo "export EXEC_TEXTEDITOR=\"$EXEC_TEXTEDITOR\""		>> $HOME/.pfind/pfindrc
+	echo "export EXEC_EXPORT_LIST_TO_TEXTEDITOR=\"$EXEC_EXPORT_LIST_TO_TEXTEDITOR\"" >> $HOME/.pfind/pfindrc
+	echo "export EXEC_IMAGEBROWSER=\"$EXEC_IMAGEBROWSER\""	>> $HOME/.pfind/pfindrc
+	echo "export EXEC_SLIDESHOW=\"$EXEC_SLIDESHOW\""		>> $HOME/.pfind/pfindrc
+	echo "export EXEC_MUSICPLAYER=\"$EXEC_MUSICPLAYER\""	>> $HOME/.pfind/pfindrc
+	echo "export EXEC_VIDEOPLAYER=\"$EXEC_VIDEOPLAYER\""	>> $HOME/.pfind/pfindrc
+	echo "export EXEC_BURNER=\"$EXEC_BURNER\""				>> $HOME/.pfind/pfindrc
+	echo "export RADIOBUTTON_PATH_PUPPY=$RADIOBUTTON_PATH_PUPPY"		>> $HOME/.pfind/pfindrc
+	echo "export RADIOBUTTON_PATH_MNT=$RADIOBUTTON_PATH_MNT"			>> $HOME/.pfind/pfindrc
+	echo "export RADIOBUTTON_PATH_CURRENT=false"						>> $HOME/.pfind/pfindrc #current path is not current at next start
+	echo "export RADIOBUTTON_PATH_ALL=$RADIOBUTTON_PATH_ALL"			>> $HOME/.pfind/pfindrc
+	echo "export PATH_PUPPY='$PATH_PUPPY'" 					>> $HOME/.pfind/pfindrc
+	echo "export PATH_MNT='$PATH_MNT'" 						>> $HOME/.pfind/pfindrc
+	. $HOME/.pfind/pfindrc #read config file
+}
+
+#========================== PROGRAM =============================
+#version upgrade
+CURRENT_VERSION="`grep VERSION $HOME/.pfind/pfindrc`"
+if [ -z "$CURRENT_VERSION" ]; then #no pfindrc, first run, or older than 2.3. copy from /usr/...
+	mkdir $HOME/.pfind
+	cp -f "$PROGPATH"pfindrc $HOME/.pfind/pfindrc
+	. $HOME/.pfind/pfindrc
+	. "$PROGPATH"/func -install
+	write_config
+fi
+if [  `echo $CURRENT_VERSION | sed -e s/^.*\=//g | tr -d "."` -lt 40 > /dev/null 2>&1 ]; then #Older than 4.0
+	mkdir $HOME/.pfind
+	cp -f "$PROGPATH"pfindrc $HOME/.pfind/pfindrc
+	. $HOME/.pfind/pfindrc
+	. "$PROGPATH"/func -install
+	write_config
+fi
+if [ `echo $CURRENT_VERSION | sed -e s/^.*\=//g | tr -d "."` -lt 423 > /dev/null 2>&1 ]; then #Older than 4.23
+	cp -f "$PROGPATH"pfindrc $HOME/.pfind/pfindrc
+	. $HOME/.pfind/pfindrc
+fi
+#---
+echo -n > $HOME/.pfilesearch/tmp/SEARCHPATHS #cleanup
+. $HOME/.pfind/pfindrc #read config file
+
+#parameters
+while [ $# != 0 ]; do
+	I=1
+	while [ $I -le `echo $# | wc -c` ]; do #check -xft
+		if [ `echo $1 | grep a` ]; then STARTMODE=advanced; fi
+		if [ `echo $1 | grep o` ]; then STARTMODE=overview; fi
+		if [ `echo $1 | grep v` ]; then echo "Pfind $VERSION"; exit; fi
+		if [ `echo $1 | grep h` ]; then
+echo 'Options
+  -a          Start with advanced gui.
+  -d [DIR]    Search in a specific directory.
+  -h          show this help message.
+  -o          Go straight to overview window.
+  -v          show Pfind version.'
+  			exit
+		fi
+		#all parameters that 'shifts'
+		if [ `echo $1 | grep d` ]; then
+			export OVERRIDE_SEARCHPATHS="$2"
+			export CURDIR="$2"
+			export RADIOBUTTON_PATH_PUPPY=false
+			export RADIOBUTTON_PATH_MNT=false
+			export RADIOBUTTON_PATH_CURRENT=true
+			export RADIOBUTTON_PATH_ALL=false
+			shift
+		fi
+		shift
+		I=$[$I+1]
+	done
+done
+
+#set language
+TMP="`ls -1 $PROGPATH/locals/ | grep ${LANG%.*}`"
+. $PROGPATH/locals/en_US:english #always run to fill gaps in translation
+#fallback to macrolanguage if available (ISO 639-1 two letter code: en, es, fr, etc.)
+[ -z $TMP ] && TMP="`ls -1 $PROGPATH/locals/ | grep ${LANG%_*}`"
+[ "$TMP" != "en_US:english" ] && . $PROGPATH/locals/$TMP 2> /dev/null 
+LANGUAGES=`ls "$PROGPATH"locals | awk '{print "<item>"$1"</item>"}'` #for configure
+#default values
+if [ -s $HOME/.pfind/SEARCHSTRING ]; then
+	SEARCHSTRING="`cat $HOME/.pfind/SEARCHSTRING`"
+else
+	SEARCHSTRING="$LOC501"
+fi
+. "$PROGPATH"pfindhlp #read help text (in installed language)
+#---
+export EXTDOC=`grep document= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+#'$' makes the end of word (extension) '\|' makes grep either
+export EXTPIC=`grep picture= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+export EXTMUSIC=`grep music= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+export EXTVIDEO=`grep video= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+export EXTMAIL=`grep mail= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+export EXTZIP=`grep zip= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+export EXTCODE=`grep code= $HOME/.pfilesearch/pfilesearchMIMErc | sed -e s/^.*\=//g | sed -e 's/ ./$\\\|\\\./g'`
+######if [ "$INTERFACE" = "cli" ]; then SEARCHSTRING="$CLI_STRING"; search; fi
+#choose browser for helpfile
+if which defaultbrowser >/dev/null ; then export BROWSER=defaultbrowser
+	elif which hv3 >/dev/null ;   then export BROWSER=hv3
+	elif which dillo >/dev/null ; then export BROWSER=dillo
+	elif which mozilla >/dev/null ; then export BROWSER=mozilla
+	elif which opera >/dev/null ; then export BROWSER=opera
+	elif which netscape >/dev/null ; then export BROWSER=netscape
+	elif which firefox >/dev/null ;   then export BROWSER=firefox
+	elif which konqueror >/dev/null; then export BROWSER=konqueror
+fi
+#---
+case $STARTMODE in
+	advanced)	gui_advanced;;
+	overview)
+				sort -u --output=/tmp/pfind-files$PROGPID $HOME/.pfilesearch/hits
+				mv -f /tmp/pfind-files$PROGPID $HOME/.pfilesearch/hits
+				cp $HOME/.pfilesearch/hits /tmp/pfind-files$PROGPID
+				cp $HOME/.pfilesearch/hits /tmp/pfind-view$PROGPID
+				overview;;
+	*)			gui_simple;;
+esac

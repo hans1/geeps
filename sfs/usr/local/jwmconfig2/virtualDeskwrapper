@@ -1,0 +1,6 @@
+#!/bin/sh
+. /tmp/JWMCONFIGVARS
+JWM_V=`jwm -v|head -n1|cut -d '-' -f2|cut -d ' ' -f1`
+if [[ "$JWM_V" -gt "493" ]];then exec $SCRIPT_DIR/virtualDesknew && exit
+ else $SCRIPT_DIR/virtualDesk && exit
+fi

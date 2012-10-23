@@ -1,0 +1,224 @@
+#!/bin/bash
+#Pmusic
+#Copyright 2008,2009,2010,2011,2012
+#Sigmund Berglund
+
+. $APPDIR/func -reset_gtk
+$APPDIR/func -kill_browser_id3 #kill ongoing process
+export ID3_GENRES=`awk -F "(" '{print "<item>"$1"("$2"</item>"}' $APPDIR/txt_id3genre` #build id3 genres
+echo "$LOC258" > $WORKDIR/tmp
+#define list to act on
+if [ $LIST = $WORKDIR/playlist ]; then
+	TAG_PLAYLIST=true; TAG_SOURCELIST=false
+else #sourcelist
+	TAG_SOURCELIST=true; TAG_PLAYLIST=false
+fi
+
+echo '
+<window title="Pmusic - '$LOC116'" icon-name="pmusic" default_width="470" default_height="400">
+<vbox>
+ <vbox>
+  <frame>
+   <hbox>
+    <text width-request="100" use-markup="true"><label>"<b>'$LOC_ARTIST'</b>"</label></text>
+    <entry><variable>ARTIST</variable></entry>
+   </hbox>
+   <hbox>
+    <text width-request="100" use-markup="true"><label>"<b>'$LOC_TITLE'</b>"</label></text>
+    <entry><variable>TITLE</variable></entry>
+   </hbox>
+   <hbox>
+    <text width-request="100" use-markup="true"><label>"<b>'$LOC_ALBUM'</b>"</label></text>
+    <entry><variable>ALBUM</variable></entry>
+   </hbox>
+   <hbox>
+    <text width-request="100" use-markup="true"><label>"<b>'$LOC_YEAR'</b>"</label></text>
+    <entry><variable>YEAR</variable></entry>
+   </hbox>
+   <hbox spacing="0">
+    <text width-request="105" use-markup="true"><label>"<b>'$LOC_TRACK' '$LOC_NR'</b>"</label></text>
+    <entry>
+     <variable>TRACK</variable>
+     <input file>'$WORKDIR'/tmp_id3tagger_track</input>
+    </entry>
+    <button width-request="27" height-request="27">
+     <input file stock="gtk-go-back"></input>
+     <action>echo "exe:printf \"%02d\" COUNT" > '$WORKDIR'/tmp_id3tagger_track</action>
+     <action>refresh:TRACK</action>
+     <action>rm '$WORKDIR'/tmp_id3tagger_track</action>
+    </button>
+   </hbox>
+   <hbox>
+    <text space-expand="false" space-fill="false" use-markup="true"><label>"<b>'$LOC_GENRE'</b>"</label></text>
+    <hbox space-expand="true" space-fill="true">
+     <text><label>""</label></text>
+    </hbox>
+    <comboboxentry><variable>GENRE</variable>'$ID3_GENRES'</comboboxentry>
+    </hbox>
+   </frame>
+  </vbox>
+  <vbox scrollable="true" spacing="0" width="230" width-request="10">
+   <text><label>""</label></text>
+   <hbox>
+    <vbox space-expand="false" space-fill="false">
+     <pixmap icon_size="6"><input file stock="gtk-dialog-info"></input></pixmap>
+    </vbox>
+    <hbox space-expand="true" space-fill="true">
+     <text><label>""</label></text>
+    </hbox>
+    <text use-markup="true" selectable="true">
+     <input file>'$WORKDIR'/tmp</input>
+    </text>
+    <hbox space-expand="true" space-fill="true">
+     <text><label>""</label></text>
+    </hbox>
+   </hbox>
+  </vbox>
+  
+ <hbox>
+  <vbox spacing="0" tooltip-text="'$LOC254'">
+   <radiobutton height-request="15">
+    <label>'$LOC110'</label>
+    <variable>TAG_PLAYLIST</variable>
+    <default>'$TAG_PLAYLIST'</default>
+   </radiobutton>
+   <radiobutton height-request="15">
+    <label>'$LOC170'</label>
+    <variable>TAG_SOURCELIST</variable>
+    <default>'$TAG_SOURCELIST'</default>
+   </radiobutton>
+  </vbox>
+  <hbox space-expand="true" space-fill="true">
+   <text><label>""</label></text>
+  </hbox>
+  <button>
+   <label>'$LOC252'</label>
+   <input file stock="gtk-clear"></input>
+   <action type="exit">clear_tag</action>
+  </button>
+  <button>
+   <label>'$LOC256'</label>
+   <input file stock="gtk-save"></input>
+   <action type="exit">save</action>
+  </button>
+ </hbox>
+</vbox>
+</window>' > $WORKDIR/xml_Pmusic_id3tagger
+[ $TOOLTIPS = false ] && sed -i 's%tooltip-text%tooltipXXXtext%g' $WORKDIR/xml_Pmusic_id3tagger #deactivate tooltips
+IFS=""
+for STATEMENTS in $($GTKDIALOG -f $WORKDIR/xml_Pmusic_id3tagger); do
+	eval $STATEMENTS
+done
+
+if [ "$EXIT" = "Cancel" ] || [ "$EXIT" = "abort" ]; then exit; fi
+
+#Message: Do you really want to clear all tags
+if [ "$EXIT" = "clear_tag" ]; then
+	FRAME="$LOC252"; IMG="question"; TXT1="$LOC257"
+	. $APPDIR/box_yesno
+	 [ $EXIT != "yes" ] && exit
+fi
+
+#show splash
+echo "'$LOC116'..." > $WORKDIR/splashtext
+$APPDIR/box_splash_progress &
+
+#remove dirs and not valid files 
+if [ $TAG_PLAYLIST = true ]; then
+	cat $WORKDIR/playlist | cut -d'|' -f4 | cut -c 5- | grep -iE "$AUDIO_FORMATS" > $WORKDIR/tmp_id3tagger
+else #sourcelist
+	cat $WORKDIR/sourcelist | cut -d'|' -f1 | cut -c 3- | grep -iE "$AUDIO_FORMATS" > $WORKDIR/tmp_id3tagger
+fi
+
+COUNT=0
+TOTAL=`grep -c ^ $WORKDIR/tmp_id3tagger`
+while read FILE; do
+	#update progressbar
+	echo "100 * $COUNT / $TOTAL" | bc > $WORKDIR/splash 
+	COUNT=$(($COUNT+1))
+	#Variables used in exe: ... COUNT might also be used
+	FILENAME="`basename "$FILE" | sed -e 's/\.[^\.]*$//' -e "s/'/'\\\\\\\\\\\\\''/g" -e 's/&/\\\&/g'`" #'
+	TMP="`dirname "$FILE"`"
+	DIRNAME="`basename "$TMP"`"
+	#---
+	. $APPDIR/func_id3io "$FILE" -read
+	[ "$ARTIST" ] && ID3_ARTIST="$ARTIST"
+	[ "$TITLE" ] && ID3_TITLE="$TITLE"
+	[ "$ALBUM" ] && ID3_ALBUM="$ALBUM"
+	[ "$YEAR" ] && ID3_YEAR="$YEAR"
+	[ "$TRACK" ] && ID3_TRACK="$TRACK"
+	[ "$GENRE" ] && ID3_GENRE="$GENRE"
+	if [ "`echo "$ARTIST" | grep "^exe:"`" ]; then #acting on source variable would stop dynamic exe: updates
+		if [ "`echo "$ARTIST" | grep -F CLEAR`" ]; then
+			ID3_ARTIST=''
+		else
+			echo "$ARTIST" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_ARTIST="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+	if [ "`echo "$TITLE" | grep "^exe:"`" ]; then
+		if [ "`echo "$TITLE" | grep -F CLEAR`" ]; then
+			ID3_TITLE=''
+		else
+			echo "$TITLE" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_TITLE="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+	if [ "`echo "$ALBUM" | grep "^exe:"`" ]; then
+		if [ "`echo "$ALBUM" | grep -F CLEAR`" ]; then
+			ID3_ALBUM=''
+		else
+			echo "$ALBUM" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_ALBUM="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+	if [ "`echo "$YEAR" | grep "^exe:"`" ]; then
+		if [ "`echo "$YEAR" | grep -F CLEAR`" ]; then
+			ID3_YEAR=''
+		else
+			echo "$YEAR" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_YEAR="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+	if [ "`echo "$TRACK" | grep "^exe:"`" ]; then
+		if [ "`echo "$TRACK" | grep -F CLEAR`" ]; then
+			ID3_TRACK=''
+		else
+			echo "$TRACK" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_TRACK="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+	if [ "`echo "$GENRE" | grep "^exe:"`" ]; then
+		if [ "`echo "$GENRE" | grep -F CLEAR`" ]; then
+			ID3_GENRE=''
+		else
+			echo "$GENRE" | cut -d: -f2- | sed -e "s%FILENAME%$FILENAME%g" -e "s%COUNT%$COUNT%g" -e "s%DIRNAME%$DIRNAME%g"> $WORKDIR/exec_tagging
+			chmod 722 $WORKDIR/exec_tagging
+			ID3_GENRE="`$WORKDIR/exec_tagging`"
+		fi
+	fi
+
+	case $EXIT in
+		#yet another time, ffmpeg doesn't like being called from a parent pid. - using xterm is a workaround.
+		save)
+			EXTENSION="`basename "$FILE" | sed -e "s/^.*\.//g"`"
+			xterm -geometry 1x1+1+1 -e ffmpeg -i "$FILE" -acodec copy -id3v2_version 3 -metadata title="$ID3_TITLE" -metadata artist="$ID3_ARTIST" -metadata album="$ID3_ALBUM" -metadata year="$ID3_YEAR" -metadata track="$ID3_TRACK" -metadata genre="$ID3_GENRE" -y $WORKDIR/tmp_ffmpeg_copy.$EXTENSION
+			mv -f $WORKDIR/tmp_ffmpeg_copy.$EXTENSION "$FILE"
+#			. $APPDIR/func_id3io "$FILE" -write
+			;;
+		clear_tag)
+			EXTENSION="`basename "$FILE" | sed -e "s/^.*\.//g"`"
+			xterm -geometry 1x1+1+1 -e ffmpeg -i "$FILE" -acodec copy -id3v2_version 3 -metadata title='' -metadata artist='' -metadata album='' -metadata year='' -metadata track='' -metadata genre='' -y $WORKDIR/tmp_ffmpeg_copy.$EXTENSION
+			mv -f $WORKDIR/tmp_ffmpeg_copy.$EXTENSION "$FILE"
+#			. $APPDIR/func_id3io "$FILE" -clear
+			;;
+	esac
+done < $WORKDIR/tmp_id3tagger
+
+$APPDIR/func -browse_id3 & #update tags in sourcelist
+echo 100 > $WORKDIR/splash

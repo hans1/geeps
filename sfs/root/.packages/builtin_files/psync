@@ -1,0 +1,14 @@
+/usr
+/usr/bin
+ ntpdate
+/usr/local
+/usr/local/psync
+ psync
+ psyncfunc
+ setcountry
+ timesync.sh
+/usr/share
+/usr/share/applications
+ Psync.desktop
+/usr/share/doc
+ psync.html

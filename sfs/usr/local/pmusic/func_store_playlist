@@ -1,0 +1,28 @@
+#!/bin/bash
+#Pmusic
+#Copyright 2008,2009,2010,2011
+#Sigmund Berglund
+IFS=$'\n'
+
+export WORKDIR=$HOME/.pmusic/tmp
+mkdir $HOME/.pmusic/storage_playlist/ > /dev/null 2>&1
+DATO="`date +%Y\_%m\_%d\_\(%H:%M:%S\)`"
+
+#check if list is not empty
+if [ -s $WORKDIR/playlist ]; then
+	ls -1 $HOME/.pmusic/storage_playlist/ > $WORKDIR/tmp
+	while read I; do
+		[ ! "`diff $HOME/.pmusic/storage_playlist/"$I" $WORKDIR/playlist`" ] && exit
+	done < $WORKDIR/tmp
+	#---
+	sed -i "s/gtk-media-play//" $WORKDIR/playlist #do not save play-icon in playlist
+	cp $WORKDIR/playlist $HOME/.pmusic/storage_playlist/"Playlist_""$DATO"
+	echo "Playlist_""$DATO" > $WORKDIR/PLAYLIST_NAME
+	#keep only the 30 newest in storage
+	ls -1 $HOME/.pmusic/storage_playlist/ | tail -n 30 > $WORKDIR/tmp_ls
+	ls -1 $HOME/.pmusic/storage_playlist/ > $WORKDIR/tmp_ls2
+	while read I; do
+		[ ! "`grep -F "$I" $WORKDIR/tmp_ls`" ] && rm $HOME/.pmusic/storage_playlist/"$I"
+	done < $WORKDIR/tmp_ls2
+fi
+exit 0

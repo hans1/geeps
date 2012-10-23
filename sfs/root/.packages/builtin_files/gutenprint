@@ -1,0 +1,267 @@
+/etc
+/etc/cups
+ command.types
+/usr
+/usr/bin
+ cups-calibrate
+ escputil
+ testpattern
+/usr/lib
+/usr/lib/cups
+/usr/lib/cups/driver
+ gutenprint.5.2
+/usr/lib/cups/filter
+ commandtocanon
+ commandtoepson
+ rastertogutenprint.5.2
+/usr/lib/gutenprint
+/usr/lib/gutenprint/5.2
+/usr/lib/gutenprint/5.2/modules
+/usr/sbin
+ cups-genppd.5.2
+ cups-genppdupdate
+/usr/share
+/usr/share/cups
+ calibrate.ppm
+/usr/share/gutenprint
+/usr/share/gutenprint/5.2
+/usr/share/gutenprint/5.2/xml
+ dither-matrix-1x1.xml
+ dither-matrix-2x1.xml
+ dither-matrix-4x1.xml
+/usr/share/gutenprint/5.2/xml/escp2
+/usr/share/gutenprint/5.2/xml/escp2/inks
+ artisan.xml
+ b500.xml
+ c120.xml
+ c64.xml
+ c80.xml
+ c82.xml
+ claria.xml
+ cmykrb.xml
+ cmykro.xml
+ cmy.xml
+ cx3650.xml
+ defaultblack.xml
+ f360_photo7_japan.xml
+ f360_photo.xml
+ f360_ultrachrome_k3v_2.xml
+ f360_ultrachrome_k3v.xml
+ f360_ultrachrome_k3.xml
+ f360_ultrachrome.xml
+ f360.xml
+ nx100.xml
+ photo_gen0.xml
+ photo_gen1.xml
+ photo_gen2.xml
+ photo_gen3_4.xml
+ photo_gen3.xml
+ photo_gen4.xml
+ photo_pigment.xml
+ picturemate_4.xml
+ picturemate_6.xml
+ pro_gen1.xml
+ pro_gen2.xml
+ pro_pigment.xml
+ pro_ultrachrome_k34.xml
+ pro_ultrachrome_k3v4.xml
+ pro_ultrachrome_k3v.xml
+ pro_ultrachrome_k3.xml
+ pro_ultrachrome.xml
+ standard_gen0.xml
+ standard.xml
+ ultrachrome.xml
+ wf40.xml
+ wf500.xml
+ x80.xml
+/usr/share/gutenprint/5.2/xml/escp2/inputslots
+ artisan.xml
+ b500.xml
+ cd_cutter_roll_feed.xml
+ cd_roll_feed.xml
+ cd.xml
+ cutter_roll_feed.xml
+ default.xml
+ pro3880.xml
+ pro_cutter_roll_feed.xml
+ pro_roll_feed.xml
+ r1800.xml
+ r2400.xml
+ r2880.xml
+ rx680.xml
+ rx700.xml
+ spro5000.xml
+ standard_roll_feed.xml
+/usr/share/gutenprint/5.2/xml/escp2/media
+ artisan.xml
+ b500.xml
+ c120.xml
+ c64.xml
+ c80.xml
+ c82.xml
+ claria1400.xml
+ claria.xml
+ cmykrb.xml
+ cmykro.xml
+ cmy.xml
+ cx3650.xml
+ f360_photo7_japan.xml
+ f360_photo.xml
+ f360_ultrachrome_k3v.xml
+ f360_ultrachrome_k3.xml
+ f360_ultrachrome.xml
+ f360.xml
+ nx100.xml
+ photo_gen0.xml
+ photo_gen1.xml
+ photo_gen2.xml
+ photo_gen3_4.xml
+ photo_gen3.xml
+ photo_gen4.xml
+ photo_pigment.xml
+ picturemate_4.xml
+ picturemate_6.xml
+ pro3880_ultrachrome_k3v.xml
+ pro_gen1.xml
+ pro_gen2.xml
+ pro_pigment.xml
+ pro_ultrachrome_k3v.xml
+ pro_ultrachrome_k3.xml
+ pro_ultrachrome.xml
+ r800.xml
+/usr/share/gutenprint/5.2/xml/escp2/mediasizes
+ standard.xml
+/usr/share/gutenprint/5.2/xml/escp2/model
+ model_0.xml
+ model_100.xml
+ model_101.xml
+ model_102.xml
+ model_103.xml
+ model_104.xml
+ model_105.xml
+ model_106.xml
+ model_107.xml
+ model_108.xml
+ model_109.xml
+ model_10.xml
+ model_110.xml
+ model_111.xml
+ model_112.xml
+ model_113.xml
+ model_114.xml
+ model_115.xml
+ model_11.xml
+ model_12.xml
+ model_13.xml
+ model_14.xml
+ model_15.xml
+ model_16.xml
+ model_17.xml
+ model_18.xml
+ model_19.xml
+ model_1.xml
+ model_20.xml
+ model_21.xml
+ model_22.xml
+ model_23.xml
+ model_24.xml
+ model_25.xml
+ model_26.xml
+ model_27.xml
+ model_28.xml
+ model_29.xml
+ model_2.xml
+ model_30.xml
+ model_31.xml
+ model_32.xml
+ model_33.xml
+ model_34.xml
+ model_35.xml
+ model_36.xml
+ model_37.xml
+ model_38.xml
+ model_39.xml
+ model_3.xml
+ model_40.xml
+ model_41.xml
+ model_42.xml
+ model_43.xml
+ model_44.xml
+ model_45.xml
+ model_46.xml
+ model_47.xml
+ model_48.xml
+ model_49.xml
+ model_4.xml
+ model_50.xml
+ model_51.xml
+ model_52.xml
+ model_53.xml
+ model_54.xml
+ model_55.xml
+ model_56.xml
+ model_57.xml
+ model_58.xml
+ model_59.xml
+ model_5.xml
+ model_60.xml
+ model_61.xml
+ model_62.xml
+ model_63.xml
+ model_64.xml
+ model_65.xml
+ model_66.xml
+ model_67.xml
+ model_68.xml
+ model_69.xml
+ model_6.xml
+ model_70.xml
+ model_71.xml
+ model_72.xml
+ model_73.xml
+ model_74.xml
+ model_75.xml
+ model_76.xml
+ model_77.xml
+ model_78.xml
+ model_79.xml
+ model_7.xml
+ model_80.xml
+ model_81.xml
+ model_82.xml
+ model_83.xml
+ model_84.xml
+ model_85.xml
+ model_86.xml
+ model_87.xml
+ model_88.xml
+ model_89.xml
+ model_8.xml
+ model_90.xml
+ model_91.xml
+ model_92.xml
+ model_93.xml
+ model_94.xml
+ model_95.xml
+ model_96.xml
+ model_97.xml
+ model_98.xml
+ model_99.xml
+ model_9.xml
+/usr/share/gutenprint/5.2/xml/escp2/qualitypresets
+ p1_5.xml
+ picturemate.xml
+ standard.xml
+ v2880.xml
+ wf40.xml
+/usr/share/gutenprint/5.2/xml/escp2/weaves
+ pro7000.xml
+ pro7500.xml
+ pro7600.xml
+ standard.xml
+/usr/share/gutenprint/samples
+ colorbars4.png
+ colorsweep.png
+ extended.sample
+ profile.jpg
+ testpattern.sample

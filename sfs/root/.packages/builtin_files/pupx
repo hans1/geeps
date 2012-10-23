@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ pupx
+/usr/share
+/usr/share/applications
+ pupX-X-settings.desktop
+/usr/share/pupx
+/usr/share/pupx/locale
+ english.po

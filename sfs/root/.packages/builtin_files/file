@@ -1,0 +1,12 @@
+/etc
+/usr
+/usr/bin
+ file
+/usr/lib
+ libmagic.so
+ libmagic.so.1
+ libmagic.so.1.0.0
+/usr/share
+/usr/share/file
+/usr/share/misc
+ magic.mgc

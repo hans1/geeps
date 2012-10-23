@@ -1,0 +1,270 @@
+#!/bin/bash
+#Pbackup
+#version=3.1.x
+#language=english
+
+# |==================================|
+# | <b>text</b>            Bold text |
+# |==================================|
+
+export LOC_OK="Ok"
+export LOC_CANCEL="Cancel"
+export LOC_INFO="Info"
+export LOC_ERROR="Error"
+export LOC_YES="Yes"
+export LOC_NO="No"
+export LOC_NEXT="Next"
+export LOC_BACK="Back"
+export LOC_QUIT="Quit"
+export LOC_ADVANCED="Advanced"
+export LOC_FINISH="Finish" #verb
+
+#====== Main Gui =====================
+### Menu
+LOC150="File"
+	export LOC158="New task - Wizard"
+	export LOC152="New"
+	export LOC154="Open"
+	export LOC151="Save"
+	export LOC153="Delete"
+	export LOC155="Chain - combine tasks"
+	export LOC157="View active task"
+	export LOC440="History / Restore"
+	LOC164="Recovery"
+	LOC165="Set schedule"
+	LOC160="Inspection - simulate backup"
+	LOC161="Start Backup process"
+	LOC163="Quit"
+LOC170="Configure"
+	LOC225="Set temporary storage"
+	export LOC171="External filemanager"
+	export LOC173="External cron editor"
+	export LOC175="External recovery"
+	LOC176="CPU usage"
+	LOC172="Reset all settings"
+	export LOC174="Clear history"
+LOC190="Help"
+	export LOC191="About"
+
+###
+LOC111="Backup recent"
+LOC112="Full backup"
+LOC113="Sync"
+LOC114="Chain"
+export LOC121="Save from"
+export LOC122="Save to"	
+LOC123="From date"
+LOC124="Tasks in Chain"
+
+### Bottomline
+LOC128="Inspection"
+LOC129="Backup"
+LOC130="                                                                        "	#Area beetween buttons 'New' and 'Inspection'
+
+###
+LOC200="Tasks"
+LOC260="Name of task"
+LOC261="Backup type"
+LOC262="Schedule"
+LOC263="Last run"
+LOC264="Status"
+
+###
+LOC210="Backup"
+LOC211="Options"
+LOC212="Include subdir"
+LOC213="Follow symlink"
+LOC214="Compress result"
+LOC215="Multisession"
+LOC216="Joliet"
+LOC220="Advanced settings"
+LOC221="Exlude from backup"
+LOC222="Save to date (today)"
+LOC223="Only these filenames"
+LOC224="Mount directory"
+
+###
+LOC230="Sync"
+LOC231="Options"
+LOC232="Keep trash"
+LOC233="Leading path"
+LOC234="Check attributes"
+LOC235="Follow symlink"
+LOC236="Update symlink"
+LOC240="Advanced settings"
+LOC241="Act on files recent created or changed in 'Save-to'"
+LOC242="Do not check"
+LOC243="Trash directory"
+
+###
+LOC280="Misc"
+LOC283="General"
+LOC284="Allow automounting of local drives"
+LOC285="Write history log"
+LOC290="Warnings"
+LOC291="If filesystem in source/target differs (Sync only)"
+LOC292="When missing mounted disk"
+LOC293="If 'Leading path' is set to false (Sync only)"
+
+#====== Finish =======================
+LOC340="Backup finished"
+LOC341="Do real backup when finish."
+LOC342="Unmount local drive."
+LOC343="Finished"
+LOC350="Pbackup has synced your chosen directories. Check it out in the filemanager."
+LOC351="Pbackup has simulated a sync. See log for details."
+LOC352="A real backup will affect files shown in log."
+LOC353="Check the backup result in the filemanager."
+LOC354="Files has been transfered to server."
+LOC355="Nothing has changed since last backup."
+LOC356="Ensure the disc is reloaded.
+- Then press OK."
+
+#====== Error ========================
+LOC370="ERROR"
+LOC371="Log"
+LOC372="Error fixed - Continue"
+LOC373="Go back"
+LOC374="Log may hold more information"
+LOC375="Temporary storage was NOT set, and are defined to /tmp/. Please try again."
+LOC380="Unable to sync more than 1 path, when option 'Leading path' is deactivated."
+LOC381="Can't access"
+LOC383="Can't burn  Sync or transfer it to FTP. Change 'Save-to' directory."
+LOC384="Save-to-date is newer than Save-from-date."
+LOC385="Date is set to future. PC date is:"
+LOC386="No files to backup."
+LOC387="No disk inserted."
+LOC388="No blank disk detected, or no valid multisession disk."
+LOC389="Not enough space in temporary storage. Free up some space, or Change temporary storage from menu 'Configure'."
+LOC390="Media is not recognized as recordable DVD."
+LOC391="No DVD inserted."
+LOC392="Joliet error."
+LOC393="Can't detect burner."
+LOC394="Too much data for chosen burn-media."
+LOC395="There are too many files in search path. Either narrow search or save backup to harddisk. Number of files:"
+LOC396="Can't use settings for this disk."
+LOC397="Unknown error."
+LOC398="Date can't be earlier than 1/1 1970."
+LOC399="Can't sync a file. Please include only directories."
+LOC400="You can't inspect a chain. Inspect tasks one by one."
+export LOC401="<b>Can't access backup directory.</b> Most often it means that it is renamed, deleted, or that disk is not mounted"
+export LOC402="Can't restore from a compressed FTP-archive."
+export LOC403="Login failed. Check username and password."
+export LOC404="Couldn't connect to host."
+LOC405="Missing dependencies: "
+export LOC406="Couldn't reach file."
+export LOC407="<b>File exist</b>. Should Pbackup overwrite it?"
+export LOC408="Can't delete active task."
+LOC409="<b>Can't start the scheduling service 'cron'.</b> Some systems got a service manager (see control panel). If not, try to run command 'crond' at every boot. Also check that /var/spool/cron/crontabs/USERNAME got write access."
+
+
+#====== Warning ======================
+LOC410="WARNING"
+LOC411="Go Back"
+LOC412="Continue"
+LOC413="Warnings can be turned off in 'Misc - Warnings'"
+#Messages
+LOC420="<b>Are you sure?</b> 'Leading path' is deactivated. All alien files in target will be <b>deleted</b> or moved to trash. Target:"
+LOC421="Save-to and Save-from has <b>different filesystems</b>. This could in some cases give troubles. Found filesystems:"
+LOC422="Copy files to a not mounted directory inside /mnt/."
+
+#====== History / Restore ============
+export LOC600="Logged backups (doubleclick to show files in success backups)"
+export LOC601="Time|Task|Status|Backup target"		#Tabs (keep |)
+export LOC602="Search"
+export LOC608="(part of) filename"
+export LOC603="Files in backup"
+export LOC604="Restore ALL files in backup"
+export LOC605="Restore selected file"
+
+#====== Log messages =================
+LOC460="...compressing search result..."
+LOC461="...wait 10 sec for burner to reload disk..."
+LOC462="...verifying source and target..."
+LOC463="...sync files..."
+LOC464="...(re)moves trashfiles..."
+LOC465="...creating directories..."
+LOC466="...updating symbolic links..."
+LOC467="...updating files..."
+LOC468="...searching files..."
+LOC469="...searching directories..."
+LOC470="...searching excluded files..."
+LOC471="Inspect mode"
+LOC472="Files in a real backup:"
+LOC473="...trying to automount"
+LOC474="...copying files..."
+LOC475="...transferring files to server..."
+
+#====== Backup status ================
+LOC490="Not used"
+LOC491="Success"
+LOC492="Error"
+LOC493="Inspection"
+LOC494="Status quo"
+
+#====== Other dialogs ================
+export LOC500="Please wait"
+export LOC501="Emergency STOP"
+export LOC503="Exclude from Backup"
+export LOC504="Exclude from Sync"
+export LOC505="Specify the date when backup begins"
+export LOC506="Specify the date when backup end. Most common will be today."
+export LOC507="Make a new task of all given options and settings. Give the task a name. (Avoid special characters as &,*,<,>...)" #Text
+export LOC508="Choose burner drive."
+export LOC509="Enter command and restart Pbackup."
+export LOC510="All settings for a backup are stored as a task. Tweak settings to fit your needs and go backup. Run wizard or see help for information. Remember! Default settings are most often OK." #Text
+export LOC502="Make Backup-task with WIZARD"
+export LOC511="Start with default settings"
+export LOC512="Backup and Sync utility"
+export LOC513="You have to choose a directory"
+export LOC516="Save settings and status"
+export LOC517="Active task is marked by a red ball in main window. Settings are loaded from this task. Active task:"
+export LOC630="A chain runs several backup-tasks in one operation. The chain will be saved as an ordinary task. First define a name of the (chain) task:" 
+export LOC631="Check tasks to chain"
+export LOC632="This will remove info (no files) of earlier backups."
+export LOC633="Continue?"
+export LOC635="From"
+export LOC636="To"
+export LOC637="Schedule task"
+export LOC638="Open task. (Click on task in main-window.)"
+export LOC639="Pbackup is already running, or it was previously exited incorrectly. Remember to use the 'quit' button.
+<b>Clear storage, and continue?</b>"
+
+#====== Set save-to ================== 
+export LOC519="Save backup files to..."	
+export LOC520="Burn files to CD"
+export LOC521="Burn files to DVD"
+export LOC522="Copy files to local disk   (Harddisk, Flash card...)"
+export LOC523="Transfer to server"
+export LOC524="Name of server"
+export LOC525="Directory on server"
+export LOC526="Username"
+export LOC527="Password"
+
+#====== Set sync mode ================
+LOC540="What to do when file is newer in 'Save-to' directory"
+LOC550="Do not overwrite"
+LOC551="Keep newer files in Save-to directory"
+LOC552="Overwrite"
+LOC553="Overwrite by older files from Save-from"
+LOC554="Copy to /tmp/pbackupSYNC/"
+LOC555="Will be deleted when pc is turned off"
+
+#====== Set time schedule ============ 
+export LOC580="Manual - Do not schedule"
+export LOC581="Hourly - XX:01"
+export LOC582="Daily - 09:15"
+export LOC583="Weekly - Monday at"
+export LOC584="Monthly - The 1. day in month at 09:45"
+export LOC585="Realtime - Every 2. minute   (uncheck 'write history log')"
+export LOC586="Free - Define cron command."
+
+#====== Wizard ========================
+LOC711="Build new backup task"
+LOC712="Choose backup type"
+LOC713="Main settings"
+LOC714="Backup options"
+LOC715="Backup settings"
+LOC716="Sync options"
+LOC717="Sync settings"
+

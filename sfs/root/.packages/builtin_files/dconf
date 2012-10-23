@@ -1,0 +1,23 @@
+/usr
+/usr/bin
+ dconf
+ dconf-editor
+/usr/lib
+/usr/libexec
+ dconf-service
+/usr/lib/gio
+/usr/lib/gio/modules
+ libdconfsettings.so
+/usr/share
+/usr/share/dbus-1
+/usr/share/dbus-1/services
+ ca.desrt.dconf.service
+/usr/share/dbus-1/system-services
+ ca.desrt.dconf.service
+/usr/share/vala
+/usr/share/vala/vapi
+ dconf.deps
+ dconf.vapi
+/usr/src
+/usr/src/dconf-0.5.1
+ SLKBUILD

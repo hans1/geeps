@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ openal-info
+/usr/lib
+ libopenal.so
+ libopenal.so.1
+ libopenal.so.1.13.0

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="Gnumeric_nlsolve">
+	<information>
+		<name>Non-Linear Program Solver</name>
+		<name xml:lang="cs">Řešitel nelineárních programů</name>
+		<name xml:lang="da">Ikkelineær programløser</name>
+		<name xml:lang="de">Nicht-Linearer Programmlöser</name>
+		<name xml:lang="el">Επίλυση μη γραμμικού προγράμματος</name>
+		<name xml:lang="en_GB">Non-Linear Program Solver</name>
+		<name xml:lang="es">Programa resolutor no lineal</name>
+		<name xml:lang="fr">Programme de résolution non-linéaire</name>
+		<name xml:lang="lt">Ne-linijinis programos sprendiklis</name>
+		<description>Non-Linear Program Solver</description>
+		<description xml:lang="cs">Řešitel nelineárních programů</description>
+		<description xml:lang="da">Ikkelineær programløser</description>
+		<description xml:lang="de">Nicht-Linearer Programmlöser</description>
+		<description xml:lang="el">Επίλυση μη γραμμικού προγράμματος</description>
+		<description xml:lang="en_GB">Non-Linear Program Solver</description>
+		<description xml:lang="es">Programa resolutor no lineal</description>
+		<description xml:lang="fr">Programme de résolution non-linéaire</description>
+		<description xml:lang="lt">Ne-linijinis programos sprendiklis</description>
+	</information>
+	<loader type="Gnumeric_Builtin:module">
+		<attribute value="nlsolve" name="module_file"/>
+	</loader>
+	<services>
+		<service type="solver" model_type="nlp" id="nlsolve">
+			<information>
+			  <description>Nlsolve</description>
+			  <description xml:lang="ast">Nlsolve</description>
+			  <description xml:lang="cs">Nlsolve</description>
+			  <description xml:lang="da">Nlsolve</description>
+			  <description xml:lang="de">NL-lösen</description>
+			  <description xml:lang="el">Nlsolve</description>
+			  <description xml:lang="en_GB">Nlsolve</description>
+			  <description xml:lang="es">Nlsolve</description>
+			  <description xml:lang="fr">NLsolve</description>
+			  <description xml:lang="lt">Nlsolve</description>
+			  <description xml:lang="nb">Nlsolve</description>
+			  <description xml:lang="ru">Nlsolve</description>
+			</information>
+		</service>
+	</services>
+</plugin>

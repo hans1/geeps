@@ -1,0 +1,142 @@
+#!/bin/sh
+#(c) Copyright Jan 2008 Barry Kauler www.puppylinux.com
+#2007 Lesser GPL licence v2 (http://www.fsf.org/licensing/licenses/lgpl.html)
+#written jan 2008 for Puppy Linux.
+#v431 improvements by Patriot.
+
+#  <text><label>\"${CHARPAD}\"</label></text>
+
+ICONSETSGUI=""
+for ONETHEME in `find /root/.jwm/themes/ -mindepth 1 -maxdepth 1 -type f | grep 'jwmrc' | sed -e 's/-jwmrc//' | tr '\n' ' '`
+do
+ ONETHEME="`basename $ONETHEME`"
+ ICONSETSGUI="$ICONSETSGUI
+ <hbox>
+  <pixmap><input file>/root/.jwm/themes/${ONETHEME}-tray.png</input></pixmap>
+  <pixmap><input file>/root/.jwm/themes/${ONETHEME}-window.png</input></pixmap>
+  <vbox>
+   <pixmap><input file>/usr/local/lib/X11/pixmaps/invisible96x8.png</input></pixmap>
+   <button><label>${ONETHEME}</label></button>
+  </vbox>
+ </hbox>
+"
+
+done
+
+export ICONSWITCHGUI="
+<window title=\"Puppy JWM Theme Switcher\" icon-name=\"gtk-convert\">
+ <vbox>
+  <text><label>JWM is the window manager, handling window borders and tray (taskbar) appearance, whereas the GTK theme is inside each window. Choose a JWM theme that matches or compliments the current GTK theme</label></text>
+
+  ${ICONSETSGUI}
+  
+  <hbox>
+   <button><input file stock=\"gtk-quit\"></input><label>QUIT</label></button>
+  </hbox>
+ </vbox>
+</window>"
+
+echo "$ICONSWITCHGUI" > /tmp/iconswitchgui
+#echo "$ICONSWITCHGUI" | gtkdialog3 --stdin
+RETSTUFF="`gtkdialog3 --program=ICONSWITCHGUI`"
+
+eval "$RETSTUFF"
+
+NEWTHEME="$EXIT"
+[ "$NEWTHEME" = "" ] && exit
+[ ! -f /root/.jwm/themes/${NEWTHEME}-jwmrc ] && exit
+
+if [ "$NEWTHEME" != "" ];then
+ #select chosen theme...
+ cp -f /root/.jwm/themes/${NEWTHEME}-jwmrc /root/.jwm/jwmrc-theme
+ #set correct backgrounds for applets...
+ cp -f /root/.jwm/themes/${NEWTHEME}-colors /root/.jwm/jwm_colors
+ #...note, /root/.xinitrc reads this file to set background for absvolume.
+ #...note, jwm_colors is written to by /usr/local/jwmconfig2/gtk2jwm script
+
+#. /root/.jwm/jwm_colors #gives MENU_BG, PAGER_BG
+
+ #########
+ #John Doe created code for the applet backgrounds, old jwmconfig, port here...
+# TrayFile="/root/.jwmrc-tray"
+# TrayFileBak="/root/.jwmrc-tray.bak"
+
+# BackgroundColor="$MENU_BG" #"#ffc100"
+# [ "$BackgroundColor" = "" ] && BackgroundColor='#ffc100'
+# IndentedBackgroundColor="$PAGER_BG"
+# [ "$IndentedBackgroundColor" = "" ] && IndentedBackgroundColor='#ffa100'
+ 
+
+# function GetLineIndex
+# {
+#	lineVal=`fgrep -in "$1" $TrayFile | awk -F":" '{print $1}'`
+	#return `expr $lineVal`
+#	return $lineVal
+# }
+
+# cp -f $TrayFile $TrayFileBak
+
+# GetLineIndex "blinkydelayed"
+# linenumber=$?
+# echo $linenumber
+
+# GetLineIndex "xload -nolabel"
+# linenumber2=$?
+# echo $linenumber2
+
+# lineNumber=`expr $linenumber`
+# lineNumber2=`expr $linenumber2`
+
+# blinkyline="			blinkydelayed -bg \"$BackgroundColor\""
+# xloadline="			xload -nolabel -fg red -hl white -bg \"$IndentedBackgroundColor\""
+
+# sed -e "$lineNumber"i"$blinkyline" -e "$lineNumber"d -e "$lineNumber2"i"$xloadline" -e "$lineNumber2"d $TrayFileBak > $TrayFile
+ #end John Doe's code.
+ ########
+
+  # Patriot Sep 2009
+  # Attempting some robustness
+  # Update only for known -bg option applets: blinky and xload
+
+  . /root/.jwm/jwm_colors #Get MENU_BG, PAGER_BG
+
+  JWMtrayfile="/root/.jwmrc-tray"
+  ThemeFile="/root/.jwm/jwmrc-theme"
+
+  if [ ! $MENU_BG ]; then
+	# if MENU_BG not found in jwm_colors
+	if [ -e $ThemeFile ]; then
+	  # Get MENU_BG from newly selected theme
+	  MENU_BG=$(awk -F: '/MenuStyle/,/<\/MenuStyle>/' ${ThemeFile} | grep '<Background>' | sed -e 's|</.*>||g' -e 's|.*<.*>||g')
+	  # theme file could be borked, so hardcode a fallback
+	  [ ! $MENU_BG ] && MENU_BG="#292D29"
+	else
+	  # if theme file missing ...
+	  MENU_BG="#292D29"
+	fi
+  fi
+
+  if [ ! $PAGER_BG ]; then
+	if [ -e $ThemeFile ]; then
+	  PAGER_BG=$(awk -F: '/PagerStyle/,/<\/PagerStyle>/' ${ThemeFile} | grep '<Background>' | sed -e 's|</.*>||g' -e 's|.*<.*>||g')
+	  [ ! $PAGER_BG ] && PAGER_BG="#292D29"
+	else
+	  PAGER_BG="#292D29"
+	fi
+  fi
+
+  # Make a backup !
+  cp -f $JWMtrayfile $JWMtrayfile.bak
+  # Update applet -bg colors, catch-all method
+  sed -e 's|\(.*blinky.*\) -bg ".*"|\1 -bg "'"$MENU_BG"'"|g' -e 's|\(.*xload.*\) -bg ".*"|\1 -bg "'"$PAGER_BG"'"|g' < $JWMtrayfile > $JWMtrayfile.new
+
+  # Precaution: update to jwmrc-tray only if not empty
+  [ -s $JWMtrayfile.new ] && cp -f $JWMtrayfile.new $JWMtrayfile
+
+  sync
+  rm -f $JWMtrayfile.new
+  pidof jwm >/dev/null && jwm -restart
+fi
+
+
+###END###

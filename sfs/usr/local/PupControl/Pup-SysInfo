@@ -1,0 +1,508 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Pup-SysInfo 2.1.2
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
+
+WORKDIR="/usr/local/PupControl"
+
+xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+XPID=$!
+[ "`which pupscan`" ] && [ "`grep -E 'silent option' /usr/sbin/pupscan`" != "" ] && pupscan --silent
+kill $XPID
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+# define specialmono gtk-theme for Pup-SysInfo display window
+echo 'style "specialmono"
+{
+  font_name="Mono 12"
+}
+widget "*mono" style "specialmono"
+class "GtkText*" style "specialmono"' > /tmp/gtkrc_mono
+
+export GTK2_RC_FILES=/tmp/gtkrc_mono:/root/.gtkrc-2.0 
+
+# set height of the Pup-SysInfo display window
+VERT_RES="`xdpyinfo | grep -E dimensions | cut -d " " -f7 | cut -d "x" -f2`" # vertical screen resolution
+if [ `which xdpyinfo` ]; then
+ if [ "$VERT_RES" -lt "600" ]; then # set reduced-height display window
+  HEIGHT="268"
+ else # set standard-height display window
+  HEIGHT="400"
+ fi
+elif [ ! `which xdpyinfo` ]; then
+  HEIGHT="400"
+fi
+
+# if Lighthouse Sys-Info is available, add full-system report to File menu of Pup-SysInfo
+if [ "`which sys-info`" ]; then
+	LH_SYSINFO="
+   <menuitem tooltip-text=\" Launch Lighthouse Sys-Info \" stock=\"gtk-find\" label=\"View full-system report\">
+    <action>$WORKDIR/func -sysinfo_lighthouse </action>
+    <action>refresh:INFO</action>
+   </menuitem>"
+else
+	LH_SYSINFO=""
+fi
+
+# if pupscan is available, add Rescan option to Devices menu of Pup-SysInfo
+if [ "`which pupscan`" ] && [ "`grep -E 'silent option' /usr/sbin/pupscan`" != "" ]; then
+	RESCAN="
+   <menuitem tooltip-text=\" All PCI interfaces and USB devices are automatically 
+ scanned when Pup-SysInfo is launched, but you can 
+ rescan at any time to refresh current status reports. \" stock=\"gtk-refresh\" label=\"Rescan\">
+    <action>$WORKDIR/func -sysinfo_rescan </action>
+   </menuitem>
+   <separator></separator>"
+else
+	RESCAN=""
+fi
+
+# if battery status is available, add Battery option to Devices menu of Pup-SysInfo
+if [ -f /proc/acpi/battery/BAT?/state ]; then
+	BATTERY="
+   <menuitem tooltip-text=\" Notebook battery status \" stock=\"gtk-info\" label=\"Battery\">
+    <action>$WORKDIR/func -sysinfo_battery </action>
+    <action>cat /tmp/sysinfo-battery > /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>"
+else
+	BATTERY=""
+fi
+
+# define task manager for System-Apps menu of Pup-SysInfo
+if [ "`which lxtask`" ]; then
+ TASKMGR="lxtask"
+elif [ "`which htop`" ]; then
+ TASKMGR="rxvt +sb -fn 9x15 -bg black -fg white -title htop -n htop -e htop"
+elif [ "`which xfce4-taskmanager`" ]; then
+ TASKMGR="xfce4-taskmanager"
+elif [ "`which pprocess`" ]; then
+ TASKMGR="pprocess"
+fi
+
+#Pup-SysInfo about dlg...
+echo '#!/bin/sh
+VERSION="2.1.2"
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PSYSINFO-about
+echo 'export PUPSYSINFO_HELP_DIALOG="<window title=\"PSI\" icon-name=\"gtk-find\" resizable=\"false\">
+ <vbox>
+   <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Pup</span><span size='"'large'"' color='"'#3272C0'"'>SysInfo</span> $VERSION</b>\"</label></text>
+  <frame About>
+  <text use-markup=\"true\"><label>\"   Pup-SysInfo is a graphical user interface which   
+   enables easy access to more than fifty utilities   
+   that provide information about the underlying   
+   functions and command structure of Puppy   
+   Linux. The tab interface sorts utilities into six   
+   categories, and system information is quickly   
+   available for each item selected in the menu.   
+
+          Roger D. Grider, Copyright 2012 GPL3   
+  \"</label></text>
+  </frame>
+
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=PUPSYSINFO_HELP_DIALOG' >> /tmp/PSYSINFO-about
+chmod 777 /tmp/PSYSINFO-about
+
+# main dialog
+export PUPSYSINFO_DIALOG="
+<window title=\"PSI\" icon-name=\"gtk-find\" resizable=\"true\">
+<vbox>
+ <menubar>
+  <menu>
+   <menuitem tooltip-text=\" Send to default text editor \" stock=\"gtk-edit\" label=\"Send current report to Edit/Print/Save\">
+    <action>defaulttexteditor /tmp/pup-sysinfo.txt &</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem tooltip-text=\" Create unique report from individual reports. 
+ Repeat this step until the report is complete. \" stock=\"gtk-convert\" label=\"Add individual report to combo-report\">
+    <action>echo >> /tmp/sysinfo-build.txt </action>
+    <action>cat /tmp/pup-sysinfo.txt >> /tmp/sysinfo-build.txt </action>
+   </menuitem>
+   <menuitem tooltip-text=\" Send to System Report viewer \" stock=\"gtk-find\" label=\"View combo-report (or current report)\">
+    <action>mv -f /tmp/sysinfo-build.txt /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Send to default text editor \" stock=\"gtk-edit\" label=\"Send combo-report to Edit/Print/Save\">
+    <action>mv -f /tmp/sysinfo-build.txt /tmp/pup-sysinfo.txt </action>
+    <action>sleep .5; defaulttexteditor /tmp/pup-sysinfo.txt </action>
+   </menuitem>
+   <separator></separator>
+   <menuitem tooltip-text=\" Create and view summary hardware report \" stock=\"gtk-find\" label=\"View summary report\">
+    <action>$WORKDIR/func -sysinfo_summary </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   $LH_SYSINFO
+   <separator></separator>
+   <menuitem tooltip-text=\" Close Pup-SysInfo \" stock=\"gtk-quit\" label=\"Exit\">
+    <action type=\"exit\">quit_now</action>
+   </menuitem>
+   <label>File</label>
+  </menu>
+
+  <menu>
+   <menuitem tooltip-text=\" Basic Input/Output System \" stock=\"gtk-info\" label=\"BIOS\">
+    <action>echo -e "'"=== BIOS ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>biosdecode >> /tmp/pup-sysinfo.txt </action>
+    <action>dmidecode -t 0 | grep -Ev 'Handle|dmidecode|SMBIOS' | sed -e '/^$/d' -e 's/Information/INFORMATION (dmidecode):/g' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Central Processing Unit \" stock=\"gtk-info\" label=\"CPU\">
+    <action>echo -e "'"=== CPU ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_cpu </action>
+    <action>echo -e "'"\n=== /proc/cpuinfo ===\n"'" >> /tmp/pup-sysinfo.txt </action>
+    <action>cat /tmp/sysinfo-cpu >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Direct Memory Access \" stock=\"gtk-info\" label=\"DMA\">
+    <action>echo -e "'"=== DMA ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /proc/dma >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Desktop Management Interface \" stock=\"gtk-info\" label=\"DMI\">
+    <action>echo -e "'"=== DMI ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>dmidecode >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Input/Output Memory \" stock=\"gtk-info\" label=\"I/O Mem\">
+    <action>echo -e "'"=== I/O Memory ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /proc/iomem | sed -e 's/^[ \t]*//' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Input/Output Ports \" stock=\"gtk-info\" label=\"I/O Ports\">
+    <action>echo -e "'"=== I/O Ports ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /proc/ioports | sed -e 's/^[ \t]*//' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Interrupt Requests \" stock=\"gtk-info\" label=\"IRQ\">
+    <action>echo -e "'"=== IRQ ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /proc/interrupts >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <label>CPU/Motherboard</label>
+  </menu>
+
+  <menu>
+   $RESCAN
+   <menuitem tooltip-text=\" Compact Disc / Digital Versatile Disc \" stock=\"gtk-info\" label=\"CD/DVD\">
+ 	<action>echo ""=== CD/DVD Drives ==="" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_optical </action>
+   <action>cat /tmp/sysinfo-optical >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Hard Drives \" stock=\"gtk-info\" label=\"HDD\">
+    <action>echo ""=== Hard Drives ==="" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_hdd </action>
+    <action>cat /tmp/sysinfo-hdd | sed -e 's/sda1/sda/g' -e 's/sdb1/sdb/g' -e 's/sdc1/sdc/g' -e 's/sdd1/sdd/g' -e 's/hda1/hda/g' -e 's/hdb1/hdb/g' -e 's/hdc1/hdc/g' -e 's/hdd1/hdd/g' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Peripheral Component Interconnect \" stock=\"gtk-info\" label=\"PCI\">
+    <action>$WORKDIR/func -sysinfo_pci </action>
+    <action>cat /tmp/sysinfo-pci > /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Universal Serial Bus \" stock=\"gtk-info\" label=\"USB\">
+    <action>rm -f /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_usbstorage </action>
+    <action>$WORKDIR/func -sysinfo_usb </action>
+    <action>cat /tmp/sysinfo-usb >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem tooltip-text=\" ALSA - audio interface information \" stock=\"gtk-info\" label=\"Audio\">
+    <action>$WORKDIR/func -sysinfo_alsa </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   $BATTERY
+   <menuitem tooltip-text=\" Input devices \" stock=\"gtk-info\" label=\"Input\">
+    <action>$WORKDIR/func -sysinfo_input </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" PC monitor specifications \" stock=\"gtk-info\" label=\"Monitor\">
+    <action>$WORKDIR/func -sysinfo_monitor </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" List of printers \" stock=\"gtk-info\" label=\"Printers\">
+    <action>$WORKDIR/func -sysinfo_printers </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" CPU temperature \" stock=\"gtk-info\" label=\"Sensors\">
+    <action>$WORKDIR/func -sysinfo_sensors </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" PC video specifications \" stock=\"gtk-info\" label=\"Video\">
+    <action>$WORKDIR/func -sysinfo_video </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <label>Devices</label>
+  </menu>
+
+  <menu>
+   <menuitem tooltip-text=\" View network configuration \" stock=\"gtk-network\" label=\"Network\">
+    <action>$WORKDIR/func -ipinfo2 &</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem tooltip-text=\" System information and benchmark tool \" stock=\"gtk-harddisk\" label=\"Hardinfo\">
+    <action>$WORKDIR/func -sysinfo &</action>
+   </menuitem>
+   <menuitem tooltip-text=\" View drive space \" stock=\"gtk-find\" label=\"Partview\">
+    <action>$WORKDIR/func -partview &</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Hardware-interfaces information \" stock=\"gtk-refresh\" label=\"PupScan\">
+    <action>$WORKDIR/func -pupscan &</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem tooltip-text=\" View/Manage system tasks \" stock=\"gtk-execute\" label=\"Task Mgr\">
+    <action>$TASKMGR &</action>
+   </menuitem>
+   <label>System-Apps</label>
+  </menu>
+
+  <menu>
+   <menuitem tooltip-text=\" bootinit.log \" stock=\"gtk-info\" label=\"bootinit\">
+    <action>$WORKDIR/func -sysinfo_bootinit </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" bootkernel.log \" stock=\"gtk-info\" label=\"bootkernel\">
+    <action>echo -e "'"=== /tmp/bootkernel.log ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /tmp/bootkernel.log | tail -n 2200 | sed -e 's/[®]//g' -e 's/[©]//g'  >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" bootsysinit.log \" stock=\"gtk-info\" label=\"bootsysinit\">
+    <action>echo -e "'"=== /tmp/bootsysinit.log ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /tmp/bootsysinit.log | tail -n 2200 >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" SFS files at /mnt/home \" stock=\"gtk-info\" label=\"Extra SFS\">
+    <action>$WORKDIR/func -sysinfo_extraSFS </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" File-systems table \" stock=\"gtk-info\" label=\"fstab\">
+    <action>echo -e "'"=== /etc/fstab ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /etc/fstab >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Command-line history \" stock=\"gtk-info\" label=\".history\">
+    <action>$WORKDIR/func -sysinfo_history </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" /var/log/packages \" stock=\"gtk-info\" label=\"Packages\">
+    <action>$WORKDIR/func -sysinfo_packages </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" User-installed Puppy packages \" stock=\"gtk-info\" label=\"PETS\">
+    <action>$WORKDIR/func -sysinfo_pets </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Puppy pinboard parameters \" stock=\"gtk-info\" label=\"PuppyPin\">
+    <action>$WORKDIR/func -sysinfo_pinboard </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" List of PupSave files \" stock=\"gtk-info\" label=\"PupSaves\">
+    <action>$WORKDIR/func -sysinfo_pupsaves </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" State of current Puppy session \" stock=\"gtk-info\" label=\"PupState\">
+    <action>echo -e "'"=== /etc/rc.d/PUPSTATE ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /etc/rc.d/PUPSTATE >> /tmp/pup-sysinfo.txt </action>
+    <action>echo -e "'"\n=== Common Pupmodes ===\n"'" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 02 : full install"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 03 : full install, flash drive"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 05 : first boot [or pfix=ram]"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 06 : pup_save is a partition"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 07 : ditto, but flash drive"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 12 : normal running puppy"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 13 : ditto, but flash drive"" >> /tmp/pup-sysinfo.txt </action>
+    <action>echo ""PUPMODE 77 : multisession cd/dvd [13+64]"" >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Files that auto-launch from /etc/rc.d/rc.local \" stock=\"gtk-info\" label=\"rc.local\">
+    <action>echo -e "'"=== /etc/rc.d/rc.local ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /etc/rc.d/rc.local >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Files that auto-launch from /root/Startup/ \" stock=\"gtk-info\" label=\"Startup\">
+    <action>$WORKDIR/func -sysinfo_startup </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Log of system messages \" stock=\"gtk-info\" label=\"System Log\">
+    <action>$WORKDIR/func -sysinfo_log </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Current window manager \" stock=\"gtk-info\" label=\"winmanager\">
+    <action>echo -e "'"=== /etc/windowmanager ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /etc/windowmanager >> /tmp/pup-sysinfo.txt </action>
+    <action>echo >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" X errors log \" stock=\"gtk-info\" label=\"xerrs.log\">
+    <action>echo -e "'"=== /tmp/xerrs.log ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /tmp/xerrs.log | tail -n 2200 | sed '/./,/^$/!d' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Configuration file for startup of X \" stock=\"gtk-info\" label=\".xinitrc\">
+    <action>echo -e "'"=== /root/.xinitrc ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /root/.xinitrc 2>/dev/null >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" X11 device log \" stock=\"gtk-info\" label=\"Xorg.0.log\">
+    <action>echo -e "'"=== /var/log/Xorg.0.log ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>cat /var/log/Xorg.0.log | tail -n 2200 | sed '/./,/^$/!d' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Xorg configuration file \" stock=\"gtk-info\" label=\"xorg.conf\">
+    <action>$WORKDIR/func -sysinfo_xorg.conf </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <label>System-Files</label>
+  </menu>
+
+  <menu>
+   <menuitem tooltip-text=\" Current calendar year \" stock=\"gtk-info\" label=\"Calendar\">
+    <action>cal -y > /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Character and Block devices \" stock=\"gtk-info\" label=\"Devices\">
+    <action>cat /proc/devices > /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Specifications of Puppy distribution \" stock=\"gtk-info\" label=\"Distro Specs\">
+    <action>echo ""=== Distro Specifications ==="" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_distro </action>
+    <action>echo -e "'"\n=== /etc/DISTRO_SPECS ===\n"'" >> /tmp/pup-sysinfo.txt </action>
+    <action>cat /etc/DISTRO_SPECS >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Filesystems allocation \" stock=\"gtk-info\" label=\"Filesystems\">
+    <action>echo -e "'"=== Filesystems '"(df -h)"' ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_filesystems </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" List of available fonts \" stock=\"gtk-info\" label=\"Fonts\">
+    <action>$WORKDIR/func -sysinfo_fonts </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Virtual interface between the user and PC hardware \" stock=\"gtk-info\" label=\"Kernel\">
+    <action>$WORKDIR/func -sysinfo_kernel </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Language/Region identifier \" stock=\"gtk-info\" label=\"Locale\">
+    <action>echo -e "'"=== Locale Settings ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_country </action>
+    <action>echo >> /tmp/pup-sysinfo.txt </action>
+    <action>locale | sed -e '/LANG/d' -e 's/\"//g' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" User login report \" stock=\"gtk-info\" label=\"Login Report\">
+    <action>$WORKDIR/func -sysinfo_login </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Memory and personal storage \" stock=\"gtk-info\" label=\"Memory\">
+    <action>$WORKDIR/func -sysinfo_memory </action>
+    <action>cat /tmp/sysinfo-memory > /tmp/pup-sysinfo.txt </action>
+    <action>echo -e "'"\n=== /bin/free ===\n"'" >> /tmp/pup-sysinfo.txt </action>
+    <action>free >> /tmp/pup-sysinfo.txt </action>
+    <action>echo -e "'"\n=== /proc/meminfo ===\n"'" >> /tmp/pup-sysinfo.txt </action>
+    <action>cat /proc/meminfo | sed 's/^/ /g' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Puppy menu apps \" stock=\"gtk-info\" label=\"Menu\">
+    <action>echo -e "'"=== Puppy Menu Apps ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>ls /usr/share/applications | sort | uniq | sed 's/.desktop//g' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Kernel modules \" stock=\"gtk-info\" label=\"Modules\">
+    <action>echo -e "'"=== Kernel Modules '"(lsmod)"' ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_lsmod </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Network specifications \" stock=\"gtk-info\" label=\"Net Specs\">
+    <action>echo -e "'"=== Network Specifications ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_network </action>
+    <action>cat /tmp/sysinfo-network | sed -e 's/Session/\nSession/' -e 's/External/\nExternal/' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Drive partitions \" stock=\"gtk-info\" label=\"Partitions\">
+    <action>echo -e "'"=== Drive Partitions ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_partitions </action>
+    <action>cat /tmp/sysinfo-partitions >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Searchable directory path to executable files \" stock=\"gtk-info\" label=\"Path\">
+    <action>echo -e "'"=== Path ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>echo '$PATH' >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Linux system processes \" stock=\"gtk-info\" label=\"Processes\">
+    <action>echo -e "'"=== System Processes '"(ps -Af)"' ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>ps -Af >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Uninterrupted current session \" stock=\"gtk-info\" label=\"Uptime\">
+    <action>echo ""=== Uptime ==="" > /tmp/pup-sysinfo.txt </action>
+    <action>$WORKDIR/func -sysinfo_uptime </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Shell script variables \" stock=\"gtk-info\" label=\"Variables\">
+    <action>$WORKDIR/func -sysinfo_variables </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" Block device attributes \" stock=\"gtk-info\" label=\"Volumes\">
+    <action>$WORKDIR/func -sysinfo_volumes </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <menuitem tooltip-text=\" X Window screen display \" stock=\"gtk-info\" label=\"X server\">
+    <action>echo -e "'"=== X Window Screen Display '"(xdpyinfo)"' ===\n"'" > /tmp/pup-sysinfo.txt </action>
+    <action>xdpyinfo | tail -n 2200 >> /tmp/pup-sysinfo.txt </action>
+    <action>refresh:INFO</action>
+   </menuitem>
+   <label>System-Specs</label>
+  </menu>
+
+  <menu>
+   <menuitem tooltip-text=\" About Pup-SysInfo \" stock=\"gtk-info\" label=\"About\">
+    <action>/tmp/PSYSINFO-about &</action>
+   </menuitem>
+   <label>Help</label>
+  </menu>
+ </menubar>
+
+  <text height-request=\"5\"><label>\"\"</label></text>
+  <text use-markup=\"true\"><label>\"<b><span size='"'x-large'"'>Pup</span><span size='"'x-large'"' color='"'#3272C0'"'>SysInfo</span></b>\"</label></text>
+
+  <frame System Report>
+   <edit editable=\"false\">
+    <variable>INFO</variable>
+    <input file>/tmp/pup-sysinfo.txt</input>
+    <height>"$HEIGHT"</height>
+    <width>760</width>
+   </edit>
+  </frame>
+
+</vbox> 
+ <action signal=\"hide\">exit:Exit</action> 
+</window>"
+
+$GTKDIALOG --center -p PUPSYSINFO_DIALOG
+
+unset PUPSYSINFO_DIALOG
+
+exit 0

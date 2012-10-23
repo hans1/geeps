@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ libpng12-config
+ libpng14-config
+ libpng-config
+/usr/lib
+ libpng12.so
+ libpng12.so.0
+ libpng12.so.0.44.0
+ libpng14.so
+ libpng14.so.14
+ libpng14.so.14.5.0
+ libpng.so
+ libpng.so.14
+ libpng.so.3
+ libpng.so.3.44.0

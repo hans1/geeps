@@ -1,0 +1,16 @@
+/etc
+ usb_modeswitch.conf
+/lib
+/lib/udev
+ usb_modeswitch
+/usr
+/usr/sbin
+ usb_modeswitch
+ usb_modeswitch_dispatcher
+/usr/share
+/usr/share/doc
+ usb_modeswitch.htm
+/var
+/var/lib
+/var/lib/usb_modeswitch
+/var/log

@@ -1,0 +1,7 @@
+/usr
+/usr/sbin
+ pns-tool
+ pns-tool-wrapper
+/usr/share
+/usr/share/applications
+ pns_tool_pup.desktop

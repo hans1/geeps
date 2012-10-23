@@ -1,0 +1,12 @@
+#!/bin/sh
+#set -x
+[ "`lsmod | grep '^button'`" == "" ] && exit
+[ ! -d /proc/acpi ] && exit
+#killall acpid 2>/dev/null
+#sleep 1
+for i in  "acpid" "acpi_listen"
+ do PS=$(ps|grep $i|grep -v "grep"|grep -v "k"|awk '{print $1}')
+ [ $PS ] && kill -9 $PS 2>/dev/null
+ done
+acpid -l
+#acpi_listen &

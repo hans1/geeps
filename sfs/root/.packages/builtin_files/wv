@@ -1,0 +1,25 @@
+/usr
+/usr/bin
+ wvAbw
+ wvCleanLatex
+ wvConvert
+ wvDocBook
+ wvDVI
+ wvHtml
+ wvLatex
+ wvMime
+ wvPDF
+ wvPS
+ wvRTF
+ wvSummary
+ wvText
+ wvVersion
+ wvWare
+ wvWml
+/usr/lib
+ libwv-1.2.so.4
+ libwv-1.2.so.4.0.1
+/usr/share
+/usr/share/wv
+/usr/share/wv/patterns
+/usr/share/wv/wingdingfont

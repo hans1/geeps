@@ -1,0 +1,7 @@
+/usr
+/usr/i486-slackware-linux
+/usr/i486-slackware-linux/lib
+/usr/lib
+ libidn.so
+ libidn.so.11
+ libstdc++.so.6

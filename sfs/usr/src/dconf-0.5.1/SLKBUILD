@@ -1,0 +1,35 @@
+#Packager: George Vlahavas <vlahavas~at~gmail~dot~com>
+
+pkgname=dconf
+pkgver=0.5.1
+pkgrel=1gv
+source=("ftp://ftp.gnome.org/pub/gnome/sources/dconf/0.5/dconf-0.5.1.tar.bz2")
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo")
+url=http://live.gnome.org/dconf
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"dconf (a low-level configuration system"
+"dconf is a low-level configuration system. Its main purpose is to"
+"provide a backend to GSettings on platforms that don't already have"
+"configuration storage systems."
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure \
+		--prefix=/usr \
+		--libdir=/usr/lib${LIBDIRSUFFIX} \
+		--localstatedir=/var \
+		--sysconfdir=/etc \
+		--disable-gtk-doc \
+		--disable-gtk-doc-html \
+		--disable-gtk-doc-pdf \
+		--build=$arch-slackware-linux
+	make -j $numjobs || return 1
+	make install DESTDIR=$startdir/pkg
+
+	rm -rf $startdir/pkg/usr/share/gtk-doc
+} 

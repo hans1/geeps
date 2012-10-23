@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ notify-send
+/usr/doc
+/usr/doc/libnotify-0.5.2
+/usr/lib
+ libnotify.so
+ libnotify.so.1
+ libnotify.so.1.3.0

@@ -1,0 +1,12 @@
+/usr
+/usr/bin
+ xfdiff
+ xfdiff4
+ xfdiff-cut
+/usr/share
+/usr/share/applications
+ Xfdiff-cut.desktop
+/usr/share/pixmaps
+ xfdiff-cut.png
+ xfdiff-icon.png
+ xfdiff.png

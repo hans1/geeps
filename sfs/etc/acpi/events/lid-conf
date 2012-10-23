@@ -1,0 +1,5 @@
+# This is a based on sample ACPID configuration
+# Additional scripts catered specifically for Puppy Linux 4.1.x
+
+event=button/lid*
+action=/etc/acpi/actions/suspend.sh

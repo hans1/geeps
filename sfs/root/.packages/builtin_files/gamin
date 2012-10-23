@@ -1,0 +1,14 @@
+/etc
+/etc/gamin
+ gaminrc
+ .wh.gaminrc.new
+/usr
+/usr/lib
+/usr/libexec
+ gam_server
+/usr/lib/python2.6
+/usr/lib/python2.6/site-packages
+ gamin.py
+ gamin.pyc
+ gamin.pyo
+ _gamin.so

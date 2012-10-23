@@ -1,0 +1,11 @@
+/usr
+/usr/local
+/usr/local/sys-freedos
+/usr/local/sys-freedos/bootsecs
+ boot32.asm
+ boot32lb.asm
+ boot.asm
+ copying
+ version.txt
+/usr/sbin
+ sys-freedos

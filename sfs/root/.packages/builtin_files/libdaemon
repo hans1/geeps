@@ -1,0 +1,8 @@
+/usr
+/usr/lib
+ libdaemon.so
+ libdaemon.so.0
+ libdaemon.so.0.4.0
+/usr/src
+/usr/src/libdaemon-0.13
+ SLKBUILD

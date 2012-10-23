@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Xdelta file difference manager
+Name[ru]=Xdelta менеджер различия файлов
+Name[es]=Xdelta-Administrador de diferencias de Archivos
+Name[hu_HU]=Xdelta fájlkülönbség-kezelő
+Name[ja]=Xdelta 差分ファイル生成/適用
+Exec=xdelta_gui
+Icon=gz.xpm
+Categories=Utility
+GenericName=Xdelta

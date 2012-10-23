@@ -1,0 +1,181 @@
+#!/bin/sh
+########################################
+##
+## Xkb Config Manager
+## 
+## author: Dougal
+## date: 
+## Created for Puppy 2.13
+##
+## A GUI for controlling the "Keyboard0"
+## part of the xorg.conf file.
+##
+## ( influenced by the jwmConfigMgr )
+########################################
+
+SCRIPT_DIR="`pwd`"
+IMAGES_DIR="$SCRIPT_DIR/images"
+#MINI_ICONS_DIR="/usr/local/lib/X11/mini-icons"
+export ERRMSG='Xdialog --title "ERROR" --msgbox "An Error has occured! Try again." 0 0'
+export SUCCESS='Xdialog --title "Success!" --no-buttons --infobox "Changes applied successfuly!" 0 0 2000'
+
+# introduction window
+export Xkb_Config_Intro="
+<window title=\"XKB Configuration Manager\" icon-name=\"gtk-preferences\" window-position=\"1\">
+<vbox>
+ <frame Information>
+  <vbox><pixmap><input file>$IMAGES_DIR/xfce4-keys.png</input></pixmap></vbox>
+    <text wrap=\"true\" width-chars=\"20\">
+     <label>This tool lets you modify the keyboard settings part of your xorg.conf file.</label>
+    </text>
+   <text>
+    <label>Note that this is only relevant for Xorg users...</label>
+   </text>
+ </frame>
+  <hbox>
+   <button ok></button>
+  </hbox>
+</vbox>
+</window>"
+
+
+
+# main window
+export XKB_Config_Main="
+<window title=\"XKB Configuration Manager\" icon-name=\"gtk-preferences\" window-position=\"1\">
+ <vbox>
+  <notebook labels=\"Main|Options\">
+ <vbox>
+  <hbox>
+   <text>
+    <label>Keyboard Model</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keyboard.png</input>
+    <action>$SCRIPT_DIR/XkbModelConfig &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Layouts</label>
+   </text>
+   <button>
+    <input file>./images/layout.png</input>
+    <action>$SCRIPT_DIR/XkbLayoutConfig &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Layout Variants</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/layout16.png</input>
+    <action>$SCRIPT_DIR/XkbVariantConfig &</action>
+   </button>
+  </hbox>
+ </vbox>
+ <vbox>
+  <hbox>
+   <text>
+    <label>Group Shift/Lock behavior</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsGrp &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Third level choosers</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsLv3 &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Control key position</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsCtrl &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Use keyboard LED to show alternative group</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsGrp_led &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>CapsLock key behavior</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsCaps &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Alt/Win key behavior</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsAltwin &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Compose key position</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/keys01.gif</input>
+    <action>$SCRIPT_DIR/XkbOptionsCompose &</action>
+   </button>
+  </hbox>
+  <hbox>
+   <text>
+    <label>Adding the EuroSign to certain keys</label>
+   </text>
+   <button>
+    <input file>$IMAGES_DIR/euro16.png</input>
+    <action>$SCRIPT_DIR/XkbOptionsEuro &</action>
+   </button>
+  </hbox>
+ </vbox>
+  </notebook>
+  <frame>
+   <hbox>
+    <text><label>Click 'Yes' to activate the new settings</label></text>   
+    <button yes><action>$SCRIPT_DIR/XkbApplyNow &</action></button>
+   </hbox>
+   <hbox>
+    <text><label>...else they will apply when you restart X            </label></text>
+   </hbox>
+  </frame>
+  <hbox>
+   <button>
+    <label>Exit</label>
+    <input file icon=\"gtk-quit\"></input>
+    <action>EXIT:abort</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+##------------run------------->>
+gtkdialog3 --program Xkb_Config_Intro
+gtkdialog3 --program XKB_Config_Main
+
+##----------cleanup------------>>
+unset Xkb_Config_Intro
+unset XKB_Config_Main
+unset ERRMSG
+unset SUCCESS
+clear
+exit 0
+

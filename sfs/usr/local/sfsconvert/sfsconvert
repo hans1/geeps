@@ -1,0 +1,66 @@
+#!/bin/sh
+#SFS Converter - 3 to 4, 4 to 3
+#Trio Tjandradjaja - GPL 2009
+
+WIDGET_DIR="`dirname $0`"
+[ "$WIDGET_DIR" = "." ] && WIDGET_DIR="`pwd`"
+export WIDGET_DIR="$WIDGET_DIR"
+
+export sfsconvert="	
+<window title=\"SFS Converter 1.3\">
+<vbox>
+<text use-markup=\"true\"><label>\"<b>Warning: the conversion directory must be in a Linux filesystem, not msdos/vfat/ntfs!!! Also free space about 3 times the size of the SFS file is required</b>\"</label></text>
+<hbox>
+<text><label>Conversion Directory</label></text>
+   <entry accept=\"directory\">
+   <input>echo /mnt/home</input>
+   <variable>DIR</variable>
+   </entry>
+   <button>
+     <input file icon=\"gtk-open\"></input>
+     <action type=\"fileselect\">DIR</action>
+     <action type=\"refresh\">DIR</action>
+     <action type=\"refresh\">TEXT</action>
+    </button>
+</hbox>
+<frame                Drag & Drop your sfs file and click convert ↓           >
+<hbox>
+<text><label>SFS</label></text>
+   <entry accept=\"directory\">
+   <input>echo ''</input>
+   <variable>SFS</variable>
+   </entry>
+</hbox>
+</frame>
+<hbox>
+   <button>
+    <input file icon=\"gtk-quit\"></input>
+    <label>Quit</label>
+   </button>
+   <button tooltip-text=\"Notes about SFS files in Puppy 4.3x\">
+    <input file icon=\"gtk-help\"></input>
+    <action>. $WIDGET_DIR/func -help</action>
+    <label>Help</label>
+   </button>
+   <button tooltip-text=\"Check sfs version plus other info\">
+    <input file icon=\"gtk-info\"></input>
+    <action>. $WIDGET_DIR/func -version</action>
+    <label>Version Check</label>
+   </button>
+   <button tooltip-text=\"Auto detect sfs v3 and converts to v4, vice versa, make sure you have enough space (more than 3 x the sfs size in the directory), the new sfs will be created in the directory  \">
+    <input file icon=\"gtk-refresh\"></input>
+    <action>. $WIDGET_DIR/func -convert</action>
+    <action>refresh: SFS</action>
+    <label>Convert</label>
+   </button>
+</hbox>
+</vbox>
+</window>"
+
+#execute gtkdialog
+gtkdialog3 --center --program=sfsconvert
+
+unset sfsconvert
+
+#clear
+exit 0

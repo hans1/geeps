@@ -1,0 +1,23 @@
+/root
+/root/.config
+/root/.config/wallpaper
+ preferences
+/usr
+/usr/bin
+ set_wallpaper
+ wallpaper
+ wallslide
+/usr/local
+/usr/local/apps
+/usr/local/apps/Wallpaper
+ AppInfo.xml
+ AppRun
+ .DirIcon
+ functions
+/usr/local/apps/Wallpaper/locale
+ english.po
+/usr/share
+/usr/share/applications
+ wallpaper.desktop
+/usr/share/pixmaps
+ wallpaper.png

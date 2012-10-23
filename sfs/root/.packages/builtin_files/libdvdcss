@@ -1,0 +1,9 @@
+/usr
+/usr/lib
+ libdvdcss.so
+ libdvdcss.so.2
+ libdvdcss.so.2.1.0
+/usr/src
+/usr/src/libdvdcss-1.2.10
+ build-libdvdcss.sh
+ SLKBUILD

@@ -1,0 +1,12 @@
+/bin
+/etc
+/lib
+ libsysfs.so.2
+ libsysfs.so.2.0.1
+/usr
+/usr/bin
+ dlist_test
+ get_device
+ get_driver
+ get_module
+ systool

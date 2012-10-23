@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<title></title>
+
+</head>
+<body><br>
+
+<table style=" text-align: left; width: 687px; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+  <tbody>
+    <tr>
+      <td style=" vertical-align: top;">
+        <h1>HOWTO internationalize applications</h1>
+
+        <br>
+
+Internationalization of applications and scripts in Puppy Linux is a work-in-progress.<br>
+
+        <br>
+
+        <br>
+
+        <h2>Applications written in BaCon</h2>
+
+BaCon is a BASIC compiler, one of our officially supported languages for
+ Puppy development. Internationalization is supported by the compiler, 
+as explained here:<br>
+
+        <br>
+
+        <a href="http://bkhome.org/bacon/international.htm">http://bkhome.org/bacon/international.htm</a> <br>
+
+        <br>
+
+There are at least two applications that you will find in every recent 
+Puppy that are written in BaCon and have internationalization support:<br>
+
+        <div style="margin-left: 40px;">
+  <pre>/usr/sbin/welcome1stboot<br>/usr/local/simple_network_setup/proxy-setup</pre>
+        </div>
+
+If you have the 'devx' SFS loaded, then these will also be present:<br>
+
+        <div style="margin-left: 40px;">
+  <pre>/usr/sbin/welcome1stboot.bac<br>/usr/sbin/welcome1stboot.pot
+/usr/sbin/welcome1stboot.pupdev
+/usr/local/simple_network_setup/proxy-setup.bac
+/usr/local/simple_network_setup/proxy-setup.pot<br>/usr/local/simple_network_setup/proxy-setup.pupdev</pre>
+        </div>
+
+The .bac file is the BaCon source code. The .pot file is the language 
+translation file. The .pupdev file is just a text file which has 
+instructions on how to compile and do the language translation. The .pot
+ and .pupdev are optional, not necessarily always in the 'devx' -- but 
+if you read one of the .pupdev files it should show you how to create a 
+language translation for any other BaCon application.<br>
+
+        <br>
+
+        <h2>Scripts internationalized with 'gettext'</h2>
+
+There are a lot of scripts in Puppy that use 'gettext' for translating. Here are some in /usr/sbin:<br>
+
+        <div style="margin-left: 40px;">
+  <pre>alsaconf<br>connectwizard<br>hostname-set<br>keymap-set<br>mousecheck<br>quicksetup<br>shutdownconfig</pre>
+        </div>
+
+If you have the 'devx' SFS loaded, you will also find these in /usr/sbin:<br>
+
+        <div style="margin-left: 40px;">
+  <pre>mousecheck.pupdev<br>quicksetup.pupdev<br>shutdownconfig.pupdev</pre>
+        </div>
+
+...these are text files that explain how to do the internationalization.
+ You can follow the instructions to translate the script to your own 
+language. The instructions can also be applied to other scripts that use
+ 'gettext'.<br>
+
+        <br>
+
+        <h2>Scripts internationalized with 't12s'</h2>
+
+This is a very fast technique pioneered by technosaurus and implemented for Puppy by L18L. See discussion in Puppy Forum:<br>
+
+        <br>
+
+        <a href="http://murga-linux.com/puppy/viewtopic.php?t=73440">http://murga-linux.com/puppy/viewtopic.php?t=73440</a> <br>
+
+        <br>
+
+Here is an example script that you will find in recent puppies:<br>
+
+        <div style="margin-left: 40px;">
+  <pre>/usr/sbin/xdelta_gui</pre>
+        </div>
+
+
+Here are online instructions on how to use this technique to create a translation for your language:<br>
+
+        <br>
+
+        <a href="http://extra-inter.net/puppy/t12s_DOC/t12s.html">http://extra-inter.net/puppy/t12s_DOC/t12s.html</a> <br>
+
+        <br>
+
+...this relies upon the application /usr/sbin/t12s, a GUI app created by
+ L18L. It requires the 'yad' package be installed, that is likely to be 
+the case in recent puppies.<br>
+
+        <br>
+<h2>
+
+MoManager translation manager</h2>
+MoManager is a GUI application written by me (Barry Kauler) that makes it very easy for anyone to 
+create non-English translations for applications in Puppy. You must have a Puppy built from a Woof 
+version later than February 14, 2012.<br>
+<br>
+MoManager is for creating and updating translation files for scripts, 
+XML files, menu files and any other data text files. <br>
+<br>
+Scripts are applications that are text files, 
+usually written in Bash or Ash (or Perl, Python, Tcl, etc.). Note, if 
+you are unfamiliar with 'scripts', don't worry, they are just 
+applications.<br>
+<br>
+To use MoManager, the best thing to do is just go ahead and use it. You 
+will find it in the 'Utility' menu. Once started, you will see two 
+columns of drop-down lists, one list is of files that already have a 
+translation file for your language (on left side), the other list is for files that 
+do not yet have a translation file. if you select a file from the former
+ list, you may update the translation, and in the latter case you may 
+create a new translation file.<br>
+<br>
+Here is a snapshot of the main window, Puppy running with de_DE locale:<br>
+<img style=" width: 862px; height: 574px;" alt="MoManager" src="http://puppylinux.com/development/MoManager.png">&nbsp;<br>
+<h3>Scripts</h3>
+
+In the case of updating an existing translation file, 
+MoManager automatically synchronises with the latest script, and will 
+identify any changed strings -- if you see the text "fuzzy" anywhere in 
+the translation file, it is likely that the original English text has 
+changed and you will need to update the translation.<br>
+<br>
+A translation file for a script means that when the application runs, it
+ will output all text in your language. By creating translation files 
+for all the scripts, you can help to create a Puppy that runs nicely in 
+your language -- and by sending the translation files to me, I can put 
+them into Woof for all future builds of Puppy.<br>
+<br>
+Although it is probably possible to figure out how to edit a translation
+ file, known as a 'po' file in it's editable form, or 'mo' file in it's 
+compiled form, it is helpful to readup a bit on the topic. I suggest:<br>
+<div style="margin-left: 40px;"><a href="http://translate.sourceforge.net/wiki/guide/project/howto">http://translate.sourceforge.net/wiki/guide/project/howto</a> <br>
+</div>
+<div style="margin-left: 40px;"><a href="http://www.gnu.org/software/gettext/manual/html_node/gettext_9.html#PO-Files">http://www.gnu.org/software/gettext/manual/html_node/gettext_9.html#PO-Files</a> <br>
+</div>
+<br>
+...note though, reading all of that can be confusing! It is possible to 
+use MoManager without understanding all of those details. MoManager uses
+ a normal text editor to edit po files rather than a specialized 
+po-editor (such as poedit) and this is quite easy to do, you just need a
+ very basic understanding of the format of po files. <br>
+<br>
+Regards,<br>
+Barry Kauler<br>
+
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
+
+
+
+<br>
+</body></html>

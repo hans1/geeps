@@ -1,0 +1,36 @@
+#!/bin/bash
+$APPDIR/func -reset_gtk
+if [ "`which gtkdialog3 2> /dev/null`" ]; then GTKDIALOG="gtkdialog3"; else GTKDIALOG="gtkdialog"; fi #puppy specific
+if [ -z "$FRAME" ]; then FRAME=" "; fi
+export WORKDIR=$HOME/.pmusic/tmp
+
+export inputbox="
+<window title=\"Pmusic\" icon-name=\"pmusic\" window_position=\"2\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <entry activates-default=\"true\">
+    <variable>INPUT</variable>
+    <default>${DEFAULT}</default>
+   </entry>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-cancel\">
+    </input><label>$LOC_CANCEL</label>
+    <action type=\"exit\">cancel</action>
+   </button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-apply\"></input>
+    <label>$LOC_OK</label>
+    <action type=\"exit\">ok</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+#make this workaround to allow `\ in filename
+$GTKDIALOG -p inputbox > $WORKDIR/tmp
+export INPUT="`cat $WORKDIR/tmp | grep -F 'INPUT=' | cut -d'"' -f2`" #'
+export EXIT="`cat $WORKDIR/tmp | grep -F 'EXIT=' | cut -d'"' -f2`" #'
+TXT1=""; DEFAULT=""; FRAME=""; IMG="" #reset to avoid alien text in next box

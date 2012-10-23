@@ -1,0 +1,16 @@
+/etc
+ wpa_supplicant.conf
+ wpa_supplicant.conf.new
+/usr
+/usr/bin
+/usr/sbin
+ wpa_cli
+ wpa_passphrase
+ wpa_supplicant
+/usr/share
+/usr/share/dbus-1
+/usr/share/dbus-1/system-services
+ fi.epitest.hostap.WPASupplicant.service
+ fi.w1.wpa_supplicant1.service
+/usr/share/pixmaps
+ wpa_gui.png

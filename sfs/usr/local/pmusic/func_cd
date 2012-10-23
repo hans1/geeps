@@ -1,0 +1,129 @@
+#!/bin/sh
+#Pmusic
+#Copyright 2008,2009,2010,2011,2012
+#Sigmund Berglund - Valåmoen, Norway.
+
+MYPID=$$
+
+case "$1" in
+-play_cd)
+	$APPDIR/func_kill
+	$APPDIR/func_store_playlist
+	$APPDIR/func -new
+	$APPDIR/func_cd -read_cd
+	cp -f $WORKDIR/playlist_read_cd $WORKDIR/playlist
+	echo true > $WORKDIR/UPDATE_GUI #update playlist when probing with the -c switch
+	$APPDIR/func_player -play
+	$APPDIR/func -statusbar_playlist & #update statusbar
+	;;
+-read_cd)
+	killall cdda2wav 2> $STDERR #in case playing from CD
+	echo "$LOC708" > $WORKDIR/splashtext
+	echo "kill -9 $MYPID" > $WORKDIR/splash_cancelcode
+	$APPDIR/box_splash &
+	echo -n > $WORKDIR/cd-tracks
+	echo -n > $WORKDIR/playlist_read_cd #-play_cd can skip -add_all
+	#read internal cd-text info
+	cdda2wav dev=$CD_DEVICE -info-only -no-infofile > $WORKDIR/cd-cddb 2>&1 &
+	while [ ! "$BREAK" ]; do
+		#is disc an audio-CD
+		if [ "`grep 'no audio' $WORKDIR/cd-cddb`" ] || [ "`grep 'Read TOC size failed' $WORKDIR/cd-cddb`" ] || [ "`grep 'load cdrom' $WORKDIR/cd-cddb`" ]; then
+			ERROR="$LOC521"
+			echo -n > $WORKDIR/cd-cddb
+			BREAK=true
+		fi
+		#don't run complete cdda2wav check. kill it when we got enough
+		if [ "`grep ISRC $WORKDIR/cd-cddb`" ] || [ "`grep 'load cdrom' $WORKDIR/cd-cddb`" ] ; then
+			BREAK=true
+			for I in `ps | grep cdda2wav | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+		fi
+	done
+	[ "`grep 'load cdrom' $WORKDIR/cd-cddb`" ] && ERROR="$LOC522"
+	#if no internal cd-text, try www
+	LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/cd-tmp #check internet connection
+	
+	if [ "`grep 'CD-Text: not detected' $WORKDIR/cd-cddb`" ] && [ "`grep 'connected' $WORKDIR/cd-tmp`" ]; then
+		cdda2wav dev=$CD_DEVICE -cddb=1 -info-only -no-infofile > $WORKDIR/cd-cddb 2>&1 &
+		while [ ! "$BREAK2" ]; do
+			#don't run complete cdda2wav check. kill it when we got enough
+			if [ "`grep ISRC $WORKDIR/cd-cddb`" ] || [ "`grep 'load cdrom' $WORKDIR/cd-cddb`" ]; then
+				BREAK2=true
+			fi
+		done
+		for I in `ps | grep cdda2wav | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+	fi
+
+	grep 'Track ' $WORKDIR/cd-cddb | grep \' | cut -d ':' -f 2- | cut -d '[' -f 1 | cut -c 3- | sed -e "s/.$//" > $WORKDIR/cd-tracks
+	ALBUM=`grep 'Album title' $WORKDIR/cd-cddb | cut -d "'" -f 2`
+	ARTIST=`grep 'Album title' $WORKDIR/cd-cddb | cut -d '[' -f 2 | cut -d ']' -f 1 | cut -d ' ' -f 2-`
+	#add length
+	echo -n > $WORKDIR/sourcelist
+	NR=1
+	while read I; do
+		COL=$NR
+		if [ $COL -gt 95 ]; then COL=$(($NR-95))
+		elif [ $COL -gt 90 ]; then COL=$(($NR-90))
+		elif [ $COL -gt 85 ]; then COL=$(($NR-85))
+		elif [ $COL -gt 80 ]; then COL=$(($NR-80))
+		elif [ $COL -gt 75 ]; then COL=$(($NR-75))
+		elif [ $COL -gt 70 ]; then COL=$(($NR-70))
+		elif [ $COL -gt 65 ]; then COL=$(($NR-65))
+		elif [ $COL -gt 60 ]; then COL=$(($NR-60))
+		elif [ $COL -gt 55 ]; then COL=$(($NR-55))
+		elif [ $COL -gt 50 ]; then COL=$(($NR-50))
+		elif [ $COL -gt 45 ]; then COL=$(($NR-45))
+		elif [ $COL -gt 40 ]; then COL=$(($NR-40))
+		elif [ $COL -gt 35 ]; then COL=$(($NR-35))
+		elif [ $COL -gt 30 ]; then COL=$(($NR-30))
+		elif [ $COL -gt 25 ]; then COL=$(($NR-25))
+		elif [ $COL -gt 20 ]; then COL=$(($NR-20))
+		elif [ $COL -gt 15 ]; then COL=$(($NR-15))
+		elif [ $COL -gt 10 ]; then COL=$(($NR-10))
+		elif [ $COL -gt 5 ]; then COL=$(($NR-5))
+		fi
+		LENGTH="`grep -m 1 $NR'.(' $WORKDIR/cd-cddb | cut -d"," -f $COL | cut -d'.' -f2 | cut -d'(' -f2 | cut -d' ' -f2`"
+		[ "`echo "$LENGTH" | wc -c`" = "5" ] && LENGTH=0$LENGTH #ensure 5digits
+		echo "  cdda:$NR: $LENGTH:$ARTIST - $I|$I|$ARTIST||$ALBUM|$NR||" >> $WORKDIR/sourcelist
+		echo "|$LENGTH|$ARTIST - $I| $(printf "%03d" $NR) cdda:$NR: $LENGTH:$ARTIST - $I" >> $WORKDIR/playlist_read_cd #-play_cd can skip -add_all
+		NR=$(($NR+1))
+	done < $WORKDIR/cd-tracks
+	#manually build list if no cd-text info available
+	if [ ! "`cat $WORKDIR/sourcelist`" ]; then
+		NR=1; LENGTH=0
+		while [ "$LENGTH" ]; do
+			COL=$NR
+			if [ $COL -gt 95 ]; then COL=$(($NR-95))
+			elif [ $COL -gt 90 ]; then COL=$(($NR-90))
+			elif [ $COL -gt 85 ]; then COL=$(($NR-85))
+			elif [ $COL -gt 80 ]; then COL=$(($NR-80))
+			elif [ $COL -gt 75 ]; then COL=$(($NR-75))
+			elif [ $COL -gt 70 ]; then COL=$(($NR-70))
+			elif [ $COL -gt 65 ]; then COL=$(($NR-65))
+			elif [ $COL -gt 60 ]; then COL=$(($NR-60))
+			elif [ $COL -gt 55 ]; then COL=$(($NR-55))
+			elif [ $COL -gt 50 ]; then COL=$(($NR-50))
+			elif [ $COL -gt 45 ]; then COL=$(($NR-45))
+			elif [ $COL -gt 40 ]; then COL=$(($NR-40))
+			elif [ $COL -gt 35 ]; then COL=$(($NR-35))
+			elif [ $COL -gt 30 ]; then COL=$(($NR-30))
+			elif [ $COL -gt 25 ]; then COL=$(($NR-25))
+			elif [ $COL -gt 20 ]; then COL=$(($NR-20))
+			elif [ $COL -gt 15 ]; then COL=$(($NR-15))
+			elif [ $COL -gt 10 ]; then COL=$(($NR-10))
+			elif [ $COL -gt 5 ]; then COL=$(($NR-5))
+			fi
+			LENGTH="`grep -m 1 $NR'.(' $WORKDIR/cd-cddb | cut -d"," -f $COL | cut -d'.' -f2 | cut -d'(' -f2 | cut -d' ' -f2`"
+			
+			[ "`echo "$LENGTH" | wc -c`" = "5" ] && LENGTH=0$LENGTH #ensure 5digits
+			[ "$LENGTH" ] && echo "  cdda:$NR: $LENGTH:Track ${NR}|Track ${NR}" >> $WORKDIR/sourcelist
+			[ "$LENGTH" ] && echo "|$LENGTH|Track ${NR}                  .|$(printf "%03d" $NR) cdda:$NR: $LENGTH:Track ${NR}" >> $WORKDIR/playlist_read_cd #-play_cd can skip -add_all
+			NR=$(($NR+1))
+		done 
+	fi
+ 	[ ! -s  $WORKDIR/sourcelist ] && echo "|$LOC709" > $WORKDIR/sourcelist #no tracks detected
+ 	cp -f $WORKDIR/sourcelist $WORKDIR/cddb
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST #update source-list
+	echo 100 > $WORKDIR/splash
+	;;
+esac
+	

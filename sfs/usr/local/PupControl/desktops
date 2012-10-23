@@ -1,0 +1,93 @@
+#!/bin/bash
+#PupControl 1.8.8
+#JWM virtual desktops
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+cp -f /usr/local/PupControl/desktops.rc /tmp/desktops.rc.tmp
+
+[ ! -s /usr/local/PupControl/desktops.rc ] && echo -e -n 'DESKTOPS="2"\nDESKTOPS_HEIGHT="2"\nDESKTOPS_WIDTH="2"\n' > /usr/local/PupControl/desktops.rc
+. /usr/local/PupControl/desktops.rc
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#define virtual desktops for legacy JWM
+DESKTOPS_ITEMS="<item>$DESKTOPS</item>"
+for I in 1 2 3 4 5 6 7 8; do DESKTOPS_ITEMS=`echo "$DESKTOPS_ITEMS<item>$I</item>"`; done
+
+#define height (rows) and width (columns) of virtual desktops for JWM 498+
+DESKTOPS_HEIGHT_ITEMS="<item>$DESKTOPS_HEIGHT</item>"
+for I in 1 2; do DESKTOPS_HEIGHT_ITEMS=`echo "$DESKTOPS_HEIGHT_ITEMS<item>$I</item>"`; done
+
+DESKTOPS_WIDTH_ITEMS="<item>$DESKTOPS_WIDTH</item>"
+for I in 1 2 3 4 5 6 7 8; do DESKTOPS_WIDTH_ITEMS=`echo "$DESKTOPS_WIDTH_ITEMS<item>$I</item>"`; done
+
+#show virtual desktops GUI appropriate for the current version of JWM
+if [ "`cat $HOME/.jwm/jwmrc-personal | grep "Desktops count"`" != "" ]; then
+DTOPS="
+  <frame Virtual Desktops>
+   <hbox>
+    <text><label>Number (1-8):</label></text>
+    <combobox width-request=\"50\">
+     <variable>DESKTOPS</variable>
+     $DESKTOPS_ITEMS
+    </combobox>
+   </hbox>
+  </frame>"
+
+elif [ "`cat $HOME/.jwm/jwmrc-personal | grep "Desktops width"`" != "" ]; then
+DTOPS="
+  <frame Virtual Desktops>
+   <hbox>
+    <text><label>Rows (1-2):</label></text>
+    <combobox width-request=\"50\">
+     <variable>DESKTOPS_HEIGHT</variable>
+     $DESKTOPS_HEIGHT_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Columns (1-8):</label></text>
+    <combobox width-request=\"50\">
+     <variable>DESKTOPS_WIDTH</variable>
+     $DESKTOPS_WIDTH_ITEMS
+    </combobox>
+   </hbox>
+  </frame>"
+else DTOPS=""
+fi
+
+#DESKTOPS dlg...
+export DESKTOPS="
+<window title=\"JWM\" icon-name=\"gtk-execute\" resizable=\"false\">
+  <vbox>
+$DTOPS
+   <hbox homogeneous=\"true\">
+     <button height-request=\"32\" tooltip-text=\" Save changes and exit \">
+      <label>Save </label>
+       <input file stock=\"gtk-ok\"></input>
+        <action>/usr/local/PupControl/func -desktops &</action>
+        <action type=\"exit\">quit_now</action>
+     </button>
+     <button height-request=\"32\" tooltip-text=\" Exit without changes \">
+      <label>\" Exit  \"</label>
+       <input file stock=\"gtk-close\"></input>
+        <action>mv -f /tmp/desktops.rc.tmp /usr/local/PupControl/desktops.rc &</action>
+        <action type=\"exit\">quit_now</action>
+    </button>
+   </hbox>
+  </vbox>
+</window>"
+
+$GTKDIALOG --center -p DESKTOPS > /usr/local/PupControl/desktops.rc
+
+unset DESKTOPS
+
+exit 0

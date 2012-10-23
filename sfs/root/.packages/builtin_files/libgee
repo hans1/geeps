@@ -1,0 +1,11 @@
+/usr
+/usr/lib
+ libgee-0.8.so.0
+ libgee-0.8.so.0.0.0
+ libgee.so.0
+ libgee.so.2
+ libgee.so.8
+/usr/share
+/usr/share/vala
+/usr/share/vala/vapi
+ gee-0.8.vapi

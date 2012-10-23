@@ -1,0 +1,15 @@
+/etc
+/etc/ssh
+/usr
+/usr/bin
+ scp
+ sftp
+ slogin
+ ssh
+ ssh-add
+ ssh-agent
+ ssh-keygen
+ ssh-keyscan
+/var
+/var/empty
+/var/log

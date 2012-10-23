@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo > $WORKDIR/pbackup-tmp
+for I in `echo "$CD_DRIVES" | tr " " "|"`; do
+	echo "<item stock=\"gtk-cdrom\">""$I""</item>" >> $WORKDIR/pbackup-tmp
+done
+ITEMS=`cat $WORKDIR/pbackup-tmp`; FRAME="$LOC508"
+. "$PROG_PATH"box_list
+if [ "$EXIT" = "99" ]; then 
+	echo $TMPSAVEMODE > $WORKDIR/pbackup-SAVEMODE #gui entry must save in files to render inside gtkdialog
+	echo $TREE > $WORKDIR/pbackup-BCKDEV
+	echo "$TMPSAVEMODE - $TREE" > $WORKDIR/pbackup-ENTRY_SAVE_TO
+fi

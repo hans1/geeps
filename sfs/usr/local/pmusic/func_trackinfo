@@ -1,0 +1,848 @@
+#!/bin/bash
+#Pmusic
+#info-grabber using id3 info, musicbrainz and several lyrics dbs
+#GPL 2011-2012 - Copyright Sigmund Berglund
+
+. $CONFIG #needs to update this in case lyrics/albumart settings (in trackinfo) has been changed without restarting Pmusic
+IFS=$'\n'
+
+#use pid-extension to filenames if not refreshing at every new playing track
+if [ "$2" = "-norefresh" ]; then #call from right-click menu
+	export MYPID=$$
+	echo -n "$LOC_LOADING $LOC141..." > $WORKDIR/tmp_statusbar
+	echo -e "$LOC_LOADING $LOC141...\n\n$LOC674" > $WORKDIR/splashtext
+	$APPDIR/box_splash &
+else
+	MYPID=''
+fi
+
+#show refreshing gui for playing song.
+#We can load as early as this because it will refresh as new info is collected.
+#This in oposite to static trackinfo called from right-click menu, which must be loaded after info is collected
+if [ ! "$MYPID" ] && [ ! "`echo "$*" | grep -E "\-rate|\-refresh|\-quiet|\-save_albumart|\-save_tags|\-clear_tags|\-help_id3|\-search_alternatives|\-tag"`" ]; then #if call is from func_progressbar (-quiet) there should be no gui
+	if [ ! -s $WORKDIR/xml_Pmusic_trackinfo_external_dynamic ]; then
+		echo -n "$LOC_LOADING $LOC141..." > $WORKDIR/tmp_statusbar
+		. $APPDIR/gui_trackinfo #load gui
+		S='
+		<window title="Pmusic - '$LOC141'" window_position="2" icon-name="pmusic" default_height="520" default_width="470">
+		 <vbox>'
+		  [ $TRACKINFO_REFRESH = false ] && S=$S'<hbox homogeneous="true"><hbox><pixmap icon_size="6"><input file stock="gtk-info"></input></pixmap><text use-markup="true"><label>"'$LOC673'"</label></text></hbox></hbox>'
+		  S=$S'<hbox height-request="1">
+		   <timer visible="false" interval="2">
+			<variable>TRACKINFO_TIMER</variable>'
+			[ $TRACKINFO_REFRESH = false ] && S=$S'<sensitive>false</sensitive>'
+			S=$S' <action>refresh:UPDATE_TRACKINFO</action>
+		   </timer>
+		  </hbox>
+		  <hbox space-expand="true" space-fill="true">
+		  '"$(<$WORKDIR/xml_Pmusic_trackinfo)"'
+		  </hbox>
+		  <hbox space-expand="false" space-fill="false">
+		   <button tooltip-text="'$LOC648'">
+		    <label>'$LOC_REFRESH'</label>
+		    <input file stock="gtk-refresh"></input>
+		    <action>. '$APPDIR'/func_trackinfo -refresh</action>
+		   </button>
+           <button ok><action>'$APPDIR'/func_config -write_config &</action><action>exit:EXIT</action></button>
+		  </hbox>
+		 </vbox>
+		 <action signal="delete-event">exit:EXIT</action>
+		</window>'
+		echo "$S" | sed 's/##.*//' > $WORKDIR/xml_Pmusic_trackinfo_external_dynamic #I use double hash (##) for comments. --> as #FF0000
+		[ $TOOLTIPS = false ] && sed -i 's%tooltip-text%tooltipXXXtext%g' $WORKDIR/xml_Pmusic_trackinfo_external_dynamic
+		rm -f $WORKDIR/tmp_statusbar
+	fi
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -f $WORKDIR/xml_Pmusic_trackinfo_external_dynamic); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	exit 0
+fi
+
+
+#set active file
+case $1 in
+	*/*) #both urls and files
+		FILE="$1"
+		;;
+	*cdda:*) #both urls and files
+		FILE="$1"
+		;;
+	*[0-9]*) #MYPID is already set - call from existing gui (rate, save tags)
+		MYPID="$1"
+		FILE="$(<$WORKDIR/trackinfo${MYPID}_FILE)"
+		;;
+	*) #nothing - use playing track
+		FILE="`cut -d'|' -f2 $HOME/.pmusic/nowplaying`"
+		NOWPLAYING=true
+		;;
+esac
+echo "$FILE" > $WORKDIR/trackinfo${MYPID}_FILE
+#---
+
+export USERAGENT="Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.2.15) Gecko/20110303 Firefox/3.6.15" #Musicbrainz will block all general requests from nov. 2011
+
+if [ "$ID3_ONLY" != "true" ]; then
+	echo -n > $WORKDIR/trackinfo${MYPID}_urls
+	echo -e "$LOC663" > $WORKDIR/trackinfo${MYPID}_discography
+	echo -e "$LOC663" > $WORKDIR/trackinfo${MYPID}_album
+	echo -e "$FILE\n\n$LOC664" > $WORKDIR/trackinfo${MYPID}_stream #show path/url while trying to recieve more info
+	echo -e "$LOC680\nazlyrics.com\nelyrics.net\nlyricswiki.org\njamendo.com" > $WORKDIR/trackinfo${MYPID}_lyrics
+	echo ' ' > $WORKDIR/trackinfo${MYPID}_lyrics_source
+	echo ' ' > $WORKDIR/trackinfo${MYPID}_albumart_source
+###	echo false > $WORKDIR/trackinfo${MYPID}_albumart_nonlocal #deactivate save-button
+fi
+
+##################################################################################
+#                                                                                #
+#                              F U N C T I O N S                                 #
+#                                                                                #
+##################################################################################
+
+
+
+convertxml() {
+	sed "s/\&amp\;/\&/g;s/\&quot\;/\"/g;s/\&apos;/\'/g;s/\&lt\;/</g;s/\&gt\;/>/g" <<<"$1"
+}
+
+artist(){
+	#discography
+	XML="$(wget -q "http://musicbrainz.org/ws/1/artist/$ID_ARTIST?type=xml&inc=sa-Album+release-events" -O-)"
+	echo -n > $WORKDIR/tmpdiscography1
+	echo -n > $WORKDIR/tmpdiscography2
+	convertxml "$XML" | tr '>' '\n' | grep -F '<release ' | cut -d'"' -f4 > $WORKDIR/tmpdiscography #release id
+	while read I; do
+		#title
+		TMP="`convertxml "$XML" | tr '>' '\n' | grep -F -A3 "$I" | grep -F '</title' | cut -d'<' -f1`"
+		[ "`grep "$TMP" $WORKDIR/tmpdiscography1`" ] && continue #could be a second release in another country
+		echo "$TMP" >> $WORKDIR/tmpdiscography1
+		#year of release
+		TMP="`convertxml "$XML" | tr '>' '\n' | grep -F -A8 "$I" | grep -Fm1 'date=' | cut -d'"' -f6 | cut -d'-' -f1`" #'
+		[ ! "$TMP" ] && TMP='           '
+		echo $TMP >> $WORKDIR/tmpdiscography2
+	done < $WORKDIR/tmpdiscography
+	ALBUMS="`paste $WORKDIR/tmpdiscography2 $WORKDIR/tmpdiscography1 | sort -g`"
+	[ ! "$ALBUMS" ] && ALBUMS="$LOC667" #nothing found - trackinfo_alternatives(){ needs something in the file to start search
+	echo "$ALBUMS" > $WORKDIR/trackinfo${MYPID}_discography
+	#URLs
+	echo -n > $WORKDIR/tmpurls
+	echo -n > $WORKDIR/tmpurls1
+	XML="$(wget -q "http://musicbrainz.org/ws/1/artist/$ID_ARTIST?type=xml&inc=url-rels" -O-)"
+	convertxml "$XML" | tr '>' '\n' | grep -F 'relation target' | cut -d '"' -f2 > $WORKDIR/tmpurls
+	convertxml "$XML" | tr '>' '\n' | grep -F 'relation target' | cut -d '"' -f4 > $WORKDIR/tmpurls1
+	URLS="`paste -d'|' $WORKDIR/tmpurls1 $WORKDIR/tmpurls`"
+	echo "$URLS" > $WORKDIR/trackinfo${MYPID}_urls
+	#---
+	echo true > $WORKDIR/UPDATE_TRACKINFO #update gui
+}
+
+lyrics(){
+	[ $LYRICS_LOCAL = true ] && LOCAL_LYRICS="`find "$LYRICS_LOCAL_DIR" -iname "$ID3_ARTIST - ${ID3_TITLE}.txt" | head -n1`"
+	if [ "$LOCAL_LYRICS" ]; then #use local file
+		LYRICS="$(<"$LOCAL_LYRICS")"
+		echo "$LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics
+		echo "$LOCAL_LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics_source #where does the lyrics come from
+	elif [ "`echo "$FILE" | grep -F 'jamendo.com'`" ]; then #jamendo.com
+		ID="`echo "$FILE" | cut -d= -f3`"
+		#the following line would be the correct, but troubles (with special chars????)
+		#LYRICS="`wget -O - http://api.jamendo.com/get2/text/track/plain/?id=$ID&n=1&order=searchweight_desc`"
+		#instead we grab it from the www-lyric-site
+		wget -U $USERAGENT -t 1 --connect-timeout=1 -O - http://www.jamendo.com/en/track/$ID | tr '<' '\n' > $WORKDIR/tmplyrics
+		LYRICS="`grep -F -A1000 'id="lyrics' $WORKDIR/tmplyrics | grep -B1000 -Fm1 '/div>' | grep -v 'br />' | grep -v '/div>' | tr '>' '\n' | grep -v 'id="lyrics'`"
+		[ "$LYRICS" ] && echo "$LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics
+		echo "http://www.jamendo.com/en/track/$ID" > $WORKDIR/trackinfo${MYPID}_lyrics_source
+	else
+		#lyricwiki.org
+		TMP_ARTIST="`echo $ARTIST | tr ' ' _`"
+		TMP_TITLE="`echo $TITLE | tr ' ' _`"
+		wget -U $USERAGENT -t 1 --connect-timeout=1 -O $WORKDIR/tmplyrics http://lyricwiki.org/$TMP_ARTIST:$TMP_TITLE
+#		note: grep -m1 fails when lyrics is offering an alternative translated coloumn. ie Dimmu borgir - Vredesbyrd. 
+#		LYRICS="`cat $WORKDIR/tmplyrics | grep -m1 ringtone | tr '>' '\n' | sed -e 's%<br /%%g' -e 's%<!--%%g' | grep -vF '<' | sed -f $APPDIR/sed_html2txt`"
+		LYRICS="`cat $WORKDIR/tmplyrics | grep ringtone | tr '>' '\n' | sed -e 's%<br /%%g' -e 's%<!--%%g' | grep -vF '<' | sed -f $APPDIR/sed_html2txt`"
+		if [ "$LYRICS" ]; then
+			echo "$LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics
+			echo "http://lyricwiki.org/$TMP_ARTIST:$TMP_TITLE" > $WORKDIR/trackinfo${MYPID}_lyrics_source
+		fi
+		#elyrics
+		if [ ! "$LYRICS" ]; then
+			TMP_ARTIST="`echo $ARTIST | tr '_' ' ' | sed -e 's/-/,,/g' | tr ' ' '-' | tr [A-Z] [a-z] | tr -d \'`"
+			TMP_TITLE="`echo $TITLE  | tr '_' ' ' | sed -e 's/-/,,/g' | tr ' ' '-' | tr [A-Z] [a-z] | tr -d \'`"
+			TMP_CHAR="`echo $TMP_ARTIST | cut -c 1`"
+			wget -U $USERAGENT -t 1 --connect-timeout=1 -O $WORKDIR/tmplyrics http://www.elyrics.net/read/$TMP_CHAR/$TMP_ARTIST-lyrics/$TMP_TITLE-lyrics.html
+			LYRICS="`cat $WORKDIR/tmplyrics | tr '>' '\n' | grep -B 1000 -m 1 'Terms of Service' | grep -A 1000 -m 1 'Ringtone to your Cell' | grep -v 'terms of service' | grep -v 'Ringtone to your Cell' | sed 's%<br%%g' | grep -vF '<' | grep -vF 'http' | head -n -3 `"
+			if [ "$LYRICS" ]; then
+				echo "$LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics
+				echo "http://www.elyrics.net/read/$TMP_CHAR/$TMP_ARTIST-lyrics/$TMP_TITLE-lyrics.html" > $WORKDIR/trackinfo${MYPID}_lyrics_source
+			fi
+		fi
+		#azlyrics
+		if [ ! "$LYRICS" ]; then
+			TMP_ARTIST="`echo $ARTIST | tr [A-Z] [a-z] | tr -d ' ' | tr -d '_' | tr -d \' | tr -d '-'`"
+			TMP_TITLE="`echo $TITLE  | tr [A-Z] [a-z] | tr -d ' ' | tr -d '_' | tr -d \' | tr -d '-'`"
+			wget -U $USERAGENT -t 1 --connect-timeout=1 -O $WORKDIR/tmplyrics http://www.azlyrics.com/lyrics/$TMP_ARTIST/$TMP_TITLE.html
+			LYRICS="`cat $WORKDIR/tmplyrics | grep -A 1000 -m 1 'END OF RINGTONE' | grep -B 1000 -m 1 'azlyrics' | grep -v azlyrics | grep -vi ringtone | sed -e "s/<[^>]*>//g"`"
+			if [ "$LYRICS" ]; then
+				echo "$LYRICS" > $WORKDIR/trackinfo${MYPID}_lyrics
+				echo "http://www.azlyrics.com/lyrics/$TMP_ARTIST/$TMP_TITLE.html" > $WORKDIR/trackinfo${MYPID}_lyrics_source
+			fi
+		fi
+	fi
+	if [ ! "$LYRICS" ]; then
+		echo "$LOC667" > $WORKDIR/trackinfo${MYPID}_lyrics_source
+		echo '' > $WORKDIR/trackinfo${MYPID}_lyrics
+	fi
+	#save if not already in db
+	if [ "$LYRICS" ] && [ $LYRICS_LOCAL = true ] && [ ! "$LOCAL_LYRICS" ]; then
+		cp $WORKDIR/trackinfo${MYPID}_lyrics "$LYRICS_LOCAL_DIR/$ID3_ARTIST - $ID3_TITLE.txt"
+	fi
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+}
+
+stream_info (){
+	ffmpeg -i "$FILE" 2> $WORKDIR/tmpinfo
+	if [ "`echo "$FILE" | grep -F 'http:'`" ]; then
+		echo "$FILE" > $WORKDIR/trackinfo${MYPID}_stream
+	else
+		echo -n "$LOC_FILENAME: " > $WORKDIR/trackinfo${MYPID}_stream
+		basename "$FILE" >> $WORKDIR/trackinfo${MYPID}_stream
+		echo -n "$LOC_PATH: " >> $WORKDIR/trackinfo${MYPID}_stream
+		dirname "$FILE" >> $WORKDIR/trackinfo${MYPID}_stream
+	fi
+	if [ "`echo "$FILE" | grep -F 'http:'`" ] && [ `which streamripper` ] && [ "`grep -F 'Invalid data found' $WORKDIR/tmpinfo`" ]; then #ffmpeg doesn't support all streams that streamripper does
+		echo >> $WORKDIR/trackinfo${MYPID}_stream
+		head -n 4 $WORKDIR/streamripper_output | tail -n 3 >> $WORKDIR/trackinfo${MYPID}_stream
+	else #ordinary output based on ffmpeg
+		echo "$LOC_SIZE: $(du -h "$FILE" | awk '{print $1}') ($(du -b "$FILE" | awk '{print $1}'))"  >> $WORKDIR/trackinfo${MYPID}_stream
+		TMP="`grep Duration $WORKDIR/tmpinfo | awk '{print $2}' | cut -d, -f1` "
+		echo -e "\n$LOC668: $TMP" >> $WORKDIR/trackinfo${MYPID}_stream
+		TMP="`grep -F 'Stream #' $WORKDIR/tmpinfo | grep -F Audio | cut -d: -f3 | cut -d, -f1`"
+		echo "$LOC293: $TMP" >> $WORKDIR/trackinfo${MYPID}_stream
+		TMP="`grep -F 'Stream #' $WORKDIR/tmpinfo | grep -F Audio | cut -d: -f3 | cut -d, -f2`"
+		echo "$LOC295: $TMP" >> $WORKDIR/trackinfo${MYPID}_stream
+		TMP="`grep -F 'Stream #' $WORKDIR/tmpinfo | grep -F Audio | cut -d: -f3 | cut -d, -f3`"
+		echo "$LOC296: $TMP" >> $WORKDIR/trackinfo${MYPID}_stream
+		TMP="`grep -F 'Stream #' $WORKDIR/tmpinfo | grep -F Audio | cut -d: -f3 | cut -d, -f5`"
+		echo "$LOC294: $TMP" >> $WORKDIR/trackinfo${MYPID}_stream
+	fi
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+}
+
+album_art (){
+	STRING="$2"
+	OUTFILE="$1"
+	[ $ALBUMART_DL = false ] && exit #deactivated in preferences
+	#define search string
+	if [ ! "$STRING" ]; then
+		FILE="$(<$WORKDIR/PLAYLIST)"
+		#CD-audio
+		if [ "`echo "$FILE" | grep -F "cdda:"`" ]; then
+			NR="`echo "$FILE" | cut -d: -f2`"
+			ARTIST="`grep -m1 "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d'|' -f3`"
+			ALBUM="`grep -m1 "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d'|' -f5`"
+		#youtube
+		elif [ "`grep "$FILE" $HOME/.pmusic/index_webmusic_youtube 2> $STDERR`" ]; then
+			ARTIST="`grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f3`"
+			ALBUM="`grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f5`"
+		#jamendo
+		elif [ "`grep "$FILE" $HOME/.pmusic/index_webmusic_jamendo 2> $STDERR`" ]; then
+			ARTIST="`grep -F "$FILE" $HOME/.pmusic/index_webmusic_jamendo | cut -d'|' -f3`"
+			ALBUM="`grep -F "$FILE" $HOME/.pmusic/index_webmusic_jamendo | cut -d'|' -f5`"
+		#file
+		else
+			. $APPDIR/func_id3io "$FILE" -read
+		fi
+		#if no valid info, exit
+		if [ ! "$ARTIST" ] || [ ! "$ALBUM" ]; then
+			#show something in case no artwork is found
+			cp -f $APPDIR/themes/$THEME/album_art.png "$OUTFILE" 2> $STDERR
+			[ ! -f "$APPDIR/themes/$THEME/album_art.png" ] && cp -f $APPDIR/pmusic20.png "$OUTFILE" 2> $STDERR
+			#update pic in main window
+			if [ ! "$MYPID" ] && [ "$NOWPLAYING" = "true" ] && [ "$OUTFILE" != $HOME/.pmusic/nowplaying_albumart.jpg ] && [ -s "$OUTFILE" ]; then
+				cp -f "$OUTFILE" $HOME/.pmusic/nowplaying_albumart.jpg
+			fi 
+			echo true > $WORKDIR/UPDATE_TRACKINFO
+			exit
+		fi
+		STRING="${ARTIST} - ${ALBUM}"
+	fi
+	
+	
+	rm -f $WORKDIR/albumart_download.jpg
+	#search for artwork
+	[ $ALBUMART_LOCAL = true ] && LOCAL_ARTWORK="`find "$ALBUMART_LOCAL_DIR" -iname "${STRING}.jpg" | head -n1`"
+	if [ "$LOCAL_ARTWORK" ]; then #use local file
+		cp -f "$LOCAL_ARTWORK" $WORKDIR/albumart_download.jpg
+		echo "$LOCAL_ARTWORK" > $WORKDIR/trackinfo${MYPID}_albumart_source
+	else #search internet
+		#let's remove old image if refreshing dynamically
+		cp -f "$APPDIR/themes/$THEME/album_art.png" $HOME/.pmusic/nowplaying_albumart.jpg
+		cp -f "$APPDIR/themes/$THEME/album_art.png" $WORKDIR/trackinfo_albumart.jpg
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+		echo true > $WORKDIR/UPDATE_GUI
+		#Amazon.com search
+		STRING_AMAZON="`echo "$STRING" | sed 's/ - /-/'`" 
+		TMP_ARTWORK="http://$(wget --tries 1 -q -O - "http://www.amazon.com/s/?url=search-alias%3Dpopular&field-keywords=${STRING_AMAZON// /-}" | grep -F -B 10 'jpg' | grep -F 'href' | grep -m1 'www.amazon.com' | awk -F "http://" '{print $2}' | awk -F ">" '{print $1}')" #'
+		TMP_ARTWORK2="`echo "$TMP_ARTWORK" | tr -d '"'`" #'
+		#album site
+		LANG=C wget --tries 1 -q -O - $TMP_ARTWORK2 > $WORKDIR/tmp_albumart1
+		TMP_ARTWORK="http://`grep -Fm1 'See larger image' $WORKDIR/tmp_albumart1 | awk -F "http://" '{print $2}' | awk -F ">" '{print $1}'`"
+		TMP_ARTWORK2="`echo "$TMP_ARTWORK" | tr -d '"'`" #'
+		#larger images
+		LANG=C wget --tries 1 -q -O - $TMP_ARTWORK2 > $WORKDIR/tmp_albumart2 #album site
+		URL_ALBUMART="http://`grep -F 'jpg' $WORKDIR/tmp_albumart2 | grep -Fm1 'id="prodImage"' | awk -F "http://" '{print $2}' | awk -F ".jpg" '{print $1}'`.jpg"
+		#download
+		wget "$URL_ALBUMART" -O "$WORKDIR/albumart_download.jpg" 2> /dev/null #use temp target to avoid slow connection to show 'missing img' icon during download.
+
+		#save
+		if [ -s "$WORKDIR/albumart_download.jpg" ] && [ $ALBUMART_LOCAL = true ] && [ ! "$LOCAL_ARTWORK" ] && [ "$ALBUM" ] && [ "$ARTIST" ]; then
+			cp "$WORKDIR/albumart_download.jpg" "$ALBUMART_LOCAL_DIR/$STRING.jpg"
+		fi
+		#if no match, try albumart.org - smaller images
+		if [ ! -s "$WORKDIR/albumart_download.jpg" ]; then
+			STRING2="`echo "$STRING" | sed 's/ - /-/'`" 
+			#grab download link
+			URL_ALBUMART="http://$(wget -q -O - "http://www.albumart.org/index.php?srchkey=${STRING2// /+}&itempage=1&newsearch=1&searchindex=Music" | grep -Fm 1 'View larger image' | awk -F ".jpg" '{print $1}' | awk -F "http://" '{print $3}').jpg"
+			#download
+			if [ ! "$URL_ALBUMART" = "http://.jpg" ]; then
+				wget "$URL_ALBUMART" -O "$WORKDIR/albumart_download.jpg" 2>/dev/null #use temp target to avoid slow connection to show 'missing img' icon during download.
+			fi
+		fi
+		#show source
+		[ -s "$WORKDIR/albumart_download.jpg" ] && echo "$URL_ALBUMART" > $WORKDIR/trackinfo${MYPID}_albumart_source
+		
+	fi
+	#define which art to choose (downloaded or default from theme)
+	if [ -s "$WORKDIR/albumart_download.jpg" ]; then
+		mv -f $WORKDIR/albumart_download.jpg "$OUTFILE"
+	else
+		cp -f "$APPDIR/themes/$THEME/album_art.png" "$OUTFILE"
+		echo "$LOC667" > $WORKDIR/trackinfo${MYPID}_albumart_source
+	fi
+	#to update pic in main window (MYPID is true for unique trackinfo (from right-click menu))
+ 	if [ ! "$MYPID" ] && [ "$NOWPLAYING" = "true" ]; then
+		cp -f "$OUTFILE" $HOME/.pmusic/nowplaying_albumart.jpg
+		echo true > $WORKDIR/UPDATE_GUI
+	fi
+	#update guis
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+}
+
+
+
+info_jamendo (){
+	check_connection
+	[ "$CONNECTION" = "false" ] && exit
+	#---
+	TRACK_ID="`echo "$FILE" | cut -d'=' -f3`"
+	wget --tries 1  -O - "http://api.jamendo.com/get2/name+artist_name+album_name+numalbum+dates+genre/track/plain/track_album+album_artist/?id=${TRACK_ID}" | tr '\t' '|' | sed -e 's/http:/  http:/g' -e 's/Array//g' > $WORKDIR/tmp
+	cut -d'|' -f1 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	cut -d'|' -f2 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	cut -d'|' -f3 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	cut -d'|' -f4 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	cut -d'|' -f5 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	cut -d'|' -f6 $WORKDIR/tmp > $WORKDIR/trackinfo${MYPID}_ID3_GENRE
+	echo true > $WORKDIR/UPDATE_TRACKINFO #we got enough info to update tags
+	#---
+	TMP="`wget  --tries 1 -q -O - "http://api.jamendo.com/get2/artist_id+album_id+artist_url/track/plain/track_album+album_artist/?id=${TRACK_ID}" | tr '\t' '|'`"
+	ARTIST_ID="`echo "$TMP" | cut -d'|' -f1`"
+	ALBUM_ID="`echo "$TMP" | cut -d'|' -f2`"
+	URL="`echo "$TMP" | cut -d'|' -f3`"
+	echo "jamendo.com|$URL" > $WORKDIR/trackinfo${MYPID}_urls
+	#album tracklist
+	wget --tries 1 "http://api.jamendo.com/get2/track_name/album/plain/track_album/?id=${ALBUM_ID}" -O "$WORKDIR/trackinfo${MYPID}_album" 2>/dev/null
+	#discography
+	wget --tries 1 "http://api.jamendo.com/get2/album_name/artist/plain/album_artist/?id=${ARTIST_ID}" -O "$WORKDIR/trackinfo${MYPID}_discography" 2>/dev/null
+	#album art
+	wget --tries 1 "http://api.jamendo.com/get2/image/album/redirect/?id=${ALBUM_ID}&imagesize=400" -O "$WORKDIR/trackinfo${MYPID}_albumart.jpg" 2>/dev/null
+	#---
+	if [ ! "$MYPID" ]; then #dynamic info - refresh for new track
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+		cp $WORKDIR/trackinfo_albumart.jpg $HOME/.pmusic/nowplaying_albumart.jpg
+		echo true > $WORKDIR/UPDATE_GUI
+	fi
+}
+
+track_info (){
+	check_connection
+	if [ "$CONNECTION" = "false" ]; then
+		#albumart and lyrics could still be caught from local storage
+		lyrics &
+		if [ $DO_ALBUMART = true ]; then
+			TMP=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ARTIST")) #these files holds the preferred info of id3 / musicbrainz
+			TMP1=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ALBUM"))
+			album_art $WORKDIR/trackinfo${MYPID}_albumart.jpg "${TMP} - ${TMP1}" &
+		fi
+		exit
+	fi
+	#musicbrainz
+	URL="http://musicbrainz.org/ws/1/track/?type=xml&limit=1"
+	[ "$ID3_TITLE" ] && URL="$URL&title=${ID3_TITLE}"
+	[ "$ID3_ARTIST" ] && URL="$URL&artist=${ID3_ARTIST}"
+	[ "$ID3_ALBUM" ] && URL="$URL&release=${ID3_ALBUM}"
+	URL="${URL// /+}"
+	XML="$(wget -q "$URL" -O-)"
+	TITLE=( $(convertxml "$(tr '>' '\n' <<<"$XML" | grep -F -A3 '<track id=' | grep -F '</title' | cut -d '<' -f 1)") )
+	ARTIST=( $(convertxml "$(tr '>' '\n' <<<"$XML" | grep -F '</name' | cut -d '<' -f1)") )
+	ALBUM=( $(convertxml "$(tr '>' '\n' <<<"$XML" | grep -FA4 '<release' | grep -F '</title' | cut -d '<' -f 1)") )
+	TMP=( $(convertxml "$(tr '>' '\n' <<<"$XML" | grep -FA5 '<release' | grep -F 'offset=' | cut -d '"' -f2)") )
+	[ "$TMP" ] && TRACK=$(($TMP+1)) #Why add 1 - I haven't looked at it???
+
+
+	#using the normal wget-way fails if album-name contains a comma (cdda2wav does not return the comma) and URL will be wrong.
+	#cdda already has set this info from function read_cd
+	#this checks if values have returned
+	if [ "`echo "$FILE" | grep -F cdda:`" ] && [ ! "$TITLE" ]; then
+		TITLE="$ID3_TITLE"
+		ARTIST="$ID3_ARTIST"
+		ALBUM="$ID3_ALBUM"
+		TRACK="$ID3_TRACK"
+	fi
+
+
+	#in case no musicbrainz tag
+	#artist
+	if [ "$ARTIST" ] && [ ! "$ID3_ARTIST" ]; then
+		echo "$ARTIST" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	elif [ ! "$ARTIST" ] && [ ! "$ID3_ARTIST" ]; then #get rid of 'searching' string
+		echo "" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	fi
+	#title
+	if [ "$TITLE" ] && [ ! "$ID3_TITLE" ]; then
+		echo "$TITLE" > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	elif [ ! "$TITLE" ] && [ ! "$ID3_TITLE" ]; then #get rid of 'searching' string
+		echo "" > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	fi
+	#album
+	if [ "$ALBUM" ] && [ ! "$ID3_ALBUM" ]; then
+		echo "$ALBUM" > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	elif [ ! "$ALBUM" ] && [ ! "$ID3_ALBUM" ]; then #get rid of 'searching' string
+		echo "" > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	fi
+	#track
+	[ "$ID3_TRACK" = " " ] && ID3_TRACK="" #space (99) is used by Pmusic when removing year-tag
+	if [ "$TRACK" ] && [ ! "$ID3_TRACK" ]; then 
+		echo "$TRACK" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	elif [ ! "$TRACK" ] && [ ! "$ID3_TRACK" ]; then #get rid of 'searching' string
+		echo "" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	fi
+	#year
+	if [ "$YEAR" ] && [ ! "$ID3_YEAR" ]; then
+		echo "$YEAR" > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	elif [ ! "$YEAR" ] && [ ! "$ID3_YEAR" ]; then #get rid of 'searching' string
+		echo "" > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	fi
+
+	#find ID numbers
+	export ID_DISC="`convertxml "$XML" | tr '>' '\n' | grep -FA2 '<release ' | grep -m1 -B2 "${ALBUM}" | grep -F 'id=' | cut -d '"' -f4`" #'
+	export ID_ARTIST="`convertxml "$XML" | tr '>' '\n' | grep -m1 -B2 "$ARTIST" | grep -F 'id=' | cut -d '"' -f2`" #'	
+	#album info - track list and year (which is not available at the initial search
+	XML="$(wget -q "http://musicbrainz.org/ws/1/release/$ID_DISC?type=xml&inc=tracks+release-events+url-rels" -O-)"
+	YEAR="`convertxml "$XML" | tr '>' '\n' | grep -F -A3 '<release-event-list' | grep -Fm1 'date=' | cut -d '"' -f6`" #'
+	if [ "$YEAR" ] && [ ! "$ID3_YEAR" ]; then echo "$YEAR" | cut -d'-' -f1 > $WORKDIR/trackinfo${MYPID}_ID3_YEAR; fi
+	echo true > $WORKDIR/UPDATE_TRACKINFO #we got enough info to update tags
+	#build track list
+	if [ "`echo "$FILE" | grep -F cdda:`" ]; then #CD-audio: Use info from read_cd in case trouble with musicbrainz (in particular the bug: comma in album-name)
+		cut -d'|' -f3 $WORKDIR/playlist_read_cd > $WORKDIR/trackinfo${MYPID}_album
+	else
+		TRACKS="`convertxml "$XML" | tr '>' '\n' | grep -F -A3 '<track id=' | grep -F '</title' | cut -d '<' -f 1 | cat -n | cut -c 5-`"
+		echo -e "$ALBUM ${YEAR}\n$TRACKS\n\n" > $WORKDIR/trackinfo${MYPID}_album
+	fi
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+	[ "$ID3_ONLY" = "true" ] && exit
+	#---
+	
+	lyrics &
+	artist &
+	if [ $DO_ALBUMART = true ]; then
+		TMP=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ARTIST")) #these files holds the preferred info of id3 / musicbrainz
+		TMP1=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ALBUM"))
+		album_art $WORKDIR/trackinfo${MYPID}_albumart.jpg "${TMP} - ${TMP1}" &
+	fi
+}
+
+check_connection (){
+	#check internet connection
+	LANG=C wget --spider --tries 1 $PING_SERVER  2> $WORKDIR/tmpinfo
+	if [ ! "`grep 'connected' $WORKDIR/tmpinfo`" ]; then
+		export CONNECTION=false
+		#show icon instead of album art
+		[ ! "$MYPID" ] && cp -f $APPDIR/themes/$THEME/album_art.png $HOME/.pmusic/nowplaying_albumart.jpg 2> $STDERR 
+		[ ! -f "$APPDIR/themes/$THEME/album_art.png" ] && cp -f $APPDIR/pmusic20.png "$OUTFILE" 2> $STDERR
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+		#add message in fields
+		echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_urls
+		echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_discography
+		echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_album
+		echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_lyrics
+		echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_alterantives
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ARTIST)" = "$LOC652" ]; then echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TITLE)" = "$LOC652" ]; then echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_ID3_TITLE; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ALBUM)" = "$LOC652" ]; then echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_YEAR)" = "$LOC652" ]; then echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_ID3_YEAR; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TRACK)" = "$LOC652" ]; then echo "$LOC669" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK; fi
+		#update gui
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+	fi
+}
+
+
+
+##################################################################################
+#                                                                                #
+#                       	E X T E R N A L  C A L L S                           #
+#                                                                                #
+##################################################################################
+
+
+TABNR=0 #default tab in <notebook>
+export DO_ALBUMART=true #search album art by default
+case "$*" in
+	*-quiet*)
+		case "$*" in *-id3_only*) ID3_ONLY=true;;esac
+		;;
+	*-save_albumart)
+		export pmusic_save_albumart='
+		<window title="Pmusic - '$LOC_SAVE'" icon-name="pmusic">
+		 <vbox>
+		  <frame '$LOC_SAVE' '$LOC_ALBUMART'>
+		   <hbox>
+			<text><label>'$LOC281'</label></text>
+			<entry accept="file" width-request="300" fs-folder="'$ALBUMART_LOCAL_DIR'" fs-title="Pmusic - '$LOC850'">
+			 <variable>SAVEFILE</variable>
+			 <input>echo "'$ALBUMART_LOCAL_DIR'/'$ID3_ARTIST' - '$ID3_ALBUM'.jpg"</input>
+			</entry>
+			<button>
+			 <input file stock="gtk-open"></input>
+			 <action type="fileselect">SAVEFILE</action>
+			</button>
+		   </hbox>
+		  </frame>
+		  <hbox>
+		   <button><input file stock="gtk-cancel"></input><label>'$LOC_CANCEL'</label></button>
+		   <button can-default="true" has-default="true" use-stock="true">
+			<input file stock="gtk-save"></input>
+			<label>'$LOC_SAVE'</label>
+			<action type="exit">ok</action>
+		   </button>
+		  </hbox>
+		 </vbox>
+		</window>'
+		I=$IFS; IFS=""
+		for STATEMENTS in $($GTKDIALOG -p pmusic_save_albumart --center); do
+			eval $STATEMENTS
+		done
+		IFS=$I
+		if [ "$EXIT" = "ok" ]; then
+			if [ -s "$SAVEFILE" ]; then #already exist
+				IMG=dilaog-warning
+				FRAME="$LOC_WARNING"
+				TXT1="<b>$SAVEFILE $LOC503</b>"
+				TXT2="$LOC504"
+				. $APPDIR/box_yesno
+				[ $EXIT = no ] && exit
+			fi
+			[ "$SAVEFILE" ] && cp $WORKDIR/trackinfo${MYPID}_albumart.jpg "$SAVEFILE"
+		fi
+	
+		exit
+		;;
+	*-save_tags)
+		#write new meta-tags for file
+		ID3_TITLE="`echo "$ID3_TITLE" | grep -vE "$LOC652|$LOC669"`"
+		ID3_ARTIST="`echo "$ID3_ARTIST" | grep -vE "$LOC652|$LOC669"`"
+		ID3_ALBUM="`echo "$ID3_ALBUM" | grep -vE "$LOC652|$LOC669"`"
+		ID3_YEAR="`echo "$ID3_YEAR" | grep -vE "$LOC652|$LOC669"`"
+		ID3_GENRE="`echo "$ID3_GENRE" | grep -vE "$LOC652|$LOC669"`"
+		ID3_TRACK="`echo "$ID3_TRACK" | grep -vE "$LOC652|$LOC669"`"
+
+		. $APPDIR/func_id3io "$FILE" -write
+		$APPDIR/func_trackinfo -quiet -id3_only &
+		exit
+		;;
+	*-clear_tags)
+		. $APPDIR/func_id3io "$FILE" -clear
+		#update gui
+		$APPDIR/func_trackinfo -quiet -id3_only &
+		exit
+		;;
+	-refresh)
+		$APPDIR/func_trackinfo -quiet &
+		exit
+		;;
+	-help_id3)
+		IMG="help"
+		FRAME="$LOC190"
+		TXT1="
+$LOC666"
+		. $APPDIR/box_ok
+		exit
+		;;
+	*-rate*) #set new rating depending on the in/de-creasing value in $3
+		NEW_RATING=$((${RATING}$3))
+		[ $NEW_RATING -lt 0 ] && NEW_RATING=0
+		[ $NEW_RATING -gt 99 ] && NEW_RATING=99
+		TMP="`grep -wF -m1 "$FILE" $HOME/.pmusic/index_rating | cut -d '|' -f -2`"
+		#since trouble with sed and '&' in songname - execute through file
+		echo "sed -i 's%$TMP|$RATING%$TMP|$NEW_RATING%g' $HOME/.pmusic/index_rating" > $WORKDIR/exec
+		sed -i 's/\&/\\\&/g' $WORKDIR/exec
+		$WORKDIR/exec
+		echo $NEW_RATING > $WORKDIR/trackinfo${MYPID}_rating
+		exit
+		;;
+		
+	*-search_alternatives) #this is the same code as for fetching tags, but now in a loop to build a list of optional albums 
+		check_connection
+		if [ "$CONNECTION" != "false" ]; then
+			echo 0 > $WORKDIR/splash
+			echo "$LOC652" > $WORKDIR/splashtext
+			$APPDIR/box_splash &
+
+			URL="http://musicbrainz.org/ws/1/track/?type=xml&limit=100"
+			[ "$ID3_TITLE" ] && URL="$URL&title=${ID3_TITLE}"
+			[ "$ID3_ARTIST" ] && URL="$URL&artist=${ID3_ARTIST}"
+			URL="${URL// /+}"
+			XML="$(wget -q "$URL" -O-)"
+			convertxml "$XML" | tr '>' '\n' | grep -F -A 3 '<track id=' | grep -F '</title' | cut -d '<' -f 1 > $WORKDIR/alt_titles
+			convertxml "$XML" | tr '>' '\n' | grep -F '</name' | cut -d '<' -f1 > $WORKDIR/alt_artists
+			convertxml "$XML" | tr '>' '\n' | grep -F -A 5 '<release-list' | grep -F -A 2 '<release type=' | grep -F '</title' | cut -d '<' -f 1 > $WORKDIR/alt_albums
+			paste -d'|' $WORKDIR/alt_artists $WORKDIR/alt_titles $WORKDIR/alt_albums > $WORKDIR/trackinfo${MYPID}_alterantives_all
+			#wait for discography is ready
+			for M in 1 2 3 4 5 6 7 8 9; do
+				[ ! -s $WORKDIR/tmpdiscography1 ] && sleep 1
+			done
+			#grab from album-list to show this alternative first in list. this requires that artist is correct
+			echo -n > $WORKDIR/trackinfo${MYPID}_alterantives_sa
+			IFS=$'\n'
+			while read N in; do
+				grep -m1 -i "$N$" $WORKDIR/trackinfo${MYPID}_alterantives_all >> $WORKDIR/trackinfo${MYPID}_alterantives_sa #single artist
+			done < $WORKDIR/tmpdiscography1
+			#build output
+			echo -n > $WORKDIR/trackinfo${MYPID}_alterantives #required if _sa is empty...
+			[ -s $WORKDIR/trackinfo${MYPID}_alterantives_sa ] && cat $WORKDIR/trackinfo${MYPID}_alterantives_sa | sort -u >> $WORKDIR/trackinfo${MYPID}_alterantives
+			echo '____________________' >> $WORKDIR/trackinfo${MYPID}_alterantives
+			cat $WORKDIR/trackinfo${MYPID}_alterantives_all >> $WORKDIR/trackinfo${MYPID}_alterantives
+
+			if [ ! -s $WORKDIR/trackinfo${MYPID}_alterantives_sa ] && [ ! -s $WORKDIR/trackinfo${MYPID}_alterantives_all ]; then echo "$LOC667" > $WORKDIR/trackinfo${MYPID}_alterantives; fi
+
+			echo 100 > $WORKDIR/splash #reset progress bar
+		fi
+		exit
+		;;
+	*-tag)
+		ID3_ARTIST="`grep "${trackinfo_ALT}$" $WORKDIR/trackinfo${MYPID}_alterantives | cut -d'|' -f1`"
+		ID3_TITLE="`grep "${trackinfo_ALT}$" $WORKDIR/trackinfo${MYPID}_alterantives | cut -d'|' -f2`"
+		ID3_ALBUM="${trackinfo_ALT}"
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+		#write tag
+		EXTENSION="`basename "$FILE" | sed -e "s/^.*\.//g"`"
+		ffmpeg -i "$FILE" -acodec copy -id3v2_version 3 -metadata title="$ID3_TITLE" -metadata artist="$ID3_ARTIST" -metadata album="$ID3_ALBUM" -metadata year='' -metadata track='' -metadata genre="$ID3_GENRE" -y $WORKDIR/tmp_ffmpeg_copy.$EXTENSION
+		mv -f $WORKDIR/tmp_ffmpeg_copy.$EXTENSION "$FILE"
+
+		$APPDIR/func_trackinfo "$FILE" -quiet -id3_only &
+		exit
+		;;
+
+esac
+
+
+##################################################################################
+#                                                                                #
+#                                    M A I N                                     #
+#                                                                                #
+##################################################################################
+
+
+
+
+#####     START COLLECTING TRACK INFORMATION     #############
+
+
+#rating
+grep -F "$FILE" $HOME/.pmusic/index_rating | cut -d"|" -f3 > $WORKDIR/trackinfo${MYPID}_rating
+echo true > $WORKDIR/UPDATE_TRACKINFO
+#tags
+echo -n > $WORKDIR/trackinfo${MYPID}_ID3_info
+if [ "`echo "$FILE" | grep -F "cdda:"`" ]; then
+	#define tags which we stored when reading CD
+	echo "$FILE" | cut -d: -f2 > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	ID3_TRACK=($(<"$WORKDIR/trackinfo${MYPID}_ID3_TRACK"))
+	grep "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d'|' -f3 > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	grep "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d'|' -f2 > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	grep "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d'|' -f5 > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	echo -n > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	echo -n > $WORKDIR/trackinfo${MYPID}_ID3_GENRE
+	#searching for extended info at musicbrainz and lyrics
+	ID3_ARTIST=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ARTIST"))
+	ID3_TITLE=($(<"$WORKDIR/trackinfo${MYPID}_ID3_TITLE"))
+	ID3_ALBUM=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ALBUM"))
+	ID3_YEAR=""
+	#differ icon between local id3 info and info from web
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ARTIST)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST; fi #artist
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TITLE)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_TITLE; fi #title
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ALBUM)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM; fi #album
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_YEAR)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_YEAR; fi #year
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TRACK)" ] && [ "$ID3_TRACK" != " " ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK; fi #track
+	track_info &
+	SAVE_BUTTON_VISIBLE="<visible>disabled</visible>"
+	#stream info is hardcoded
+	echo -n "$LOC668: " > $WORKDIR/trackinfo${MYPID}_stream
+	grep "|${ID3_TRACK}|" $WORKDIR/cddb | cut -d':' -f3-4 >> $WORKDIR/trackinfo${MYPID}_stream
+	echo "$LOC293: CD-audio (pcm_s16le)" >> $WORKDIR/trackinfo${MYPID}_stream
+	echo "$LOC295: 44100 Hz" >> $WORKDIR/trackinfo${MYPID}_stream
+	echo "$LOC296: Stereo" >> $WORKDIR/trackinfo${MYPID}_stream
+	echo "$LOC294: 1411 kb/s" >> $WORKDIR/trackinfo${MYPID}_stream
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+elif [ ! "`echo "$FILE" | grep -F 'http:'`" ]; then
+	. $APPDIR/func_id3io "$FILE" -read
+	echo "$ID3_ARTIST" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	echo "$ID3_TITLE"  > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	echo "$ID3_ALBUM"  > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	echo "$ID3_YEAR"  > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	echo "$ID3_TRACK" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	#genre
+	if [ "$ID3_GENRE" -ge 0 ]; then
+		TMP="`echo "$ID3_GENRE" | sed -e 's/^00//' -e 's/^0//'`"
+		ID3_GENRE="`grep -m1 "(${TMP})" $APPDIR/txt_id3genre | cut -d'(' -f1`"
+	fi
+	[ "$ID3_GENRE" = "255" ] && ID3_GENRE='' #if set to 255 (cleared), show only a space that will be converted to 255 at 'Exit and Save'.
+	echo "$ID3_GENRE" > $WORKDIR/trackinfo${MYPID}_ID3_GENRE
+	#---
+	echo true > $WORKDIR/UPDATE_TRACKINFO
+	#differ icon between local id3 info and info from web
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ARTIST)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST; fi #artist
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TITLE)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_TITLE; fi #title
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ALBUM)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM; fi #album
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_YEAR)" ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_YEAR; fi #year
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TRACK)" ] && [ "$ID3_TRACK" != " " ]; then ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png; else ln -sf $APPDIR/themes/$THEME/icon_source_web.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png; echo "$LOC652" > $WORKDIR/trackinfo${MYPID}_ID3_TRACK; fi #track
+	#if both Artist and Title is missing --> manual edit required
+	if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ARTIST)" = "$LOC652" ] && [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TITLE)" = "$LOC652" ]; then
+		echo "$LOC672" > $WORKDIR/trackinfo${MYPID}_urls
+		echo "$LOC672" > $WORKDIR/trackinfo${MYPID}_discography
+		echo "$LOC672" > $WORKDIR/trackinfo${MYPID}_album
+		echo "$LOC672" > $WORKDIR/trackinfo${MYPID}_lyrics
+		check_connection
+		echo "$LOC659" > $WORKDIR/trackinfo${MYPID}_ID3_info
+		echo true > $WORKDIR/UPDATE_TRACKINFO
+		echo '' > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+		echo '' > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+		ln -sf $APPDIR/themes/$THEME/icon_source_manual.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png
+		ln -sf $APPDIR/themes/$THEME/icon_source_manual.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ALBUM)" = "$LOC652" ] || [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_ALBUM)" = "$LOC669" ]; then echo '' > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM; ln -sf $APPDIR/blank.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_YEAR)" = "$LOC652" ] || [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_YEAR)" = "$LOC669" ]; then echo '' > $WORKDIR/trackinfo${MYPID}_ID3_YEAR; ln -sf $APPDIR/blank.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png; fi
+		if [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TRACK)" = "$LOC652" ] || [ "$(<$WORKDIR/trackinfo${MYPID}_ID3_TRACK)" = "$LOC669" ]; then echo '' > $WORKDIR/trackinfo${MYPID}_ID3_TRACK; ln -sf $APPDIR/blank.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png; fi
+	else
+		track_info &
+	fi
+	[ "$ID3_ONLY" != "true" ] && stream_info &
+elif [ "`echo "$FILE" | grep -F 'youtube.com'`" ] && [ "`grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube`" ]; then	#Webmusic
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f3 > $WORKDIR/trackinfo${MYPID}_ID3_ARTIST
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f2 > $WORKDIR/trackinfo${MYPID}_ID3_TITLE
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f5 > $WORKDIR/trackinfo${MYPID}_ID3_ALBUM
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f7 > $WORKDIR/trackinfo${MYPID}_ID3_YEAR
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f6 > $WORKDIR/trackinfo${MYPID}_ID3_TRACK
+	grep -F "$FILE" $HOME/.pmusic/index_webmusic_youtube | cut -d'|' -f8 > $WORKDIR/trackinfo${MYPID}_ID3_GENRE
+	SAVE_BUTTON_VISIBLE="<visible>disabled</visible>"
+	ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_artist.png
+	ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_title.png
+	ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_album.png
+	ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_year.png
+	ln -sf $APPDIR/themes/$THEME/icon_source_local.png $WORKDIR/trackinfo${MYPID}_icon_id3_track.png
+	ID3_ARTIST=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ARTIST"))
+	ID3_TITLE=($(<"$WORKDIR/trackinfo${MYPID}_ID3_TITLE"))
+	ID3_ALBUM=($(<"$WORKDIR/trackinfo${MYPID}_ID3_ALBUM"))
+	ID3_YEAR=($(<"$WORKDIR/trackinfo${MYPID}_ID3_YEAR"))
+	ID3_TRACK=($(<"$WORKDIR/trackinfo${MYPID}_ID3_TRACK"))
+	ID3_GENRE=($(<"$WORKDIR/trackinfo${MYPID}_ID3_GENRE"))
+	track_info &
+	stream_info &
+elif [ "`echo "$FILE" | grep -F 'jamendo.com'`" ]; then
+	info_jamendo &
+	lyrics &
+	stream_info &
+	SAVE_BUTTON_VISIBLE="<visible>disabled</visible>"
+else
+	#no supported file format for tagging and musicbrainz
+	cp -f $APPDIR/themes/$THEME/album_art_radio.png $HOME/.pmusic/nowplaying_albumart.jpg 2> $STDERR
+	cp -f $APPDIR/themes/$THEME/album_art_radio.png $WORKDIR/trackinfo_albumart.jpg 2> $STDERR
+	if [ ! -f "$APPDIR/themes/$THEME/album_art_radio.png" ]; then
+		cp -f $APPDIR/themes/$THEME/album_art_radio.png $HOME/.pmusic/nowplaying_albumart.jpg 2> $STDERR
+		cp -f $APPDIR/themes/$THEME/album_art_radio.png $WORKDIR/trackinfo_albumart.jpg 2> $STDERR
+	fi
+	#---
+	if [ ! "$MYPID" ]; then #update refreshing gui
+		stream_info &
+		#clear the rest
+		echo ' ' > $WORKDIR/trackinfo_urls
+		echo ' ' > $WORKDIR/trackinfo_discography
+		echo ' ' > $WORKDIR/trackinfo_album
+		echo ' ' > $WORKDIR/trackinfo_lyrics
+		ln -sf $APPDIR/blank.png $WORKDIR/trackinfo_icon_id3_artist.png
+		ln -sf $APPDIR/blank.png $WORKDIR/trackinfo_icon_id3_title.png
+		ln -sf $APPDIR/blank.png $WORKDIR/trackinfo_icon_id3_album.png
+		ln -sf $APPDIR/blank.png $WORKDIR/trackinfo_icon_id3_year.png
+		ln -sf $APPDIR/blank.png $WORKDIR/trackinfo_icon_id3_track.png
+		echo ' ' > $WORKDIR/trackinfo_ID3_ARTIST
+		echo ' ' > $WORKDIR/trackinfo_ID3_TITLE
+		echo ' ' > $WORKDIR/trackinfo_ID3_ALBUM
+		echo ' ' > $WORKDIR/trackinfo_ID3_YEAR
+		echo ' ' > $WORKDIR/trackinfo_ID3_TRACK
+		echo ' ' > $WORKDIR/trackinfo_ID3_GENRE
+		echo true > $WORKDIR/UPDATE_TRACKINFO #update gui
+		echo true > $WORKDIR/UPDATE_GUI
+
+	else #show window
+		echo -n "$LOC_LOADING $LOC141..." > $WORKDIR/tmp_statusbar
+		stream_info
+		$APPDIR/func -reset_gtk
+		export Pmusic_trackinfo='
+		<window title="Pmusic - '$LOC141'" window_position="2" icon-name="pmusic">
+		 <frame>
+		  <text><label>"'$(<$WORKDIR/trackinfo${MYPID}_stream)'"</label></text>
+		 </frame>
+		 <action signal="show">rm -f '$WORKDIR'/tmp_statusbar</action>
+		</window>'
+		echo 100 > $WORKDIR/splash
+		$GTKDIALOG -p Pmusic_trackinfo
+	fi
+	exit 0
+fi
+
+
+##################################################################################
+#                                                                                #
+#                              S A T I C     G U I                               #
+#                                                                                #
+##################################################################################
+
+#use this fallback if
+# - Window is called from right-click menu and is static - no <timer>
+# - If trackinfo refreshing is turned off in preferences
+if [ "$MYPID" ]; then
+	#wait for info is collected. Hopefully all is ready when URLs is collected
+	while [ "$A" != "true" ]; do
+		if [ -s $WORKDIR/trackinfo${MYPID}_urls ]; then
+			A=true
+			break
+		fi 
+		sleep 0.2
+	done
+	#---
+	. $APPDIR/gui_trackinfo #load gui
+	echo '
+	<window title="Pmusic - '$LOC141'" window_position="2" icon-name="pmusic" default_height="520" default_width="470">
+	 '"$(<$WORKDIR/xml_Pmusic_trackinfo)"'
+	 <action signal="delete-event">'$APPDIR'/func_config -write_config &</action>
+	 <action signal="delete-event">rm -f '$WORKDIR'/trackinfo'${MYPID}'_*</action>
+	 <action signal="delete-event">exit:EXIT</action>
+	</window>' > $WORKDIR/xml_Pmusic_trackinfo_external_static #I use double hash (##) for comments. --> as #FF0000
+	
+	rm -f $WORKDIR/tmp_statusbar
+	echo 100 > $WORKDIR/splash
+	
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -f $WORKDIR/xml_Pmusic_trackinfo_external_static); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+fi

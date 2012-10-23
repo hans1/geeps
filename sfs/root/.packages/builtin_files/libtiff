@@ -1,0 +1,9 @@
+/usr
+/usr/lib
+ libtiff.so
+ libtiff.so.3
+ libtiff.so.3.9.4
+ libtiff.so.4
+ libtiffxx.so
+ libtiffxx.so.3
+ libtiffxx.so.3.9.4

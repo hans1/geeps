@@ -1,0 +1,8 @@
+/usr
+/usr/lib
+/usr/lib/ladspa
+ caps.so
+/usr/share
+/usr/share/ladspa
+/usr/share/ladspa/rdf
+ caps.rdf

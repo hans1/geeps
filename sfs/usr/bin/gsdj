@@ -1,0 +1,8 @@
+#!/bin/sh
+# $Id: gsdj,v 1.3 2002/02/21 21:49:28 giles Exp $
+gs="`dirname $0`/gs"
+if test ! -x "$gs"; then
+	gs=gs
+fi
+
+exec "$gs" -q -sDEVICE=deskjet -r300 -dNOPAUSE -sPROGNAME=$0 -- gslp.ps --heading-center "`date`" "$@"

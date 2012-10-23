@@ -1,0 +1,32 @@
+#Packager: George Vlahavas (vlahavas~at~gmail~dot~com)
+
+pkgname=libgnomecanvas
+pkgver=2.30.2
+pkgrel=1gv
+source=(http://ftp.gnome.org/pub/GNOME/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.2.tar.bz2)
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo" "maintainers")
+url=www.gnome.org
+options=('noautodotnew')
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"libgnomecanvas (A powerful object-oriented display)"
+"The canvas widget is a powerful and extensible object-oriented display"
+"engine. A GnomeCanvasItem is a GtkObject representing some element of"
+"the display, such as an image, a rectangle, an ellipse, or some text."
+"You can refer to this architecture as structured graphics; the canvas"
+"lets you deal with graphics in terms of items, rather than an"
+"undifferentiated grid of pixels. "
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var/lib --sysconfdir=/etc --disable-static --build=$arch-slackware-linux
+	make || return 1
+	make install DESTDIR=$startdir/pkg
+
+	# we don't really need these
+	rm -rf $startdir/pkg/usr/share/gtk-doc
+} 

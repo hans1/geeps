@@ -1,0 +1,1027 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Functions
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+WORKDIR="/usr/local/PupControl"
+DESKTOPS=`cat $WORKDIR/desktops.rc | grep -a DESKTOPS | cut -d "=" -f2 | sed 's/\"//g'`
+DESKTOPS_HEIGHT=`cat $WORKDIR/desktops.rc | grep -a DESKTOPS_HEIGHT | cut -d "=" -f2 | sed 's/\"//g'`
+DESKTOPS_WIDTH=`cat $WORKDIR/desktops.rc | grep -a DESKTOPS_WIDTH | cut -d "=" -f2 | sed 's/\"//g'`
+DISTRO_NAME=`cat /etc/DISTRO_SPECS | grep -a DISTRO_NAME | cut -d "=" -f2 | sed s/\'//g`
+DISTRO_VERSION=`cat /etc/DISTRO_SPECS | grep -a DISTRO_VERSION= | cut -d "=" -f2 | sed s/\'//g`
+TINTWIZARD=`which tintwizard.py`
+
+#get current window manager
+if [ -f "$HOME/Choices/windowmanager" ]; then
+	 CURRWM=`cat "$HOME/Choices/windowmanager"` #TazOC LHP
+else
+	 CURRWM=`cat /etc/windowmanager`
+fi
+
+#set code syntax for virtual desktops of JWM 498+
+if [ "$DISTRO_NAME" = "Lighthouse Pup" -o "$DISTRO_NAME" = "Lighthouse64" ]; then
+	 DESKTOPS_SYNTAX="><\/Desktops>" #TazOC LHP
+else
+	 DESKTOPS_SYNTAX="\/>"
+fi
+
+#define optional shutdown dialog
+SHUTDOWN_DIALOG=`cat $WORKDIR/pupcontrol.rc | grep -a SHUTDOWN_DIALOG | cut -d "=" -f 2 | sed 's/\"//g'`
+if   [ "`which pupsaveconfig`" ]; then
+	POWEROFF="wmpoweroff &"
+	REBOOT="wmreboot &"
+elif [ "$SHUTDOWN_DIALOG" = "yes" ]; then
+	POWEROFF="/tmp/PC-poweroff &"
+	REBOOT="/tmp/PC-reboot &"
+else
+	POWEROFF="wmpoweroff &"
+	REBOOT="wmreboot &"
+fi
+
+case "$1" in
+
+-commandline) if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then xfrun4 & elif [ "`which gmrun`" ]; then gmrun & elif [ "`which grun`" ]; then grun & elif [ "`which pexec`" ]; then pexec & elif [ "`which gexec`" ]; then gexec & else Xdialog --title Alert --beep --msgbox " Command-line program is not available. " 0 0 & fi ;;
+
+-console)
+	CONSOLE=`cat $WORKDIR/pupcontrol.rc | grep -a CONSOLE | cut -d "=" -f 2 | sed 's/\"//g'`
+	PUP_RXVT=`cat $WORKDIR/pupcontrol.rc | grep -a PUP_RXVT | cut -d "=" -f 2 | sed 's/\"//g'`
+	if   [ "$CONSOLE" = "Prxvt" ] && [ "`pidof enlightenment`" != "" ]; then urxvt -title Prxvt -sr -bg SteelBlue4 -fg white -fn xft:mono:pixelsize=14:autohint=true -sl 2000 &
+	elif [ "$CONSOLE" = "Prxvt" ] &&	[ "$PUP_RXVT" = "on" ]; then urxvt -title Prxvt -sr -inheritPixmap -fg white -fn xft:mono:pixelsize=14:autohint=true -sl 2000 &
+	elif [ "$CONSOLE" = "Prxvt" ] && [ "$PUP_RXVT" = "off" ]; then urxvt -title Prxvt -sr -bg SteelBlue4 -fg white -fn xft:mono:pixelsize=14:autohint=true -sl 2000 &
+	else $WORKDIR/defaultapps/console &
+	fi
+	;;
+
+-cpufrequency) if [ "`which wcpufreq`" ]; then wcpufreq & elif [ -f /usr/local/cpu-freq/cpu_freq ]; then /usr/local/cpu-freq/cpu_freq -start & elif [ "`which acpi-control`" ]; then acpi-control & else Xdialog --title Alert --beep --msgbox " CPU Frequency Scaling is not available. " 0 0 & fi ;;
+
+-cursor)
+	if   [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfce4-mouse-settings`" ]; then xfce4-mouse-settings &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell mouse &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell mouse &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell mouse &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	elif [ "`pidof enlightenment`" ]; then Xdialog --title Alert --beep --msgbox " Please left-click the e17 desktop \n and select the 'Settings' option. " 0 0 && exit 0
+	elif [ -f /usr/bin/pcursorsel ]; then /usr/bin/pcursorsel &
+	elif [ -f /usr/sbin/pcur ]; then /usr/sbin/pcur &
+	else Xdialog --title Alert --beep --msgbox " PCur is not available. " 0 0 &
+	fi
+	;;
+
+-desktops)
+	if   [ "`ls $HOME/.jwm/jwmrc-personal-bak`" = "" ]; then cp $HOME/.jwm/jwmrc-personal $HOME/.jwm/jwmrc-personal-bak & fi
+	if   [ "`which ptray`" ]; then ptray & fi
+	if   [ "`cat $HOME/.jwm/jwmrc-personal | grep "Desktops count"`" != "" ]; then
+		 cat $HOME/.jwm/jwmrc-personal | sed 's/^.*Desktops count.*$/<Desktops count="'$DESKTOPS'"\/>/' > /tmp/tmpfile && mv -f /tmp/tmpfile $HOME/.jwm/jwmrc-personal && jwm -restart &
+	elif [ "`cat $HOME/.jwm/jwmrc-personal | grep "Desktops width"`" != "" ]; then
+		 cat $HOME/.jwm/jwmrc-personal | sed 's/^.*Desktops width.*$/<Desktops width="'$DESKTOPS_WIDTH'" height="'$DESKTOPS_HEIGHT'"'$DESKTOPS_SYNTAX'/' > /tmp/tmpfile && mv -f /tmp/tmpfile $HOME/.jwm/jwmrc-personal && jwm -restart & fi
+	;;
+
+-firewall) if [ "`which Firewall_Genie`" ]; then Firewall_Genie & else rxvt -e firewallinstallshell & fi ;;
+
+-fonts)
+	if   [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfce4-appearance-settings`" ]; then xfce4-appearance-settings &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	elif [ `which Xfont-setdpi` ]; then Xfont-setdpi & #TazOC LHP
+	elif [ "`pidof enlightenment`" ]; then Xdialog --title Alert --beep --msgbox " Please left-click the e17 desktop \n and select the 'Settings' option. " 0 0 && exit 0
+	else /usr/sbin/set-xftdpi &
+	fi
+	;;
+
+-gfontsel)
+	if   [ "`which gfontsel`" ]; then gfontsel &
+	elif [ "`pidof enlightenment`" ]; then Xdialog --title Alert --beep --msgbox " Please left-click the e17 desktop \n and select the 'Settings' option. " 0 0 && exit 0
+	else Xdialog --title Alert --beep --msgbox " Gfontsel is not available. " 0 0 &
+	fi
+	;;
+
+-gparted) if [ "`which gparted_shell`" ]; then gparted_shell & elif [ "`which gparted`" ]; then gparted & else Xdialog --title Alert --beep --msgbox " Gparted is not available. " 0 0 & fi ;;
+
+-gtkhash) if [ "`which ghasher`" ]; then ghasher & elif [ "`which gtkhash`" ]; then gtkhash & else Xdialog --title Alert --beep --msgbox " Ghasher and GtkHash are not available. " 0 0 & fi ;;
+
+-gtktheme)
+	if   [ "`which pgtktheme`" ]; then pgtktheme && $WORKDIR/PupControl &
+	elif [ "`which ptheme`" ]; then ptheme && $WORKDIR/PupControl &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell kthememanager && $WORKDIR/PupControl &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell kthememanager && $WORKDIR/PupControl &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell kthememanager && $WORKDIR/PupControl &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings && $WORKDIR/PupControl &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfce4-appearance-settings`" ]; then xfce4-appearance-settings && $WORKDIR/PupControl &
+	elif [ "`which gtk-chtheme`" ]; then gtk-chtheme && $WORKDIR/PupControl &
+	elif [ "`which lxappearance`" ]; then lxappearance && $WORKDIR/PupControl &
+	elif [ "`which gtk-theme-switch2`" ]; then gtk-theme-switch2 && $WORKDIR/PupControl &
+	else Xdialog --title Alert --beep --msgbox " The Puppy GTK theme selector \n (gtk-chtheme) is not available. " 0 0 && $WORKDIR/PupControl &
+	fi
+	;;
+
+-hotkeys) if [ "`which xbindkeys-config-wrapper`" ]; then xbindkeys-config-wrapper & elif [ "`which xbindkeys_config`" ]; then xbindkeys_config & elif [ "`which xbindkeys-config`" ]; then xbindkeys-config & elif [ "`which svenconfig`" ]; then svenconfig & else Xdialog --title Alert --beep --msgbox " Hotkey binding is not available. " 0 0 & fi ;;
+
+-hwclock)
+	if   [ ! "`cat /etc/DISTRO_SPECS | grep Akita`" = "" ]; then
+	  if [ "`which set_hwclock_type`" ]; then set_hwclock_type & else Xdialog --title Alert --beep --msgbox " The hardware clock option is not available. " 0 0 & fi
+	elif [ ! "`cat /etc/DISTRO_SPECS | grep 'Fatdog64\|Lighthouse64'`" = "" ]; then
+	  if [ "`which quicksetup`" ]; then quicksetup & elif [ "`which firstrun`" ]; then firstrun & else Xdialog --title Alert --beep --msgbox " The hardware clock option is not available. " 0 0 & fi
+	elif [ "`which set_hwclock_type`" ] && [ ! -h /usr/sbin/set_hwclock_type ]; then set_hwclock_type &
+	elif [ "`which quickcountry`" ]; then quickcountry &
+	elif [ "`which countrywizard`" ]; then countrywizard &
+	elif [ "`which countrywizard.qs`" ]; then countrywizard.qs &
+	elif [ "`which firstrun`" ]; then firstrun &
+	else Xdialog --title Alert --beep --msgbox " The hardware clock option is not available. " 0 0 &
+	fi
+	;;
+
+-icons)
+	if   [ "$CURRWM" = "lxsession" ]; then
+	  if [ -f /usr/bin/pcmanfm ]; then /usr/bin/pcmanfm --show-pref=1 & elif [ ! -f /usr/bin/pcmanfm ]; then /usr/sbin/icon_switcher & fi
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfce4-appearance-settings`" ]; then xfce4-appearance-settings &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	elif [ ! "`which icon_switcher`" ]; then Xdialog --title Alert --beep --msgbox " The global icon option is not available. " 0 0 &
+	else /usr/sbin/icon_switcher &
+	fi
+	;;
+
+-ipinfo2)
+	[ "`pidof Pup-SysInfo`" = "" ] && [ "`grep '#widget_class' $HOME/.gtkrc-2.0`" = "" ] && cat $HOME/.gtkrc-2.0 | sed 's/widget_class "\*" style "user-font"/#widget_class "\*" style "user-font"/' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.gtkrc-2.0 2>/dev/null ##briefly comment [widget_class "*" style "user-font"] in .gtkrc-2.0 -> allows consistent use of monspace font in the netstat <edit> widget of ipinfo2.
+	$WORKDIR/ipinfo2
+	[ "`pidof Pup-SysInfo`" = "" ] && cat $HOME/.gtkrc-2.0 | sed 's/#widget_class "\*" style "user-font"/widget_class "\*" style "user-font"/' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.gtkrc-2.0 2>/dev/null ##remove commenting in .gtkrc-2.0.
+	;;
+
+-keymouse)
+	if   [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfce4-keyboard-settings`" ]; then xfce4-keyboard-settings & sleep 1 && xfce4-mouse-settings &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell mouse & sleep 1 && kcmshell keyboard &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell mouse & sleep 1 && kcmshell keyboard &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell mouse & sleep 1 && kcmshell keyboard &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	else pupx & sleep 1 && input-wizard &
+	fi
+	;;
+
+-logout)
+	Xdialog --title Alert --no-buttons --infobox " Logging out to command prompt... " 0 0 2000
+	if   [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then killall X &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ]; then kill -9 `pidof fluxbox` && killall X &
+	elif [ "$CURRWM" = "enlightenment_start" ] && [ -f /usr/bin/wmexit ]; then
+		 wmexit
+		 killall enlightenment &
+	elif [ "$CURRWM" != "enlightenment_start" ] && [ -f /usr/bin/wmexit ]; then wmexit &
+	else killall X &
+	fi
+	;;
+
+-mount) if [ "`which pmount`" ]; then pmount & elif [ "`which ymount`" ]; then ymount & else Xdialog --title Alert --beep --msgbox " Pmount and/or Ymount are not available. " 0 0 &  fi ;;
+
+-partview)
+	if   [ "`which partview`" ] && [ "`cat /usr/sbin/partview | grep -a pdff.pl`" != "" ]; then #new partview
+		 partview &
+	elif [ "`which partview`" ] && [ "`cat /usr/sbin/partview | grep -a pdff.pl`" = "" ]; then #old partview
+		 xmessage -title PSI -buttons "" -center -timeout 4 -bg goldenrod1 " Please wait, processing..." &
+		 partview &
+	else Xdialog --title Alert --beep --msgbox " Partview is not available. " 0 0 &
+	fi
+	;;
+
+-poweroff)
+	if   [ "$CURRWM" = "enlightenment_start" ]; then
+		  wmpoweroff
+		  killall enlightenment &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then wmpoweroff && killall X &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ]; then kill -9 `pidof fluxbox` && wmpoweroff &
+	else $POWEROFF
+	fi
+	;;
+
+-preferences_nochange)
+	if   [ "`which gtkdialog-splash`" ]; then gtkdialog-splash -timeout 2 -fontsize large -bg goldenrod1 -text " Changes not saved... " &
+	elif [ "`which Xdialog`" ]; then Xdialog --title Exit --no-buttons --infobox " Changes not saved... " 0 0 2000 & fi
+	sleep 0.7; cp -f $WORKDIR/pupcontrol2.rc $WORKDIR/pupcontrol.rc && sleep 0.3 && $WORKDIR/PupControl &
+	;;
+
+-preferences_save)
+	if   [ "`which gtkdialog-splash`" ]; then gtkdialog-splash -timeout 2 -fontsize large -bg goldenrod1 -text " Saving changes... " &
+	elif [ "`which Xdialog`" ]; then Xdialog --title Exit --no-buttons --infobox " Saving changes... " 0 0 2000 & fi
+	sleep 0.7; $WORKDIR/setdefaults &
+	;;
+
+-printmanager)
+	if   [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kprinter ]; then /usr/bin/kprinter &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kprinter ]; then /opt/kde3/bin/kprinter &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kprinter ]; then /opt/trinity/bin/kprinter &
+	elif [ "`which gtklp`" ]; then gtklpq & sleep 1 && gtklp &
+	elif [ "`which cupsd`" ]; then defaulthtmlviewer http://localhost:631/printers &
+	else Xdialog --title Alert --beep --msgbox " PupControl does not detect a printer manager. " 0 0 & 
+	fi
+	;;
+
+-printsetup)
+	if   [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell printers &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell printers &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell printers &
+	elif [ "`which cups_shell`" ]; then cups_shell &
+	else Xdialog --title Alert --beep --msgbox " PupControl does not detect a printer setup module. " 0 0 & 
+	fi
+	;;
+
+-pupapps) if [ -f /usr/local/PupApps/PupApps ]; then /usr/local/PupApps/PupApps & else /tmp/PupControl-pupapps & fi ;;
+
+-pupscan) if [ "`which pupscan`" ]; then pupscan & else Xdialog --title Alert --beep --msgbox " PupScan is not available. " 0 0 &  fi ;;
+
+-prxvt)
+	[ -f /usr/bin/urxvt ] && [ ! -f /usr/local/bin/Prxvt ] && echo "PupControl placeholder for non-path applications." > /usr/local/bin/Prxvt && chmod 755 /usr/local/bin/Prxvt
+	[ -f /usr/local/bin/Prxvt ] && [ ! -f /usr/bin/urxvt ] && rm -f /usr/local/bin/Prxvt
+	;;
+
+-reboot)
+	if   [ "$CURRWM" = "enlightenment_start" ]; then
+		  wmreboot
+		  killall enlightenment &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then wmreboot && killall X &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ]; then kill -9 `pidof fluxbox` && wmreboot &
+	else $REBOOT
+	fi
+	;;
+
+-restartWM)
+	if   [ "$CURRWM" = "enlightenment_start" ]; then
+		  restartwm
+		  killall enlightenment &
+	elif [ "$CURRWM" = "icewm" -o "$CURRWM" = "starticewm" -o "$CURRWM" = "icewm-session" ]; then killall -HUP icewm &
+	elif [ "$CURRWM" = "jwm" -o "$CURRWM" = "jwm-session" -o "$CURRWM" = "startjwm" ]; then jwm -restart &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ]; then kill -1 $(xprop -root _BLACKBOX_PID | awk '{print $3}') &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then restartwm && killall X &
+	else restartwm &
+	fi
+	;;
+
+-restartX)
+	if   [ "$CURRWM" = "enlightenment_start" ]; then
+		  restartwm
+		  killall enlightenment &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then restartwm && killall X &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ]; then kill -9 `pidof fluxbox` && restartwm &
+	elif [ -f /usr/bin/restartx ]; then /usr/bin/restartx & #jemimah script support
+	else restartwm &
+	fi
+	;;
+
+-ScreenSaveON)
+	DELAY=`cat $WORKDIR/ss-control.rc | grep -a DELAY | cut -d "=" -f 2 | sed 's/\"//g'`
+	if [ "$DELAY" = "5" ]; then SSDELAY="300"
+	elif [ "$DELAY" = "10" ]; then SSDELAY="600"
+	elif [ "$DELAY" = "15" ]; then SSDELAY="900"
+	elif [ "$DELAY" = "20" ]; then SSDELAY="1200"
+	elif [ "$DELAY" = "30" ]; then SSDELAY="1800"
+	elif [ "$DELAY" = "45" ]; then SSDELAY="2700"
+	elif [ "$DELAY" = "60" ]; then SSDELAY="3600"
+	elif [ "$DELAY" = "90" ]; then SSDELAY="5400"
+	elif [ "$DELAY" = "120" ]; then SSDELAY="7200"
+	elif [ "$DELAY" = "150" ]; then SSDELAY="9000"
+	elif [ "$DELAY" = "180" ]; then SSDELAY="10800"
+	elif [ "$DELAY" = "210" ]; then SSDELAY="12600"
+	elif [ "$DELAY" = "240" ]; then SSDELAY="14400"
+	else SSDELAY="600" #10-minute default
+	fi
+	[ -f /$HOME/Startup/ss-off ] && rm /$HOME/Startup/ss-off &
+	echo "#!/bin/sh
+	xset s $SSDELAY dpms 0 0 $SSDELAY" > $HOME/Startup/ss-on
+	chmod 755 /$HOME/Startup/ss-on
+	xset s $SSDELAY dpms 0 0 $SSDELAY
+	cp -f $WORKDIR/icons/on.png $WORKDIR/icons/status.png
+	cp -f $WORKDIR/ss-control.rc $WORKDIR/ss-control2.rc
+	sleep .3
+	[ "`pidof SS-control`" = "" ] && $WORKDIR/SS-control &
+	;;
+
+-ScreenSaveOFF)
+	[ -f /$HOME/Startup/ss-on ] && rm /$HOME/Startup/ss-on &
+	echo "#!/bin/sh
+	xset s off -dpms" > $HOME/Startup/ss-off
+	chmod 755 /$HOME/Startup/ss-off
+	xset s off -dpms
+	cp -f $WORKDIR/icons/off.png $WORKDIR/icons/status.png
+	sleep .3
+	;;
+
+-suspend_standby) if [ -f /etc/acpi/sleep.sh ]; then /etc/acpi/sleep.sh & else acpitool -s & fi ;; #jemimah script support
+
+-sysinfo)
+	if [ "`which hardinfo`" ]; then hardinfo &
+	else Xdialog --title Alert --beep --msgbox " Hardinfo is not available. " 0 0 &
+	fi
+	;;
+
+-sysinfo_alsa)
+	echo -e "=== ALSA Information ===\n" > /tmp/pup-sysinfo.txt
+	if [ "`cat /tmp/chipnummod.txt`" != "" ]; then
+	 cat /tmp/chipnummod.txt | grep -A3 Audio | grep -E 'Audio|KERNEL' | sed 's/DESCRIPTION: //g' >> /tmp/pup-sysinfo.txt
+	elif [ "`lspci -knn`" != "" ]; then
+	 lspci -knn | tr '|' ' ' | tr -s ' ' | tr '\t' '|' | grep -v 'Subsystem: ' | grep -A2 'Audio' | sed -r 's/^[^ \t]*[ \t]+//g' | awk '{gsub(/\[[A-Z0-9.,:]*\]/,""); print; }' | sed -e  's/driver in use/KERNEL DRIVER/g' -e 's/modules/KERNEL MODULE/g' -e '/USB Controller/d' >> /tmp/pup-sysinfo.txt
+	elif [ "`lspci -knn`" = "" ] && [ "`which scanpci`" ]; then
+	 scanpci | grep 'Audio' >> /tmp/pup-sysinfo.txt
+	fi
+	if [ "`which  alsa-info.sh`" ]; then
+	 echo >> /tmp/pup-sysinfo.txt
+	 alsa-info.sh --stdout > /tmp/alsainfo.txt
+	 cat /tmp/alsainfo.txt | sed -e 's/[©®]//g' -e '/upload=true/d' >> /tmp/pup-sysinfo.txt
+	fi
+	if [ "`cat /tmp/pup-sysinfo.txt | grep 'Audio'`" = "" ]; then
+	 echo "ALSA information is not available." >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_battery)
+	lsmod | grep -q -e "battery"
+	if [ $? -ne 0 ]; then
+	 modprobe battery
+	 modprobe ac
+	fi
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	X2PID=$!
+	if [ -f /proc/acpi/battery/BAT?/state ]; then
+	 echo -e "=== NOTEBOOK BATTERY ===\n" > /tmp/sysinfo-battery
+	 echo -e "Baseline Report:" >> /tmp/sysinfo-battery
+	 dmidecode -t 22 | grep -E 'Manufacture Date:|Name:' | sed -e 's/Date:/Date:       /g' -e 's/Name:/Name:                   /g' -e 's/^/ /' -e 's/	//g' | sed 's/:/ /g' >> /tmp/sysinfo-battery
+	 cat /proc/acpi/battery/BAT?/info | grep -E 'capacity|voltage' | sed 's/^/ /' | sed 's/:/ /g' >> /tmp/sysinfo-battery
+	 cat /proc/acpi/battery/BAT?/state | sed -e 's/^/ /' -e '/present:/d' | sed 's/:/ /g' >> /tmp/sysinfo-battery
+	 cat /proc/acpi/ac_adapter/AC/state | sed -e 's/^/ /' -e 's/ state:   / AC-state:/g' | sed 's/:/ /g' >> /tmp/sysinfo-battery
+	 echo >> /tmp/sysinfo-battery
+	 if [ "`which acpitool`" ]; then
+	  echo -e "Acpitool Report:" >> /tmp/sysinfo-battery
+	  echo -e "`acpitool -B | sed -e 's/^[ \t]*/ /' | sed -e '/Battery #/d' -e 's/:/     /' | grep -E '[Cc]apacity'`" >> /tmp/sysinfo-battery
+	  echo >> /tmp/sysinfo-battery
+	 fi
+	fi
+	kill $X2PID
+	;;
+
+-sysinfo_bootinit)
+	if [ "`cat /initrd/tmp/bootinit.log`" != "" ]; then
+	 echo "'FATAL' messages may be insignificant." > /tmp/pup-sysinfo.txt
+	 echo -e "\n=== /initrd/tmp/bootinit.log ===\n" >> /tmp/pup-sysinfo.txt
+	 cat /initrd/tmp/bootinit.log >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No information is detected in /initrd/tmp/bootinit.log. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_country)
+	echo -e "Language: `locale | grep LANG | cut -d "=" -f2`" >> /tmp/pup-sysinfo.txt
+	echo -e "Keyboard: `cat /etc/keymap`" >> /tmp/pup-sysinfo.txt
+	echo -e "Timezone: `readlink /etc/localtime | sed -e 's%^.*share/zoneinfo/%%'`" >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_cpu)
+	cat /proc/cpuinfo > /tmp/sysinfo-cpu
+	CPU_MHz="`cat /tmp/sysinfo-cpu | grep 'MHz' | awk '{print $4}' | cut -d '.' -f1`"
+	CORE=0
+	CPU_SPEED="Core "
+	for ONE_CORE in $CPU_MHz; do
+	 CPU_SPEED="$CPU_SPEED$CORE: $ONE_CORE MHz,  "
+	 CORE=$(expr $CORE + 1)
+	done
+	CORE_SPEED="`echo -e "Current Speed of $CPU_SPEED"`"
+	grep -m 1 'model name' /tmp/sysinfo-cpu | sed -e 's/model name	: //g' -e 's/  */\ /g' >> /tmp/pup-sysinfo.txt
+	dmidecode -t 4 | grep -E 'Socket Designation:|Manufacturer:|Voltage:|External Clock:|Max Speed:|Current Speed:|Core Count:|capable' | sed -e 's/	//g' -e 's/^.*Current Speed.*$/'"$CORE_SPEED"'/' -e 's/[ \t]*$//' -e 's/  /  Core /g' -e 's/,$//' >> /tmp/pup-sysinfo.txt
+	if [ "`which acpitool`" ] && [ "`acpitool -c | grep 'scaling'`" != "" ]; then
+	 echo -e "\n`acpitool -c | grep -E 'Min|governor|driver' | sed -e 's/^[ \t]*//' -e 's/  :/:/g'`" >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_distro)
+	. /etc/DISTRO_SPECS
+	echo -e "\nOperating System: $DISTRO_NAME $DISTRO_VERSION" >> /tmp/pup-sysinfo.txt
+	[ "`pidof fbpanel`" ] && echo -e "Desktop Panel: `fbpanel --version`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof lxpanel`" ] && echo -e "Desktop Panel: `lxpanel --version`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof lxpanel.bin`" ] && echo -e "Desktop Panel: `lxpanel.bin --version`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof tint2`" ] && echo -e "Desktop Panel: `tint2 -v`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof xfce4-panel`" ] && echo -e "Desktop Panel: `xfce4-panel --version | grep xfce4-panel`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof enlightenment`" ] && echo -e "Desktop Environment: Enlightenment" >> /tmp/pup-sysinfo.txt
+	[ "`pidof fluxbox`" ] && echo -e "Desktop Window Manager: `fluxbox -version | grep Fluxbox | cut -d " " -f1,2`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof icewm`" ] && echo -e "Desktop Window Manager: `icewm -v | cut -d "," -f1`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof jwm`" ] && echo -e "Desktop Window Manager: `jwm -v | grep JWM | cut -d " " -f1,2`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof metacity`" ] && echo -e "Desktop Window Manager: `metacity --version | grep metacity`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof openbox`" ] && echo -e "Desktop Window Manager: `openbox --version | grep Openbox`" >> /tmp/pup-sysinfo.txt
+	[ "`pidof xfwm4`" ] && echo -e "Desktop Window Manager: `xfwm4 --version | grep xfwm4 | cut -d " " -f3,5`" >> /tmp/pup-sysinfo.txt
+	[ "$CURRWM" = "startkde" ] && echo -e "Desktop Environment: KDE" >> /tmp/pup-sysinfo.txt
+	[ "$CURRWM" = "startfusion" ] && echo -e "Desktop Environment: Fusion" >> /tmp/pup-sysinfo.txt
+	echo -e "Desktop Start: xwin $CURRWM" >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_extraSFS)
+	if [ "`cat /initrd/tmp/EXTRASFSS`" != "" ]; then
+	 echo -e "=== /initrd/tmp/EXTRASFSS ===\n" > /tmp/pup-sysinfo.txt
+	 cat /initrd/tmp/EXTRASFSS >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No extra SFS files are detected in /initrd/tmp/EXTRASFSS. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_filesystems) df -h | (read -r; printf "%s\n" "$REPLY"; sort) >> /tmp/pup-sysinfo.txt ;;
+
+-sysinfo_fonts)
+	echo -e "=== Fonts ===\n" > /tmp/pup-sysinfo.txt
+	echo "`fc-list | cut -d ":" -f 1 | sort | uniq`" >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_hdd)
+	echo > /tmp/sysinfo-hdd
+	if [ "`hdparm -I /dev/sda1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-1\n=====" > /tmp/sysinfo-hdd
+	 hdparm -I /dev/sda1 2>/dev/null >> /tmp/sysinfo-hdd
+	elif [ "`hdparm -I /dev/hda1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-1\n=====" > /tmp/sysinfo-hdd
+	 hdparm -I /dev/hda1 2>/dev/null >> /tmp/sysinfo-hdd
+	fi
+	if [ "`hdparm -I /dev/sdb1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-2\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/sdb1 2>/dev/null >> /tmp/sysinfo-hdd
+	elif [ "`hdparm -I /dev/hdb1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-2\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/hdb1 2>/dev/null >> /tmp/sysinfo-hdd
+	fi
+	if [ "`hdparm -I /dev/sdc1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-3\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/sdc1 2>/dev/null >> /tmp/sysinfo-hdd
+	elif [ "`hdparm -I /dev/hdc1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-3\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/hdc1 2>/dev/null >> /tmp/sysinfo-hdd
+	fi
+	if [ "`hdparm -I /dev/sdd1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-4\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/sdd1 2>/dev/null >> /tmp/sysinfo-hdd
+	elif [ "`hdparm -I /dev/hdd1 | grep 'ATA device'`" != "" ]; then
+	 echo -e "\nHDD-4\n=====" >> /tmp/sysinfo-hdd
+	 hdparm -I /dev/hdd1 2>/dev/null >> /tmp/sysinfo-hdd
+	fi
+	if [ "`cat /tmp/sysinfo-hdd`" = "" ]; then
+	 echo -e "\nNo Hard Drive detected." > /tmp/sysinfo-hdd
+	fi
+	;;
+
+-sysinfo_history)
+	if [ "`cat /root/.history`" != "" ]; then
+	 echo -e "=== /root/.history ===\n" > /tmp/pup-sysinfo.txt
+	 cat /root/.history >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No command history is detected in /root/.history. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_input)
+	if [ "`cat /proc/bus/input/devices`" != "" ]; then
+	 echo -e "=== Input Devices ===\n" > /tmp/pup-sysinfo.txt
+	 grep -Ev 'S:|U:|H:|B:' /proc/bus/input/devices | sed -e 's/I: //g' -e 's/N: //g' -e 's/P: //g' -e 's/Phys=/Connected to: /g' -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No input devices are detected in cat /proc/bus/input/devices. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_kernel)
+	echo -e "=== Linux Kernel ===\n" > /tmp/pup-sysinfo.txt
+	echo -e "Kernel Release: `uname -r`" >> /tmp/pup-sysinfo.txt
+	echo -e "Build Date: `uname -v`" | sed -e 's/#[0-9] SMP //g' >> /tmp/pup-sysinfo.txt
+	echo -e "OS Support: `uname -o`" >> /tmp/pup-sysinfo.txt
+	echo -e "Architecture: `uname -m`" >> /tmp/pup-sysinfo.txt
+	if [ "`uname -v | grep 'SMP'`" != "" ]; then
+	 SMP="Yes"
+	else
+	 SMP="No"
+	fi
+	uname -v | grep 'SMP' && echo -e "SMP Enabled: $SMP" >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== Kernel Messages (dmesg) ===\n" >> /tmp/pup-sysinfo.txt
+	dmesg | tail -n 2000 | sed -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_lighthouse)
+	SYSDATE="`date +'%y%m%d'`"
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Processing Lighthouse Sys-Info..." &
+	X3PID=$!
+	mkdir -p /tmp/${USER}/
+	sys-info -q > /tmp/${USER}/sys-info-$SYSDATE #TazOC script support
+	sleep .3
+	cat /tmp/${USER}/sys-info-$SYSDATE | head -n 2500 | sed -e 's/[©®]//g' -e '1i\"'"The Lighthouse full-system report is also\n available here: /tmp/${USER}/sys-info-$SYSDATE"'"\n' > /tmp/${USER}/sys-info2-$SYSDATE
+	mv -f /tmp/${USER}/sys-info2-$SYSDATE /tmp/pup-sysinfo.txt
+	kill $X3PID
+	;;
+
+-sysinfo_log)
+	if [ "`cat /var/log/messages`" != "" ]; then
+	 echo -e "=== /var/log/messages ===\n" > /tmp/pup-sysinfo.txt
+	 cat /var/log/messages | tail -n 1000 | sed -e '/./,/^$/!d' -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No information is detected in /var/log/messages. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_login)
+	[ "`which last`" ] && last > /tmp/pup-sysinfo.txt
+	CURRLOGIN=`cat /tmp/pup-sysinfo.txt | sed 's/^.*wtmp.*$//'`
+	if [ "`which last`" ] && [ "$CURRLOGIN" = "" ]; then
+	 echo " No information is detected in a report " > /tmp/pup-sysinfo.txt 
+	 echo " generated by the Linux 'last' command. " >> /tmp/pup-sysinfo.txt
+	elif [ "`which last`" ] && [ ! "$CURRLOGIN" = "" ]; then
+	 echo -e "=== User Login Report ===\n" > /tmp/pup-sysinfo.txt
+	 echo "User     Terminal        Date    Login   Logout Logtime     Remote Host" >> /tmp/pup-sysinfo.txt
+	 echo "====     ========     ========== =====   ====== =======     ===========" >> /tmp/pup-sysinfo.txt
+	 last -adn 2000 >> /tmp/pup-sysinfo.txt
+	elif [ ! "`which last`" ]; then
+	 echo " This Distro has no Linux 'last' command to create a login report. " > /tmp/pup-sysinfo.txt 
+	fi
+	;;
+
+-sysinfo_lsmod) lsmod | (read -r; printf "%s\n" "$REPLY"; sort) | sed 's/Module /MODULE:/' >> /tmp/pup-sysinfo.txt ;;
+
+-sysinfo_memory)
+	. $WORKDIR/func -sysinfo_storage
+	echo -e "=== COMPUTER MEMORY ===\n" > /tmp/sysinfo-memory
+	if [ "$PUPMODE" = "5" -o "$PUPMODE" = "77" ]; then
+	 echo "Personal Storage: RAM Disk" >> /tmp/sysinfo-memory
+	 df -h | awk '/Filesystem|tmpfs.*pup_rw/' | awk '{print $2,$3,$4,$5}' | sed -e 's/ /	/g' -e 's/^/ /g' -e 's/Avail/Free/g' >> /tmp/sysinfo-memory
+	 echo >> /tmp/sysinfo-memory
+	fi
+	if [ "$PERSISTMNTPT" != "" ]; then
+	 echo "Personal Storage File" >> /tmp/sysinfo-memory
+	 echo " Name: $NAMEPFILE" >> /tmp/sysinfo-memory
+	 echo " Total Size: $ACTUALSIZE MB" >> /tmp/sysinfo-memory
+	 echo " Free Space: $SIZEFREE MB" >> /tmp/sysinfo-memory
+	 echo -e " Location: partition $SAVEPART\n" >> /tmp/sysinfo-memory
+	fi
+	echo "Memory Allocation" >> /tmp/sysinfo-memory
+	echo " Total RAM: $MEMTOTAL MB" >> /tmp/sysinfo-memory
+	echo " Used RAM: $MEMUSED MB" >> /tmp/sysinfo-memory
+	echo " Free RAM: $MEMFREE MB" >> /tmp/sysinfo-memory
+	echo " Buffers: $BUFFERS MB" >> /tmp/sysinfo-memory
+	echo " Total Swap: $SWAPTOTAL MB" >> /tmp/sysinfo-memory
+	echo " Free Swap: $SWAPFREE MB" >> /tmp/sysinfo-memory
+	;;
+
+-sysinfo_monitor)
+	EDIDFAIL="`ddcprobe | grep edidfail`"
+	if [ "$EDIDFAIL" != "" ]; then
+	 echo -e "=== Monitor ===\n" > /tmp/pup-sysinfo.txt
+	 echo "Processing Error: The ddcprobe utility could not detect the" >> /tmp/pup-sysinfo.txt
+	 echo "Extended Display Identification Data (EDID) of your monitor." >> /tmp/pup-sysinfo.txt
+	 echo >> /tmp/pup-sysinfo.txt
+	 ddcprobe >> /tmp/pup-sysinfo.txt
+	else
+	 echo -e "=== Monitor ===\n" > /tmp/pup-sysinfo.txt
+	 ddcprobe | grep -A 100 -e 'eisa:' >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_mono)
+	[ "`grep '#widget_class' $HOME/.gtkrc-2.0`" = "" ] && cat $HOME/.gtkrc-2.0 | sed 's/widget_class "\*" style "user-font"/#widget_class "\*" style "user-font"/' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.gtkrc-2.0 2>/dev/null ##briefly comment [widget_class "*" style "user-font"] in .gtkrc-2.0 -> allows consistent use of monspace font in Pup-SysInfo report.
+	if [ "`pidof Pup-SysInfo`" = "" ]; then
+	 echo "Please select a menu item." > /tmp/pup-sysinfo.txt
+	 $WORKDIR/Pup-SysInfo
+	 cat $HOME/.gtkrc-2.0 | sed 's/#widget_class "\*" style "user-font"/widget_class "\*" style "user-font"/' > /tmp/tmpfile ; mv -f /tmp/tmpfile $HOME/.gtkrc-2.0 2>/dev/null ##after exiting Pup-SysInfo, remove commenting in .gtkrc-2.0.
+	else Xdialog --title Alert --beep --msgbox " Pup-SysInfo is already active. " 0 0 &
+	fi
+	;;
+
+-sysinfo_network)
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	X4PID=$!
+	IFACE="`ifconfig | grep '^[a-z]' | cut -d " " -f1 | grep -v '^lo'`"
+	CURRENTRX="`cat /sys/class/net/$IFACE/statistics/rx_bytes`"
+	CURRENTTX="`cat /sys/class/net/$IFACE/statistics/tx_bytes`"
+	SESSIONRX="`ifconfig | grep -A7 $IFACE | grep 'RX bytes' | sed 's/iB/B/g' | tr -s ' ' | awk '{print $3,$4}'`"
+	[ "$SESSIONRX" = "" ] && SESSIONRX="$(expr $(expr $CURRENTRX + 524288) \/ 1048576) MB"
+	SESSIONTX="`ifconfig | grep -A7 $IFACE | grep 'TX bytes' | sed 's/iB/B/g' | tr -s ' ' | awk '{print $7,$8}'`"
+	[ "$SESSIONTX" = "" ] && SESSIONTX="$(expr $(expr $CURRENTTX + 524288) \/ 1048576) MB"
+	MONTHRX="`cat /var/local/sns/rx_bytes_month`"
+    MONTHRX="$(expr $(expr $MONTHRX + 524288) \/ 1048576 + $(expr $CURRENTRX + 524288) \/ 1048576) MB"
+	MONTHTX="`cat /var/local/sns/tx_bytes_month`"
+	MONTHTX="$(expr $(expr $MONTHTX + 524288) \/ 1048576 + $(expr $CURRENTTX + 524288) \/ 1048576) MB"
+	if [ ! "`lsmod | grep ip_tables`" = "" ]; then
+	 FWSTATUS="On (ip_tables detected)"
+	else
+	 FWSTATUS="Off (ip_tables not detected)"
+	fi
+	if [ ! "`wget -T 15 -O - -q icanhazip.com`" = "" ]; then
+	 NETSTATUS="Connected"
+	else
+	 NETSTATUS="Disconnected"
+	fi
+	echo -e "Firewall: $FWSTATUS" > /tmp/sysinfo-network
+	echo -e "Network Status: $NETSTATUS $IFACE" >> /tmp/sysinfo-network
+	if [ ! "`iwgetid | awk '{print $2}'`" = "" ]; then
+	 ESSID="`iwgetid | cut -d ":" -f 2- | sed 's/\"//g'`"
+	 IWSPECS="`iwconfig | grep -E 'Bit|Link' | tr -s ' ' | sed -e 's/^[ \t]*//' -e 's/ level//g'`"
+	 echo "Wireless Network: $ESSID" >> /tmp/sysinfo-network
+	 echo "$IWSPECS" >> /tmp/sysinfo-network
+	else
+	 echo "Wireless Network: No wireless connection" >> /tmp/sysinfo-network
+	fi
+	if [ "$NETSTATUS" = "Connected" ]; then
+	 NETADDRESS="`ifconfig | grep -A7 $IFACE | grep 'inet addr' | cut -d ":" -f2 | cut -d " " -f1`"
+	 echo -e "Session: Received $SESSIONRX, Sent $SESSIONTX" | sed -e 's/(//g' -e 's/)//g' >> /tmp/sysinfo-network
+	 echo -e "Month: Received $MONTHRX, Sent $MONTHTX" >> /tmp/sysinfo-network
+	 echo -e "External IP Address: `wget -O - -q icanhazip.com`" >> /tmp/sysinfo-network
+	 echo -e "Network Address: $NETADDRESS" >> /tmp/sysinfo-network
+	 echo -e "Domain Name Server (DNS):`grep nameserver /etc/resolv.conf | sed 's/nameserver//g'`" >> /tmp/sysinfo-network
+	fi
+	kill $X4PID
+	;;
+
+-sysinfo_optical)
+	echo > /tmp/sysinfo-optical
+	if [ "`hdparm -I /dev/sr0 | grep 'CD-ROM'`" != "" ]; then
+	 hdparm -I /dev/sr0 2>/dev/null > /tmp/sysinfo-optical
+	 hdparm -I /dev/sr1 2>/dev/null >> /tmp/sysinfo-optical
+	 hdparm -I /dev/sr2 2>/dev/null >> /tmp/sysinfo-optical
+	 hdparm -I /dev/sr3 2>/dev/null >> /tmp/sysinfo-optical
+	fi
+	if [ "`cat /tmp/sysinfo-optical`" = "" ]; then
+	 hdparm -I /dev/cdrom 2>/dev/null > /tmp/sysinfo-optical
+	 hdparm -I /dev/dvd 2>/dev/null >> /tmp/sysinfo-optical
+	fi
+	if [ "`cat /tmp/sysinfo-optical`" = "" ]; then
+	 echo -e "\nNo CD/DVD Drive detected." > /tmp/sysinfo-optical
+	fi	 
+	;;
+
+-sysinfo_packages)
+	echo -e "=== /var/log/packages ===\n" > /tmp/pup-sysinfo.txt
+	if [ "`ls /var/log/packages`" != "" ]; then
+	 ls /var/log/packages | sort | uniq >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No packages are detected. " >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_partitions)
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	X5PID=$!
+	echo -e "Partition Attributes:\n" > /tmp/sysinfo-partitions
+	blkid | grep -E 'sd[a-z]|sr[0-9]' | sed 's/\/dev\// /g' | sort >> /tmp/sysinfo-partitions
+	echo -e "\nPartition Specifications:\n" >> /tmp/sysinfo-partitions
+	echo -e " Part   Type    Size(MB)" >> /tmp/sysinfo-partitions
+	probepart -m | grep -Ev 'none' | sed -e 's/\/dev\// /g' -e 's/|/	/g' >> /tmp/sysinfo-partitions
+	if [ "`df -h | grep -E 'sd[a-z]|hd[a-z]|sr[0-9]|cdrom|dvd'`" != "" ]; then
+	 echo -e "\nMounted Partitions:\n" >> /tmp/sysinfo-partitions
+	 df -h | grep -E 'Filesystem|sd[a-z]|hd[a-z]|sr[0-9]|cdrom|dvd' | sed -e 's/          //g' -e 's/^/ /'  >> /tmp/sysinfo-partitions
+	fi
+	echo -e "\n---" >> /tmp/sysinfo-partitions
+	echo -e "\nPartition Tables (fdisk 1):" >> /tmp/sysinfo-partitions
+	fdisk -l 2>/dev/null | sed 's/^/ /' >> /tmp/sysinfo-partitions
+	kill $X5PID
+	;;
+
+-sysinfo_pci)
+	echo -e "=== PCI INTERFACES ===\n" > /tmp/sysinfo-pci
+	if [ -r /tmp/chipnummod.txt ]; then
+	 cat /tmp/chipnummod.txt | sed -e '/^$/d' -e '/DESCRIPTION/{x;p;x;}' | sed '/./,/^$/!d' >> /tmp/sysinfo-pci
+	elif [ "`lspci -knn`" != "" ]; then
+	 lspci -knn | sed -e '/:[0-9a-z][0-9a-z]./{x;p;x;}' -e 's/driver in use/Kernel Driver/g' -e 's/modules/Kernel Module/g' | cut -d " " -f2- | sed '/./,/^$/!d' >> /tmp/sysinfo-pci
+	elif [ "`lspci -knn`" = "" ] && [ "`which scanpci`" ]; then
+	 scanpci | grep -A 2 'pci bus' | sed '/./,$!d' >> /tmp/sysinfo-pci
+	else
+	 lspci -nn | cut -c 9-200 >> /tmp/sysinfo-pci
+	fi
+	;;
+
+-sysinfo_pets)
+	cut -d "|" -f 1,10 /root/.packages/user-installed-packages > /tmp/installedpkgs.results
+	if [ "`cat /tmp/installedpkgs.results`" != "" ]; then
+	 echo -e "=== /root/.packages/user-installed-packages ===\n" > /tmp/pup-sysinfo.txt
+	 cat /tmp/installedpkgs.results >> /tmp/pup-sysinfo.txt
+	elif [ "`cat /root/.packages/alienpackages.txt`" != "" ]; then
+	 echo -e "=== /root/.packages/alienpackages.txt ===\n" > /tmp/pup-sysinfo.txt
+	 cat /root/.packages/alienpackages.txt | cut -d " " -f1 | sed 's/\"//g' | sort >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No user-installed PET packages are detected. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_pinboard)
+	if [ "`cat /root/Choices/ROX-Filer/PuppyPin`" != "" ]; then
+	 echo -e "=== /root/Choices/ROX-Filer/PuppyPin ===\n" > /tmp/pup-sysinfo.txt
+	 cat /root/Choices/ROX-Filer/PuppyPin >> /tmp/pup-sysinfo.txt
+	else
+	 echo " PuppyPin is not detected in /root/Choices/ROX-Filer/PuppyPin. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_printers)
+	echo "`grep '<DefaultPrinter ' /etc/cups/printers.conf | tr -d '<' | tr -d '>'`" > /tmp/sysinfo-printers
+	echo "`grep '<Printer ' /etc/cups/printers.conf | tr -d '<' | tr -d '>'`" >> /tmp/sysinfo-printers
+	if [ "`cat /tmp/sysinfo-printers`" != "" ]; then
+	 echo -e "=== Printers ===\n" > /tmp/pup-sysinfo.txt
+	 cat /tmp/sysinfo-printers | sed '/^$/d' >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No printers are detected in /etc/cups/printers.conf. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_pupsaves)
+	if [ "`cat /initrd/tmp/PUPSAVES-complete`" != "" ]; then
+	 echo -e "=== /initrd/tmp/PUPSAVES-complete ===\n" > /tmp/pup-sysinfo.txt
+	 cat /initrd/tmp/PUPSAVES-complete >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No PupSave files are detected in /initrd/tmp/PUPSAVES-complete. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_rescan)
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	X6PID=$!
+	pupscan --silent
+	kill $X6PID
+	;;
+
+-sysinfo_sensors)
+	#code from CPUtemp utility of rcrsn51...
+	lsmod | grep -q -e "k.temp"
+	if [ $? -ne 0 ]; then
+	 modprobe coretemp
+	fi
+	sensors -A -c /etc/sensors3.conf | tr -s " " > /tmp/sysinfo-sensors
+	#end
+	if [ "`cat /tmp/sysinfo-sensors`" != "" ]; then
+	 echo -e "=== CPU Temperature ===\n" > /tmp/pup-sysinfo.txt
+	 cat /tmp/sysinfo-sensors | sed 's/[°]/ /g' >> /tmp/pup-sysinfo.txt
+	else
+	 echo " Sensor status is not available, or required kernel drivers are not loaded. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_startup)
+	echo -e "=== /root/Startup/ ===\n" > /tmp/pup-sysinfo.txt
+	ls /root/Startup | sort | uniq | sed -e 's/^.*txt.*$//' -e '/^$/d' >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_storage)
+	#code adapted from BK's resizepfile.sh...
+	. /etc/rc.d/PUPSTATE
+	CURRMODE="`echo -n "$PUPMODE" | cut -f 2 -d '='`"
+	if [ $CURRMODE = "12" ]; then
+	 PERSISTMNTPT="/initrd/pup_rw"
+	elif [ $CURRMODE = "13" ]; then
+	 PERSISTMNTPT="/initrd/pup_ro1"
+	else
+	 PERSISTMNTPT=""
+	fi
+	SAVEFILE="`echo -n "$PUPSAVE" | cut -f 3 -d ','`"
+	SAVEPART="`echo -n "$PUPSAVE" | cut -f 1 -d ','`"
+	BOOTPART="`echo -n "$PDEV1" | cut -f 2 -d '='`"
+	BOOTFS="`echo -n "$DEV1FS" | cut -f 2 -d '='`"
+	BOOTMEDIA="`echo -n "$PMEDIA" | cut -f 2 -d '='`"
+	NAMEPFILE="`basename $SAVEFILE`"
+	HOMELOCATION="/initrd${PUP_HOME}${SAVEFILE}"
+	SIZEFREE=`df -m | grep "$PERSISTMNTPT" | tr -s " " | cut -f 4 -d " "` #free space in pup_save.3fs
+	ACTUALSIZK=`ls -sk $HOMELOCATION | tr -s " " | cut -f 1 -d " "` #total size of pup_save.3fs
+	if [ ! $ACTUALSIZK ] 2>/dev/null; then
+	ACTUALSIZK=`ls -sk $HOMELOCATION | tr -s " " | cut -f 2 -d " "`
+	fi
+	ACTUALSIZE=`expr $ACTUALSIZK \/ 1024 2>/dev/null`
+	MEMTOTAL=`grep MemTotal /proc/meminfo | awk '{print $2}'`
+	MEMTOTAL=`expr $MEMTOTAL \/ 1024`
+	MEMFREE=`grep MemFree /proc/meminfo | awk '{print $2}'`
+	MEMFREE=`expr $MEMFREE \/ 1024`
+	MEMUSED=`expr $MEMTOTAL \- $MEMFREE`
+	BUFFERS=`grep Buffers /proc/meminfo | awk '{print $2}'`
+	BUFFERS=`expr $BUFFERS \/ 1024`
+	SWAPTOTAL=`grep SwapTotal /proc/meminfo | awk '{print $2}'`
+	SWAPTOTAL=`expr $SWAPTOTAL \/ 1024`
+	SWAPFREE=`grep SwapFree /proc/meminfo | awk '{print $2}'`
+	SWAPFREE=`expr $SWAPFREE \/ 1024`
+	;;
+
+-sysinfo_summary)
+	. /etc/DISTRO_SPECS
+	. $WORKDIR/func -sysinfo_pci
+	. $WORKDIR/func -sysinfo_storage
+	. $WORKDIR/func -sysinfo_usb
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	XPID=$!
+	echo -e "Pup-SysInfo Summary Report, `date +'%a %-e %b %Y'`" > /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_uptime
+	echo -e "\n=== BASE SYSTEM ===\n" >> /tmp/pup-sysinfo.txt
+	dmidecode -t 1 | grep -E 'Manufacturer:|Product Name:|Serial Number:|UUID:' | sed -e 's/Manufacturer:/PC Manufacturer:/g' -e 's/	//g' >> /tmp/pup-sysinfo.txt
+	echo >> /tmp/pup-sysinfo.txt
+	dmidecode -t 2 | grep -E 'Manufacturer:|Product Name:|Serial Number:' | sed -e 's/Manufacturer:/Motherboard Vendor:/g' -e 's/	//g' >> /tmp/pup-sysinfo.txt
+	echo -e "\nLinux Kernel: `uname -r` (`uname -m`)" >> /tmp/pup-sysinfo.txt
+	echo -e "Version: `uname -v`" >> /tmp/pup-sysinfo.txt
+	echo -e "\nHostname: "$(hostname)"" >> /tmp/pup-sysinfo.txt
+	echo -e "Username: "`whoami`"" >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_country
+	. $WORKDIR/func -sysinfo_distro
+	. $WORKDIR/func -sysinfo_network
+	echo >> /tmp/pup-sysinfo.txt
+	cat /tmp/sysinfo-network >> /tmp/pup-sysinfo.txt
+	SAVESIZE=`df -h | grep dev_save | awk '{print $2}'`
+	SAVEFREE=`df -h | grep dev_save | awk '{print $4}'`
+	[ "$PUPMODE" = "12" -o "$PUPMODE" = "13" ] && SAVEPARTSPACE="(Size $SAVESIZE, Free $SAVEFREE)"
+	echo -e "\nBoot Partition: $BOOTPART $SAVEPARTSPACE" >> /tmp/pup-sysinfo.txt
+	[ "$DEV1FS" != "" ] && echo -e "Boot File System: $BOOTFS" >> /tmp/pup-sysinfo.txt
+	[ "$PMEDIA" != "" ] && echo -e "Boot Media: $BOOTMEDIA\n" >> /tmp/pup-sysinfo.txt
+	grep -E 'PUPMODE|PUPSFS|PUPSAVE' /etc/rc.d/PUPSTATE | sed s/\'//g >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== BIOS ===\n" >> /tmp/pup-sysinfo.txt
+	dmidecode -t 0 | grep -E 'Vendor:|Version:|Release Date:|Runtime Size:|ROM Size:' | sed 's/	//g' >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== CENTRAL PROCESSOR ===\n" >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_cpu
+	echo >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_memory
+	cat /tmp/sysinfo-memory >> /tmp/pup-sysinfo.txt
+	echo >> /tmp/pup-sysinfo.txt
+	dmidecode -t 5 | grep -E 'Memory Controller|Size:|Voltage:|Slots:' | sed 's/	/ /g' >> /tmp/pup-sysinfo.txt
+	dmidecode -t 19 | grep -E 'Range Size:' | sed -e 's/	/ /g' -e 's/Range Size:/Installed Memory:/g' >> /tmp/pup-sysinfo.txt
+	dmidecode -t 17 | grep -E 'Memory Device|Data Width:|Size:|Form Factor:|	Locator:|Type|Speed:|Number:' | sed -e 's/	/ /g' -e '/Memory Device/{x;p;x;}' | awk '/Device/{c++;if(c==1){sub("Device","Module 1")}}1' | awk '/Device/{c++;if(c==1){sub("Device","Module 2")}}1' | awk '/Device/{c++;if(c==1){sub("Device","Module 3")}}1' | awk '/Device/{c++;if(c==1){sub("Device","Module 4")}}1' >> /tmp/pup-sysinfo.txt
+	dmidecode -t 7 | grep -E 'Cache Information|Configuration:|Installed Size:' | sed -e 's/	/ /g' -e '/Cache Information/{x;p;x;}' | awk '/Cache Information/{c++;if(c==1){sub("Cache Information","Internal Cache")}}1' | awk '/Cache Information/{c++;if(c==1){sub("Cache Information","External Cache")}}1' >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== DRIVES: CD/DVD ===" >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_optical
+	grep -E 'CD/DVD|/dev|Model Number:|Serial Number:|Firmware Revision:' /tmp/sysinfo-optical | sed -e 's/	//g' -e 's/\/dev\//Device Name:        /g' -e '/Device Name/{x;p;x;}' -e 's/sr0:/sr0/g' -e 's/sr1:/sr1/g' >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== DRIVES: HDD ===" >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_hdd
+	grep -E 'HDD|/dev|Model Number:|Serial Number:|Firmware Revision:|MBytes' /tmp/sysinfo-hdd | sed -e 's/	//g' -e '/HDD/d' -e '/===/d' -e 's/\/dev\//Device Name:        /g' -e '/Device Name/{x;p;x;}' -e 's/sda1/sda/g' -e 's/sdb1/sdb/g' -e 's/sdc1/sdc/g' -e 's/sdd1/sdd/g' -e 's/hda1/hda/g' -e 's/hdb1/hdb/g' -e 's/hdc1/hdc/g' -e 's/hdd1/hdd/g' >> /tmp/pup-sysinfo.txt
+	if [ "`grep -E 'usb-storage' /proc/bus/usb/devices`" != "" ]; then
+	 echo -e "\n=== DRIVES: USB ===\n" >> /tmp/pup-sysinfo.txt
+	 grep -EB 4 'usb-storage' /proc/bus/usb/devices | grep -Ev 'C:|I:' | sed -e 's/S:  //g' -e 's/SerialNumber/Serial Number/g' -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	fi
+	echo -e "\n=== DRIVES: PARTITIONS ===\n" >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_partitions
+	cat /tmp/sysinfo-partitions >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== FILESYSTEMS ===\n" >> /tmp/pup-sysinfo.txt
+	df -h | (read -r; printf "%s\n" "$REPLY"; sort) >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== INPUT DEVICES ===\n" >> /tmp/pup-sysinfo.txt
+	grep -Ev 'S:|U:|H:|B:' /proc/bus/input/devices | sed -e 's/I: //g' -e 's/N: //g' -e 's/P: //g' -e 's/Phys=/Connected to: /g' -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	echo -e "=== MONITOR/GRAPHICS ===\n" >> /tmp/pup-sysinfo.txt
+	ddcprobe | grep -E 'monitorname:|monitorserial:' | sed -e 's/monitorname:/Monitor Name:/g' -e 's/monitorserial:/Monitor Serial Number:/g' | sort >> /tmp/pup-sysinfo.txt
+	echo "Screen Resolution (pixels): `xrandr | grep '*' | sed 's/ x /x/g' | cut -d ' ' -f3-6 | sed 's/ //'`" >> /tmp/pup-sysinfo.txt
+	[ "`which xdriinfo`" ] && echo -e "Direct Renderer of `xdriinfo`" >> /tmp/pup-sysinfo.txt
+	glxinfo 2>/dev/null | grep 'OpenGL renderer string:' | sed 's/renderer string/Renderer/g' >> /tmp/pup-sysinfo.txt
+	xdpyinfo | grep version: >> /tmp/pup-sysinfo.txt
+	echo >> /tmp/pup-sysinfo.txt
+	lspci | grep VGA | sed -r 's/^[^ \t]*[ \t]+//' >> /tmp/pup-sysinfo.txt
+	ddcprobe | grep -E '^oem: |^product: ' >> /tmp/pup-sysinfo.txt
+	if [ -r /tmp/chipnummod.txt ]; then
+	 echo -e "\n=== MULTIMEDIA/SOUND ===\n" >> /tmp/pup-sysinfo.txt
+	 cat /tmp/chipnummod.txt | grep -A3 Audio | grep -E 'Audio|KERNEL' | sed 's/DESCRIPTION: //g' >> /tmp/pup-sysinfo.txt
+	 echo -e "\n=== NETWORK ===\n" >> /tmp/pup-sysinfo.txt
+	 cat /tmp/chipnummod.txt | grep -EA3 'Ethernet|Network' | grep -E 'Ethernet|Network|KERNEL' | sed 's/DESCRIPTION: //g' >> /tmp/pup-sysinfo.txt
+	fi
+	echo >> /tmp/pup-sysinfo.txt
+	. $WORKDIR/func -sysinfo_battery
+	cat /tmp/sysinfo-battery >> /tmp/pup-sysinfo.txt
+	echo -e "`cat /tmp/sysinfo-pci`" >> /tmp/pup-sysinfo.txt
+	echo -e "\n=== PRINTERS ===\n" >> /tmp/pup-sysinfo.txt
+	echo "`grep '<DefaultPrinter ' /etc/cups/printers.conf | tr -d '<' | tr -d '>'`" > /tmp/sysinfo-printers
+	echo "`grep '<Printer ' /etc/cups/printers.conf | tr -d '<' | tr -d '>'`" >> /tmp/sysinfo-printers
+	cat /tmp/sysinfo-printers | sed '/^$/d' >> /tmp/pup-sysinfo.txt
+	echo >> /tmp/pup-sysinfo.txt
+	cat /tmp/sysinfo-usb >> /tmp/pup-sysinfo.txt
+	echo -e "=== END OF SUMMARY REPORT ===\n" >> /tmp/pup-sysinfo.txt
+	SYSDATE="`date +'%y%m%d'`"
+	echo -e "This report is also available in\n/tmp/${USER}/SysInfo-Summary-$SYSDATE." >> /tmp/pup-sysinfo.txt
+	mkdir -p /tmp/${USER}/
+	cat /tmp/pup-sysinfo.txt > /tmp/${USER}/SysInfo-Summary-$SYSDATE
+	cat /tmp/pup-sysinfo.txt | gzip -f > /tmp/${USER}/SysInfo-Summary-$SYSDATE.gz
+	kill $XPID
+	;;
+
+-sysinfo_uptime)
+	echo -e "\n`date '+Current Time: %H:%M:%S'`" >> /tmp/pup-sysinfo.txt
+	echo -e "System Uptime: `uptime | tr -s ' ' | grep -e '\up.*\, load' | sed -e 's/.*\up\(.*\)\, load.*/\1/' -e 's/ min//' -e 's/:/ hr /'` min" | tr -s ' ' >> /tmp/pup-sysinfo.txt
+	echo -e "Load Average: `cat /proc/loadavg | cut -d " " -f1-3`" >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_usb)
+	echo -e "=== USB DEVICES ===\n" > /tmp/sysinfo-usb
+	if [ -r /tmp/usbchipnummod.txt ]; then
+	 cat /tmp/usbchipnummod.txt | sed -e 's/[©®]//g' >> /tmp/sysinfo-usb
+	else
+	 grep -Ev 'T:|B:|D:|C:|I:|E:' /proc/bus/usb/devices | sed -e 's/P:  //g' -e 's/S:  //g' -e 's/Vendor/VendorID/g' -e 's/ProdID/ProductID/g' -e 's/[©®]//g' | sed '/./,/^$/!d' >> /tmp/sysinfo-usb
+	 echo >> /tmp/sysinfo-usb
+	fi
+	;;
+
+-sysinfo_usbstorage)
+	if [ "`grep -E 'usb-storage' /proc/bus/usb/devices`" != "" ]; then
+	 echo -e "=== USB DRIVES ===\n" >> /tmp/pup-sysinfo.txt
+	 grep -EB 4 'usb-storage' /proc/bus/usb/devices | grep -Ev 'C:|I:' | sed -e 's/S:  //g' -e 's/SerialNumber/Serial Number/g' -e 's/[©®]//g' >> /tmp/pup-sysinfo.txt
+	 echo >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_variables)
+	echo -e "=== Shell Script Variables (set) ===\n" > /tmp/pup-sysinfo.txt
+	set | grep -Ev 'BUTTON|TEXT|THINGY|INFO=|_=|<window|</window|<vbox|</vbox|<hbox|</hbox|<button|</button|<text|</text|<input|</input|<action|</action|<variable|</variable' >> /tmp/pup-sysinfo.txt
+	;;
+
+-sysinfo_video)
+	if [ "`which report-video-glx`" ]; then
+	 echo -e "=== Video ===\n" > /tmp/pup-sysinfo.txt
+	 report-video-glx -cl >> /tmp/pup-sysinfo.txt
+	elif [ "`which report-video`" ]; then
+	 echo -e "=== Video ===\n" > /tmp/pup-sysinfo.txt
+	 report-video -q >> /tmp/pup-sysinfo.txt
+	else
+	 echo -e "=== Video ===\n" > /tmp/pup-sysinfo.txt
+	 ddcprobe | grep monitorname | sed 's/monitorname:/Monitor:/g' >> /tmp/pup-sysinfo.txt
+	 xrandr | grep '*' | sed 's/ x /x/g' | cut -d ' ' -f3-6 | sed 's/ /Resolution: /' >> /tmp/pup-sysinfo.txt
+	 [ "`which xdriinfo`" ] && echo -e "Direct Renderer `xdriinfo`" >> /tmp/pup-sysinfo.txt
+	 glxinfo 2>/dev/null | grep 'OpenGL renderer string:' | sed 's/renderer string/renderer/g' >> /tmp/pup-sysinfo.txt
+	 xdpyinfo | grep version: >> /tmp/pup-sysinfo.txt
+	 echo >> /tmp/pup-sysinfo.txt
+	 lspci | grep VGA | sed -r 's/^[^ \t]*[ \t]+//' >> /tmp/pup-sysinfo.txt
+	 ddcprobe | grep -E '^oem: |^product: ' >> /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-sysinfo_volumes)
+	xmessage -title PSI -buttons "" -center -bg goldenrod1 " Please wait, processing..." &
+	X7PID=$!
+	echo -e "=== Block Device Attributes (blkid) ===\n" > /tmp/pup-sysinfo.txt
+	blkid | sed 's/\/dev\///g' | sort | sed 's/^/\/dev\//' >> /tmp/pup-sysinfo.txt
+	kill $X7PID
+	;;
+
+-sysinfo_xorg.conf)
+	if [ "`cat /etc/X11/xorg.conf`" != "" ]; then
+	 echo -e "=== /etc/X11/xorg.conf ===\n" > /tmp/pup-sysinfo.txt
+	 cat /etc/X11/xorg.conf >> /tmp/pup-sysinfo.txt
+	else
+	 echo " No information is detected in /etc/X11/xorg.conf. " > /tmp/pup-sysinfo.txt
+	fi
+	;;
+
+-taskbar) if [ "`which ptray`" ]; then ptray & else /usr/local/jwmconfig2/taskbar & fi ;;
+
+-tintwizard)
+	if [ ! -f $TINTWIZARD-bak ]; then cp -f $TINTWIZARD $TINTWIZARD-bak & fi
+	if [ "`cat $TINTWIZARD | grep -a Color\(s\)`" != "" ]; then
+	cat $TINTWIZARD | sed 's/^.*Color(s).*$/			col = gtk.gdk.Color/' > /tmp/TWIZARD.tmp && chmod 755 /tmp/TWIZARD.tmp && mv -f /tmp/TWIZARD.tmp $TINTWIZARD & fi
+	;;
+
+-traybuttons) if [ "`which ptray`" ]; then ptray & else /usr/local/jwmconfig2/panel-buttons & fi ;;
+
+-trayclock)
+	if [ "`pidof enlightenment`" -o "`pidof xfwm4`" -o "$CURRWM" = "startkde" ]; then Xdialog --title Alert --beep --msgbox " PupClockset does not support this \n clock and/or desktop environment. " 0 0 && exit 0
+	elif [ "`which ptray`" ]; then ptray &
+	elif [ -f /usr/local/PupClockset/PupClockset ]; then /usr/local/PupClockset/PupClockset &
+	else /tmp/PupControl-pupclockset &
+	fi
+	;;
+
+-updatetime) if [ -f /usr/local/psync/psync ]; then /usr/local/psync/psync & else Xdialog --title Alert --beep --msgbox " Psync is not available. " 0 0 & fi ;;
+
+-wallpaper)
+	if [ "$CURRWM" = "lxsession" ]; then
+	  if [ -f /usr/bin/pcmanfm ]; then /usr/bin/pcmanfm --show-pref=2 & elif [ ! -f /usr/bin/pcmanfm ]; then /usr/bin/wallpaper & fi
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ] && [ "`which xfdesktop-settings`" ]; then xfdesktop-settings &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcmshell ]; then /usr/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcmshell ]; then /opt/kde3/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcmshell ]; then /opt/trinity/bin/kcmshell kthememanager &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	elif [ "`pidof enlightenment`" ]; then Xdialog --title Alert --beep --msgbox " Please left-click the e17 desktop \n and select the 'Settings' option. " 0 0 && exit 0
+	else $WORKDIR/defaultapps/wallpaper &
+	fi
+	;;
+
+-webcam) if [ "`which guvcview`" ]; then guvcview & elif [ "`which luvcview`" ]; then luvcview & elif [ "`which ucview`" ]; then ucview & fi ;;
+
+-windowmanager)
+	if	 [ "$CURRWM" = "icewm" -o "$CURRWM" = "starticewm" -o "$CURRWM" = "icewm-session" ]; then
+	if	 [ "`cat /usr/sbin/ice_config.sh`" ]; then /usr/sbin/ice_config.sh & elif [ "`cat /usr/bin/icewinconfigure`" ]; then /usr/bin/icewinconfigure & elif [ "`cat /usr/bin/icewm-pref`" ]; then /usr/bin/icewm-pref & else Xdialog --title Alert --beep --msgbox " PupControl finds no configurator \n for the active window manager. " 0 0 & fi
+	elif [ "$CURRWM" = "jwm" -o "$CURRWM" = "jwm-session" -o "$CURRWM" = "startjwm" ] && [ "`which jwm`" ]; then $WORKDIR/JWMconfig &
+	elif [ "$CURRWM" = "startfluxbox" -o "$CURRWM" = "fluxbox" -o "$CURRWM" = "fluxbox-session" ] && [ "`which fluxconf`" ]; then /usr/bin/fluxconf &
+	elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then
+	 if [ "`which xfce4-settings-manager`" ]; then xfce4-settings-manager &
+	 elif [ "`which xfwm4-settings`" -o "`which xfwm4-tweaks-settings`" ]; then
+	  xfwm4-settings &
+	  sleep 1
+	  xfwm4-tweaks-settings &
+	  sleep 1
+	  xfce4-panel -p &
+	 else Xdialog --title Alert --beep --msgbox " PupControl finds no configurator \n for the active window manager. " 0 0 &
+	 fi 
+	elif [ "`pidof fbpanel`" ] && [ "`pidof lxpanel`" ]; then Xdialog --title Alert --beep --msgbox " PupControl does not support concurrent \n active sessions of Fbpanel and Lxpanel. " 0 0 &
+	elif [ "$CURRWM" = "lxsession" -o "$CURRWM" = "openbox" -o "$CURRWM" = "openbox-session" -o "$CURRWM" = "openbox-lxde" -o "$CURRWM" = "startlxde" ] && [ "`pidof lxpanel`" -o "`pidof lxpanel.bin`" ]; then /usr/bin/obconf & sleep 1 && lxpanelctl config &
+	elif [ "$CURRWM" = "openbox" -o "$CURRWM" = "openbox-session" ] && [ "`pidof fbpanel`" ]; then /usr/bin/obconf & sleep 1 && pfbpanel &
+	elif [ "$CURRWM" = "openbox" -o "$CURRWM" = "openbox-session" ] && [ "`pidof tint2`" ]; then /usr/bin/obconf & sleep 1 && tintwizard.py &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/kcontrol ]; then /usr/bin/kcontrol &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/kde3/bin/kcontrol ]; then /opt/kde3/bin/kcontrol &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /opt/trinity/bin/kcontrol ]; then /opt/trinity/bin/kcontrol &
+	elif [ "$CURRWM" = "startkde" ] && [ -f /usr/bin/systemsettings ]; then /usr/bin/systemsettings &
+	elif [ "$CURRWM" = "wmaker" ] && [ "`which WPrefs`" ]; then WPrefs &
+	elif [ "$CURRWM" = "startfusion" ]; then #Fusion desktop (TaZoC)
+	 [ "`pidof openbox`" ] && obconf 2>/dev/null &
+	 [ "`pidof kwin`" ] && systemsettings 2>/dev/null &
+	 [ "`pidof xfwm4`" ] && xfce4-settings-manager &
+	elif [ "`pidof enlightenment`" ]; then Xdialog --title Alert --beep --msgbox " Please left-click the e17 desktop \n and select the 'Settings' option. " 0 0 && exit 0
+	else Xdialog --title Alert --beep --msgbox " PupControl finds no configurator \n for the active window manager. " 0 0 &
+	fi
+	[ "`pidof compiz`" ] && [ "`which ccsm`" ] && ccsm &
+	[ "`pidof compiz`" ] && [ "`which emerald-theme-manager`" ] && sleep 1 && emerald-theme-manager &
+	;;
+
+-wmchanger)  if [ "`which wmswitcher`" ]; then wmswitcher & elif [ "`which changewm.sh`" ]; then changewm.sh & elif [ "`which change-wm`" ]; then change-wm & else Xdialog --title Alert --beep --msgbox " PupControl finds no WM-Changer. " 0 0 & fi ;;
+-xorgwizard) if [ "`which xorgwizard-puppy`" ]; then xorgwizard-puppy & elif [ "`which xorgwizard-strap`" ]; then xorgwizard-strap & else xorgwizard & fi ;;
+
+esac

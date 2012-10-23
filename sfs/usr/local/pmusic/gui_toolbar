@@ -1,0 +1,44 @@
+#!/bin/bash
+
+GUI_BUTTON_PREFERENCES="
+<button tooltip-text=\" $LOC103 \">
+ <input file stock=\"gtk-preferences\"></input>
+ <action>echo 'progress' > $WORKDIR/progressbar_status; $APPDIR/func_config -preferences</action>
+</button>"
+
+GUI_BUTTON_UPDATE_SOURCE2="
+<button tooltip-text=\" $LOC104 \">
+ <input file stock=\"gtk-refresh\"></input>
+ <action>$APPDIR/func_index -update_index &</action>
+</button>"
+
+S="<button tooltip-text=\" $LOC105 \">
+ <input file stock=\"gtk-cdrom\"></input>"
+ [ "$CD_DEV" = false ] && S=$S'<visible>disabled</visible>'
+ S=$S"<action>$APPDIR/func_cd -play_cd</action>
+ <action>refresh:PLAYLIST</action>
+</button>"
+GUI_BUTTON_CD="$S"
+
+GUI_BUTTON_SONG_INFO="
+<button tooltip-text=\" $LOC131 \">
+ <input file stock=\"gtk-info\"></input>
+ <action>$APPDIR/func -edit_tags</action>
+</button>"
+
+GUI_BUTTON_QUIT="
+<button tooltip-text=\" $LOC405 \">
+ <input file stock=\"gtk-quit\"></input>
+</button>"
+
+GUI_BUTTON_TIME_FORMAT="
+<button tooltip-text=\" $LOC158 \">
+ <input file stock=\"gtk-sort-ascending\"></input>
+ <action>$APPDIR/func -time_format</action>
+</button>"
+
+GUI_BUTTON_MUTE="
+<button tooltip-text=\" $LOC405 \">
+ <input file stock=\"gtk-stop\"></input>
+ <action>. $APPDIR/func_mixer -mute</action>
+</button>"

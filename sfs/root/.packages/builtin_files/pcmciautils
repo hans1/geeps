@@ -1,0 +1,33 @@
+/etc
+/etc/init.d
+ rc.pcmcia
+/etc/pcmcia
+ config.opts
+/etc/udev
+/etc/udev/rules.d
+ 85-pcmcia.rules
+/lib
+/lib/firmware
+ 3CCFEM556.cis
+ 3CXEM556.cis
+ COMpad2.cis
+ COMpad4.cis
+ DP83903.cis
+ E-CARD.cis
+ GLOBETROTTER.cis
+ LA-PCM.cis
+ MT5634ZLX.cis
+ NE2K.cis
+ PCMLM28.cis
+ PE-200.cis
+ PE520.cis
+ RS-COM-2P.cis
+ tamarack.cis
+/sbin
+ lspcmcia
+ pccardctl
+ pcmcia-check-broken-cis
+ pcmcia-socket-startup
+/usr
+/usr/lib
+/usr/lib/pcmciautils

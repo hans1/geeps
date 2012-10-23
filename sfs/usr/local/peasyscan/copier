@@ -1,0 +1,98 @@
+#!/bin/sh
+
+PRINTERLIST=`lpstat -v | cut -d " " -f 3 | cut -d ":" -f 1`
+COMBOLIST=""
+for P in $PRINTERLIST
+do
+ COMBOLIST="$COMBOLIST<item>$P</item>"
+done
+
+INFO="Select the printer resolution and paper size
+               to match the scanner."
+
+export DIALOG="
+<window title=\"Peasyscan\">
+<vbox>
+   <frame Select a printer>
+    <combobox>
+      <variable>PRINTER</variable>
+     $COMBOLIST 
+    </combobox>
+  </frame>
+  <frame>
+    <text>
+      <label>\"$INFO\"</label>
+    </text>
+  </frame>
+  <hbox>
+    <frame>
+      <radiobutton> 
+	<variable>D1</variable>
+        <label>75 DPI</label>
+      </radiobutton>
+      <radiobutton> 
+	<variable>D2</variable>
+        <label>150 DPI</label>
+      </radiobutton>
+      <radiobutton> 
+	<variable>D3</variable>
+        <label>300 DPI</label>
+      </radiobutton>
+      <radiobutton> 
+	<variable>D4</variable>
+        <label>600 DPI</label>
+      </radiobutton>
+    </frame>
+    <frame>
+      <radiobutton> 
+	<variable>P1</variable>
+        <label>Letter</label>
+      </radiobutton>
+      <radiobutton> 
+	<variable>P2</variable>
+        <label>Legal</label>
+      </radiobutton>
+      <radiobutton> 
+	<variable>P3</variable>
+        <label>A4</label>
+      </radiobutton>
+    </frame>
+  </hbox>
+  <hbox>
+    <button><label>Print</label></button>
+    <button><label>Cancel</label></button>
+  </hbox>
+</vbox>
+</window>
+"
+
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program DIALOG); do
+  eval $STATEMENTS
+done
+IFS=$I
+
+if [ $D1 = "true" ]; then
+  SCALE=1.0
+elif [ $D2 = "true" ]; then
+  SCALE=0.5
+elif [ $D3 = "true" ]; then
+  SCALE=0.25
+elif [ $D4 = "true" ]; then
+  SCALE=0.125
+fi
+
+if [ $P1 = "true" ]; then
+  PAPER="-width=8.5 -height=11.0"
+elif [ $P2 = "true" ]; then
+  PAPER="-width=8.5 -height=14.0"
+elif [ $P3 = "true" ]; then
+  PAPER="-width=8.3 -height=11.7"
+fi
+
+pnmtops -noturn -scale=$SCALE $PAPER /tmp/out.pnm > $SAVEFILENAME
+
+if [ "$EXIT" = "Print" ]; then
+  Xdialog --title " " --infobox "Printing ..." 0 0 2000 &
+  lp -d $PRINTER $SAVEFILENAME
+fi

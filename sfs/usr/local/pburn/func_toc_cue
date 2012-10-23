@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Burn from a .toc file
+if [ "$TOC" = "true" ]; then
+	TITLE="$LOC410"
+	. $APPDIR/box_chooser
+	if [ "$EXIT" != "OK" ]; then exit; fi
+	TMP="`echo $CHOOSER | grep -i '.toc'`"
+	if [ "$TMP" = "" ]; then
+		TXT1="$LOC311 - $LOC410"
+		. $APPDIR/box -ok #error
+		exit
+	else
+		DIRNAME="`dirname \"$CHOOSER\"`"
+		FILENAME="`basename \"$CHOOSER\"`"
+		IMAGE_FILE="`echo $CHOOSER | sed -e '/.toc//g'`" #cdrecord doesn't call the *.toc file, but its image
+		IMG=cdrom
+		FRAME="$LOC123"
+		TXT1="$LOC411 '$FILENAME'. $LOC412 ($BURNDEV)."
+		TXT2="$LOC413"
+		. $APPDIR/box -yesno
+		if [ $EXIT = Yes ]; then
+			if [ "$CDSPEED" = "Auto" ]; then SPEED=""; else SPEED="-speed=$CDSPEED"; fi
+			if [ "`which cdrdao`" ]; then
+				echo "cd \"$DIRNAME\"" > $WORKDIR/exec
+				echo "cdrdao write --device $BURNDEV \"$FILENAME\"" >> $WORKDIR/exec
+			else
+				echo "$CDRECORD dev=$BURNDEV -raw96r $SPEED -clone -v \"$IMAGE_FILE\"" > $WORKDIR/exec
+			fi
+			. $APPDIR/func_exec
+		fi
+		exit
+	fi
+fi
+
+# Burn from a .cue file
+if [ "$CUE" = "true" ]; then
+	TITLE="$LOC416"
+	. $APPDIR/box_chooser
+	if [ "$EXIT" != "OK" ]; then exit; fi
+	TMP="`echo $CHOOSER | grep -i '.cue'`"
+	if [ "$TMP" = "" ]; then
+		TXT1="$LOC311 - $LOC416"
+		. $APPDIR/box -ok #error
+		exit
+	else
+		DIRNAME="`dirname \"$CHOOSER\"`"
+		FILENAME="`basename \"$CHOOSER\"`"
+		IMG=cdrom
+		FRAME="$LOC127"
+		TXT1="$LOC411 '$FILENAME'. $LOC412 ($BURNDEV)."
+		TXT2="$LOC413"
+		. $APPDIR/box -yesno
+		if [ $EXIT = Yes ]; then
+			if [ "$CDSPEED" = "Auto" ]; then SPEED=""; else SPEED="-speed=$CDSPEED"; fi
+			echo "$CDRECORD dev=$BURNDEV -dao $SPEED -v -text cuefile=\"$CHOOSER\"" > $WORKDIR/exec
+			. $APPDIR/func_exec
+		fi
+		exit
+	fi
+fi

@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Top view running processes
+Name[ru]=Top просмотр процессов
+Name[hu_HU]=Top Futó folyamatok
+Name[ja]=Top プロセスビューア
+Name[zh_CN]=Top 查看正在运行的进程
+Icon=mini-run.xpm
+Comment=Top view running processes
+Exec=rxvt -font 7x14 -bg "#c0c0c0" -fg black -T Top -n Top -e top
+Terminal=false
+Type=Application
+Categories=System
+GenericName=Top view running processes

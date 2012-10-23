@@ -1,0 +1,46 @@
+/root
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+/root/.config/rox.sourceforge.net/OpenWith/.application_x-cd-image
+/root/.config/rox.sourceforge.net/OpenWith/.application_x-cd-image/Burn with Pburn
+/usr
+/usr/bin
+ pburn
+/usr/local
+/usr/local/apps
+/usr/local/apps/Pburn
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/usr/local/pburn
+ box
+ box_chooser
+ box_save
+ box_splash
+ box_tail
+ func
+ func_build_command
+ func_burn_options
+ func_exec
+ func_gui
+ func_gui_options
+ func_man
+ func_toc_cue
+/usr/local/pburn/locals
+ en_US:english
+/usr/local/pburn/themes
+/usr/local/pburn/themes/Mini
+ button-burn.png
+/usr/local/pburn/themes/Mini/gtk
+ gtkrc
+ pburn20_inactive.png
+ pburn20.png
+ progress_green.png
+ progress_red.png
+/usr/share
+/usr/share/applications
+ pburn.desktop
+/usr/share/doc
+/usr/share/doc/pburn
+ en_US:english.html

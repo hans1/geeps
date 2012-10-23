@@ -1,0 +1,33 @@
+/etc
+/etc/ssl
+/etc/ssl/certs
+/etc/ssl/misc
+ CA.pl
+ CA.sh
+ c_hash
+ c_info
+ c_issuer
+ c_name
+/etc/ssl/private
+/lib
+ libcrypto.so.0
+ libcrypto.so.0.9.8
+ libssl.so.0
+ libssl.so.0.9.8
+/usr
+/usr/bin
+ c_rehash
+ openssl
+/usr/lib
+/usr/lib/engines
+ lib4758cca.so
+ libaep.so
+ libatalla.so
+ libcapi.so
+ libchil.so
+ libcswift.so
+ libgmp.so
+ libnuron.so
+ libsureware.so
+ libubsec.so
+/usr/lib/ssl

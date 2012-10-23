@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ dumpiso
+ sendiso
+ testlibraw
+/usr/lib
+ libraw1394.so
+ libraw1394.so.11
+ libraw1394.so.11.0.1

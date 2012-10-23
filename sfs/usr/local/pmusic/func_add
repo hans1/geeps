@@ -1,0 +1,325 @@
+#!/bin/sh
+#Pmusic
+#Copyright, Sigmund Berglund
+
+$APPDIR/func -reset_gtk
+
+case "$1" in
+-add_random)
+	FRAME="$LOC232"; IMG="add"; TXT1="$LOC514"; DEFAULT="1"
+	. $APPDIR/box_input
+	if [ $EXIT = "ok" ]; then
+		COUNT=0
+		echo -n > $WORKDIR/pmusic.m3u
+		cut -d'|' -f1 $WORKDIR/sourcelist | cut -c3- | grep -iE "$AUDIO_FORMATS|cdda:|://" > $WORKDIR/tmp_add
+		n=`wc -l < $WORKDIR/tmp_add`
+		while [ $COUNT -lt $INPUT ]; do
+			r=$((RANDOM % n))
+			I="`head -n $r $WORKDIR/tmp_add | tail -n 1`"
+			case $I in
+				*youtube.com*|*jamendo.com*)
+					TITLE="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f2`"
+					ARTIST="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f3`"
+					TMP="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f9`" #length
+					MIN="`echo "$TMP" | cut -d'|' -f1 | awk -F: '{ SUM += $1} END { print SUM*60 }'`"
+					SEC="`echo "$TMP" | cut -d'|' -f1 | awk -F: '{ SUM += $2} END { print SUM }'`"
+					LENGTH="`echo "$MIN + $SEC" | bc`"
+					echo -e "#EXTINFO:$LENGTH,$ARTIST - $TITLE\n$I" >> $WORKDIR/pmusic.m3u
+					COUNT=$(($COUNT+1))
+					;;
+				*://*)
+					echo -e "#EXTINFO:1,\n$I" >> $WORKDIR/pmusic.m3u
+					COUNT=$(($COUNT+1))
+					;;
+				*) #no metainfo is added for local files and CD-tracks
+					TMP="`echo "$I" | grep -iE "$AUDIO_FORMATS|cdda:"`"
+					[ "$TMP" ] && echo -e "#EXTINFO:,\n$TMP" >> $WORKDIR/pmusic.m3u
+					COUNT=$(($COUNT+1))
+					;;
+			esac
+		done
+		echo 100 > $WORKDIR/splash #reset progress bar
+		SOURCE="  $WORKDIR/pmusic.m3u"
+		ADD_MORE=true #add to tail. This is faster
+		. $APPDIR/func_add -add
+	fi
+	;;
+-add_all)
+	if [ "`grep -c '^' $WORKDIR/sourcelist`" -gt 300 ]; then
+		IMG=dialog-warning
+		FRAME="$LOC_WARNING"
+		TXT1="<b>$LOC510</b>"
+		TXT2="$LOC511 $TMP $LOC512"
+		. $APPDIR/box_yesno
+		[ $EXIT = no ] && exit
+	fi
+	cut -d'|' -f 1 $WORKDIR/sourcelist | cut -c 3- > $WORKDIR/tmp_add
+	echo -n > $WORKDIR/pmusic.m3u
+	while read I; do
+		case $I in
+			*youtube.com*|*jamendo.com*)
+				TITLE="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f2`"
+				ARTIST="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f3`"
+				TMP="`grep -Fm1 "$I" $WORKDIR/sourcelist | cut -d'|' -f9`" #length
+				MIN="`echo "$TMP" | cut -d'|' -f1 | awk -F: '{ SUM += $1} END { print SUM*60 }'`"
+				SEC="`echo "$TMP" | cut -d'|' -f1 | awk -F: '{ SUM += $2} END { print SUM }'`"
+				LENGTH="`echo "$MIN + $SEC" | bc`"
+				echo -e "#EXTINFO:$LENGTH,$ARTIST - $TITLE\n$I" >> $WORKDIR/pmusic.m3u
+				;;
+			*://*)
+				echo -e "#EXTINFO:1,\n$I" >> $WORKDIR/pmusic.m3u
+				;;
+			*) #no metainfo is added for local files and CD-tracks
+				TMP="`echo "$I" | grep -iE "$AUDIO_FORMATS|cdda:"`"
+				[ "$TMP" ] && echo -e "#EXTINFO:,\n$TMP" >> $WORKDIR/pmusic.m3u
+				;;
+		esac
+	done < $WORKDIR/tmp_add
+	export SOURCE="  $WORKDIR/pmusic.m3u"
+	ADD_MORE=true #add to tail. This is faster
+	. $APPDIR/func_add -add
+	;;
+-add)
+	SOURCE="`echo "$SOURCE" | cut -c 3-`"
+	[ "`file -L "${SOURCE}" | grep " directory$"`" ] && exit #directory - browse instead of add
+	#check for timestamp from bookmark
+	TMP="`echo "$SOURCE" | grep -E "?:??]"`"
+	if [ "$TMP" ]; then
+		SOURCE="`echo "$TMP" | awk -F ']' '{print $2}'`"
+		TIME="`echo "$TMP" | awk -F ']' '{print $1}' | cut -d'[' -f2`"
+		MIN=`echo $TIME | cut -d':' -f1`
+		SEC=`echo $TIME | cut -d':' -f2`
+		echo "$[($MIN*60)+$SEC]" > $WORKDIR/SS
+		echo true > $WORKDIR/TIMESTAMP
+		ENSURE_PLAY=true #playlist has no internal structure to handle timestamps. --> must play imediatly
+	fi
+	#ENSURE_PLAY is also defined by the -P switch. 
+	if [ "$ENSURE_PLAY" = "true" ]; then
+		$APPDIR/func_store_playlist
+		$APPDIR/func -new
+	fi
+
+	#read input
+	case $SOURCE in
+	pmusic_*) #redirect all navigations here for speed reasons
+		case $SOURCE in 
+			pmusic_file_search)				$APPDIR/func -pfilesearch;						exit;;
+			pmusic_index)					$APPDIR/func_index -update_index;				exit;;
+			pmusic_songs)					$APPDIR/func -index_songs;						exit;;
+			pmusic_collections)				$APPDIR/func -index_playlists;					exit;;
+			pmusic_radiohits)				$APPDIR/func_radiohits;							exit;; 
+			pmusic_radiohits:*)				SOURCE="`echo "$SOURCE" | cut -d: -f2-`"
+											$APPDIR/func -browse_radiohits "$SOURCE";		exit;; 
+			pmusic_radio)					$APPDIR/func_radio;								exit;;
+			pmusic_radio_country)			$APPDIR/func -radio -country;					exit;;
+			pmusic_radio_genre)				$APPDIR/func -radio -genre;						exit;;
+			pmusic_rating)					$APPDIR/func -index_rating;						exit;;
+			pmusic_recent)					$APPDIR/func -index_recent;						exit;;
+			pmusic_podcast)					$APPDIR/func_podcast;							exit;;
+			pmusic_cd_audio)				$APPDIR/func_cd -read_cd;						exit;;
+			pmusic_bookmarks)				$APPDIR/func_bookmarks -manage_bookmarks;		exit;;
+			pmusic_webmusic_manager)		$APPDIR/func_webmusic -webmusic_manager;		exit;;
+			pmusic_webmusic)				$APPDIR/func_webmusic -webmusic;				exit;; 
+			pmusic_webmusic_back)			$APPDIR/func_webmusic -webmusic_back;			exit;; 
+			pmusic_webmusic_artist*)		SOURCE="`echo "$SOURCE" | cut -d: -f2`"
+											$APPDIR/func_webmusic -webmusic_artist "$SOURCE";exit;; 
+			pmusic_webmusic_album*)
+				SOURCE="`echo "$SOURCE" | cut -d: -f2`"
+				if [ "$SOURCE" = "youtube" ]; then #go back
+					$APPDIR/func_webmusic -webmusic
+				else
+					$APPDIR/func_webmusic -webmusic_album	"$SOURCE"
+				fi
+				exit;;
+			pmusic_top100*)
+				TMP="`echo "$SOURCE" | cut -d_ -f3`"
+				$APPDIR/func_webmusic -jamendo_top100 $TMP
+				exit;;
+			pmusic_radio:*)
+				TMP="`echo "$SOURCE" | cut -d: -f2-`"
+				grep "|$TMP" $HOME/.pmusic/index_radio | cut -d'|' -f1-2 > $WORKDIR/sourcelist
+				echo true > $WORKDIR/UPDATE_SOURCELIST2
+				exit;;
+		esac
+		;;
+	cdda:*)
+		echo "$SOURCE||" > $WORKDIR/songs_in_list
+		;;
+	*://*) #streaming
+		if [ "`echo $SOURCE | grep -E "youtube.com|jamendo.com"`" ] && [ ! "`grep -F "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f2 | grep -F 'http:'`" ]; then #tags exist either from webmusic index or from jamendo.com
+			TITLE="`grep -Fm1 "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f2`"
+			[ "`echo "$TITLE" 1 grep -E "?:??]http"`" ] && TITLE="`echo "$TITLE" | cut -d']' -f2`" #if add bookmark with timestamp from sourcelist
+			if [ ! "`grep -Fm1 "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f5`" ]; then #if adding from recent/favorites index (or a straight jamendo URL), there is no more than 2 coloumns
+				echo "$SOURCE|$TITLE|" > $WORKDIR/songs_in_list
+			else
+				ARTIST="`grep -Fm1 "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f3`"
+				LENGTH="`grep -Fm1 "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f9`" #youtube requires length set. For jamendo it is not strictly reqired, but a lot faster than ffmpeg -i
+				[ "$LENGTH" -gt "1" ] && LENGTH=`$APPDIR/func -sec2time $LENGTH` #transform seconds into a human readable length
+				echo "$SOURCE|$ARTIST - $TITLE|$LENGTH" > $WORKDIR/songs_in_list
+			fi
+		else
+			echo "$SOURCE||00:00" > $WORKDIR/songs_in_list
+		fi
+		ID3_PLAYLIST=false
+		;;
+	*.m3u*|*.dir*|*.album*)
+		#splash if playlist contains more than 1 entyr --> A m3u could be one single url
+		if [ `grep -vE "#EXT|#M3U" "$SOURCE" | wc -l | cut -d' ' -f1` -ge 3 ]; then
+			echo "$LOC506..." > $WORKDIR/splashtext
+			$APPDIR/box_splash_progress &
+		fi
+		#---
+		echo "$SOURCE" > $WORKDIR/last_added_playlist
+		#check if path is valid in playlist
+		echo -n > $WORKDIR/songs_in_list
+		while read I; do
+			[ "`echo "$I" | grep -E '#EXTM3U|#M3U'`" ] && continue #header info. We don't use this
+			if [ "`echo "$I" | grep '#EXT'`" ]; then
+				if [ "$M3U_META_PLAYLIST" = "true" ]; then
+					LENGTH="`echo "$I" | cut -d: -f2- | cut -d, -f1`"
+					if [ "$LENGTH" -gt 0 ]; then
+						LENGTH=`$APPDIR/func -sec2time $LENGTH` #m3u stores length in seconds, we want a human readable length
+					else
+						LENGTH=""
+					fi
+					NAME="`echo "$I" | cut -d, -f2-`"
+				fi
+				continue #if EXT line, go to next line...
+			fi
+			#Adress (path/URL)
+			case $I in
+				cdda:*) #CD-audio
+					ADR="$I"
+					;;
+				*://*) #streaming
+					ADR="$I"
+					;;
+				*/*) #path is defined in playlist
+					if [ -s "$I" ]; then #path exist, use path in playlist
+						ADR="$I"
+					else #Use current dir
+						TMP="`dirname "$SOURCE"`"
+						TMP2="`basename "$I"`"
+						ADR="$TMP/$TMP2"
+					fi
+					;;
+				*) #no path for files in list. Use current dir
+					TMP="`dirname "$SOURCE"`"
+					ADR="$TMP/$I"
+					;;
+			esac
+			echo "$ADR|$NAME|$LENGTH" | tr -d '\r' >> $WORKDIR/songs_in_list #sed is removing carriage return
+		done < "$SOURCE"
+		;;
+	*.pls*) #gxine playlist
+		echo "$LOC506..." > $WORKDIR/splashtext
+		$APPDIR/box_splash_progress &
+		echo "$SOURCE" > $WORKDIR/last_added_playlist
+		echo "`grep 'File' "$SOURCE" | cut -d'=' -f2`||" > $WORKDIR/songs_in_list #use only FileX=
+		;;
+	*/*) #single file
+		echo "$SOURCE||" > $WORKDIR/songs_in_list
+		;;
+	*) #search string
+		SEARCH="$SOURCE"
+		. $APPDIR/func -search_refresh
+		exit
+		;;
+	esac
+	#if nothing in playlist, play added song
+	[ ! -s $WORKDIR/playlist ] && AUTOPLAY=true 
+	#for progress bar
+	COUNT=1
+	TOTAL=`grep -c '^' $WORKDIR/songs_in_list`
+	#add
+	while read I; do
+		ADR="`echo "$I" | cut -d'|' -f1`"
+		### N A M E ###
+		#use already detected info - EXT m3u, streams...
+		if [ "`echo "$I" | cut -d'|' -f2`" ]; then
+			NAME="`echo "$I" | cut -d'|' -f2`"
+		#use metatag or filename in playlist
+		elif [ "$ID3_PLAYLIST" = "true" ]; then
+			case $ADR in
+				*cdda:*) NAME="`echo "$ADR" | cut -d':' -f5-`";; #CD audio
+				*)
+					. $APPDIR/func_id3io "$ADR" -read
+					if [ "$ID3_TITLE" ] && [ ! "`echo "$ID3_TITLE" | grep -iE "^ $|unknown"`" ]; then 
+						NAME="$ID3_ARTIST - $ID3_TITLE"
+					else #use filename
+						NAME="`basename "$ADR" | sed -e 's/\.[^\.]*$//'`"
+					fi
+					;;
+			esac
+		else #use filename
+			case $ADR in
+				/*)	NAME="`basename "$ADR" | sed -e 's/\.[^\.]*$//'`";; #file
+				*://*) #URL
+					NAME="$ADR"
+					[ "`grep "$ADR" $HOME/.pmusic/bookmarks`" ] && NAME="`grep "$ADR" $HOME/.pmusic/bookmarks | cut -d'|' -f1 | cut -c 7-`"
+					[ "`grep "$ADR" $HOME/.pmusic/index_radio 2> /dev/null`" ] && NAME="`grep -m1 "$ADR" $HOME/.pmusic/index_radio | cut -d'|' -f2`"
+					;;
+				*cdda:*) NAME="`echo "$ADR" | cut -d':' -f5-`" #CD-audio
+			esac
+		fi
+		#convert underscores and %20
+		[ $CONVERT_UNDERSCORE = true ] && NAME="`echo "$NAME" | tr '_' ' '`"
+		[ $CONVERT_20 = true ] && NAME="`echo "$NAME" | sed 's/%20/ /g'`"
+		#Index_recent and rating may contain (CD) or (www) - remove
+		NAME="`echo "$NAME" | sed -e 's/ (CD)//g' -e 's/ (www)//g'`"
+
+		### L E N G T H ###
+		LENGTH="`echo "$I" | cut -d'|' -f3`" #let's try
+		if [ ! "$LENGTH" ]; then
+			case $ADR in 
+				*cdda:*)
+					LENGTH="`echo "$ADR" | cut -d: -f3-4`";;
+				*)
+					ffmpeg -i "$ADR" 2> $WORKDIR/tmp_add
+					grep -F Duration $WORKDIR/tmp_add | awk '{print $2}' | cut -d"." -f1 > $WORKDIR/tmp_add2
+					if [ ! "`cut -d":" -f1 $WORKDIR/tmp_add2`" ]; then
+						LENGTH=""
+					elif [ "`cut -d":" -f1 $WORKDIR/tmp_add2`" != "00" ] && [ "`cut -d":" -f1 $WORKDIR/tmp_add2`" != 'N/A,' ]; then #time is above 59:59
+						HOUR=`cut -d":" -f1 $WORKDIR/tmp_add2 | sed "s/^0//"`
+						MIN=`cut -d":" -f2 $WORKDIR/tmp_add2 | sed "s/^0//"`
+						SEC=`cut -d":" -f3 $WORKDIR/tmp_add2`
+						LENGTH=$((($HOUR*60)+$MIN)):$SEC
+					else
+						LENGTH=`cut -d":" -f2- $WORKDIR/tmp_add2`
+					fi
+					;;
+			esac
+		fi
+		#define unique songnr (not line number)
+		PLAYLIST_NR=($(<"$WORKDIR/PLAYLIST_NR"))
+		PLAYLIST_NR=$(($PLAYLIST_NR+1))
+		echo $PLAYLIST_NR > $WORKDIR/PLAYLIST_NR
+		#---
+		LINE_SELECTED="`grep -m1 "$(<$WORKDIR/PLAYLIST)" $WORKDIR/playlist`"
+		if [ "$ADD_MORE" != "true" ] && [ "`grep -F playing $WORKDIR/ADDMODE`" ] && [ "$(<$WORKDIR/PLAYLIST)" ]; then #add the song after selection. This is slower, so do not use for multiple adds.
+			LINE_NEW="|$LENGTH|$NAME|$(printf "%03d" $PLAYLIST_NR) $ADR"
+			#do not add same song twice
+			if [ "`grep -wF -A1 "$LINE_SELECTED" $WORKDIR/playlist | tail -n 1 | cut -d '|' -f 2`" != "`echo $LINE_NEW | cut -d '|' -f 2`" ]; then
+				grep -w -B10000 "$LINE_SELECTED" $WORKDIR/playlist > $WORKDIR/tmp_add
+				echo "$LINE_NEW" >> $WORKDIR/tmp_add
+				grep -w -A10000 "$LINE_SELECTED" $WORKDIR/playlist | tac | head -n -1 | tac >> $WORKDIR/tmp_add
+				mv $WORKDIR/tmp_add $WORKDIR/playlist
+			fi
+		else #add at the end of list
+			[ ! "`tail -n 1 $WORKDIR/playlist | grep -w "$NAME"`" ] && echo "|$LENGTH|$NAME|$(printf "%03d" $PLAYLIST_NR) $ADR" >> $WORKDIR/playlist #do not add same song twice
+		fi
+
+		#update progressbar
+		echo $(($COUNT*100/$TOTAL)) > $WORKDIR/splash
+		COUNT=$(($COUNT+1))
+		#if nothing was previously in playlist (or open CD-audio), play added song.
+		if [ "$AUTOPLAY" = "true" ]; then
+			$APPDIR/func_player -play -autoplay &
+			AUTOPLAY=false
+		fi
+	done < $WORKDIR/songs_in_list
+	echo true > $WORKDIR/UPDATE_PLAYLIST
+	echo 100 > $WORKDIR/splash #be sure to close progress dialog
+	$APPDIR/func -statusbar_playlist & #update statusbar
+	;;
+esac

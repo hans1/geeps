@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PupControl panel
+Icon=/usr/local/PupControl/icons/control-panel_20.png
+Comment=PupControl panel
+Exec=PupControl
+Terminal=false
+Type=Application
+Categories=Utility;
+GenericName=PupControl panel

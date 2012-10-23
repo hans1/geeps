@@ -1,0 +1,9 @@
+/usr
+/usr/local
+/usr/local/sfsconvert
+ func
+ README.txt
+ sfsconvert
+/usr/share
+/usr/share/applications
+ sfsconvert.desktop

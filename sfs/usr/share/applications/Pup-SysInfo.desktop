@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pup-SysInfo system information
+Icon=/usr/local/PupControl/icons/Pup-SysInfo20.png
+Comment=Pup-SysInfo system information
+Exec=/usr/local/PupControl/func -sysinfo_mono
+Terminal=false
+Type=Application
+StartupNotify=true
+Categories=System
+GenericName=Pup-SysInfo system information

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Countrywizard Country Settings
+Icon=mini-font.xpm
+Comment=Country Settings
+Exec=countrywizard
+Terminal=false
+Type=Application
+Categories=X-DesktopCountry
+GenericName=Countrywizard country localisation

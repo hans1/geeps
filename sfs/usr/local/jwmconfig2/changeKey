@@ -1,0 +1,155 @@
+#!/bin/sh
+
+####
+#
+# changeKey: to be used with the 
+# jwmConfigMgr and keyboard scripts
+# provides gui for changing or deleting
+# a shortcut
+# 
+# author: thoughtjourney
+# date: 22/08/2005
+#
+# modified by kwiller on 07-May-2006
+# to allow use of multiple mask keys
+#
+#
+####
+
+#------------variables--------------->>
+TMP1="/tmp/addmask.tmp.$$"
+TMP2="/tmp/maskkey.tmp.$$"
+K=
+M=
+MASK=`echo $KEY | grep -c mask`
+A=
+TMPFILE="/tmp/shortcut"
+#SCRIPT_DIR="/root/.jwm"
+SCRIPT_DIR="/usr/local/jwmconfig"
+ID=
+
+PATH1=$PATH
+
+#-----find key value and mask value--->>
+
+if [ $MASK -eq 1 ]; then
+   M=`echo $KEY | awk -F\" '/key/ {print $2}'`
+   K=`echo $KEY | awk -F\" '/key/ {print $4}'`
+   echo M: $M
+   echo K: $K 
+else
+   K=`echo $KEY | awk -F\" '/key/ {print $2}'`
+   echo K: $K  
+fi
+echo key $KEY
+export $KEY
+
+##------------write current key details to a file--------->>
+
+echo "old|$M|$K">/tmp/short
+sync
+
+#-------find line in config file------>>
+
+if [ $MASK -eq 1 ]; then
+   RES=`echo $KEY | awk -F_ '/mask/ {print $1 " " $2}'`
+else
+   RES=$KEY
+fi
+
+echo res $RES
+
+KEYLINE=`grep "$RES" /root/.jwm/jwmrc-personal`
+
+#xmessage -name "Current Details" -nearmouse "Current shortcut details:  $KEYLINE" &
+   echo $KEYLINE
+   A=`echo $KEYLINE | awk -F\> '/key/ {print $2}' | awk -F\< '/Key/ {print $1}'`
+   export A
+
+##------write to temp file------------>>
+
+MASKKEY=
+
+if [ -z $M  ]; then
+   echo -e "KEY:        $K\nACTION:  $A" > $TMPFILE
+else
+  echo "$M" > $TMP1
+  sed -e "s#A#Alt-#" \
+      -e "s#C#Ctrl-#" \
+      -e "s#H#Hyper-#" \
+      -e "s#M#Meta-#" \
+      -e "s#S#Shift-#" \
+      -e "s#P#Super-#" $TMP1 > $TMP2
+ 
+  MASKKEY=`cat $TMP2`
+  rm -f $TMP1
+  rm -f $TMP2
+
+  echo -e "KEY COMBO:  $MASKKEY$K\nACTION:           $A" > $TMPFILE
+fi
+#   echo A: $A >> /tmp/shortcut
+
+##---taskbar config for jwmConfigMgr--->>
+
+export Change_Shortcut="
+ <vbox>
+  <frame Shortcut Details>
+   <hbox>
+    <edit><input file>$TMPFILE</input><width>300</width><height>45</height></edit> 
+   </hbox>
+  </frame>
+  <frame Delete>
+   <hbox>
+    <pixmap><input file>mini-cross.xpm</input></pixmap>
+    <checkbox>
+      <label>Delete this shortcut?</label>
+      <default>no</default>
+      <action>if true disable:MSK</action>
+      <action>if true disable:KY</action>
+      <action>if false enable:MSK</action>
+      <action>if false enable:KY</action>
+      <variable>CHECK</variable>
+    </checkbox>
+   </hbox>
+  </frame>
+  <frame Change Shortcut>
+   <hbox>
+    <text><label>Enter Mask (optional):</label></text>
+    <entry>
+     <default>mask</default>
+     <visible>enabled</visible>
+      <variable>MSK</variable>
+    </entry>
+    <text><label>Enter Key:</label></text>
+    <entry>
+     <default>key</default>
+     <visible>enabled</visible>
+      <variable>KY</variable>
+    </entry>
+   </hbox>
+  </frame>
+   <hbox>
+   <button ok>
+     <action>confirmKey &</action>
+     <action>exit</action>
+   </button>
+   <button help>
+      <action>dillo http://www.joewing.net/programs/jwm/config.shtml#keys &</action>
+   </button>
+   <button cancel></button>
+   </hbox>
+ </vbox>"
+
+##----------run------------>>
+cd $SCRIPT_DIR
+export PATH="$PATH:."
+gtkdialog3 --program Change_Shortcut
+
+##-------cleanup---------->>
+#rm -f $TMPFILE
+unset Change_Shortcut	
+unset A
+export PATH=$PATH1
+#clear	
+
+

@@ -1,0 +1,16 @@
+README
+
+You can create your own themes for the network_tray icon
+You need to make a directory in /usr/share/network_tray 
+naming it relevant to your theme.
+Inside you put 5 24x24 pixel xpm icons named as follows:
+	networkdead.xpm	
+	networkblank.xpm
+	networkin.xpm	
+	networkout.xpm	
+	networkboth.xpm
+	
+The script will detect your new theme and automatically put 
+it in the window.
+
+Have fun! 

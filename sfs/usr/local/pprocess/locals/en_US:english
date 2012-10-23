@@ -1,0 +1,40 @@
+#!/bin/bash
+#Pprocess
+#version=2.2
+#language=english
+#translator=native
+set -a
+
+LOC_OK="Ok"
+LOC_CANCEL="Cancel"
+LOC_ERROR="Error"
+LOC_SEARCHTEXT="Search text"
+
+LOC100="Process manager"
+LOC101="End process (kill)"
+LOC102="Processes"
+LOC103="Messages"
+LOC104="CPU priority"
+LOC105="High"
+LOC106="Normal"
+LOC107="Low"
+LOC108="Filter"
+LOC109="Action"
+LOC111="Send signal" #must be 2 words
+LOC112="Running processes"
+LOC113="Kernel messages"
+LOC114="Graphic server"
+LOC115="Kernel boot"
+LOC116="Puppy boot"
+LOC118="Power off"
+LOC119="Restart system"
+LOC120="Double-click to watch messages"
+
+LOC131="No action defined"
+
+
+#tooltips
+LOC200="Use filter to show only wanted processes.
+Keep field blank to show all processes."
+LOC201="What should happen to the process
+when click on it."

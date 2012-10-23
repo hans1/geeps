@@ -1,0 +1,16 @@
+- initrd/ is to be cpio'd and compressed to file initrd.gz
+- sfs/ is to be mksquashfs'd to file puppy_slacko_5.3.3.sfs
+
+Not included:
+- device nodes in initrd/ are not included
+- these binaries should be setuid root:
+	/bin/fusermount
+	/bin/mount-FULL
+	/bin/umount-FULL
+	/usr/bin/Xorg
+	/usr/bin/sudo
+	/usr/libexec/dbus-daemon-launch-helper
+	/usr/libexec/pt_chown
+	/usr/sbin/cgi-wrapper
+	/usr/sbin/hiawatha
+	/usr/sbin/pppoe-wrapper

@@ -1,0 +1,249 @@
+/etc
+/etc/fonts
+ fonts.conf
+ fonts.dtd
+ local.conf
+/etc/X11
+/etc/X11/app-defaults
+ XCalc
+ XClipboard
+ XConsole
+ XFontSel
+ XLoad
+ Xvidtune
+/etc/X11/xkb
+/etc/X11/xkb/compat
+ accessx
+ basic
+ complete
+ default
+ iso9995
+ japan
+ keypad
+ ledcaps
+ lednum
+ ledscroll
+ misc
+ mousekeys
+ norepeat
+ pc
+ pc98
+ README
+ xfree86
+ xtest
+/etc/X11/xkb/compiled
+/etc/X11/xkb/geometry
+ dell
+ everex
+ hp
+/etc/X11/xkb/geometry/ibm
+ thinkpad
+/etc/X11/xkb/keycodes
+ aliases
+ evdev
+ README
+ xfree86
+ xfree98
+/etc/X11/xkb/keymap
+ README
+ xfree86
+ xfree98
+/etc/X11/xkb/rules
+ base
+ base.lst
+ evdev
+ evdev.lst
+ README
+ xfree86
+ xfree86.lst
+ xkb.dtd
+ xorg
+ xorg.lst
+/etc/X11/xkb/semantics
+ basic
+ complete
+ default
+ xtest
+/etc/X11/xkb/symbols
+ altwin
+ capslock
+ compose
+ ctrl
+ dvorak
+ eurosign
+ group
+ inet
+ iso9995-3
+ keypad
+ level3
+ lock
+/etc/X11/xkb/symbols/pc
+ al
+ am
+ ara
+ az
+ ba
+ bd
+ be
+ bg
+ br
+ bt
+ by
+ ca
+ ch
+ cz
+ de
+ dk
+ ee
+ es
+ fi
+ fo
+ fr
+ gb
+ ge
+ gr
+ hr
+ hu
+ ie
+ il
+ in
+ ir
+ is
+ it
+ jp
+ kg
+ la
+ latam
+ latin
+ lk
+ lt
+ lv
+ mao
+ mkd
+ mm
+ mn
+ mt
+ nl
+ no
+ pc
+ pk
+ pl
+ pt
+ qc
+ ro
+ ru
+ se
+ si
+ sk
+ srp
+ sy
+ th
+ tj
+ tr
+ ua
+ us
+ uz
+ vn
+/etc/X11/xkb/torture
+ indicator
+ indicator1
+ indicator2
+ indicator3
+ mod_compat
+ mod_compat1
+ mod_compat2
+ mod_compat3
+ mod_compat4
+ sym_interp
+ sym_interp1
+ sym_interp2
+ sym_interp3
+ sym_interp4
+ types
+/etc/X11/xkb/types
+ basic
+ cancel
+ caps
+ complete
+ default
+ extra
+ iso9995
+ mousekeys
+ numpad
+ pc
+ README
+/lib
+/usr
+/usr/bin
+ bdftopcf
+ cxpm
+ fc-cache
+ fc-cat
+ fc-list
+ fc-match
+ gxmessage
+ iceauth
+ mkfontdir
+ mkfontscale
+ setxkbmap
+ sxpm
+ X
+ xauth
+ xcalc
+ xclipboard
+ xconsole
+ xdpyinfo
+ xev
+ xfontsel
+ xgamma
+ xhost
+ xinit
+ xkbcomp
+ xload
+ xmessage
+ xmodmap
+ xprop
+ xrandr
+ xrdb
+ xset
+ xsetroot
+ xvidtune
+ xwininfo
+/usr/lib
+/usr/lib/dri
+/usr/lib/mesa
+/usr/lib/xserver
+ SecurityPolicy
+/usr/share
+/usr/share/applications
+ Xcalc-scientific-calculator.desktop
+ Xclipboard.desktop
+ xconsole.desktop
+ Xfontsel-font-viewer.desktop
+ Xorg-Video-Wizard.desktop
+/usr/share/X11
+/usr/share/X11/app-defaults
+/usr/share/X11/locale
+/usr/share/X11/locale/C
+ Compose
+ XI18N_OBJS
+ XLC_LOCALE
+/usr/share/X11/locale/en_US.UTF-8
+ Compose
+ XI18N_OBJS
+ XLC_LOCALE
+/usr/share/X11/locale/iso8859-1
+/usr/share/X11/locale/iso8859-15
+ Compose
+ XI18N_OBJS
+ XLC_LOCALE
+/usr/share/X11/locale/iso8859-2
+ Compose
+ XI18N_OBJS
+ XLC_LOCALE
+/usr/share/X11/xkb
+/var
+/var/cache
+/var/cache/fontconfig
+/var/lib
+/var/lib/xkb

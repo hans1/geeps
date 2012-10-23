@@ -1,0 +1,17 @@
+#!/bin/sh
+MOUNTPOINT=$1
+MOUNTED="$(mount | grep $(echo "$MOUNTPOINT" | sed 's/\$/\\$/g;s/ /\\\\040/g'))$(mount | grep "$MOUNTPOINT")"
+if [ "$MOUNTED" ];then
+#smbumount "$MOUNTPOINT" #dependency on smbumount
+umount-FULL "$MOUNTPOINT"
+RESULT=$?
+if [ "$RESULT" = 0 ]; then
+	echo Unmount: $MOUNTPOINT successful >>${TMP}log
+else
+	export MAIN_DIALOG="<window title=\"Pnethood Error\" icon-name=\"gtk-network\"><vbox><text wrap=\"true\"><label>Unmount ${MOUNTPOINT} failed, share still in use. Please close all programs accessing this share. Hit the connect button then try disconnect again.</label></text><hbox homogeneous=\"true\"><pixmap icon_size=\"5\"><input file stock=\"gtk-dialog-error\"></input></pixmap><button ok></button></hbox></vbox></window>"
+gtkdialog4 --program=MAIN_DIALOG --center
+	echo Unmount: $MOUNTPOINT failed >> ${TMP}log
+fi
+else
+echo Unmount: error $MOUNTPOINT not in use >> ${TMP}log
+fi

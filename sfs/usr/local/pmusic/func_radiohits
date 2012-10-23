@@ -1,0 +1,187 @@
+#!/bin/sh
+
+#first run
+if [ ! -f $WORKDIR/RADIOHITS_URL ]; then
+	mkdir "$HOME/.pmusic/radio-hits preset"
+	echo 'http://www.181.fm/winamp.pls?station=181-uktop40&bitrate=hi' > $WORKDIR/RADIOHITS_URL
+	echo '181.fm UK Top40 - (128kb)' > $WORKDIR/RADIOHITS_NAME
+	echo -n > $WORKDIR/RADIOHITS_PATH
+	#build some available presets
+	echo '100hit-radio - Top40 USA (128kb)||http://streaming201.radionomy.com:80/100-HIT-radio' > "$HOME/.pmusic/radio-hits preset/100hit-radio - Top40 USA (128kb)"
+	echo '181.fm UK Top40 - (128kb)||http://www.181.fm/winamp.pls?station=181-uktop40&bitrate=hi' > "$HOME/.pmusic/radio-hits preset/181.fm UK Top40 - (128kb)"
+	echo 'DMR Depressive Metal Rock Radio - Black metal Canada (128kb)||http://184.154.10.83:8390/listen.pls' > "$HOME/.pmusic/radio-hits preset/DMR Depressive Metal Rock Radio - Black metal Canada (128kb)"
+	echo 'RadioCrazy - Classical Switzerland (128kb)||http://www.swissradio.ch/streams/6034.m3u' > "$HOME/.pmusic/radio-hits preset/RadioCrazy - Classical Switzerland (128kb)"
+	echo '1.FM Blues - USA (128kb)||http://sc16.1.fm:8030' > "$HOME/.pmusic/radio-hits preset/1.FM Blues - USA (128kb)"
+	echo "181.fm 80's hairband - HeavyRock USA (128kb)||http://www.181.fm/winamp.pls?station=181-hairband&bitrate=hi" > "$HOME/.pmusic/radio-hits preset/181.fm 80's hairband - HeavyRock USA (128kb)"
+#	echo 'RMF 60s - Poland (128kb)||http://files.kusmierz.be/rmf/rmf60s.mp3' > "$HOME/.pmusic/radio-hits preset/RMF 60s - Poland (128kb)"
+	echo '1.FM 50s-60s - USA (128kb)||http://sc10.1.fm:8015' > "$HOME/.pmusic/radio-hits preset/1.FM 50s-60s - USA (128kb)"
+fi	
+
+RADIOHITS_NAME="$(<$WORKDIR/RADIOHITS_NAME)"
+
+grab (){
+	#missing download path
+	if [ ! -d "$RADIOHITS_PATH" ]; then
+		TXT1="$LOC760"
+		. $APPDIR/box_yesno
+		[ $EXIT != "yes" ] && exit
+		mkdir -p "$RADIOHITS_PATH"
+	fi
+	#---
+#	rxvt -bg black -fg green -cr black -geometry 100x8 -title "Pmusic - $LOC229" -e streamripper "$RADIOHITS_URL" -d "$RADIOHITS_PATH" -s -o never --codeset-id3=ISO-8859-1 --codeset-metadata=ISO-8859-1 -k 1 -u WinampMPEG/5.0 &
+	UNIQUE=`date +%s`
+	echo "connecting... $RADIOHITS_URL" > $WORKDIR/output_streamripper2$UNIQUE
+#	streamripper "$RADIOHITS_URL" -d "$RADIOHITS_PATH" -s -o never --codeset-filesys=utf8 --codeset-metadata=ISO-8859-1 -k 1 -u WinampMPEG/5.0 > $WORKDIR/output_streamripper$UNIQUE 2>&1 &
+	streamripper "$RADIOHITS_URL" -d "$RADIOHITS_PATH" -s -o never -k 1 -u WinampMPEG/5.0 > $WORKDIR/output_streamripper$UNIQUE 2>&1 &
+	S='
+	<window title="Pmusic - '$LOC229' ::: '$RADIOHITS_NAME'" icon-name="pmusic" resizable="false">
+	 <vbox>
+	  <timer visible="false" interval="4">
+	   <action>tail -c 1000 '$WORKDIR'/output_streamripper'$UNIQUE' | tr "\r" "\n" | tail -n1 > '$WORKDIR'/output_streamripper2'$UNIQUE'</action>
+	   <action>refresh:OUTPUT</action>
+	  </timer>
+	  <hbox>
+	   <vbox>
+	    <checkbox>
+	     <variable>CHK_INCOMPLETE</variable>
+	     <default>true</default>
+	     <label>'$LOC763'</label>
+	    </checkbox>
+	    <checkbox>
+	     <variable>CHK_MIN_SIZE</variable>
+	     <label>'$LOC764'</label>
+	    </checkbox>
+	   </vbox>
+	   <text width-request="50"><label>""</label></text>
+	   <button image-position="2">
+	    <input file stock="gtk-quit"></input>
+	    <label>'$LOC762'</label>
+	   </button>
+	  </hbox>
+	  <statusbar has-resize-grip="false">
+	   <variable>OUTPUT</variable>
+	   <input file>'$WORKDIR'/output_streamripper2'$UNIQUE'</input>
+	  </statusbar>
+	 </vbox>
+	</window>'
+
+	[ $TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	export Pmusic_radiohits_grabber$UNIQUE="`echo "$S" | sed 's/##.*//'`" #I use double hash (##) for comments. --> as #FF0000
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -p Pmusic_radiohits_grabber$UNIQUE); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+
+	#kill process
+	TMP="`ps`"
+	for I in `echo "$TMP" | grep -F "$RADIOHITS_URL" | grep -F streamripper | awk '{print $1}'`; do kill -9 $I 2> /dev/null; done
+	#cleanup
+	rm -f $WORKDIR/output_streamripper*$UNIQUE
+	[ $CHK_INCOMPLETE = true ] && rm -fr "$RADIOHITS_PATH/incomplete"
+	[ $CHK_MIN_SIZE = true ] && find "$RADIOHITS_PATH" -maxdepth 1 -mindepth 1 -type f -size 1M -iname "*.mp3" -exec rm {} \;
+	[ $CHK_MIN_SIZE = true ] && find "$RADIOHITS_PATH" -maxdepth 1 -mindepth 1 -type f -size 1M -iname "*.ogg" -exec rm {} \;
+}
+
+load_preset (){
+	cut -d'|' -f 2 "$HOME/.pmusic/radio-hits preset/$RADIOHITS_NAME" > $WORKDIR/RADIOHITS_PATH
+	cut -d'|' -f 3 "$HOME/.pmusic/radio-hits preset/$RADIOHITS_NAME" > $WORKDIR/RADIOHITS_URL
+	echo "$RADIOHITS_NAME" > $WORKDIR/RADIOHITS_NAME
+}
+
+save_preset (){
+	#check if exist
+	if [ -f "$HOME/.pmusic/radio-hits preset/$RADIOHITS_NAME" ]; then
+		TXT1="<b>${RADIOHITS_NAME}</b> $LOC503"; TXT2="$LOC504"
+		. $APPDIR/box_yesno
+		[ $EXIT != "yes" ] && exit
+	fi
+	#save
+	echo "$RADIOHITS_NAME|$RADIOHITS_PATH|$RADIOHITS_URL" > "$HOME/.pmusic/radio-hits preset/$RADIOHITS_NAME"
+	#update list
+	ls -1 "$HOME/.pmusic/radio-hits preset" | sort -u > $WORKDIR/radiohits_presets
+	rm $WORKDIR/xml_Pmusic #make sure gui updates at next run to show this new menuitem
+}
+
+fetch_playing (){
+	tac $WORKDIR/radiohits_presets > $WORKDIR/tmp
+	echo >> $WORKDIR/tmp
+	tac $WORKDIR/tmp | sort -u > $WORKDIR/radiohits_presets
+	cp -f $WORKDIR/PLAYLIST $WORKDIR/RADIOHITS_URL
+}
+
+more_info (){
+	echo "$LOC771" >> $WORKDIR/radiohits_info
+}
+
+export -f grab load_preset save_preset fetch_playing more_info
+
+ls -1 "$HOME/.pmusic/radio-hits preset" > $WORKDIR/radiohits_presets
+echo "$LOC770" > $WORKDIR/radiohits_info
+
+S='
+<window title="Pmusic - '$LOC229' '$LOC_SETUP'" icon-name="pmusic">
+<vbox>
+ <text width-request="500"><variable>INFO</variable><input file>'$WORKDIR'/radiohits_info</input></text>
+ <hbox>
+  <hbox space-expand="true" space-fill="true">
+   <text><label>""</label></text>
+  </hbox>
+  <button relief="2" image-position="1">
+   <variable>MOREINFO</variable>
+   <label>'$LOC_MOREINFO'</label>
+   <input file stock="gtk-dialog-info"></input>
+   <action>more_info</action>
+   <action>disable:MOREINFO</action>
+   <action>refresh:INFO</action>
+  </button>
+ </hbox>
+ <frame>
+  <hbox>
+   <text space-expand="false" space-fill="false"><label>"'$LOC_PRESET'"</label></text>
+   <comboboxentry space-expand="true" space-fill="true">
+    <variable>RADIOHITS_NAME</variable>
+    <default>"'$RADIOHITS_NAME'"</default>
+    <input file>'$WORKDIR'/radiohits_presets</input>
+    <action>load_preset</action>
+    <action>refresh:RADIOHITS_URL</action>
+    <action>refresh:RADIOHITS_PATH</action>
+   </comboboxentry>
+  </hbox>
+  <text height-request="20"><label>""</label></text>
+  <hbox>
+   <text><label>"URL"</label></text>
+   <entry><variable>RADIOHITS_URL</variable><input file>'$WORKDIR'/RADIOHITS_URL</input></entry>
+  <text width-request="30"><label>""</label></text>
+  </hbox>
+  <hbox>
+   <text><label>"'$LOC751'"</label></text>
+   <entry accept="directory"><variable>RADIOHITS_PATH</variable><input file>'$WORKDIR'/RADIOHITS_PATH</input></entry>
+   <button><input file stock="gtk-open"></input><action type="fileselect">RADIOHITS_PATH</action></button>
+  </hbox>
+ </frame>
+  <hbox>
+   <button>
+    <input file stock="gtk-jump-to"></input>
+    <label>"'$LOC754'"</label>
+    <action>fetch_playing</action>
+    <action>refresh:RADIOHITS_URL</action>
+    <action>refresh:RADIOHITS_NAME</action>
+   </button>
+   <button>
+    <input file stock="gtk-save"></input>
+    <label>"'$LOC752'"</label>
+    <action>save_preset</action>
+    <action>refresh:RADIOHITS_NAME</action>
+   </button>
+   <button>
+    <input file stock="gtk-execute"></input>
+    <label>"'$LOC753'"</label>
+    <action>grab &</action>
+   </button>
+  </hbox>
+</vbox>
+</window>'
+[ $TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+export Pmusic_radiohits="`echo "$S" | sed 's/##.*//'`" #I use double hash (##) for comments. --> as #FF0000
+$GTKDIALOG -p Pmusic_radiohits

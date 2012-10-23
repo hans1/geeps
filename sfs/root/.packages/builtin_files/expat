@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ xmlwf
+/usr/lib
+ libexpat.so
+ libexpat.so.1
+ libexpat.so.1.5.2

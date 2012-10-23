@@ -1,0 +1,9 @@
+#!/bin/sh
+Xdialog --title " " --infobox "Starting scanner ..." 0 0 2000 &
+
+$PEASYPATH/xscanimage-peasy $URI 2> /dev/null
+
+if [ -e /tmp/out.pnm ]; then
+  pnmtopng /tmp/out.pnm > /tmp/out.png 
+  defaultimageviewer /tmp/out.png &
+fi

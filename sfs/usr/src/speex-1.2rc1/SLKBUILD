@@ -1,0 +1,32 @@
+#Maintainer: Thorsten Muehlfelder <thenktor@gmx.de>
+
+pkgname=speex
+pkgver=1.2rc1
+pkgrel=1tm
+arch=i486
+source=("http://downloads.xiph.org/releases/speex/speex-$pkgver.tar.gz")
+sourcetemplate=http://thenktor.dyndns.org/packages/$pkgname/
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo" "maintainers" "manual.pdf")
+url=http://www.speex.org/
+options=('noautodotnew')
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"speex is a patent-free audio compression format designed for speech"
+"The Speex Project aims to lower the barrier of entry for voice"
+"applications by providing a free alternative to expensive"
+"proprietary speech codecs. Moreover, Speex is well-adapted to"
+"Internet applications and provides useful features that are not"
+"present in most other codecs. Speex is based on CELP and is"
+"designed to compress voice at bitrates ranging from 2 to 44 kbps."
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr --localstatedir=/var --sysconfdir=/etc --disable-static
+	make -j3 || return 1
+	make install DESTDIR=$startdir/pkg
+	rm -rf $startdir/pkg/usr/share/doc
+} 

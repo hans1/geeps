@@ -1,0 +1,112 @@
+#! /bin/bash
+if [ -f /tmp/pschedule-loading ] && [ "$2" = "-a" ]; then exit; fi #Pschedule calls this at <action> in tables, which means it would check 5 times during startup if we hadn't prevented it with the -a switch. See xml code in func_new
+
+if [ "$1" = "-new" ]; then
+	MINUTE=`cat /tmp/pschedule-cronminute`
+	HOUR=`cat /tmp/pschedule-cronhour`
+	DAY=`cat /tmp/pschedule-cronday`
+	MONTH=`cat /tmp/pschedule-cronmonth`
+	WEEKDAY=`cat /tmp/pschedule-cronweekday`
+	echo "$MINUTE{ð®SSSđþ}$HOUR{ð®SSSđþ}$DAY{ð®SSSđþ}$MONTH{ð®SSSđþ}$WEEKDAY" > /tmp/pschedule-forloop
+else
+	echo -n > /tmp/pschedule-treeitems
+	cat /var/spool/cron/crontabs/$USER | sed -e "s/ /{ð®SSSđþ}/g" | sed -e "s/*/{ð®STARđþ}/g" > /tmp/pschedule-forloop
+fi
+N=1 #jake_take
+for I in `cat /tmp/pschedule-forloop`; do
+	I=`echo "$I" | sed -e 's/{ð®SSSđþ}/ /g'` #used later to check for advanced cron
+	CRONCOMMAND=`echo "$I" | sed -e "s/{ð®STARđþ}/*/g"`
+	MINUTE=`echo "$CRONCOMMAND" | cut -d " " -f 1`
+	HOUR=`echo "$CRONCOMMAND" | cut -d " " -f 2`
+	DAY=`echo "$CRONCOMMAND" | cut -d " " -f 3`
+	MONTH=`echo "$CRONCOMMAND" | cut -d " " -f 4`
+	WEEKDAY=`echo "$CRONCOMMAND" | cut -d " " -f 5`
+	COMMAND=`echo "$CRONCOMMAND" | cut -d " " -f 6- | cut -d "#" -f 2-` #jake_take
+	PREMONTH=""
+	PREDAY=""
+	PRETIME=""
+	TIME_DELIMINATOR=":"
+	
+	#TIME
+	if [ "$MINUTE" = "*" ]; then MINUTE="xx"; fi
+	if [ `echo $MINUTE | wc -c` = 2 ]; then MINUTE=0"$MINUTE"; fi #place a zero in front when only 1 digit
+	if [ "$HOUR" = "*" ]; then HOUR="xx"; fi
+	if [ `echo $HOUR | wc -c` = 2 ]; then HOUR=0"$HOUR"; fi #place a zero in front when only 1 digit
+	if [ "$HOUR" = "xx" ]; then
+		if [ "$MINUTE" != "xx" ]; then
+			PRETIME="$Every_hour_at "
+		fi
+		if [ "$MINUTE" = "xx" ]; then
+			PRETIME="$Every_minute"
+			TIME_DELIMINATOR=""
+			MINUTE=""
+			HOUR=""
+		fi
+	fi
+	if [ "$HOUR" != "xx" ] && [ "$MINUTE" = "xx" ]; then
+		PRETIME="$Every_minute $during_the_hour "
+		TIME_DELIMINATOR=""
+		MINUTE=""
+	fi	
+	#DAY
+	if [ "$DAY" != "*" ]; then
+		DAY=" $the $DAY."
+		PREDAY=" -"
+		PREMONTH=" $of"
+	else
+		DAY=""
+		if [ "$MONTH" != "*" ] && [ "$WEEKDAY" = "*" ]; then
+			PREDAY=" -"
+			DAY=" $any $day"
+			PREMONTH=" $IN"
+		fi
+	fi
+	if [ "$WEEKDAY" != "*" ] && [ "$MONTH" != "*" ]; then
+		PREDAY=" $IN"
+	fi
+	if [ "$WEEKDAY" != "*" ] && [ "$DAY" != "" ]; then PREDAY=", $if_its_on "; fi
+	case $WEEKDAY in
+		0)		WEEKDAY=" - $Sundays";;
+		1)		WEEKDAY=" - $Mondays";;
+		2)		WEEKDAY=" - $Tuesdays";;
+		3)		WEEKDAY=" - $Wednesdays";;
+		4)		WEEKDAY=" - $Thursdays";;
+		5)		WEEKDAY=" - $Fridays";;
+		6)		WEEKDAY=" - $Saturdays";;
+		"*")	WEEKDAY="";;
+	esac
+		case "$MONTH" in
+		1)		MONTH=" $January";;
+		2)		MONTH=" $February";;
+		3)		MONTH=" $March";;
+		4)		MONTH=" $April";;
+		5)		MONTH=" $May";;
+		6)		MONTH=" $June";;
+		7)		MONTH=" $July";;
+		8)		MONTH=" $August";;
+		9)		MONTH=" $September";;
+		10)		MONTH=" $October";;
+		11)		MONTH=" $November";;
+		12)		MONTH=" $December";;
+		"*")	MONTH=""
+				if [ "$DAY" ]; then 
+					MONTH=" $any $month"
+				fi;;
+	esac
+
+
+	#strip $COMMAND to max 25 chars
+	if [ `echo "$COMMAND" | wc -c` -gt 25 ]; then
+		COMMAND="`echo "$COMMAND" | cut -c 1-22`..."
+	fi
+	echo "$PRETIME$HOUR$TIME_DELIMINATOR$MINUTE$WEEKDAY$PREDAY$DAY$PREMONTH$MONTH" > /tmp/pschedule-next #for new_task
+
+
+	#if cron contains , / - will it be set to 'Advanced schedule'
+	if [ "`echo "$I" | cut -d " " -f 1-5 | grep '/'`" ] || [ "`echo "$I" | cut -d " " -f 1-5 | grep ','`" ] || [ "`echo "$I" | cut -d " " -f 1-5 | grep '-'`" ]; then
+		echo "$N:$COMMAND | Advanced schedule | $CRONCOMMAND" >> /tmp/pschedule-treeitems # for main window #jake_take
+	else
+		echo "$N:$COMMAND | $PRETIME$HOUR$TIME_DELIMINATOR$MINUTE$WEEKDAY$PREDAY$DAY$PREMONTH$MONTH | $CRONCOMMAND" >> /tmp/pschedule-treeitems # for main window #jake_take
+	fi
+	N=`expr $N + 1` #jake_take
+done

@@ -1,0 +1,70 @@
+/bin
+/etc
+ nscd.conf
+/etc/profile.d
+ glibc.sh
+/lib
+ ld-2.13.so
+ ld-linux.so.2
+ libanl-2.13.so
+ libanl.so.1
+ libBrokenLocale-2.13.so
+ libBrokenLocale.so.1
+ libc-2.13.so
+ libcidn-2.13.so
+ libcrypt-2.13.so
+ libcrypt.so.1
+ libc.so.6
+ libdl-2.13.so
+ libdl.so.2
+ libm-2.13.so
+ libmemusage.so
+ libm.so.6
+ libnsl-2.13.so
+ libnsl.so.1
+ libnss_compat-2.13.so
+ libnss_compat.so.2
+ libnss_dns-2.13.so
+ libnss_dns.so.2
+ libnss_files-2.13.so
+ libnss_files.so.2
+ libnss_hesiod-2.13.so
+ libnss_hesiod.so.2
+ libnss_nis-2.13.so
+ libnss_nisplus-2.13.so
+ libnss_nisplus.so.2
+ libnss_nis.so.2
+ libpcprofile.so
+ libpthread-2.13.so
+ libpthread.so.0
+ libresolv-2.13.so
+ libresolv.so.2
+ librt-2.13.so
+ librt.so.1
+ libthread_db-1.0.so
+ libthread_db.so.1
+ libutil-2.13.so
+ libutil.so.1
+ .wh.incoming
+/usr
+/usr/lib
+ libanl.so
+ libBrokenLocale.so
+ libcrypt.so
+ libdl.so
+ libm.so
+ libnsl.so
+ libnss_compat.so
+ libnss_dns.so
+ libnss_files.so
+ libnss_hesiod.so
+ libnss_nisplus.so
+ libnss_nis.so
+ libresolv.so
+ librt.so
+ libthread_db.so
+ libutil.so
+/usr/share
+/usr/share/zoneinfo
+ localtime
+ timeconfig

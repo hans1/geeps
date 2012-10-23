@@ -1,0 +1,109 @@
+#!/bin/sh
+#LGPL 2007 Puppy Linux www.puppyos.com
+#based on probedisk3 written by Dougal.
+#small mods by BK 16 june 2007
+# 21 Jun 2007 BK: force /proc update for usb drives.
+#v3.93 10 dec 2007 BK: updated for 2.6.24 kernel, no /dev/hd*.
+#v3.97 31jan2008 BK: refinement for detecting kernels with /dev/hd* drives.
+#v4.01 10may2008 BK: bugfix for detecting if usb drive.
+
+. /etc/rc.d/PUPSTATE
+#v4.01
+# ...older kernel with /proc/ide support will have SATADRIVES variable, else ATADRIVES
+#   will be all ide/sata drives (not usb) (which all have /dev/sd notation).
+INTERNAL_SD_DRIVES="$SATADRIVES"
+[ "$ATADRIVES" != "" ] && INTERNAL_SD_DRIVES="$ATADRIVES"
+
+if [ -f /root/.usb-drive-log-probedisk ];then #force /proc upate mechanism
+ for ONEUSBDRV in `cat /root/.usb-drive-log-probedisk | tr '\n' ' '`
+ do
+  disktype /dev/$ONEUSBDRV > /dev/null 2>&1
+ done
+fi
+
+#mounted drives/partitions...
+MNTDDEVS="`mount | cut -f 1 -d ' ' | cut -f 3 -d '/' | grep -E '^hd|^sd|^scd|^sr|^mmc' | tr '\n' ' '`"
+
+##all disk devices, mask off partitions...
+#ALLDRVS="`grep -E ' hd| scd| sd| mmc| sr' /proc/diskstats | tr -s ' ' | cut -f 4 -d ' ' | grep -vE 'hd.*[0-9]$|sd.*[0-9]$|mmc.*p[0-9]' | tr '\n' ' '`"
+##plug in a cd, /proc/diskstats does not register it until drive is accessed...
+##for ONEIDE in `ls -1 /proc/ide | grep '^hd' | tr '\n' ' '`
+#for ONEBLKDRV in `ls -1 /sys/block | grep -E '^hd|^scd|^sd|^mmc|^sr' | tr '\n' ' '`
+#do
+# IPATTERN="$ONEBLKDRV "
+# [ "`echo -n "$ALLDRVS" | grep "$IPATTERN"`" = "" ] && ALLDRVS="$ALLDRVS $ONEBLKDRV"
+#done
+
+#yeah, so why not just do this...
+#ALLDRVS="`ls -1 /sys/block | grep -E '^hd|^scd|^sd|^mmc|^sr' | tr '\n' ' '`"
+
+#crap, right now, /sys/block does not show my hdb cd/dvd drive, but it is in
+#/proc/ide. pathetic kernel! oh well...
+if [ ! -e /proc/ide ];then #v3.97
+ ALLDRVS="`ls -1 /sys/block | grep -E '^scd|^sd|^mmc|^sr' | tr '\n' ' '`" #v3.93 no /proc/ide
+else
+ ALLDRVS="`ls -1 /sys/block | grep -E '^scd|^sd|^mmc|^sr' | tr '\n' ' '``ls -1 /proc/ide | grep '^hd' | tr '\n' ' '`"
+fi
+#note: after further testing, the 2.6.21.5 kernel exhibits inconsistent behaviour for hd devices, best to avoid.
+
+for ONEDRV in $ALLDRVS
+do
+  case $ONEDRV in
+   hd*) # ide device, look in /proc/ide for info
+     MEDIA="`cat /proc/ide/$ONEDRV/media`"
+     INFO="`cat /proc/ide/$ONEDRV/model`"
+     ;;
+   sd*) # scsi devices, look in /sys/block (all appear as Direct-Access)
+     MEDIA="Direct-Access"
+     VENDOR="`cat /sys/block/$ONEDRV/device/vendor`"
+     MODEL="`cat /sys/block/$ONEDRV/device/model`"
+     INFO="$VENDOR$MODEL"
+     DRVNAMES="$DRVNAMES `echo -n "$ONEDRV" | cut -b 1-3` "
+     
+     #log if usb drive (not a sata drive)... v4.01...
+     if [ "`echo "$INTERNAL_SD_DRIVES" | grep "$ONEDRV"`" = "" ];then
+      echo "$ONEDRV" >> /root/.usb-drive-log-probedisk
+      sort -u /root/.usb-drive-log-probedisk > /tmp/usb-drive-log-probedisk-tmp
+      mv -f /tmp/usb-drive-log-probedisk-tmp /root/.usb-drive-log-probedisk
+     fi
+
+     ;;
+   scd*|sr*) #  scsi cdroms
+     MEDIA="cdrom"
+     VENDOR="`cat /sys/block/$ONEDRV/device/vendor`"
+     MODEL="`cat /sys/block/$ONEDRV/device/model`"
+     INFO="$VENDOR$MODEL"
+     ;;
+   mmc*) #/dev/mmcblk0
+     MEDIA="Direct-Access"
+     INFO="MMC/SD: `cat /sys/block/$ONEDRV/device/name`"
+     ;;
+   *) # maybe I let something bad in -- skip it
+     continue
+     ;;
+  esac
+  echo "/dev/$ONEDRV|$MEDIA|$INFO"
+
+done
+
+#find out if a mounted device has been unplugged...
+#for hotplug drives, remove it and it will disappear from /sys/block, however
+#still shows up in 'mount' if hasn't been unmounted.
+for ONEMNTD in $MNTDDEVS
+do
+ case $ONEMNTD in
+  hd*|sd*|sr*)
+   MNTDDRVs="`echo -n "$ONEMNTD" | cut -b 1-3` "
+   ;;
+  scd*)
+   MNTDDRVs="`echo -n "$ONEMNTD" | cut -b 1-4` "
+   ;;
+  mmc*)
+   MNTDDRVs="`echo -n "$ONEMNTD" | cut -b 1-7` "
+   ;;
+ esac
+ #prints to system log and to stderr...
+ [ "`echo "$ALLDRVS" | grep "$MNTDDRVs"`" = "" ] && logger -s "PROBEDISK ERROR: MOUNTED UNPLUGGED $ONEMNTD"
+done
+
+###END###

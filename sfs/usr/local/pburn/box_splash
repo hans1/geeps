@@ -1,0 +1,28 @@
+#! /bin/sh
+
+#reset gtk-theme
+if [ -f /etc/gtk-2.0/gtkrc ]; then
+	export GTK2_RC_FILES=':/etc/gtk-2.0/gtkrc' #/etc/gtk-2.0/gtkrc is for < Puppy4
+else
+	export GTK2_RC_FILES="`grep -m 1 gtkrc $HOME/.gtkrc-2.0 | cut -d'\"' -f2 2> /dev/null`" #get active theme
+fi
+#---
+
+echo 0 > $WORKDIR/splash #reset progressbar
+SPLASH=`cat $WORKDIR/splash_image`
+export pburn_splash='
+<window title="Pburn" icon-name="gtk-cdrom" resizable="false">
+<vbox>
+ <frame>
+  '"$SPLASH
+  <text use-markup=\"true\"><label>\"<b><span size='"'x-large'"'>P</span><span size='"'x-large'"' color='"'#B6661F'"'>burn</span> $VERSION</b>\"</label></text>
+  <text><input file>$WORKDIR/splashtext</input></text>
+ </frame>
+ <progressbar>
+  <label>Sigmund Berglund,   GPL 2007-2012</label>
+  <input>"'while [ "$M" != "100" ]; do M=`cat '"$WORKDIR"'/splash`; echo $M; usleep 500000; done</input>
+  <action type="exit">Ready</action>
+ </progressbar>
+</vbox></window>'
+$GTKDIALOG -p pburn_splash --center
+

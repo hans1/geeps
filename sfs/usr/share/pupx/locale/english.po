@@ -1,0 +1,34 @@
+#!/bin/sh
+# translation file for pupx
+# language en_US
+
+# window title
+export LOC_MAIN="pupX: set properties of X"
+# tabs
+export LOC_TABS="Mouse|Keyboard|Screensaver"
+# mouse tab
+export LOC_ACCEL="Acceleration:"
+export LOC_ACCEL_TEXT="The mouse will accelerate with this factor when moved more than 'threshold' pixels in a short time"
+export LOC_THRESHOLD="Threshold:"
+export LOC_THRESHOLD_TEXT="Acceleration will happen when the mouse is moved this many pixels in a short time"
+# keyboard tab
+export LOC_VOLUME="Volume:"
+export LOC_KEYCLICK="Keyclick volume in percentage (0-100)"
+export LOC_AUTOREPEAT="Auto-repeat"
+export LOC_ENABLE_AR="Enable auto-repeat"
+export LOC_DELAY="Delay:"
+export LOC_MSEC="(milliseconds)       "
+export LOC_DELAY_HINT="This is the delay before keys start repeating"
+export LOC_RATE="Rate:"
+export LOC_REPEATS="(repeats per second)       "
+export LOC_REPEAT_HINT="This is the rate at which keys repeat"
+# screensaver tab
+export LOC_ENABLE_SS="Enable screen saver"
+export LOC_SECONDS="(seconds)       "
+export LOC_SECONDS_HINT="This is the delay before screensaver is activated"
+export LOC_CYCLE="Cycle:"
+export LOC_INTERVAL="This is the interval for change of background pattern"
+export LOC_BLANK="Blank the screen rather than display a pattern"
+export LOC_EXPOSE="Allow exposures"
+# buttons
+export LOC_APPLY="Apply"

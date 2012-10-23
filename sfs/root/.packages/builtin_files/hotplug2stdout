@@ -1,0 +1,4 @@
+/sbin
+ cddetect_quick
+ hotplug2stdout
+ hotplug2stdout_notimeout

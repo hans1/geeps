@@ -1,0 +1,15 @@
+/usr
+/usr/bin
+ dc1394_reset_bus
+ dc1394_vloopback
+/usr/include
+/usr/include/dc1394
+/usr/include/dc1394/juju
+/usr/include/dc1394/macosx
+/usr/include/dc1394/usb
+/usr/lib
+ libdc1394.so
+ libdc1394.so.22
+ libdc1394.so.22.1.6
+/usr/man
+/usr/man/man3

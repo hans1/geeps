@@ -1,0 +1,24 @@
+#!/bin/sh
+# $Id: dumphint,v 1.1.4.1 2003/12/12 22:07:58 giles Exp $
+# Linearized PDF hint formatting utility.
+gs="`dirname $0`/gs"
+if test ! -x "$gs"; then
+	gs=gs
+fi
+
+OPTIONS="-dSAFER -dDELAYSAFER"
+while true
+do
+	case "$1" in
+	-*) OPTIONS="$OPTIONS $1" ;;
+	*)  break ;;
+	esac
+	shift
+done
+
+if [ $# -ne 1 ]; then
+	echo "Usage: `basename $0` input.pdf" 1>&2
+	exit 1
+fi
+
+exec "$gs" -q -dNODISPLAY $OPTIONS -- dumphint.ps "$1"

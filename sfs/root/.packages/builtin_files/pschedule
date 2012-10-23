@@ -1,0 +1,16 @@
+/usr
+/usr/local
+/usr/local/bin
+ pschedule
+/usr/local/pschedule
+ box_ok
+ func_cron_to_human
+ func_delete
+ func_human_to_cron
+ func_new
+ func_run
+/usr/local/pschedule/locals
+ en_US:english
+/usr/share
+/usr/share/applications
+ pschedule.desktop

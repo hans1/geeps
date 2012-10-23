@@ -1,0 +1,271 @@
+#!/bin/sh
+#################################################################################
+#
+#	File:			pdf-writer
+#
+#	Description: 	A simple PDF Writer for CUPS 
+#
+#	Copyright:		(c) 2007  Andrew R (jcoder24 on puppylinux forum)
+#	          		(c) 2006  Axel Schmidt,  SUSE LINUX GmbH, Nuernberg, Germany
+#				    (c) 2001  Michael Goffioul (kdeprint <at> swing <dot> be)
+#
+#	License:		GPL
+#
+#################################################################################
+#100411 fix: rcrsn51 http://murga-linux.com/puppy/viewtopic.php?t=54294&start=15
+
+#------------------------
+# BEGIN jcoder24
+#------------------------
+set_filename()
+{
+	if [ "$CONVERT_SPACES" = "YES" ]; then
+		fname="`basename \"$FILENAME\" | gawk '{ gsub (\"[ ]+\",\"_\",$0); print $0 }'`"
+		FILENAME="$PDFPATH/$fname"
+		logger "pdf-writer: set_filename fname:$fname Filename:$FILENAME"
+	fi
+}
+#------------------------
+# END jcoder24
+#------------------------
+
+PS2PDF=`which ps2pdf`
+DEFGROUP="users"
+PREFS=".pdfwriter.conf" #jcoder24
+JOB=$1
+PRTUSER=$2
+PRTFILE=$3
+
+# Check DEVICE DISCOVERY + test PS2PDF 
+#100411 replace 'unkown' with 'PDF'...
+if [ "$JOB" = "" ]; then
+        if [ -f "$PS2PDF" ]; then
+                echo "file pdf-writer:/dev/null \"PDF\" \"pdf writer\" " 
+                exit 0  
+        else
+                echo "Error: $0 - ps2pdf is not available!"      
+                logger "pdf-writer: ERROR: ps2pdf is not available!"      
+                exit 1 
+        fi 
+fi
+
+logger "pdf-writer started: $1 $2 $3 $4 $5 $6"
+
+# Check number of command line arguments
+#
+if [ $# -ne 5 -a $# -ne 6 ]; then
+        echo "Usage: $0 job-id user title copies options [file]"
+        logger "pdf-writer: CRITICAL: Printer stopped !"      
+        exit 1
+fi
+
+#------------------------
+# BEGIN jcoder24
+#------------------------
+
+# initialise variables
+LOCALE="`locale | grep LANG | cut -f 2 -d =`"
+REMOTE_OR_TEST="FALSE"
+PUPPY_LINUX=`uname -a | grep -ic puppy`
+
+# set path so our script can find all necessary utilites
+export PATH=$PATH:/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/X11R7/bin
+
+# determine user's home directory
+if [ "$PRTUSER" = "root" ]; then
+	FOLDER="/root"
+else
+	FOLDER="/home/$PRTUSER"
+
+	# if $FOLDER does not exists or user="", we are probably printing remotely
+	if [ ! -d "$FOLDER" -o -z "$PRTUSER" ]; then
+		REMOTE_OR_TEST="TRUE"
+	fi
+fi
+
+# get user settings from preferences file
+PREF_FILE="$FOLDER/$PREFS"
+if [ ! -f "$PREF_FILE" ];then
+	MRUD="$FOLDER"
+	NOTIFY_ON="YES"
+	NOTIFY_TIME="4000"
+	NOTIFY_MSG="FULL"
+	USE_XWINDOWS="YES"
+	CONVERT_SPACES="NO"
+	SHARED_DIR="/export/pdfs"
+	
+	echo "MRUD:$MRUD" > $PREF_FILE
+	echo "NOTIFY_ON:$NOTIFY_ON" >> $PREF_FILE
+	echo "NOTIFY_TIME:$NOTIFY_TIME" >> $PREF_FILE
+	echo "NOTIFY_MSG:$NOTIFY_MSG" >> $PREF_FILE
+	echo "USE_XWINDOWS:$USE_XWINDOWS" >> $PREF_FILE
+	echo "CONVERT_SPACES:$CONVERT_SPACES" >> $PREF_FILE
+	echo "SHARED_DIR:$SHARED_DIR" >> $PREF_FILE
+	
+    chmod 0666 $PREF_FILE
+    chown $PRTUSER:$DEFGROUP $PREF_FILE
+else
+	MRUD="`grep MRUD $PREF_FILE | cut -f 2 -d :`"
+	NOTIFY_ON="`grep NOTIFY_ON $PREF_FILE | cut -f 2 -d :`"
+	NOTIFY_TIME="`grep NOTIFY_TIME $PREF_FILE | cut -f 2 -d :`"
+	NOTIFY_MSG="`grep NOTIFY_MSG $PREF_FILE | cut -f 2 -d :`"
+	USE_XWINDOWS="`grep USE_XWINDOWS $PREF_FILE | cut -f 2 -d :`"
+	CONVERT_SPACES="`grep CONVERT_SPACES $PREF_FILE | cut -f 2 -d :`"
+	SHARED_DIR="`grep SHARED_DIR $PREF_FILE | cut -f 2 -d :`"
+fi
+
+# determine default filename based on the one was passed in to cups
+DEF_FILE=`echo $PRTFILE | gawk '{ if (toupper($0) ~ /STDIN/) { print "" } else { gsub ("[^ A-Za-z0-9_.-]+","",$0); print $0 }}'`
+
+if [ "$MRUD" = "/" ]; then
+	[ ! -z "$DEF_FILE" ] && DEF_FILE="$DEF_FILE.pdf"
+else
+	[ ! -z "$DEF_FILE" ] && DEF_FILE="/$DEF_FILE.pdf"
+fi
+
+# determine filename when running in normal|xwindows mode
+if [ "$USE_XWINDOWS" != "NO" -a "$REMOTE_OR_TEST" = "FALSE" ]; then
+
+	# setup env variables are needed by Xdialog
+	export DISPLAY=":0.0"
+	export XAUTHORITY="$FOLDER/.Xauthority"
+
+	#if we are are not using puppylinux and ~/.Xauthority does not exists, exit gracefully with warning
+	if [ "$REMOTE_OR_TEST" != "TRUE" -a ! -f "$XAUTHORITY" -a $PUPPY_LINUX -eq 0 ]; then
+		logger "pdf-writer: WARNING: $XAUTHORITY not found! Switch to console mode!"
+		exit 0
+	fi
+
+	# fix problem with unsupported/missing locales
+	if [ ! -z "$LOCALE" -a ! -d "/usr/lib/locale/$LOCALE" ]; then
+		export LANG="C"
+		export LC_ALL="C"
+	fi
+
+	LOOP="TRUE"
+	until [ $LOOP = "FALSE" ]; do
+		#get filename from user
+		FILENAME=`Xdialog --title "PDF-Writer - Save As..." --fselect "$MRUD$DEF_FILE" 28 60 2>&1 | tail -1`
+
+		#if gtk error issue warning and exit 1 (stop printer depending on options set by user)
+		if [ `echo $FILENAME | grep -ice "Gtk-WARNING" -e "Gtk-CRITICAL"` -gt 0 ]; then
+			logger "pdf-writer: WARNING: gtk error! Troubleshoot or switch to console mode!"
+			exit 1
+
+		#if empty filename, the user cancelled
+		elif [ -z "$FILENAME" ]; then
+			FILENAME=""
+			break
+
+		#remove .pdf extension if supplied
+		else
+			FILENAME="`echo $FILENAME | gawk '{gsub (/\.pdf$|\.PDF$/,"",$0); print $0'}`"
+		fi
+
+		#remove any illegal characters entered by user
+		FILENAME=`echo $FILENAME | gawk '{ if (toupper($0) ~ /STDIN/) { print "" } else { gsub ("[^ A-Za-z0-9/_.-]+","",$0); print $0 ".pdf"}}'`
+
+		PDFPATH="`dirname \"$FILENAME\"`" 
+		set_filename
+
+		#if selected file exists ask user if to overwrite
+		if [ -f "$FILENAME" ]; then 
+			Xdialog --title "File exists" --yesno "Overwrite file?" 6 40
+			if [ $? -eq 0 ]; then LOOP="FALSE"; fi
+		else
+			LOOP="FALSE"
+		fi
+	done
+
+	#if user choses not to save file, exit gracefully
+	if [ -z "$FILENAME" -a "$NOTIFY_ON" = "YES" ]; then
+		Xdialog --left --title "PDF-Writer" --infobox "Print Job Cancelled" 6 30 4000
+		logger "pdf-writer: INFO: JOB $JOB aborted by $PRTUSER!"      
+		exit 0
+	fi
+
+#Determine filename when running in console mode
+else
+	if [ -z "$DEF_FILE" ]; then #filename = stdin
+		FILENAME="/`date +%Y%m%d-%H%M-%S`.pdf"
+	else
+		FILENAME="$DEF_FILE"
+	fi
+	
+	if [ "$REMOTE_OR_TEST" = "TRUE" ]; then
+		if [ ! -d "$SHARED_DIR" ]; then
+			mkdir -p "$SHARED_DIR"
+			chmod root:$DEFGROUP "$SHARED_DIR"
+		fi
+		
+		FILENAME="$SHARED_DIR$FILENAME"
+	else
+		FILENAME="$MRUD$FILENAME"
+	fi
+
+	PDFPATH="`dirname \"$FILENAME\"`" 
+	set_filename
+		
+	#If file exists, append timestamp
+	if [ -f "$FILENAME" ]; then
+		FILENAME="`echo $FILENAME | gawk '{ print substr($0,0,length($0)-4) }'`"
+		FILENAME="$FILENAME-`date +%Y%m%d-%H%M-%S`.pdf"
+	fi
+
+	logger "pdf: REMOTE_OR_TEST: Printed $FILENAME"
+fi
+
+#------------------------
+# END jcoder24
+#------------------------
+
+# Check write status 
+#
+if [ ! -d "$PDFPATH" -o ! -w "$PDFPATH" ]; then
+        logger "pdf-writer: ERROR: directory \"$PDFPATH\" not writeable"
+        exit 1
+fi
+
+# Run ps2pdf (ghostscript)
+#
+if [ $# -eq 6 ]; then
+        $PS2PDF $6 "$FILENAME" #>& /dev/null #jcoder24 enclosed filename in "" and commented out redirection
+else
+        $PS2PDF - "$FILENAME" #>& /dev/null #jcoder24 enclosed filename in "" and commented out redirection
+fi
+
+# Chown + set permissions for the user 
+# Note: this will not work if CUPS runs as lp
+if [ "$PRTUSER" != "" ]; then
+        chmod 644 "$FILENAME"  #jcoder24 enclosed filename in ""
+        chown $PRTUSER:$DEFGROUP "$FILENAME" #jcoder24 enclosed filename in ""
+fi
+
+#------------------------
+# BEGIN jcoder24
+#------------------------
+
+# update settings with 'new' MRUD settings
+if [ "$USE_XWINDOWS" = "YES" ]; then
+	cp $PREF_FILE $PREF_FILE.bak
+	gawk -F: -v pdfpath="$PDFPATH" '{ if (/MRUD/) {print $1 ":" pdfpath} else {print $0} }' $PREF_FILE.bak > $PREF_FILE
+	rm $PREF_FILE.bak
+fi
+
+# notify user of job completion if turned on
+if [ "$NOTIFY_ON" = "YES" -a "$USE_XWINDOWS" = "YES" -a "$REMOTE_OR_TEST" != "TRUE" ]; then
+	if [ "$NOTIFY_MSG" = "FULL" ]; then
+		Xdialog --left --title "PDF-Writer" --infobox "Created: $FILENAME" 6 0 $NOTIFY_TIME
+	else
+		Xdialog --left --title "PDF-Writer" --infobox "Created: `basename \"$FILENAME\"`" 6 0 $NOTIFY_TIME
+	fi
+fi
+#------------------------
+# END jcoder24
+#------------------------
+
+exit 0
+
+#
+#########################  CUPS pdf-writer ends here  ########################
+#

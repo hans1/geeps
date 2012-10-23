@@ -1,0 +1,8 @@
+/root
+ .rxvt.menu
+/usr
+/usr/bin
+ urxvt
+/usr/share
+/usr/share/applications
+ Urxvt-terminal-emulator.desktop

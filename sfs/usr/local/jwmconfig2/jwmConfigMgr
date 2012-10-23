@@ -1,0 +1,126 @@
+#!/bin/sh
+#based on the original jwmConfigMgr developed by 'thoughtjourney' 2005.
+#removed gtktheme section for lupu 01micko 20101212
+
+
+##--------variables---------->>
+SCRIPT_DIR="/usr/local/jwmconfig2"
+MINI_ICONS_DIR="/usr/local/lib/X11/mini-icons"
+HOME_DIR="/root/.jwm"
+echo "SCRIPT_DIR='${SCRIPT_DIR}'" > /tmp/JWMCONFIGVARS
+echo "MINI_ICONS_DIR='${MINI_ICONS_DIR}'" >> /tmp/JWMCONFIGVARS
+echo "HOME_DIR='${HOME_DIR}'" >> /tmp/JWMCONFIGVARS
+
+
+export JWM_Display="
+<window title=\"JWM Configuration Manager\" icon-name=\"gtk-preferences\" window-position=\"1\">
+ <vbox>
+  <notebook labels=\"JWM|Desktop\">
+   <vbox>
+    <hbox>
+     <text>
+      <label>Choose a JWM theme</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini.window3d.xpm</input>
+      <action>$SCRIPT_DIR/theme_switcher &</action>
+     </button>
+    </hbox>
+    <hbox>
+     <text>
+      <label>Tray management</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini-maxwide.xpm</input>
+      <action>$SCRIPT_DIR/taskbar &</action>
+     </button>
+    </hbox>
+    <hbox>
+     <text>
+      <label>Window focus Model</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini-windows.xpm</input>
+      <action>$SCRIPT_DIR/focusModel &</action>
+     </button>
+    </hbox>
+    <hbox>
+     <text>
+      <label>Keyboard Shortcuts</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini-keyboard.xpm</input>
+      <action>$SCRIPT_DIR/keyboard &</action>
+     </button>
+    </hbox>
+    <hbox>
+     <text>
+      <label>Application launch buttons in tray</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/Executable.xpm</input>
+      <action>$SCRIPT_DIR/panel-buttons &</action>
+     </button>
+    </hbox>
+   </vbox>
+   <vbox>
+    <hbox>
+     <text>
+      <label>GTK Theme</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini.window3d.xpm</input>
+      <action>gtk-chtheme &</action>
+     </button>
+    </hbox>
+    <hbox>
+     <text>
+      <label>Desktop Background</label>
+     </text>
+     <button>
+      <input file>$MINI_ICONS_DIR/mini-cave.xpm</input>
+      <action>wallpaper &</action>
+     </button>
+    </hbox>
+   </vbox>
+  </notebook>
+  <frame Important!>
+   <hbox>
+    <pixmap>
+     <input file>$MINI_ICONS_DIR/info16.xpm</input>
+    </pixmap>
+    <text>
+     <label>Some of the above actions require JWM to be restarted for changes to take effect</label>
+    </text>
+   </hbox>
+   <hbox>
+    <text>
+     <label>Restart JWM now?</label>
+    </text>
+    <button yes>
+     <action>jwm -restart &</action>
+    </button>
+   </hbox>
+  </frame>
+  <hbox>
+   <button help>
+    <action>xmessage -buttons Exit -bg black -fg green -name 'jwmConfigMgr HELP' -center 'JWM is a Window Manager. It controls the behaviour and appearance of the windows and the tray.' &</action>
+   </button>
+   <button>
+    <label>Exit</label>
+    <input file stock=\"gtk-quit\"></input>
+    <action>EXIT:ok</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>
+"
+##------------run------------->>
+gtkdialog3 --program JWM_Display
+
+##----------cleanup------------>>
+unset JWM_Display
+
+#clear
+exit 0
+

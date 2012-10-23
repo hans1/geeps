@@ -1,0 +1,142 @@
+#!/bin/sh
+#Pmusic
+#Copyright, Sigmund Berglund
+
+. $APPDIR/func -reset_gtk
+
+echo 0 > $WORKDIR/radio_splash
+echo "Pmusic" > $WORKDIR/radio_progresstext #text in progressbar
+echo -n > $WORKDIR/radio_tmp2
+
+build_db (){
+	#check internet connection
+	echo "$LOC492" > $WORKDIR/radio_progresstext
+	LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/tmp
+	if [ ! "`grep 'connected' $WORKDIR/tmp`" ]; then
+		TXT1="<b>$LOC669</b>"
+		. $APPDIR/box_ok
+		exit
+	fi
+
+### We use a static tag file instead - Keep this code for later updates
+###	echo -n > $WORKDIR/radio-tags
+###	echo -n > $WORKDIR/radio-country
+	echo -n > $HOME/.pmusic/index_radio
+
+	#download updated 
+	echo "www.radiosure.com" > $WORKDIR/radio_progresstext
+	LANG=C wget --tries=1 -O $WORKDIR/radio_sure.zip http://www.radiosure.com/rsdbms/stations2.zip
+	unzip -p $WORKDIR/radio_sure.zip > $WORKDIR/radio_wget
+	#pre-formating
+	cat $WORKDIR/radio_wget | tr -s "\t" '|' > $WORKDIR/radio_tmp2
+	grep -iE "m3u|mp3|pls|ogg|winamp|:....\|" $WORKDIR/radio_tmp2 > $WORKDIR/radio_tmp3
+	#---
+	echo -n > $WORKDIR/radio_tmp2
+	echo -n > $WORKDIR/radio_radiosure_tags
+	echo -n > $WORKDIR/radio_radiosure_country
+	#for percent
+	COUNT=0
+	TOTAL="`grep -c ^ $WORKDIR/radio_tmp3`"
+	#---
+	while read I; do
+		RADIO_NAME="`echo "$I" | cut -d'|' -f1`"
+		RADIO_TAG="`echo "$I" | cut -d'|' -f3 | sed  "s/^ //"`"
+		RADIO_COUNTRY="`echo "$I" | cut -d'|' -f4`"
+		#URL
+		RADIO_PATH="`echo "$I" | cut -d'|' -f6`"
+		[ ! "`echo "$RADIO_PATH" | grep -iE "m3u|mp3|pls|ogg|winamp|:....$" | grep -viE "winstream|asx|mms:"`" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f7`"
+		[ ! "`echo "$RADIO_PATH" | grep -iE "m3u|mp3|pls|ogg|winamp|:....$" | grep -viE "winstream|asx|mms:"`" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f8`"
+		[ ! "`echo "$RADIO_PATH" | grep -iE "m3u|mp3|pls|ogg|winamp|:....$" | grep -viE "winstream|asx|mms:"`" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f9`"
+		[ ! "`echo "$RADIO_PATH" | grep -iE "m3u|mp3|pls|ogg|winamp|:....$" | grep -viE "winstream|asx|mms:"`" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f10`"
+		[ ! "`echo "$RADIO_PATH" | grep -iE "m3u|mp3|pls|ogg|winamp|:....$" | grep -viE "winstream|asx|mms:"`" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f11`"
+		[ "$RADIO_PATH" = "-" ] && RADIO_PATH="`echo "$I" | cut -d'|' -f6`" #no match --> go for the first alternative
+		#---
+		echo "  ${RADIO_PATH}|${RADIO_NAME}|${RADIO_TAG}||${RADIO_COUNTRY}" >> $WORKDIR/radio_tmp2 #tmp2 is used by progressbar
+###		[ ! "`grep "$RADIO_TAG" $WORKDIR/radio_radiosure_tags`" ] && echo "  radio:$RADIO_TAG|$RADIO_TAG" >> $WORKDIR/radio_radiosure_tags
+###		if [ ! "`grep "$RADIO_COUNTRY" $WORKDIR/radio_radiosure_country`" ]; then #some seems to be misplaced
+###			echo "  radio:$RADIO_COUNTRY|$RADIO_COUNTRY" >> $WORKDIR/radio_radiosure_country
+###		fi
+		COUNT=$(($COUNT+1))
+		echo $(($COUNT*98/$TOTAL)) > $WORKDIR/radio_splash #98 to prevent it to be 100% and close window
+	done < $WORKDIR/radio_tmp3
+	cat $WORKDIR/radio_tmp2 >> $HOME/.pmusic/index_radio
+###	sort -u -o $WORKDIR/radio-country $WORKDIR/radio_radiosure_country
+###	sort -u -o $WORKDIR/radio-tags $WORKDIR/radio_radiosure_tags
+	rm $WORKDIR/radio_*
+	$APPDIR/func -radio -country
+	echo 100 > $WORKDIR/radio_splash
+	echo true > $WORKDIR/SWITCH_SOURCELIST_UPDATE
+}
+
+install_index (){
+	echo "$LOC495" > $WORKDIR/splashtext
+	$APPDIR/box_splash &
+	#check internet connection
+	LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/tmp
+	if [ ! "`grep 'connected' $WORKDIR/tmp`" ]; then
+		sleep 0.2
+		TXT1="<b>$LOC669</b>"
+		. $APPDIR/box_ok
+		echo 100 > $WORKDIR/splash
+		exit
+	fi
+	#---
+	rm $HOME/.pmusic/index_radio
+	wget --tries=1 --user $FTP_USER --password $FTP_PASSWORD --output-document=$HOME/.pmusic/index_radio.gz "$FTP_SERVER/pmusic_index_radio.gz"
+	gunzip $HOME/.pmusic/index_radio.gz
+	$APPDIR/func -radio -country
+	echo 100 > $WORKDIR/splash
+	echo true > $WORKDIR/SWITCH_SOURCELIST_UPDATE
+}
+
+export -f build_db install_index
+
+export pmusic_radio='
+<window title="Pmusic - '$LOC222' '$LOC_SETUP'" icon-name="pmusic">
+<vbox>
+ <notebook labels=" '$LOC_INSTALL' | '$LOC_ADVANCED' ">
+ <frame>
+  <text height-request="120"><label>"'$LOC490'"</label></text>
+  <hbox homogeneous="true"><hbox>
+   <button>
+    <variable>BUTTON_INSTALL</variable>
+    <input file stock="gtk-apply"></input>
+    <label>'$LOC_INSTALL'</label>
+    <action>install_index</action>
+    <action>EXIT:exit</action>
+   </button>
+  </hbox></hbox>
+ </frame>
+ <frame>
+  <text><label>"'$LOC491'"</label></text>
+  <progressbar>
+   <input>while [ "$I" != "100" ]; do I=`cat '$WORKDIR'/radio_splash`; J=`cat '$WORKDIR'/radio_progresstext`; [ -f '$WORKDIR'/radio_tmp2 ] && NR=`grep -c ^ '$WORKDIR'/radio_tmp2`; echo $I; echo "$J (${I}% - $NR added)"; usleep 500000; done</input>
+   <action type="exit">cancel</action>
+  </progressbar>
+  <hbox homogeneous="true"><hbox>
+   <button>
+    <variable>BUTTON_BUILD</variable>
+    <label>'$LOC637'</label>
+    <action>build_db &</action>
+    <action>disable:BUTTON_BUILD</action>
+    <action>disable:BUTTON_INSTALL</action>
+   </button>
+   </hbox></hbox>
+  </frame>
+ </notebook>
+ <hbox>
+  <text use-markup="true"><label>"<b>'$LOC316':</b>"</label></text>
+  <text><input>find $HOME/.pmusic/index_radio -printf "%Td.%Tb %TY   (%TH:%TM)"</input></text>
+  <text use-markup="true"><label>"  <b>'$LOC222':</b>"</label></text>
+  <text><input>"grep -c ^ $HOME/.pmusic/index_radio"</input></text>
+  <button cancel></button>
+ </hbox>
+</vbox>
+<action signal="hide">exit:cancel</action>
+</window>'
+$GTKDIALOG -p pmusic_radio
+
+#kill backends
+TMP="`ps`"
+for I in `echo "$TMP" | grep -F 'build_db &' | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+echo 100 > $WORKDIR/radio_splash #end loop

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Default-Programs-Chooser
+Icon=pet48.png
+Comment=Default-Programs-Chooser
+Exec=defaults-chooser
+Terminal=false
+Type=Application
+Categories=PackageManager
+GenericName=Default-Program-Chooser

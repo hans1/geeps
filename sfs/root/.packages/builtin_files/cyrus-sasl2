@@ -1,0 +1,37 @@
+/etc
+/etc/rc.d
+ rc.saslauthd
+ .wh.rc.saslauthd.new
+/usr
+/usr/lib
+ libsasl2.so
+ libsasl2.so.2
+ libsasl2.so.2.0.23
+/usr/lib/sasl2
+ libcrammd5.so
+ libcrammd5.so.2
+ libcrammd5.so.2.0.23
+ libdigestmd5.so
+ libdigestmd5.so.2
+ libdigestmd5.so.2.0.23
+ liblogin.so
+ liblogin.so.2
+ liblogin.so.2.0.23
+ libotp.so
+ libotp.so.2
+ libotp.so.2.0.23
+ libplain.so
+ libplain.so.2
+ libplain.so.2.0.23
+ libsasldb.so
+ libsasldb.so.2
+ libsasldb.so.2.0.23
+/usr/sbin
+ pluginviewer
+ saslauthd
+ sasldblistusers2
+ saslpasswd2
+ testsaslauthd
+/var
+/var/state
+/var/state/saslauthd

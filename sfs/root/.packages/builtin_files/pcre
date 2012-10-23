@@ -1,0 +1,14 @@
+/usr
+/usr/bin
+ pcregrep
+ pcretest
+/usr/lib
+ libpcrecpp.so
+ libpcrecpp.so.0
+ libpcrecpp.so.0.0.0
+ libpcreposix.so
+ libpcreposix.so.0
+ libpcreposix.so.0.0.0
+ libpcre.so
+ libpcre.so.0
+ libpcre.so.0.0.1

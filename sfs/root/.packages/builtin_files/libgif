@@ -1,0 +1,11 @@
+/usr
+/usr/lib
+ libgif.so
+ libgif.so.0
+ libgif.so.3
+ libgif.so.4
+ libgif.so.4.1.6
+ libungif.so
+ libungif.so.0
+ libungif.so.3
+ libungif.so.4

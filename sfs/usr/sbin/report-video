@@ -1,0 +1,130 @@
+#!/bin/sh
+# 2010-04 TazOC, Graphics Information from CL/GUI, based on report-video by Barry Kauler
+#100928 Added /tmp/$USER/report-video-full with xorg.conf and Xorg log. Should work on any Woof-based system. -q or --quiet for no GUI.
+#110417 L64 updates
+#110615 Better driver detection
+#110719 #110615 again
+#110910 Driver detection fix for Xorg 1.9.5
+#120221 Driver detection fix for Xorg 1.9.5+ take2
+#120319 Add -shsort option
+
+APPTITLE="Report-video 0.6-1"
+APPNAME="report-video"
+ICON="/usr/share/icons/report-video.png"
+
+. /etc/DISTRO_SPECS
+SYSDATE="`date +'%y%m%e'`" # yymmdd
+
+mkdir -p "/tmp/$USER/" #100928 might want to run as non-root
+XORGCONF_PRESENT="yes"
+XORGCONF="\n=== /etc/X11/xorg.conf ==="; XORGLOG="\n=== /var/log/Xorg.0.log ==="
+[ ! -e /etc/X11/xorg.conf ] && XORGCONF="=== /etc/X11/xorg.conf not present ===\n" && XORGCONF_PRESENT="no"
+[ ! -e /var/log/Xorg.0.log ] && XORGLOG="=== /var/log/Xorg.0.log not present ===\n"
+
+#if [ "`which scanpci`" != "" ];then
+# GRAPHICSCHIP="`scanpci | grep -i -E 'graphic|video|display'`"
+#else
+ GRAPHICSCHIP="`lspci | grep VGA | tr '\n' '|' | sed 's%|%  %g' | sed -e 's%0[0-9]:0%%g' | tr ':' '\n'`" #110417 
+#fi
+#if [ "$GRAPHICSCHIP" = "" ];then
+ if [ -f /tmp/ddcprobe.txt ];then
+  GRAPHICSCHIP="$GRAPHICSCHIP\n`cat /tmp/ddcprobe.txt | grep -E '^oem: |^product: '`"
+ else
+  GRAPHICSCHIP="$GRAPHICSCHIP\n`ddcprobe | grep -E '^oem: |^product: '`"
+ fi
+#fi
+[ -s /var/log/Xorg.0.log ] && CHIPSET="`cat /var/log/Xorg.0.log | grep 'Chipset:' | cut -f 2 -d '"'`" #TazOC'
+[ -z "$GRAPHICSCHIP" ] && GRAPHICSCHIP="$CHIPSET" #110417
+[ "$GRAPHICSCHIP" = "" ] && GRAPHICSCHIP="unknown"
+
+# TazOC Some old driver tag cleanup, may not be necessary anymore
+if [ -s /etc/X11/xorg.conf ] && [ -n "`grep ' #card0driver' /etc/X11/xorg.conf`" ]; then #110719
+ sed -i -e "s/^ #card0driver$//" /etc/X11/xorg.conf #TazOC
+ sed -i -e "s/#card0driver #card0driver/#card0driver/" /etc/X11/xorg.conf #TazOC
+ sed -i -e  '/./,/^$/!d' /etc/X11/xorg.conf #TazOC removes consecutive blank lines
+fi
+
+XSERVER="`readlink /usr/bin/X`"
+[ "$XSERVER" = "Xvesa" ] && VIDEODRIVER="Xvesa" #110417
+[ -z "$VIDEODRIVER" ] && VIDEODRIVER="`grep -m1 ' #card0driver' /etc/X11/xorg.conf | grep -v '#Driver ' || cat /var/log/Xorg.0.log | grep vendor= | grep -v X.Org | sed "s%drm%%"`" #110529 #110615 #110719
+[ -n "$VIDEODRIVER" ] && VIDEODRIVER="`echo $VIDEODRIVER | sed -e 's% #card0driver%%' -e 's%^\[.*) %%' -e 's%Driver %%' -e 's%Module %%' | tr -d '"'`" #'geany
+
+if [ -z "$VIDEODRIVER" ]; then #110910
+ [ -z "$VIDEODRIVER" ] && VIDEODRIVER="`cat /var/log/Xorg.0.log | grep 'Chipset:' | head -1`" #110910
+ [ -z "$VIDEODRIVER" ] && VIDEODRIVER="`grep 'ScreenInit' /var/log/Xorg.0.log`" #110417
+ [ -z "$VIDEODRIVER" ] && VIDEODRIVER="`grep 'Total Memory' /var/log/Xorg.0.log`"  #110417
+ [ -z "$VIDEODRIVER" ] && VIDEODRIVER="`grep ' Configured Monitor' /var/log/Xorg.0.log`"  #110615
+ 
+ [ -n "$VIDEODRIVER" ] && VIDEODRIVER="`echo $VIDEODRIVER | tr '\n' ' ' | cut -f 2- -d ')' | cut -f 1 -d '(' | tr 'A-Z' 'a-z' | tr -d ' ' | tr -d '"'`" #'geany
+fi
+#[ "$VIDEODRIVER" = "" ] && VIDEODRIVER="`grep -E -i " connected|card detect|primary dev" /var/log/Xorg.0.log|cut -d ':' -f1|rev|cut -d ' ' -f1|rev|cut -d '(' -f1|tr '[:upper:]' '[:lower:]'|head -n1`"
+# double check if vesa, misreported
+#shinobar fix
+LOADED="`grep -o 'Loading .*xorg/modules/drivers/.*_drv.so' /var/log/Xorg.0.log | rev | cut -f 1 -d '/' | rev | cut -f 1 -d '_' | sort -u`" #111027 fix multiple hits.
+UNLOADED="`grep 'Unload' /var/log/Xorg.0.log | tr -d '"' | rev | cut -f1 -d' ' | cut -f1 -d'/' | rev | cut -f1 -d'_'| sort -u`"
+  # ' fix geany highlight
+  if [ "$UNLOADED" ]; then
+    # remove unloaded
+    # 'for' loop instead of 'grep -f' to be free from the busybox version
+    for D in $UNLOADED; do
+      LOADED=$(echo "$LOADED" | grep -vw "$D")
+    done
+  fi
+  VIDEODRIVER=$(echo "$LOADED"| tail -n1 )	# precaution
+ [ "$VIDEODRIVER" = "" ] && VIDEODRIVER="undetermined" # we tried!
+  echo "$VIDEODRIVER"
+[ "$VIDEODRIVER" = "# vesa" ] && VIDEODRIVER="`grep -E -i " connected|card detect|primary dev" /var/log/Xorg.0.log|cut -d ':' -f1|rev|cut -d ' ' -f1|rev|cut -d '(' -f1|tr '[:upper:]' '[:lower:]'|head -n1`"
+[ "$VIDEODRIVER" = "" ] && VIDEODRIVER="undetermined" # we tried!
+if [ "$XSERVER" = "Xorg" ] && [ "`ps -eo comm | grep ^X`" ]; then #110417
+ if [ `which xdpyinfo` ]; then
+  RANDR="`xdpyinfo | grep -E "version:|dimensions|depth of"`"
+ else
+  [ `which xrandr` ] && RANDR="`xrandr | grep '*'`"
+ fi
+fi
+
+if [ -r /etc/LHPVERSION ]; then #100928 Lighthouse
+VERSION="`cat /etc/LHPVERSION | tr -d '\n'`" # ex: 5.00-F
+else VERSION="`echo $DISTRO_VERSION`" #100928 Generic Pup ex: 500
+fi
+
+case $1 in #120319
+-short) echo $VIDEODRIVER ;;
+*)
+#Video mode used by Xorg: $VIDEORES  $VIDEODEPTH
+echo -e "$DISTRO_NAME, version $VERSION on `date +'%a %-e %b %Y'`
+
+Chip description:
+ $GRAPHICSCHIP
+ 
+X Server: $XSERVER
+Driver used: $VIDEODRIVER
+
+$RANDR " > "/tmp/${USER}/report-video" #TazOC
+
+echo -e "$XORGCONF" | cat "/tmp/${USER}/report-video" - /etc/X11/xorg.conf >"/tmp/${USER}/report-video-full" #100928 TazOC
+echo -e "$XORGLOG" | cat - /var/log/Xorg.0.log >> "/tmp/${USER}/report-video-full" #100928 TazOC
+
+sed -i '/./,/^$/!d' "/tmp/${USER}/report-video-full" # TazOC strip consecutive blank lines, allows 0 blanks at top, 1 at EOF
+cat "/tmp/${USER}/report-video-full" | gzip -f > "/tmp/${USER}/report-video-full.gz" #100928 TazOC
+
+cat "/tmp/${USER}/report-video" #TazOC
+echo
+echo "   ...the above also recorded in /tmp/${USER}/ as report-video," 
+echo "and archived with xorg.conf and Xorg.0.log as report-video-full.gz" 
+MSG="\n`cat  "/tmp/${USER}/report-video"`\n\n
+ ...the above also recorded in /tmp/${USER}/ as report-video, and  
+ gzipped with xorg.conf and Xorg.0.log as report-video-full.gz  
+"
+
+if [ "$(ps -eo comm | grep ^X)" -a "$1" != "-q" -a "$1" != "--quiet" ]; then # X is running
+   #100928  report-video -q or --quiet for no GUI
+   Xdialog --title "$APPTITLE" --wmclass "$APPNAME" --icon "$ICON" \
+           --fill --msgbox "$MSG" 0 0
+           
+   #[ "`which 3d-demo`" ] && 3d-demo & #100928 TazOC
+fi
+;;
+esac
+
+exit

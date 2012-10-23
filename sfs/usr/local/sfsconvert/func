@@ -1,0 +1,51 @@
+#!/bin/sh
+#SFS Converter - 3 to 4, 4 to 3
+#Trio Tjandradjaja - GPL 2009
+
+
+case $1 in
+-convert)
+
+[ ! "$SFS" ] && Xdialog --title "SFS Converter Splash" --msgbox "Please drag & drop an sfs" 10 40 && exit 0
+
+CHECKSFS=`echo $SFS | sed 's/^.*\.//'`
+BASENAME=`basename $SFS .sfs`
+if [ "$CHECKSFS" = "sfs" ]; then
+	TYPE=`disktype $SFS | grep 'version 4'`
+	if [ ! "$TYPE" ] ; then
+	Xdialog --title "SFS Converter Splash" --msgbox "Converting sfs v 3.x to 4.x
+	Please wait until this box is closed
+	Trio Tj - GPL 2009" 10 40 &
+	p=$!
+	cd $DIR
+	unsquashfs3 $SFS
+	mksquashfs4 "squashfs-root" "$BASENAME-sfs4.sfs"
+	rm -rf "squashfs-root"
+	md5sum "$BASENAME-sfs4.sfs" > "$BASENAME-sfs4.sfs-md5.txt"
+	kill $p
+	else
+	Xdialog --title "SFS Converter Splash" --msgbox "Converting sfs v 4.x to 3.x
+	Please wait until this box is closed
+	Trio Tj - GPL 2009" 10 40 &
+	p=$!
+	cd $DIR
+	unsquashfs4 $SFS
+	mksquashfs3 "squashfs-root" "$BASENAME-sfs3.sfs"
+	rm -rf "squashfs-root"
+	md5sum "$BASENAME-sfs3.sfs" > "$BASENAME-sfs3.sfs-md5.txt"
+	kill $p
+	fi
+else
+Xdialog --title "SFS Converter Splash" --msgbox "Not a valid sfs file" 10 40
+fi
+;;
+
+-version)
+Xdialog --title "SFS Version Info" --msgbox "INFO:
+	`disktype $SFS`" 15 50 &
+;;
+-help)
+defaulttextviewer /usr/local/sfsconvert/README.txt &
+;;
+
+esac

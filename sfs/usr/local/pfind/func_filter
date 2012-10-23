@@ -1,0 +1,36 @@
+#!/bin/bash
+FILTER=$1
+cp /tmp/pfind-view$PROGPID /tmp/pfind-tmp$PROGPID
+case $FILTER in
+	-Find_files_in_list)
+		FRAME="$LOC606"; IMG="find";
+		TXT1="$LOC607"
+		. "$PROGPATH"box_input
+		if [ $EXIT = "ok" ]; then
+			GREPSTRING=`echo "$INPUT" | sed -e 's/ \[/\[/g' | sed -e 's/\] /\]/g'` #remove some spaces
+			GREPSTRING=`echo "$GREPSTRING" | sed -e 's/\[OR\]/\\\|/g'` #convert to grep syntax
+			grep "('\|$GREPSTRING\|')" /tmp/pfind-tmp$PROGPID > /tmp/pfind-view$PROGPID
+		fi;;
+	-Remove_files_from_list)
+		FRAME="$LOC606"; IMG="clear";
+		TXT1="$LOC608"
+		. "$PROGPATH"box_input
+		if [ $EXIT = "ok" ]; then
+			GREPSTRING=`echo "$INPUT" | sed -e 's/ \[/\[/g' | sed -e 's/\] /\]/g'` #remove some spaces
+			GREPSTRING=`echo "$GREPSTRING" | sed -e 's/\[OR\]/\\\|/g'` #convert to grep syntax
+			grep -v "('\|$GREPSTRING\|')" /tmp/pfind-tmp$PROGPID > /tmp/pfind-view$PROGPID
+		fi;;
+	-Search_for_TEXT_in_files)
+		FRAME="$LOC606"; IMG="find";
+		TXT1="$LOC609"
+		. "$PROGPATH"box_input
+		if [ $EXIT = "ok" ]; then
+			GREPSTRING=`echo "$INPUT" | sed -e 's/\[OR\]/\\\|/g'` #convert to grep syntax
+			echo -e "\c" > /tmp/pfind-view$PROGPID
+			TMP=`sed -i -e "s/ /{ð®Sđþ}/g" /tmp/pfind-tmp$PROGPID`
+			for I in $TMP; do
+				TMP2=`echo $I | sed -e 's/{ð®Sđþ}/ /g'`
+				grep -il "$GREPSTRING" "$TMP2" >> /tmp/pfind-view$PROGPID
+			done
+		fi;;
+esac

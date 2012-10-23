@@ -1,0 +1,182 @@
+#!/bin/bash
+##Slickpet zh_CN 
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=chinese
+#translator=native
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="取消"
+export LOC_ERROR="错误"
+export LOC_WARNING="警告"
+export LOC_YES="是"
+export LOC_NO="否"
+export LOC_QUIT="退出"
+export LOC_HELP="帮助"
+export LOC_INFO="信息"
+export LOC_FILE="文件"
+
+#browser installer
+export LOC_001="欢迎来到"
+export LOC_002="请先连接到互联网，再选择浏览器。"
+export LOC_003="注意"
+export LOC_004="如果你的内存小于256 MB，推荐在安装浏览器前先创建个人文件。"
+export LOC_005="Generic Browser，轻巧快速 -已安装"
+export LOC_006="点击安装Firefox"
+export LOC_007="点击安装Seamonkey"
+export LOC_008="点击安装Chromium"
+export LOC_009="点击安装Opera"
+export LOC_010="点击设置Generic Browser为默认浏览器，它已内置在你的系统中。"
+
+#yaf messages
+export LOC_101="出错：无法下载。请先连接到互联网。"
+export LOC_102="请稍候 ..."
+export LOC_103="错误：更新站点没有响应。请检查网络连接并重试。"
+export LOC_104="你的Slacko Puppy是目前最新的"
+export LOC_105="现在没有Slacko Puppy的更新"
+export LOC_106a="请稍候正在"
+export LOC_106b="下载中。然后，您会被要求确认安装"
+export LOC_107="连接超时。请稍后再试"
+export LOC_108="错误：无法下载。请稍后再试。如果下载将开始恢复。"
+export LOC_109="错误：软件包无法安装，请再试一次"
+export LOC_110="安装成功"
+export LOC_111="Puppy Browser浏览器已设置为默认"
+export LOC_112="Slickpet正在运行中。请稍候..."
+export LOC_113="正在尝试探索你要的软件包，请稍候..."
+
+#xmessages
+export LOC_201="即将打开一个浏览器窗口为您提供一个用于
+SlackoPuppy的更新包。如果它没有出现，您的浏览器正在运行，
+请最大化。如果您运行的是您的默认浏览器PuppyBrowser，您
+需要拖动更新连接到下载图标，然后程序将自动开始下载。包默认
+保存在目录 /root、/root/Downloads或/root/my-documents
+下。您可以在浏览器偏好设定里进行更改。当包下载完成，导航到
+它的存储位置，并点击一次安装。你可以通过puppy软件包管理器
+卸载或更新包"
+export LOC_202="Welcome to Slacko Puppy's Slickpet
+	There are three main tabs for Pets, Puppy's package format Pets 
+are very straight forward. Once you make your selection and click the icon
+the pet package is downloaded from a Puppy repository. This may take some 
+time on slow connections so please be patient.Once it has arrived the 
+PPM (Puppy Package Manager) opens and asks some simple questions which, as 
+long as you select OK, will install your package ready for use. You will see 
+a Success message at the top of your screen.
+	There is a preferences feature which allows you to select the Puppy 
+repository that works best for you. If one doesn't work or is too slow
+you can change it to another one.
+    A Drivers tab is provided so that you can install an apropriate video
+driver for your specific hardware. For Nvidia there are other drivers in the 
+Puppy Package Manager in the Main Menu. For Radeon and Intel the Xorg High 
+Package is recommended. Some Radeon users may need the Radeon HD driver.
+	There is also an extra tab called Update. This is for Updating Slacko Puppy 
+with fixes and features and updating Slickpet itself as new programs become
+available for Slacko Puppy.
+	If you run into trouble there is a help file in the Support menu.
+	Don't forget you can install packages from the main Puppy Package 
+Manager from the main Puppy menu. Also Slacko Lynx debs can be installed.
+	Enjoy using Slacko Puppy"
+export LOC_203="Please note that the following entries are links to 
+applications compiled and prepared by Puppy Linux
+enthusiasts. No warranty is offerred. Most fall 
+under the Gnu GPL licence and it's variants. Most 
+of these programs are maintained regularly and 
+therefore are not suitable for hosting in a 
+repository. You will most often get the latest 
+stable version to keep your operating system 
+at the cutting edge.
+You must have a browser installed to use this 
+feature. Click the browse icon on the desktop
+to download and install a browser."
+export LOC_204="If Slickpet is failing for you there's no need to despair.
+You can click Slickpet on The Web and a web page will open so that you can download the 
+packages from weblinks. There is also access to the updates on that page. There are links 
+to other programs that are reported to work in Slacko Puppy in the More Programs tab.
+	You can change your download repository in the File menu, Preferences entry to a location closer 
+to you or a mirror that works better for you. Your choice is remembered.
+	Downloaded packages are stored within your pupsave/installation. You can see what is there 
+by clicking the Download Directory menu and move these packages if you wish. You can also clear 
+your Download Directory with the Clear Downloaded Packages menu entry.
+	There is also a menu for SFS files. These are special packages usually made from quite large 
+programs which can be installed with out using space in your pupsave. For more information click 
+the SFS Support menu entry.
+Enjoy using Slacko Puppy!
+The Puppy Team."
+
+#gtkdialog
+#prefs
+export LOC_300="Puppy软件包管理器"
+export LOC_301="Slickpet配置选项"
+export LOC_302="点击OK后更改生效"
+export LOC_303="选择一个软件库"
+#main gui
+export LOC_304="偏好"
+export LOC_305="在网络上"
+export LOC_306="法律许可 "
+export LOC_307="支持"
+export LOC_308="自述"
+export LOC_309="欢迎来到"
+export LOC_310="这是puppy软件包管理器的快速替代。根据您的选择点击图标会自动下载并安装您选择的程序"
+export LOC_311="普通软件包"
+export LOC_312="互联网软件包"
+export LOC_313="有用的软件包"
+export LOC_314="驱动程序"
+export LOC_315="更新"
+export LOC_316="请选择一个包来安装"
+export LOC_317="选择一个浏览器或邮件客户端来安装"
+export LOC_318="选择一个软件包"
+export LOC_319="选择一个驱动程序"
+export LOC_350="更多 Pets"
+export LOC_351="下载目录"
+export LOC_352="清除已下载的软件包"
+export LOC_355="关于"
+#Tooltips
+export LOC_353="点击这里会显示你所下载的软件包。如果你想保存并清理下载文件来，您可以拖放文件到另一个位置。这样做可释放个人文件中的部分空间。"
+export LOC_354="点击这儿会删除所有已下载的软件包"
+#pets
+export LOC_320="Gimp 强大的图像编辑器 23MB" 
+export LOC_321="Pwidgets  小型桌面程序 283KB"
+export LOC_322="Audacity  强大的音乐编辑器 6.7MB"
+export LOC_323="Songbird 功能丰富的音乐管理器 17MB"
+export LOC_324="Wine  运行Windows软件 17MB"
+export LOC_325="Clan Bomber 炸弹人游戏 5.3MB"
+#internet
+export LOC_501="Firefox  流行的Mozilla浏览器 15MB"
+export LOC_502="Seamonkey  完整的互联网套件 15MB"
+export LOC_503="Chromium  Ubuntu Chrome 浏览器 19MB"
+export LOC_504="Opera  快速的浏览器套件 16MB"
+export LOC_505="Thunderbird  雷鸟邮件客户端 11MB"
+export LOC_506="Kompozer 站点管理器 9.2MB"
+#more pets
+export LOC_601="Vlc 多功能音乐播放器 28MB"
+export LOC_602="Dia Diagram 流程图绘制工具 4.3MB"
+export LOC_603="Cinelerra 视频编辑器 15MB"
+export LOC_604="JRE Java 实时环境  36MB"
+export LOC_605="Foxit Reader PDF阅读器 3.6MB"
+export LOC_606="Inkscape 矢量图绘制工具 23MB"
+#drivers
+export LOC_390="有些系统会需要这些额外的驱动程序，以更好地利用该系统的功能"
+export LOC_391="RadeonHD 用于新型的ATI显卡 372KB"
+export LOC_392="Nvidia 195 用于新型的Nvidia显卡 22MB"
+export LOC_392g="Nvidia-glx 195 用于新型Nvidia显卡 46MB"
+export LOC_392x="Xorg High -GLX 用于 Radeon 和 Intel 显卡 14MB"
+export LOC_392j="Nvidia-glx 256.35 于新型的Nvidia显卡 14MB"
+export LOC_392tt="其他puppy软件包管理器里可用的nvidia软件包"
+###########
+
+#Update
+export LOC_500="不定期提供最新的补丁包括Slickpet的更新，使您的操作系统保持最新。"
+
+#Xdialog
+export LOC_401="Slacko Puppy 驱动程序安装"
+export LOC_402="你已经选择安装"
+export LOC_403="一旦你
+安装了视频驱动程序。您必须先退出到命令行
+... 菜单>>关机>>退出到命令行。然后
+你必须在命令提示符下键入'xorgwizard'重新配置
+您的设备。设置完成后您将
+留在命令提示符下。然后，你必须键入'xwin'来
+重启X。
+您想继续吗？"
+
+#END
+

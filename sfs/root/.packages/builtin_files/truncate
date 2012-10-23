@@ -1,0 +1,6 @@
+/usr
+/usr/bin
+ truncate
+/usr/share
+/usr/share/doc
+ truncate.txt

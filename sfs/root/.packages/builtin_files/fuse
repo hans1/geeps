@@ -1,0 +1,17 @@
+/bin
+ fusermount
+ ulockmgr_server
+/lib
+ libfuse.so
+ libfuse.so.2
+ libfuse.so.2.8.5
+ libulockmgr.so
+ libulockmgr.so.1
+ libulockmgr.so.1.0.1
+/sbin
+ mount.fuse
+/usr
+/usr/bin
+/usr/lib
+/usr/share
+/usr/share/hal

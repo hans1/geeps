@@ -1,0 +1,92 @@
+/usr
+/usr/bin
+ inkscapelite
+/usr/lib
+/usr/lib/inkscape
+/usr/lib/inkscape/extensions
+ dia2svg.sh
+ ill2svg.pl
+ roundhole
+/usr/share
+/usr/share/applications
+ InkLite-vector-editor.desktop
+/usr/share/doc
+ inklite.htm
+/usr/share/inkscape
+ about.svg
+ add_xml_element_node.xpm
+ add_xml_text_node.xpm
+ add.xpm
+ al_bottom_in.xpm
+ al_bottom_out.xpm
+ al_center_hor.xpm
+ al_center_ver.xpm
+ align_bc.xpm
+ align_bl.xpm
+ align_br.xpm
+ align_cc.xpm
+ align_cl.xpm
+ align_cr.xpm
+ align_tc.xpm
+ align_tl.xpm
+ align_tr.xpm
+ al_left_in.xpm
+ al_left_out.xpm
+ al_right_in.xpm
+ al_right_out.xpm
+ al_top_in.xpm
+ al_top_out.xpm
+ angle_180.xpm
+ angle_270.xpm
+ angle_90.xpm
+ angle_any.xpm
+ arrows_hor.xpm
+ arrows_ver.xpm
+ cap_butt.xpm
+ cap_round.xpm
+ cap_square.xpm
+ clear.xpm
+ create_new.xpm
+ curve.xpm
+ cusp.xpm
+ delete_xml_attribute.xpm
+ delete_xml_node.xpm
+ del.xpm
+ dimension_hor.xpm
+ dimension_ver.xpm
+ div.xpm
+ draw_arc.xpm
+ draw_dynahand.xpm
+ draw_freehand.xpm
+ draw_node.xpm
+ draw_pen.xpm
+ draw_rect.xpm
+ draw_select.xpm
+ draw_spiral.xpm
+ draw_star.xpm
+ draw_text.xpm
+ draw_zoom.xpm
+ dt_active.xpm
+ dt_inactive.xpm
+ duplicate_xml_node.xpm
+ duplicate.xpm
+ edge_down.xpm
+ edge_up.xpm
+ edit_copy.xpm
+ edit_cut.xpm
+ edit_delete.xpm
+ edit_duplicate.xpm
+ edit_paste.xpm
+ edit_redo.xpm
+ edit_undo.xpm
+ ellipse.xpm
+/usr/share/inkscape/extensions
+ roundhole.xpm
+/usr/share/inkscape/modules
+ ai_input.inkmod
+ dia.inkmod
+ roundhole.inkmod
+ svgz_input.inkmod
+ svgz_output.inkmod
+/usr/share/pixmaps
+ inkscape.png

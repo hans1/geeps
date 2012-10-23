@@ -1,0 +1,27 @@
+/etc
+/etc/ppp
+ firewall-masq
+ firewall-standalone
+/etc/ppp/plugins
+ README
+/etc/ppp/rp-pppoe-gui
+/usr
+/usr/sbin
+ pppoe
+ pppoe-connect
+ pppoe_gui
+ pppoe-README.txt
+ pppoe-relay
+ pppoe-server
+ pppoe-setup
+ pppoe-sniff
+ pppoe-start
+ pppoe-start_shell
+ pppoe-status
+ pppoe-status_shell
+ pppoe-stop
+ pppoe-stop_shell
+ pppoe-wrapper
+/usr/share
+/usr/share/doc
+ pppoe.htm

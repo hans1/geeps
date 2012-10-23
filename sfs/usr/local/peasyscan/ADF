@@ -1,0 +1,101 @@
+#!/bin/sh
+
+if [ "$F4" = "true" -o "$F5" = "true" ]; then
+  Xdialog --title " " --msgbox "Select either PNG, JPG or PDF!" 0 0
+  exit
+fi
+
+if [ -z "$SAVEFILENAME" ]; then
+  Xdialog --title " " --msgbox "No Save file selected!" 0 0 
+  exit
+fi
+
+Xdialog --title " " --3inputs "ADF Scan Details" 0 0 "Number of sheets in the feeder:" 1 "Start numbering the pages at:" 1 "Increase each page number by:" 1  2> /tmp/ADFout
+[ $? -gt 0 ] && exit
+
+ADFINFO=`cat /tmp/ADFout | tr -d " "`
+COUNT=`echo $ADFINFO | cut -d "/" -f 1`
+FIRST=`echo $ADFINFO | cut -d "/" -f 2`
+INC=`echo $ADFINFO | cut -d "/" -f 3`
+
+Xdialog --title " " --yesno "Are you sure there are $COUNT sheets in the feeder?" 0 0
+[ $? -eq 1 ] && exit
+
+if [ -n "$SOURCE" ]; then
+  SOURCEPAR="--source"; SOURCE=\"$SOURCE\"
+else
+  SOURCEPAR=""
+fi
+
+if [ -n "$MODE" ]; then
+  MODEPAR="--mode"; MODE=\"$MODE\"
+else
+  MODEPAR=""
+fi
+
+if [ -n "$RESOLUTION" ]; then
+  RESOLUTIONPAR="--resolution"; RESOLUTION=\"$RESOLUTION\"
+else
+  RESOLUTIONPAR=""
+fi
+
+URI=\"$URI\"
+
+Xdialog --title " " --msgbox "Scanning ..." 0 0 &
+MSGPID=$!
+
+rm -f /tmp/out*.pnm  #delete any previous scans
+
+eval "scanimage -v -d $URI --format=pnm --batch=\"/tmp/out%d.pnm\" --batch-count=$COUNT --batch-start=$FIRST --batch-increment=$INC $SOURCEPAR $SOURCE $MODEPAR $MODE $RESOLUTIONPAR $RESOLUTION"
+
+if [ ! -f /tmp/out${FIRST}.pnm ]; then
+  Xdialog --title " " --msgbox "ADF scan failed - check your options!" 0 0 
+  kill $MSGPID; exit
+fi
+
+if [ "$F1" = "true" ]; then
+  EXT=".png"
+elif [ "$F2" = "true" ]; then
+  EXT=".jpg"
+elif [ "$F3" = "true" ]; then
+  EXT=".pdf"
+fi
+
+for F in /tmp/out*.pnm 
+do
+  I=${F#/tmp/out}; I=${I%.pnm}; I=`printf %2.2d $I`
+  DESTNAME=$SAVEFILENAME"-"$I$EXT
+  if [ -f "$DESTNAME" ]; then
+    Xdialog --title " " --yesno "File exists! Overwrite it?" 0 0
+    if [ $? -eq 1 ]; then
+      kill $MSGPID; exit
+    fi
+  fi
+  touch "$DESTNAME" 2> /dev/null
+  if [ $? -eq 1 ]; then
+    Xdialog --title " " --msgbox "Invalid filename!" 0 0
+    kill $MSGPID; exit
+  fi
+ 
+  if [ "$EXT" = ".png" ]; then
+    pnmtopng $F > $DESTNAME
+  elif [ "$EXT" = ".jpg" ]; then
+    pnmtojpeg $F > $DESTNAME
+  elif [ "$EXT" = ".pdf" ]; then
+    pnmtops -noturn $F > /tmp/out.ps #pipe split so Lupu runs faster
+    ps2pdf /tmp/out.ps $DESTNAME
+    rm /tmp/out.ps
+  fi
+  rm $F
+done
+
+kill $MSGPID
+Xdialog --title " " --msgbox "Last page saved to $DESTNAME" 0 0
+
+if [ "$F3" = "true" ]; then
+  Xdialog --title " " --yesno "Combine into one PDF document?" 0 0
+  [ $? -eq 1 ] && exit
+  gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=${SAVEFILENAME}-DOC.pdf $SAVEFILENAME-??.pdf
+  SHORTNAME=`basename $SAVEFILENAME`"-DOC.pdf"
+  Xdialog --title " " --msgbox "Files combined as $SHORTNAME" 0 0
+fi

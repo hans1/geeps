@@ -1,0 +1,24 @@
+/usr
+/usr/bin
+ galculator
+/usr/share
+/usr/share/applications
+ galculator.desktop
+/usr/share/galculator
+/usr/share/galculator/glade
+ about.glade
+ basic_buttons.glade
+ classic_view.glade
+ dispctrl_bottom.glade
+ dispctrl_right.glade
+ dispctrl_right_vertical.glade
+ main_frame.glade
+ main_frame_hildon.glade
+ paper_view.glade
+ prefs.glade
+ prefs-ume.glade
+ scientific_buttons.glade
+/usr/share/pixmaps
+ galculator.png
+ galculator.svg
+ galculator.xpm

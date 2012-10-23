@@ -1,0 +1,8 @@
+/sbin
+ lspci
+/usr
+/usr/lib
+/usr/sbin
+ lspci
+/usr/share
+/usr/share/misc

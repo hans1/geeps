@@ -1,0 +1,6 @@
+/usr
+/usr/sbin
+ ssh-gui
+/usr/share
+/usr/share/applications
+ Ssh-gui-secure-telnet.desktop

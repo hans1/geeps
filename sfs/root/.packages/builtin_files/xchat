@@ -1,0 +1,18 @@
+/root
+/root/.xchat2
+ colors.conf
+ keybindings.conf
+ servlist_.conf
+ urlhandlers.conf
+ xchat.conf
+/usr
+/usr/bin
+ xchat
+/usr/share
+/usr/share/applications
+ xchat.desktop
+/usr/share/dbus-1
+/usr/share/dbus-1/services
+ org.xchat.service.service
+/usr/share/pixmaps
+ xchat.png

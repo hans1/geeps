@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pup-Advert-Blocker block online ads
+Name[ru]=Блокировка рекламы в Интернет
+Icon=adblock.xpm
+Comment=Blocks many online adverts
+Exec=pup-advert-blocker
+Terminal=false
+Type=Application
+Categories=WebBrowser
+GenericName=Pup-Advert-Blocker

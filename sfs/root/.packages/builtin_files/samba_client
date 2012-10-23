@@ -1,0 +1,14 @@
+/etc
+/etc/samba
+/etc/samba/private
+/usr
+/usr/bin
+ nmblookup
+ smbclient
+/usr/sbin
+ mount.cifs
+ umount.cifs
+/var
+/var/samba
+/var/samba/locks
+/var/samba/log

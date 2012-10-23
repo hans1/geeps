@@ -1,0 +1,71 @@
+#!/bin/sh
+# A script to change the XkbOption "caps" variable in xorg.conf
+# Part of the Puppy XkbConfigurator
+
+##--------variables---------->>
+INFILE='/etc/X11/xorg.conf'
+OUTFILE='/etc/X11/xorg.conf.tmp8'
+OPTION='caps'
+LIST="/etc/X11/xkb/rules/xorg.lst"
+# exported the following from main
+#ERRMSG='Xdialog --title "ERROR" --msgbox "An Error has occured! Try again." 0 0'
+#SUCCESS='Xdialog --title "Success!" --no-buttons --infobox "Changes applied successfuly!" 0 0 2000'
+
+# the full line containing XkbOptions:
+ORIGINAL=`fgrep '"XkbOptions"' $INFILE | grep -v '^#'`
+
+#find current variants and layouts:
+CURRENT=`echo "$ORIGINAL" | cut -d'"' -f4`
+
+# check if already have one, find description and add to message.
+EXIST=`echo -n "$CURRENT" | tr ',' '\n' | fgrep "$OPTION:"`
+
+if [ ! "$EXIST" = "" ]; then
+	INFO=`fgrep -w "$EXIST" $LIST`
+	MESSAGE="You are currently using the following group setting:
+	"$INFO"
+
+To change it, select a new one below, then press OK.
+To remove it, select it below and press OK.
+To abort press cancel."
+else
+	MESSAGE="Please select the setting you would like to use, then press OK.
+To abort, press cancel."
+fi
+
+# give choice dialog
+CHOICE=`Xdialog --stdout --title "Configure Xkb Option" --left --menubox "$MESSAGE" 17 100 15 caps:internal "CapsLock uses internal capitalization. Shift cancels CapsLock." caps:internal_nocancel "CapsLock uses internal capitalization. Shift doesn't cancel CapsLock." caps:shift "CapsLock acts as Shift with locking. Shift cancels CapsLock." caps:shift_nocancel "CapsLock acts as Shift with locking. Shift doesn't cancel CapsLock." caps:shift_lock "CapsLock just locks the Shift modifier." caps:capslock "CapsLock toggles normal capitalization of alphabetic characters." caps:shiftlock "CapsLock toggles Shift so all keys are affected."`
+[ ! $? -eq 0 ] && echo "cancelled" && exit 
+echo "$CHOICE"
+
+if [ ! "$EXIST" = "" ]; then # if there's one already
+	if [ "$CHOICE" = "$EXIST" ]; then # the same -> remove
+		NEW=`echo -n $CURRENT | tr ',' '\n' | fgrep -v $CHOICE | tr '\n' ',' | tr -s ',' | sed 's/^,//;s/,$//'`
+	else # change
+		NEW=`echo "$CURRENT" | sed "s/$EXIST/$CHOICE/"`
+	fi
+else
+	NEW="$CURRENT,$CHOICE"
+	[ "$CURRENT" = "" ] && NEW="$CHOICE"
+fi
+
+# add new variant to line, or entire line, if it doesn't exist:
+if [ "$ORIGINAL" = "" ] ;then
+	ORIGINAL=`fgrep '"XkbVariant"' $INFILE | grep -v '^#'`
+	[ "$ORIGINAL" = "" ] && ORIGINAL=`fgrep '"XkbLayout"' $INFILE | grep -v '^#'`
+	MODIFIED="$ORIGINAL\n	Option 		\"XkbOptions\"   \"$NEW\""
+else
+	MODIFIED=`echo "$ORIGINAL" | sed "s%\"$CURRENT\"%\"$NEW\"%"`
+fi
+
+# add to file
+cat $INFILE | sed "s%$ORIGINAL%$MODIFIED%" >$OUTFILE
+
+if ! fgrep -q '"XkbOptions"' $OUTFILE ;then
+	eval $ERRMSG
+	rm -f $OUTFILE
+else
+	mv -f $OUTFILE $INFILE
+	eval $SUCCESS
+fi
+exit

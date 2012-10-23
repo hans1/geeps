@@ -1,0 +1,18 @@
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/pnethood
+ AppInfo.xml
+ AppRun
+ .DirIcon
+ func_mount
+ func_unmount
+ network-transmit.png
+ pnethood
+/usr/sbin
+ pnethood
+/usr/share
+/usr/share/applications
+ pnethood.desktop
+/usr/share/doc
+ pnethood.html

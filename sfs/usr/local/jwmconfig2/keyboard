@@ -1,0 +1,125 @@
+#!/bin/bash
+
+#############################
+#
+#  GUI to configure JWM keyboard
+#  shortcuts
+#  
+#  for use with the jwmConfigMgr
+#
+#  author: thoughtjourney
+#  date: 13/08/2005
+#
+#
+#############################
+
+##-------variables----------->>
+. /tmp/JWMCONFIGVARS
+KEY=
+PATH1=$PATH
+
+
+##--------key list----------->>
+
+awk '/key/ {print $2 "_" $3}' $HOME_DIR/jwmrc-personal | awk -F\> '/key/ {print $1 " " $2}' | awk -F\< '/key/ {print $1}' > $SCRIPT_DIR/cuts
+
+
+##---------GUI--------------->>   
+
+export Keyboard_Shortcuts="
+<window title=\"JWM Configuration Manager\" icon-name=\"gtk-preferences\">
+<vbox>
+  <frame Description>
+    <hbox>
+   <pixmap><input file>$MINI_ICONS_DIR/mini-keyboard.xpm</input></pixmap>
+      <text>
+        <label>You can configure your keyboard shortcuts here.</label>
+      </text>
+    </hbox>
+  </frame>
+
+  <frame Current Shortcuts>
+    <hbox>
+      <text>
+        <label>
+You can delete or change a shortcut by selecting it below.
+        </label>
+      </text>
+    </hbox> 
+    <hbox>
+       <text>
+        <label>
+Note that changes will appear next time you run this script.
+        </label>
+      </text>
+    </hbox>
+    <table>
+      <label>KeyCombo                         |Action</label>
+      <variable>KEY</variable>
+      <input>more $SCRIPT_DIR/cuts</input>
+      <action>$SCRIPT_DIR/changeKey</action>
+      <width>500</width><height>180</height>
+    </table>
+  </frame>
+
+  <frame Add Shortcut>
+    <hbox><text><label>Add a new shortcut by filling in the boxes below. Click the button to add your shortcut.</label></text></hbox>
+    <hbox>
+     <entry> 
+      <default>mask (optional)</default>
+      <visible>enabled</visible>
+      <variable>ADDMASK</variable>
+     </entry>
+     <entry> 
+      <default>key</default>
+      <visible>enabled</visible>
+      <variable>ADDKEY</variable>
+     </entry>
+     <entry> 
+      <default>action</default>
+      <visible>enabled</visible>
+      <variable>ADDACTION</variable>
+     </entry>
+     <button>
+      <label>Add</label>
+      <input file>$MINI_ICONS_DIR/mini-keyboard.xpm</input>
+      <action>$SCRIPT_DIR/addShortcut</action>
+      <action>$SCRIPT_DIR/listShortcuts</action>
+      <action type=\"clear\">KEY</action>
+      <action>Refresh:KEY</action>
+     </button>
+    </hbox>
+  </frame>
+  <frame Quick Info>
+    <pixmap><input file>$MINI_ICONS_DIR/info16.xpm</input></pixmap>
+    <edit>
+      <input file>$SCRIPT_DIR/keyConfigHelp</input>
+      <width>600</width><height>140</height>
+    </edit>
+  </frame>
+  <hbox>
+    <button ok>
+      <action>rm -f cuts</action>
+      <action type=\"exit\">OK</action>
+    </button>
+    <button help>
+      <action>defaulthtmlviewer http://www.joewing.net/programs/jwm/config.shtml#keys &</action>
+    </button>
+  </hbox>
+</vbox>
+</window>
+"
+
+#------------run------------>>
+
+export PATH="$PATH:."
+gtkdialog3 --program Keyboard_Shortcuts
+
+
+#----------cleanup--------->>
+
+rm -f $SCRIPT_DIR/cuts
+unset Keyboard_Shortcuts
+export PATH="$PATH1"
+clear
+exit 0

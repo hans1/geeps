@@ -1,0 +1,86 @@
+#!/bin/sh
+set -a
+
+. $APPDIR/gui_misc
+. $APPDIR/gui_mixer
+export SEARCH_MYMUSIC=false
+export SEARCH_WEBMUSIC=false
+export SEARCH_RADIOHITS=false
+export SEARCH_RADIO=true
+export SEARCH_FILES=false
+
+radio_start (){
+	echo -e "\n  pmusic_radio_genre|    ${LOC_GENRE}\n  pmusic_radio_country|    $LOC_COUNTRY\n" > $WORKDIR/sourcelist
+}
+
+radio_select (){
+	case $SOURCE in 
+		*pmusic_radio_country)	$APPDIR/func -radio -country;;
+		*pmusic_radio_genre)	$APPDIR/func -radio -genre;;
+		*pmusic_radio:*)
+			TMP="`echo "$SOURCE" | cut -d: -f2-`"
+			grep "|$TMP" $HOME/.pmusic/index_radio | cut -d'|' -f1-2 > $WORKDIR/sourcelist
+			;;
+		*) 	$APPDIR/func_player -stop
+			echo "$SOURCE" | cut -c3- > $WORKDIR/PLAYLIST
+			echo 0 > $WORKDIR/SS
+			$APPDIR/func_player -playing &
+			;;
+	esac
+}
+
+statusbar (){
+	TMP="`grep -Fm1 "$SOURCE" $WORKDIR/sourcelist | cut -d'|' -f2`" #station name
+	TMP1="`tail -n 1 $WORKDIR/streamripper_output | cut -d']' -f2 | cut -d'[' -f1`" #track meta info 
+	echo "$TMP    $TMP1" > $WORKDIR/statusbar
+}
+
+radio_start
+[ ! -f $HOME/.pmusic/index_radio ] && $APPDIR/func_radio &
+
+GUI='
+<window title="Pmusic" icon-name="gtk-media-stop" default_height="450">
+ <vbox>
+  <hbox homogeneous="true"><hbox>
+   '$GUI_MIXER'
+
+   <text width-request="50"><label>""</label></text>
+
+   <button tooltip-text="Browse radio stations">
+    <input file stock="gtk-open"></input>
+    <action>radio_start</action>
+    <action>clear:SOURCE</action>
+    <action>refresh:SOURCE</action>
+   </button>
+   <button tooltip-text="record radio stream"><input file stock="gtk-media-record"></input><action>'$APPDIR'/func_export</action></button>
+   <button><input file stock="gtk-preferences"></input><action>'$APPDIR'/func_config -playback</action></button>
+  </hbox></hbox>
+  
+  <entry activates-default="true" is-focus="true" secondary-icon-stock="gtk-find">
+   <variable>SEARCH</variable>
+   <action signal="activate">'$APPDIR'/func -search_refresh</action>
+   <action signal="activate">clear:SOURCE</action>
+   <action signal="activate">refresh:SOURCE</action>
+  </entry>
+
+  <table>
+   <variable>SOURCE</variable>
+   <label>"|"</label>
+   <input>cat '$WORKDIR'/sourcelist</input>
+   <action>radio_select</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </table>
+
+  <timer visible="false">
+   <action>statusbar</action>
+   <action>refresh:STATUSBAR</action>
+  </timer>
+  '$GUI_STATUSBAR'
+ </vbox>
+ <action signal="show">echo > '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">rm -f '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">'$APPDIR'/func -quit</action>
+ <action signal="delete-event">exit:Exit</action>
+</window>'
+

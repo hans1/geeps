@@ -1,0 +1,73 @@
+#!/bin/sh
+#note, root2user called via shutdownconfig, changes root to fido.
+#110507 TaZOC bug fix.
+#120201 rodin.s: internationalized.
+#120323 replace 'xmessage' with 'pupmessage'.
+#120409 if using minit instead of busybox init.
+
+export TEXTDOMAIN=loginmanager
+export TEXTDOMAINDIR=/usr/share/locale
+export OUTPUT_CHARSET=UTF-8
+
+HOMEUSER="`whoami`"
+
+CHANGE2ROOT=""
+if [ "$HOMEUSER" != "root" ];then
+ CHANGE2ROOT="<text><label>$(gettext 'However, if you wish, you can change to the administrator (root) permanently on the next boot. Just tick this box and it will be so:')</label></text>
+  <checkbox>
+   <label>$(gettext 'Tick box to become administrator permanently')</label>
+   <default>false</default>
+   <variable>CHECKADMIN</variable>
+  </checkbox>
+  <hbox>
+   <entry invisible_char=\"x\" visibility=\"false\">
+    <variable>ADMINPASSWORD</variable>
+   </entry>
+   <text><label>$(gettext 'Type admin password here')</label></text>
+  </hbox>
+ <text><label>$(gettext 'This will take affect after reboot.')</label></text>
+ "
+
+fi
+
+
+export MAIN_DIALOG="
+<window title=\"LoginManager\" icon-name=\"gtk-execute\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b>$(gettext 'Currently you are logged in as') '${HOMEUSER}'</b>\"</label></text>
+  
+  ${CHANGE2ROOT}
+  
+  <hbox>
+   <button ok></button>
+   <button cancel></button>
+  </hbox>
+ </vbox>
+</window>
+"
+
+
+RETSTRING="`gtkdialog3 --program=MAIN_DIALOG --center`"
+[ $? -ne 0 ] && exit
+
+#echo "$RETSTRING"
+eval "$RETSTRING"
+[ "$EXIT" != "OK" ] && exit
+
+#if [ "$CHANGE2ROOT" != "" ];then
+ if [ "$CHECKADMIN" = "true" ];then
+  echo "$ADMINPASSWORD" | su root
+  if [ $? -ne 0 ];then
+   pupmessage -bg red -title "$(gettext 'LoginManager: error')" -center "$(gettext 'Sorry, admin password is wrong')"
+   exit
+  fi
+  rootEXPR="s%^tty1.*%tty1::respawn:/sbin/mingetty --autologin root tty1%"
+  sed -i -e "$rootEXPR" /etc/inittab #110507 TaZOC bug fix.
+  #120409 if using minit instead of busybox init...
+  if [ -f /etc/minit/getty/1/params  ];then #see my minit pet pkg.
+   EXPR2='s%^fido$%root%'
+   sed -i -e "$EXPR2" /etc/minit/getty/1/params
+  fi
+  pupmessage -bg green -center -title "$(gettext 'Login Manager: OK')" "$(gettext 'Ok, you will be administrator at next boot')"
+ fi
+#fi

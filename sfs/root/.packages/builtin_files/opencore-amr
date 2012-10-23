@@ -1,0 +1,12 @@
+/usr
+/usr/lib
+ libopencore-amrnb.so
+ libopencore-amrnb.so.0
+ libopencore-amrnb.so.0.0.2
+ libopencore-amrwb.so
+ libopencore-amrwb.so.0
+ libopencore-amrwb.so.0.0.2
+/usr/src
+/usr/src/opencore-amr-0.1.2
+ build-opencore-amr.sh
+ SLKBUILD

@@ -1,0 +1,55 @@
+**********************Puppy File Sharing******************
+
+This script uses Curlftpfs, Mpscan, Pure-ftpd, and Rox to setup a file sharing system,  that is similar to Samba (windows) file sharing to the user. The intent is that this will be used between two computers running Puppy linux. However, another operating system (Windows), can connect to the server using a web browser. Just type in the IP address in the address field (eg. ftp://192.168.254.2).   
+
+Before doing anything, you must be connected to your network
+
+  Inside of the File-Sharing folder you will find a Rox application named Setup-Sharing. Clicking on Setup-Sharing will open a series of windows. The first menu will ask you if you want to connect to a folder on another computer (Client) or share a folder on your computer (server).
+ 
+If you select to share a folder on your computer, so that another computer can connect to it, you will be presented with two options:
+   
+ * Anonymous  No password required for others to connect.
+ 
+     This will allow others to connect to your computer without a user name or password. However, they will only be able to connect to /root/ftpd. So place any items you want to share in that folder.
+ 
+ * Password  A user name and password will be required for others to connect. 
+   
+     This will require others to use a user name and password to connect to your computer. In Puppy you normally run as a user named root, your home folder is /root, and the default password is woofwoof. If you choose this option you should change your root password. To do this open a terminal (The console icon on the desktop) and type:
+   
+     # passwd
+     
+   You'll be prompted to enter a new password. User root is the superuser (he can do anything), so you may not want others logging in as root. So if you want, you can add new users. If you wanted to add a new user named doug and give doug a home directory of /mnt/home/doug, you can do this by opening a terminal and typing:
+   
+    # adduser doug -h /mnt/home/doug
+
+  You'll be prompted for a new password for doug and the folder /mnt/home/doug will be created. Now someone can connect to your computer by using the user name doug and whatever password you entered. When they login as doug, they will see whatever is in /mnt/home/doug. You can use just about any user name you like and the home folder doesn't have to be /mnt/home/doug, use whatever you like.
+
+
+     Next, you will be asked if you want to start the sever for just this session or if you want it to start on every boot. If you choose to start it on every boot an entry will made in /etc/rc.d/rc.local.
+
+
+
+
+
+
+If you choose to connect to another computer, you will be presented with two options:
+
+* Scan     Search your local network for a connection. 
+
+  This will scan your local network (subnet) and list any ftp servers it finds. You will then be asked if you want to create a connection. If the connection requires a user name and password you will be asked for it.
+
+
+* Manual      Enter an IP address. (Optional username and password)
+
+  This will let you enter a user name, password and a IP address to create a new connection.
+
+  After selecting one of the above options a new connection will be created in the File-Sharing folder. By clicking on one of the newly created Shared-xxx icons, a window will open for that network connection and you can drag and drop files to and from it.
+
+
+Limitations:
+
+* Permissions are not allways preserved, so ROX reports errors. Copied files are created with a umask of 022.
+* Symlinks don't copy.
+* When scanning for servers, somtimes your server may not be found, try again.
+* If your computers are on a DHCP network (IP address are automaticly assigned), The the connection short-cuts (rox apps) may not work the next time you boot because of IP address changes. In this case you'll have to scan and create a new connection.
+

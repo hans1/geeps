@@ -1,0 +1,7 @@
+#!/bin/sh
+Xdialog --yesno "Do you need help with adding a printer?" 0 0
+if [ $? -eq 0 ];then
+  exec defaultbrowser http://www.murga-linux.com/puppy/viewtopic.php?p=444080#444080
+else
+  exec defaultbrowser http://localhost:631
+fi

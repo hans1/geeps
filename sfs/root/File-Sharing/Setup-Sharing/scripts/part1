@@ -1,0 +1,7 @@
+#!/bin/sh
+SUBN=$(ifconfig | grep inet | grep -v 127. | cut -d " " -f 12 | cut -d ":" -f 2 | cut -n -d "." -f 1-3)
+if [ "$SUBN" = "" ] ; then
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "It dosen't seem like you are connected to your network. \n You need to be on a network to share files. \n Try using the Network Wizard first." 0 0 90000
+exit
+fi
+rm /tmp/curlftpfs.error

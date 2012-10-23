@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Mouse/keyboard Wizard
+Name[ru]=Настройка мыши/клавиатуры
+Name[de]=Maus-Tastatur Einstellungen
+Name[es]=Gestor de Ratón/Teclado 
+Name[hu_HU]=Egér/billentyűzet varázsló
+Name[ja]=マウス/キーボードウィザード
+Name[zh_CN]=鼠标键盘配置向导
+Name[zh_TW]=滑鼠鍵盤配置精靈
+Icon=wizard16.xpm
+Comment=Mouse/keyboard Wizard
+Exec=input-wizard
+Terminal=false
+Type=Application
+Categories=X-SetupWizard
+GenericName=Mouse/keyboard Wizard

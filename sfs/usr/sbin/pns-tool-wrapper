@@ -1,0 +1,2 @@
+#!/bin/sh
+rxvt -bg grey20 -fg white -e /usr/sbin/pns-tool

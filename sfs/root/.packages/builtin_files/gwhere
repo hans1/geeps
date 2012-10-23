@@ -1,0 +1,36 @@
+/usr
+/usr/bin
+ gwhere
+/usr/share
+/usr/share/applications
+ gwhere.desktop
+/usr/share/gwhere
+/usr/share/gwhere/plugins
+/usr/share/gwhere/plugins/catalog
+ libgwplugincatalogcsv.so
+ libgwplugincatalogcsv.so.1
+ libgwplugincatalogcsv.so.1.0.0
+ libgwplugincataloggwcatalog.so
+ libgwplugincataloggwcatalog.so.1
+ libgwplugincataloggwcatalog.so.1.0.0
+/usr/share/gwhere/plugins/descr
+ libgwplugindescriptionavi.so
+ libgwplugindescriptionavi.so.1
+ libgwplugindescriptionavi.so.1.0.0
+ libgwplugindescriptiondescript_ion.so
+ libgwplugindescriptiondescript_ion.so.1
+ libgwplugindescriptiondescript_ion.so.1.0.0
+ libgwplugindescriptionfile_id_diz.so
+ libgwplugindescriptionfile_id_diz.so.1
+ libgwplugindescriptionfile_id_diz.so.1.0.0
+ libgwplugindescriptionhtml.so
+ libgwplugindescriptionhtml.so.1
+ libgwplugindescriptionhtml.so.1.0.0
+ libgwplugindescriptionmp3.so
+ libgwplugindescriptionmp3.so.1
+ libgwplugindescriptionmp3.so.1.0.0
+ libgwplugindescriptionmpc.so
+ libgwplugindescriptionmpc.so.1
+ libgwplugindescriptionmpc.so.1.0.0
+/usr/share/pixmaps
+ gwhere.xpm

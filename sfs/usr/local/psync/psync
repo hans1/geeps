@@ -1,0 +1,164 @@
+#!/bin/bash
+#Psync Time Synchroniser Gui 
+#Synchronises system and hardware clock to a public time server
+#Robert Lane 2009 2010 2011(tasmod)
+
+#Add services for ntp
+
+[ ! "`grep 'ntp 123/tcp' /etc/services`" ] && echo -e "ntp 123/tcp\nntp 123/udp" >> /etc/services
+
+#DST report variables
+YEAR=`date +%Y` 
+SPRING=`zdump -v /etc/localtime | grep "$YEAR" | head -2| tail -1 | cut -f1 -d "=" | cut -f3 -d "e"`
+FALL=`zdump -v /etc/localtime | grep "$YEAR" | tail -1 | cut -f1 -d "=" | cut -f3 -d "e"`
+ISGMT=`readlink /etc/localtime | sed -e 's%^.*share/zoneinfo/%%'`
+
+
+ if [[ $ISGMT == *GMT* ]]
+	 then  DSTIS="You are using GMT"
+	     elif  [[ $ISGMT == *UTC* ]]
+	 then  DSTIS="You are using UTC"
+	     elif  [[ $ISGMT == *Zulu* ]]
+	 then  DSTIS="You are using Zulu" 
+	     elif  [[ $ISGMT == *UCT* ]]
+	 then  DSTIS="You are using UCT"
+	     elif  [[ $ISGMT == *Universal* ]]
+	 then  DSTIS="You are using Universal"
+	     elif  [[ $ISGMT == *Greenwich* ]]
+	 then  DSTIS="You are using Greenwich"
+		 elif  [[ ! $SPRING ]]
+     then  DSTIS="DST does not apply to this timezone"		 
+	  	 else
+	       DSTIS="Spring = $SPRING  Autumn = $FALL "
+fi
+
+#Read hwclock --debug and send to temp file
+hwclock --debug | tail -3 > /tmp/psyncreport 
+
+CURRENT_DATE=`cat /tmp/psyncreport | grep 'Time read from Hardware Clock:' | cut -d " " -f6 | sed -n -e "s_\(....\)\(...\)\(...\)_\3\2/\1_p" | cut -d "/" -f 2-6` 
+CURRENT_DEBUG=`cat /tmp/psyncreport | grep 'Time read from Hardware Clock:' | cut -d " " -f 7` 
+CURRENT_HW=`cat /tmp/psyncreport | tail -1 `
+#CURRENT_OFFSET=`cat /tmp/psyncreport | tail -1 | cut -d " " -f 7-8 `
+CURRENT_TIME=`date +%X%t%Z`
+OFF=`date +%z`
+#set browser for help file
+if [ "`which defaultbrowser 2> /dev/null`" ]; then export BROWSER=defaulthtmlviewer
+	elif [ "`which hv3 2> /dev/null`" ]; then export BROWSER=hv3
+	elif [ "`which dillo 2> /dev/null`" ]; then export BROWSER=dillo
+	elif [ "`which mozilla 2> /dev/null`" ]; then export BROWSER=mozilla
+	elif [ "`which opera 2> /dev/null`" ]; then export BROWSER=opera
+	elif [ "`which netscape 2> /dev/null`" ]; then export BROWSER=netscape
+	elif [ "`which firefox 2> /dev/null`" ]; then export BROWSER=firefox
+	elif [ "`which konqueror 2> /dev/null`" ]; then export BROWSER=konqueror
+fi
+cd $HOME
+export Psync="
+<window title=\" Psync Time Server Synchroniser Version 2.8\"  >
+ <vbox>
+  <frame ------------System Time & Offset to current Hardware Clock>
+     <text use-markup=\"true\"><label>\"<b>$CURRENT_HW</b>\"</label></text>
+     </frame>
+	 <frame -------------------------------Hardware Time >
+	 <text use-markup=\"true\"><label>\"<b>$CURRENT_DATE   $CURRENT_DEBUG </b>\"</label></text>
+     </frame>
+	 <hbox>
+	 <frame ------------Time Zone set as :->
+     <text use-markup=\"true\"><label>\"<b>`readlink /etc/localtime | sed -e 's%^.*share/zoneinfo/%%'`</b>\"</label></text>
+     </frame>
+	 <frame ----------True Offset to UTC>
+     <text use-markup=\"true\"><label>\"<b>$OFF</b>\"</label></text>
+     </frame>
+	 </hbox>
+	 <frame ----------------------Daylight Saving Change Times >
+	
+	 <text use-markup=\"true\"><label>\"<b> $DSTIS  </b>\"</label></text>
+     </frame>
+	 
+	 <frame>
+	 <text><label> To synchronise your clock. </label></text>
+	 <text><label>Choose a Time Server Region nearest to you. </label></text>
+	 
+	 </frame>
+     <frame>
+	 <text><label>If display blanks, move the mouse slightly. </label></text>
+	 <text><label>If you use GMT with offset then the top line hardware </label></text>
+	 <text><label>report will show the offset in reverse notation.</label></text>
+	 <text><label>After setting the time there is an option to run Psync automatically at each startup.</label></text>
+	 <text><label> \"       \"  </label></text>
+	 <text><label>Please read the 'Help' file for more information.</label></text>
+	 <text><label> \"       \"  </label></text>
+	 <hbox>
+     <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>Africa  </label>
+	 <action> /usr/local/pysnc/psyncfunc AFRICA</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>Asia   </label>
+	 <action> /usr/local/psync/psyncfunc ASIA</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>Europe   </label>
+	 <action> /usr/local/psync/psyncfunc EUROPE</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>United Kingdom   </label>
+	 <action> /usr/local/psync/psyncfunc UK</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 </hbox>
+	 <text><label>\"       \"</label></text>
+	 <hbox>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>North America </label>
+	 <action> /usr/local/psync/psyncfunc NORTHAMERICA</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>South America </label>
+	 <action> /usr/local/psync/psyncfunc SOUTHAMERICA</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <button>
+     <input file icon=\"gtk-execute\"></input>
+     <label>Oceania </label>
+	 <action> /usr/local/psync/psyncfunc OCEANIA</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <text><label>\"       \"</label></text>	 
+	 </hbox>
+	 <text><label>\"       \"</label></text>
+	 </frame>
+	 <frame>
+     <hbox>
+	 <button>
+     <input file icon=\"gtk-help\"></input>
+     <label>Help</label>
+	 <action> $BROWSER /usr/share/doc/psync.html</action>
+	 <action> exit: gtkdialogue </action>
+     </button>
+	 <text><label>\"       \"</label></text>
+	 <text><label>\"       \"</label></text>
+     <button>
+     <input file icon=\"gtk-cancel\"></input>
+     <label>Close</label>
+     </button>
+	 <text><label>\"       \"</label></text>
+	 <text><label>\"       \"</label></text>
+	 <text><label>\"    \"</label></text>
+     </hbox>
+     </frame>
+     </vbox>
+</window>"
+
+#execute gtkdialog
+gtkdialog3  -c -p  Psync
+

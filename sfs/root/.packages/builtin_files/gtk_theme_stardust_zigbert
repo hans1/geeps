@@ -1,0 +1,34 @@
+/usr
+/usr/share
+/usr/share/themes
+/usr/share/themes/Stardust
+/usr/share/themes/Stardust/gtk-2.0
+ arrow_down1.png
+ arrow_down2.png
+ arrow_left1.png
+ arrow_left2.png
+ arrow_right1.png
+ arrow_right2.png
+ arrow_up1.png
+ arrow_up2.png
+ blank.png
+ button1.png
+ button2.png
+ button3.png
+ check2.png
+ default.png
+ gtkrc
+ in.png
+ list_header-light.png
+ list_header.png
+ notebook1.png
+ notebook2.png
+ obutton1.png
+ obutton2.png
+ option1.png
+ option2.png
+ spin1.png
+ spin2.png
+ spin3.png
+ trough.png
+ up.png

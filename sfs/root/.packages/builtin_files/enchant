@@ -1,0 +1,13 @@
+/usr
+/usr/bin
+ enchant
+ enchant-lsmod
+/usr/lib
+/usr/lib/enchant
+ libenchant_aspell.so
+ libenchant_ispell.so
+ libenchant_myspell.so
+ libenchant_zemberek.so
+/usr/share
+/usr/share/enchant
+ enchant.ordering

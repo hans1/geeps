@@ -1,0 +1,13 @@
+/usr
+/usr/bin
+ dubdv
+ dvconnect
+ encodedv
+/usr/lib
+ libdv.so
+ libdv.so.4
+ libdv.so.4.0.3
+/usr/src
+/usr/src/libdv-1.0.0
+ build-libdv.sh
+ SLKBUILD

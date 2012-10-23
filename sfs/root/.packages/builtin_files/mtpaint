@@ -1,0 +1,13 @@
+/usr
+/usr/bin
+ mtpaint
+ mtpaintsnapshot.sh
+/usr/local
+/usr/local/bin
+ defaultpaint
+/usr/share
+/usr/share/applications
+ mtpaint.desktop
+ mtPaint-snapshot-screen-capture.desktop
+/usr/share/pixmaps
+ mtpaint.png

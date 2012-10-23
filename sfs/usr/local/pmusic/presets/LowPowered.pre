@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo false > $WORKDIR/TRACKINFO_REFRESH #for func_progressbar
+#force switch: -U 4000
+export UPDATE_INTERVAL=4000

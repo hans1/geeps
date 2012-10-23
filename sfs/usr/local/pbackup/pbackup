@@ -1,0 +1,2228 @@
+#!/bin/bash
+#Pbackup
+#Copyright 2006, 2007, 2008, 2009, 2010, 2011
+#Sigmund Berglund
+
+#------------------------------
+#Pbackup is released under the GNU General Public License (GPL). You have the right to use and modify this software in any way you like, so long as any derivative works remain under a GPL license.
+    
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
+#See the GNU General Public License homepage for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+if which defaulthtmlviewer >/dev/null;	then export BROWSER=defaulthtmlviewer #set browser for helpfile
+	elif which hv3 >/dev/null;			then export BROWSER=hv3
+	elif which dillo >/dev/null;		then export BROWSER=dillo
+	elif which mozilla >/dev/null;		then export BROWSER=mozilla
+	elif which opera >/dev/null;		then export BROWSER=opera
+	elif which netscape >/dev/null;		then export BROWSER=netscape
+	elif which firefox >/dev/null;		then export BROWSER=firefox
+	elif which konqueror >/dev/null;	then export BROWSER=konqueror
+fi
+
+export VERSION="3.1.9" #3 digits
+export PROG_PATH=`dirname "$0"`"/" #Determine path to this application.
+export WORKDIR="$HOME/.pbackup/tmp"
+mkdir $HOME/.pbackup > /dev/null 2>&1
+mkdir $HOME/.pbackup/tmp > /dev/null 2>&1
+TAB130="$PROG_PATH""tab130.png"
+TAB80="$PROG_PATH""tab80.png"
+
+export CDRECORD="cdrecord"; export MKISOFS="mkisofs"
+if [ "`which wodim 2> /dev/null`" ]; then export CDRECORD="wodim"; export MKISOFS="genisoimage"; fi
+
+#================== FUNCTIONS ===================
+cleanup(){
+#the files $WORKDIR/pbackup-splash and $WORKDIR/pbackup-splashtext are instance independent
+#and should not be removed
+rm -f $WORKDIR/pupbck* > /dev/null 2>&1
+rm -f `echo "$IMG"` > /dev/null 2>&1
+echo -e " \c" > $LOG
+}
+
+unmount (){
+if [ "$SAVEMODE" = "CD" ] || [ "$SAVEMODE" = "DVD" ]; then
+	umount $BCKDEV > /dev/null 2>&1
+	eject $BCKDEV > /dev/null 2>&1
+else
+	if [ "$AUTOMOUNT" = "true" ]; then
+		sync
+		umount /dev/$DEVICE
+	fi
+fi
+}
+
+cron_check () {
+#include a link to crond in ~/Startup for autostart cron daemon at boot
+mkdir $HOME/Startup  > /dev/null 2>&1
+echo '
+TMP=`ps -e`
+TMP=`echo "$TMP" | grep " cron"`
+if [ -z "$TMP" ]; then #cron is not running
+	crond
+fi' > $HOME/Startup/cron-check
+chmod 700 $HOME/Startup/cron-check
+#---
+killall -q crond; crond #restart cron
+#Did these really happen. Do user has permission.
+TMP=`ps -e`; TMP=`echo "$TMP" | grep " cron"`
+if [ -z "$TMP" ]; then #cron is not running
+	FRAME="$LOC_ERROR"; TXT2="$LOC409"; IMG="dialog-error"
+	. "$PROG_PATH"box_ok
+fi
+}
+
+install(){
+echo 100 > $WORKDIR/pbackup-splash #to kill already splash from boot
+usleep 500000 #the first splash checks every 0.5 sec
+echo "Installing...please wait" > $WORKDIR/pbackup-splashtext
+echo 0 > $WORKDIR/pbackup-splash #to activate progress bar
+"$PROG_PATH"box_splash &
+#build helptext variables for wizard
+echo -e "\c" > $WORKDIR/pbackup-tmp
+echo -e "\c" > $WORKDIR/pbackup-hlp2
+echo -e "\c" > $WORKDIR/pbackup-hlp4
+echo -e "\c" > $WORKDIR/pbackup-hlp51
+echo -e "\c" > $WORKDIR/pbackup-hlp52
+echo -e "\c" > $WORKDIR/pbackup-hlp61
+echo -e "\c" > $WORKDIR/pbackup-hlp62
+echo -e "\c" > $WORKDIR/pbackup-hlp7
+if [ -f /usr/share/doc/pbackup/help-$LANGUAGE.html ]; then
+	cp /usr/share/doc/pbackup/help-$LANGUAGE.html $WORKDIR/pbackup-helpfile #not work on org
+else
+	cp /usr/share/doc/pbackup/help-english.html $WORKDIR/pbackup-helpfile #not work on org
+fi
+sed -i -e 's/<br>//g' $WORKDIR/pbackup-helpfile #remove html tags
+sed -i -e "s/ /{ð®SSSđþ}/g" $WORKDIR/pbackup-helpfile
+for I in `cat $WORKDIR/pbackup-helpfile`; do
+	if [ `echo "$I" | grep -o "\[2\]"` ]; then echo "[2]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[3\]"` ]; then echo "[3]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[4\]"` ]; then echo "[4]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[5.1\]"` ]; then echo "[5.1]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[5.2\]"` ]; then echo "[5.2]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[6.1\]"` ]; then echo "[6.1]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[6.2\]"` ]; then echo "[6.2]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[7\]"` ]; then echo "[7]" > $WORKDIR/pbackup-tmp; fi
+	if [ `echo "$I" | grep -o "\[8\]"` ]; then echo "[8]" > $WORKDIR/pbackup-tmp; fi
+	case `cat $WORKDIR/pbackup-tmp` in
+		"[2]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp2;;
+		"[4]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp4;;
+		"[5.1]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp51;;
+		"[5.2]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp52;;
+		"[6.1]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp61;;
+		"[6.2]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp62;;
+		"[7]") echo "$I" | sed -e "s/{ð®SSSđþ}/ /g" >> $WORKDIR/pbackup-hlp7;;
+	esac
+done
+#remove empty lines and make headings bold
+HLPTXT2=`cat $WORKDIR/pbackup-hlp2 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT4=`cat $WORKDIR/pbackup-hlp4 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT51=`cat $WORKDIR/pbackup-hlp51 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT52=`cat $WORKDIR/pbackup-hlp52 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT61=`cat $WORKDIR/pbackup-hlp61 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT62=`cat $WORKDIR/pbackup-hlp62 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+HLPTXT7=`cat $WORKDIR/pbackup-hlp7 | grep -v "\[*\]" | sed -e 's/< /<b>/g' | sed -e 's/ >/<\/b>/g'`
+#Write config
+echo > $HOME/.pbackup/pbackuphlp
+echo "HLPTXT2=\"$HLPTXT2\""		>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT4=\"$HLPTXT4\""		>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT51=\"$HLPTXT51\""	>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT52=\"$HLPTXT52\""	>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT61=\"$HLPTXT61\""	>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT62=\"$HLPTXT62\""	>> $HOME/.pbackup/pbackuphlp
+echo "HLPTXT7=\"$HLPTXT7\""		>> $HOME/.pbackup/pbackuphlp
+chmod 700 $HOME/.pbackup/pbackuphlp
+echo 100 > $WORKDIR/pbackup-splash #to end progressbar
+}
+
+kill_logbox(){
+#kill all pbackup processes
+for I in `ps -eo pid,command | grep func | grep logbox | awk '{print $1}'`; do kill -9 $I; done
+for I in `ps -eo pid,command | grep -i tailbox | awk '{print $1}'`; do kill -9 $I; done
+}
+
+default_variables(){
+PROFILE="Pbackup_default"
+export LANGUAGE="auto"
+FILEMANAGER="rox"
+CRON_EDITOR="pschedule"
+TMPDIR="/tmp/"
+SAVEMODE="CD"
+echo $SAVEMODE > $WORKDIR/pbackup-SAVEMODE
+BCKDEV=$DETECTED_BURNER
+echo $BCKDEV > $WORKDIR/pbackup-BCKDEV
+BCKDATE_FROM="01/01/1970"
+echo $BCKDATE_FROM > $WORKDIR/pbackup-BCKDATE_FROM
+CHKINCREMENTAL="true"
+CHKFULLBACKUP="false"
+CHKSYNC="false"
+CHKREC="true"
+CHKMULTISESSION="false"
+CHKCOMPRESS="false"
+FIND_NAME="*"
+CHKSYMLN="false"
+CHKJOLIET="false"
+MNTPNT="/mnt/cdrom/"
+CHK_WRITEHIST="true"
+CHKTRASH="true"
+CHKLEADING_PATH="true"
+CHKAUTOMOUNT="false"
+WARN_FS="true"
+WARN_MOUNT="true"
+WARN_LEADPATH="true"
+SYNCACTION="1"
+TRASHDIR="/tmp/pbackupTRASH/"
+CHKSYNCSYMLN="false"
+CHKSYNCATTRIBUTES="true"
+CHKSYNCUPDATESYM="false"
+LASTSUCCESS="---"
+LASTRUNTXT="---"
+LASTSTATUS="$LOC490"
+export FTPSERVER="ftp.server.com"
+export FTPSERVERDIR="/"
+export FTPUSERNAME="username"
+export FTPPASSWORD="puppy"
+echo "$HOME/my-documents/" > $WORKDIR/pbackup-include
+echo > $WORKDIR/pbackup-exclude_backup
+echo > $WORKDIR/pbackup-exclude_sync
+}
+
+get_config (){
+CHAIN="false"
+. "$CONF" #get profile
+build_task_items
+if [ "$CHAIN" = "true" ]; then return; fi
+convert_date	
+#include
+TMP=`echo "$INCLUDE" | sed -e s/^.*\=//g | sed -e "s/ /{ð®SSSđþ}/g" | sed -e "s/|/ /g"`
+echo -e "\c" > $WORKDIR/pbackup-include
+for K in $TMP; do
+	K=`echo "$K" | sed -e "s/{ð®SSSđþ}/ /g"`
+	echo $K >> $WORKDIR/pbackup-include
+done
+#exclude from backup
+TMP=`echo "$EXCLUDE_BACKUP" | sed -e s/^.*\=//g | sed -e "s/ /{ð®SSSđþ}/g" | sed -e "s/|/ /g"`
+echo -e "\c" > $WORKDIR/pbackup-exclude_backup
+for K in $TMP; do
+	K=`echo "$K" | sed -e "s/{ð®SSSđþ}/ /g"`
+	echo $K >> $WORKDIR/pbackup-exclude_backup
+done
+#exclude from syncing
+TMP=`echo "$EXCLUDE_SYNC" | sed -e s/^.*\=//g | sed -e "s/ /{ð®SSSđþ}/g" | sed -e "s/|/ /g"`
+echo -e "\c" > $WORKDIR/pbackup-exclude_sync
+for K in $TMP; do
+	K=`echo "$K" | sed -e "s/{ð®SSSđþ}/ /g"`
+	echo $K >> $WORKDIR/pbackup-exclude_sync
+done
+}
+
+build_task_items (){
+#build tasks for <tree>. Could have started main_window, but slows rendering when not needed
+echo > $WORKDIR/pbackup-tmp
+for I in `ls "$HOME"/.pbackup/profiles/`; do
+	TMPCONF="$HOME/.pbackup/profiles/$I"
+	TMP1=`grep CHKINCREMENTAL= "$TMPCONF" | sed -e s/^.*\=//g`
+	TMP2=`grep CHKFULLBACKUP= "$TMPCONF" | sed -e s/^.*\=//g`
+	TMP3=`grep CHKSYNC= "$TMPCONF" | sed -e s/^.*\=//g`
+	TMP4=`grep -m 1 CHAIN= "$TMPCONF" | sed -e s/^.*\=//g`
+	TMP6=`grep LASTRUNTXT= "$TMPCONF" | sed -e s/^.*\=//g | sed -e 's/"//g'`
+	TMP7=`grep LASTSTATUS= "$TMPCONF" | sed -e s/^.*\=//g | sed -e 's/"//g'`
+	TMPBCKDATE=`grep BCKDATE_FROM= "$TMPCONF" | sed -e s/^.*\=//g`
+	if [ "$TMP1" = "true" ]; then BACKUPTYPE="$LOC111"; fi
+	if [ "$TMP2" = "true" ]; then BACKUPTYPE="$LOC112"; fi
+	if [ "$TMP3" = "true" ]; then BACKUPTYPE="$LOC113"; fi
+	if [ "$TMP4" = "true" ]; then BACKUPTYPE="$LOC114"; fi
+	#set schedule
+	CRONTIME=`grep "\"$I\"" /var/spool/cron/crontabs/$USER | grep "pbackup" | sed -e 's/\/usr[^\.]*$//'` #until first /
+	if [ -z "$CRONTIME" ]; then
+		SCHEDULE="---"
+	else
+		case "$CRONTIME" in
+			'1 * * * * ')	SCHEDULE=`echo "$LOC581" | cut -d "-" -f 1`;; #preset hourly
+			'15 9 * * * ')	SCHEDULE=`echo "$LOC582" | cut -d "-" -f 1`;; #preset daily
+			'31 9 * * 1 ')	SCHEDULE=`echo "$LOC583" | cut -d "-" -f 1`;; #preset weekly
+			'45 9 1 * * ')	SCHEDULE=`echo "$LOC584" | cut -d "-" -f 1`;; #preset monthly
+			'*/2 * * * * ')	SCHEDULE=`echo "$LOC585" | cut -d "-" -f 1`;; #preset realtime
+			*)				SCHEDULE="$CRONTIME";;
+		esac
+	fi
+	#---
+	if [ "$I" = "$PROFILE" ]; then #give active task a red ball
+		echo -e "<item stock=\"gtk-media-record\">$I|$BACKUPTYPE|$SCHEDULE|$TMP6|$TMP7</item>" >> $WORKDIR/pbackup-tmp
+	else
+		echo -e "<item stock=\"gtk-nothing\">$I|$BACKUPTYPE|$SCHEDULE|$TMP6|$TMP7</item>" >> $WORKDIR/pbackup-tmp
+	fi
+done
+TREE_ITEMS=`cat $WORKDIR/pbackup-tmp`
+}
+
+syncing(){
+echo "$LOC161..." >> $LOG #just let something be added to log incase huge amount of datas that will spin awhile
+if [ "$CHKLEADING_PATH" = "false" ]; then
+	if [ `cat $WORKDIR/pbackup-include | wc -l` -gt 1 ]; then 
+		ERROR="$LOC380"; error_dialog; fi
+	if [ "$WARN_LEADPATH" = "true" ]; then
+		WARNING="$LOC420 $BCKDEV"
+		warning_dialog
+	fi
+fi
+#Start loop, check included directories, one by one
+while read BCKDIR; do
+	#Check if source and destination exist
+	find "$BCKDIR" > /dev/null 2>&1
+	if [ $? != 0 ];then ERROR="$LOC381 $BCKDIR"; error_dialog; fi
+	find "$BCKDEV" > /dev/null 2>&1
+	if [ $? != 0 ];then ERROR="$LOC381 $BCKDEV"; error_dialog; fi
+	#check if backup directory is a DIRECTORY or symlink pointing to one
+	if [ `readlink "$BCKDIR"` ]; then
+		TMP2=`readlink "$BCKDIR"`
+		TMP=`find "$TMP2" -type d`
+	else
+		TMP=`find "$BCKDIR" -type d`
+	fi
+	if [ -z "$TMP" ]; then ERROR="$LOC399"; error_dialog; fi
+	#Search
+	echo > $WORKDIR/pupbck-files #syncing handles search one by one, backup handles all in one 
+	echo > $WORKDIR/pupbck-links
+	echo > $WORKDIR/pupbck-dirs
+	make_searchlist
+	#---
+	if [ "$CHKLEADING_PATH" = "true" ]; then
+		SYNCDIR=`echo "$BCKDEV""syncfiles$BCKDIR"`
+		mkdir "$BCKDEV""syncfiles/" > /dev/null 2>&1
+	else
+		SYNCDIR=`echo "$BCKDEV"`
+	fi
+	#Check if filesystem in source and taget differs.
+	if [ "$WARN_FS" = "true" ]; then 
+		echo "$LOC462" >> $LOG
+		echo "$LOC462" >> $LOG2
+		echo " " > "$BCKDIR""pbackup-testfile" #temporary files for 'find'
+		echo " " > "$BCKDEV""pbackup-testfile"
+		FSBCK=`find "$BCKDIR""pbackup-testfile" -printf "%F"`
+		FSSYNC=`find "$BCKDEV""pbackup-testfile" -printf "%F"`
+		rm "$BCKDIR""pbackup-testfile"
+		rm "$BCKDEV""pbackup-testfile"
+		if [ `echo "$FSBCK" | cut -c -3` != `echo "$FSSYNC" | cut -c -3` ]; then #check only first 3 chars
+			WARNING="$LOC421 $FSBCK $FSSYNC"; warning_dialog; fi
+	fi
+	#Make files (lists) with files|dirs|links in sourcedir and syncdir. Then run Diff.
+	echo -e "\c" > $WORKDIR/pupbck-syncfiles
+	echo -e "\c" > $WORKDIR/pupbck-synclinks
+	echo -e "\c" > $WORKDIR/pupbck-syncdirs
+	echo -e "\c" > $WORKDIR/pupbck-del
+	echo -e "\c" > $WORKDIR/pupbck-cpfiles
+	echo -e "\c" > $WORKDIR/pupbck-cplinks
+	echo -e "\c" > $WORKDIR/pupbck-cpdirs
+	TMP=`ls "$SYNCDIR" 2> /dev/null` #does syncdir dir exist?
+	if [ "$TMP" ]; then
+		find "$SYNCDIR" -type f -printf "$PRINTF" >> $WORKDIR/pupbck-syncfiles
+		find "$SYNCDIR" -type d -printf "$PRINTF_DIR" >> $WORKDIR/pupbck-syncdirs
+		find "$SYNCDIR" -type l -printf "$PRINTF_DIR" >> $WORKDIR/pupbck-synclinks
+		#test if options 'Follow symlinks' and 'Update symlinks' has changed.
+		#If they have, make all symlinks differ from source, so they will be updated
+		CHECKLN="false"
+		TMP=`grep follow_symlink_sync= "$CONF" | sed -e s/^.*\=//g`
+		if [ "$CHKSYNCSYMLN" != "$TMP" ]; then CHECKLN="true"; fi
+		TMP=`grep check_update_symlink= "$CONF" | sed -e s/^.*\=//g`
+		if [ "$CHKSYNCUPDATESYM" != "$TMP" ]; then CHECKLN="true"; fi
+		if [ "$CHECKLN" = "true" ]; then
+			PRINTF_DIR="%p"
+			if [ "$CHKSYNCSYMLN" = "true" ] || [ "$CHKSYNCUPDATESYM" = "true" ]; then
+				find "$SYNCDIR" -type l -delete
+			else
+				find "$BCKDIR" -type l > $WORKDIR/pupbck-tmp
+				sed -i -e "s%$BCKDIR%$SYNCDIR$BCKDIR%g" $WORKDIR/pupbck-tmp
+				sed -i -e "s/\/\//\//g" $WORKDIR/pupbck-tmp #squeeze double //
+				while read TMP; do
+					rm -drf "$TMP" > /dev/null 2>&1
+				done < $WORKDIR/pupbck-tmp
+			fi		
+		fi
+	fi
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-syncfiles
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-syncfiles
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-synclinks
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-synclinks
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-syncdirs
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-syncdirs
+	#make source path equal to syncing lists.
+	sed -i -e "s%$BCKDIR%$SYNCDIR%g" $WORKDIR/pupbck-files
+	sed -i -e "s%$BCKDIR%$SYNCDIR%g" $WORKDIR/pupbck-links
+	sed -i -e "s%$BCKDIR%$SYNCDIR%g" $WORKDIR/pupbck-dirs
+	#---
+	diff $WORKDIR/pupbck-files $WORKDIR/pupbck-syncfiles > $WORKDIR/pupbck-diffiles 2> /dev/null
+	diff $WORKDIR/pupbck-links $WORKDIR/pupbck-synclinks > $WORKDIR/pupbck-difflinks 2> /dev/null
+	diff $WORKDIR/pupbck-dirs $WORKDIR/pupbck-syncdirs > $WORKDIR/pupbck-diffdirs 2> /dev/null
+	while read J; do
+		TMP=`echo $J | grep "< /"` #files only in source
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-cpfiles
+		fi
+		TMP=`echo $J | grep "> /"` #files only in syncdir
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-del
+		fi
+	done < $WORKDIR/pupbck-diffiles
+	while read J; do
+		TMP=`echo $J | grep "< /"` #files only in source
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-cplinks
+		fi
+		TMP=`echo $J | grep "> /"` #files only in syncdir
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-del
+		fi
+	done < $WORKDIR/pupbck-difflinks
+	while read J; do
+		TMP=`echo $J | grep "< /"` #files only in source
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-cpdirs
+		fi
+		TMP=`echo $J | grep "> /"` #files only in syncdir
+		if test "$TMP"; then
+			echo "$TMP" | cut -d "|" -f 1 >> $WORKDIR/pupbck-del
+		fi
+	done <  $WORKDIR/pupbck-diffdirs
+
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-cpfiles > /dev/null 2>&1 # back to normal
+	sed -i -e "s/\/\//\//g" $WORKDIR/pupbck-cpfiles > /dev/null 2>&1 #squeeze double //
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-cplinks > /dev/null 2>&1 # back to normal
+	sed -i -e "s/\/\//\//g" $WORKDIR/pupbck-cplinks > /dev/null 2>&1 #squeeze double //
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-cpdirs > /dev/null 2>&1 # back to normal
+	sed -i -e "s/\/\//\//g" $WORKDIR/pupbck-cpdirs > /dev/null 2>&1 #squeeze double //
+	sed -i -e "s/> \//\//g" $WORKDIR/pupbck-del > /dev/null 2>&1
+	sed -i -e "s/\/\//\//g" $WORKDIR/pupbck-del > /dev/null 2>&1
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-cpfiles > /dev/null 2>&1
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-cpfiles
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-cplinks > /dev/null 2>&1
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-cplinks
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-cpdirs > /dev/null 2>&1
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-cpdirs
+	sort -ru --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-del > /dev/null 2>&1 #-r mkdir will get empty dirs at last
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-del
+#========== SYNC-files =============
+	#Divide files unique in syncdir into 2 categories.
+	#Files newer than last syncing --> choosen action on these files.
+	#Older ones are trashfiles.
+	echo -e "\c" > $WORKDIR/pupbck-syncfiles
+	echo -e "\c" > $WORKDIR/pupbck-trash
+	if [ -s $WORKDIR/pupbck-del ]; then #if delete list (file) exist
+		while read FILE; do
+			FILESEC=`find "$FILE" -printf "%Ts"`
+			if [ $FILESEC -gt $LASTSUCCESS > /dev/null 2>&1 ]; then
+				echo "$FILE" >> $WORKDIR/pupbck-syncfiles
+			else
+				echo "$FILE" >> $WORKDIR/pupbck-trash
+			fi
+		done < $WORKDIR/pupbck-del
+	fi
+#====== Syncfiles ======
+	echo -e "$LOC463" >> $LOG
+	echo -e "$LOC463" >> $LOG2
+	echo -e "\c" > $WORKDIR/pbackup-tmp
+	mkdir $WORKDIR/pbackupSYNC > /dev/null 2>&1
+	if [ -s $WORKDIR/pupbck-syncfiles ]; then #if syncing list (file) exist
+		while read FILE; do
+			if [ "$INSPECT" = "false" ]; then
+				case "$SYNCACTION" in
+					1)
+						sed -i -e "s%$J%%g" $WORKDIR/pupbck-cpfiles
+						;;
+					3)
+						TMP=`basename "$FILE"`
+						cp -fp "$FILE" "$WORKDIR/pbackupSYNC/$TMP"
+						sed -i -e "s%$J%%g" $WORKDIR/pupbck-cpfiles
+						;;
+				esac
+			fi
+			echo "        $FILE" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pupbck-syncfiles
+		cat $WORKDIR/pbackup-tmp >> $LOG2
+	fi
+#======= Trashfiles =======
+	echo -e "$LOC464" >> $LOG
+	echo -e "$LOC464" >> $LOG2
+	echo -e "\c" > $WORKDIR/pbackup-tmp
+	mkdir "$TRASHDIR" > /dev/null 2>&1
+	if [ -s $WORKDIR/pupbck-trash ]; then #if trash list (file) exist
+		while read FILE; do
+			if [ "$CHKLEADING_PATH" = "true" ]; then
+				find $FILE/* -type d > /dev/null 2>&1 #move dirs only if its empty
+				if test $? = 0; then
+					continue
+				fi
+			fi
+			if [ "$INSPECT" = "false" ]; then
+				if [ "$CHKTRASH" = "true" ]; then
+					cp -f --parents "$FILE" "$TRASHDIR" > /dev/null 2>&1
+				fi
+				rm -f "$FILE" > /dev/null 2>&1
+				rmdir "$FILE" > /dev/null 2>&1
+			fi
+			echo "        $FILE" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pupbck-trash
+		cat $WORKDIR/pbackup-tmp >> $LOG2
+	fi
+#====== update dirs ======
+	echo -e "$LOC465" >> $LOG
+	echo -e "$LOC465" >> $LOG2
+	echo -e "\c" > $WORKDIR/pbackup-tmp
+	if [ -s $WORKDIR/pupbck-cpdirs ]; then #if delete list (file) exist
+		while read TARGET; do
+			if [ "$INSPECT" = "false" ]; then
+				mkdir "$TARGET" > /dev/null 2>&1
+				if [ $? = 0 ]; then echo "        $TARGET"  >> $WORKDIR/pbackup-tmp; fi
+#			else
+#				echo "        $TARGET"  >> $WORKDIR/pbackup-tmp
+			fi
+		done < $WORKDIR/pupbck-cpdirs
+		cat $WORKDIR/pbackup-tmp >> $LOG2
+	fi
+	#--
+	CP_U=""; if [ "$SYNCACTION" = "1" ]; then CP_U="-u"; fi
+#====== update links ======
+	echo -e "$LOC466" >> $LOG
+	echo -e "$LOC466" >> $LOG2
+	echo -e "\c" > $WORKDIR/pbackup-tmp
+	UPDATESYM=""; if [ "$CHKSYNCUPDATESYM" = "true" ]; then UPDATESYM="-s"; fi
+	if [ -s $WORKDIR/pupbck-cplinks ]; then #if delete list (file) exist
+		while read J; do
+			if [ "$CHKLEADING_PATH" = "false" ]; then
+				FILE=`echo "$BCKDIR""$J" | sed -e "s%$SYNCDIR%%g"` #switch path
+				TARGET="$J"
+				PARENTS=""
+ 			else
+				FILE=`echo "$BCKDIR""$J" | sed -e "s%$SYNCDIR%%g"` #keep path
+ 				TARGET="$BCKDEV""syncfiles/"
+ 				PARENTS="--parents"
+  			fi
+			if [ "$INSPECT" = "false" ]; then
+				cp -fp $CP_U $UPDATESYM $FOLLOW_SYM $PARENTS "$FILE" "$TARGET"
+			fi
+			echo "        $FILE"  >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pupbck-cplinks
+		cat $WORKDIR/pbackup-tmp >> $LOG2
+	fi
+#====== update files ======
+	echo -e "$LOC467" >> $LOG
+	echo -e "$LOC467" >> $LOG2
+	echo -e "\c" > $WORKDIR/pbackup-tmp
+	if [ -s $WORKDIR/pupbck-cpfiles ]; then #if delete list (file) exist
+		while read J; do
+			if [ "$CHKLEADING_PATH" = "false" ]; then
+				FILE=`echo "$BCKDIR""$J" | sed -e "s%$SYNCDIR%%g"` #switch path
+				TARGET="$J"
+				PARENTS=""
+ 			else
+				FILE=`echo "$BCKDIR""$J" | sed -e "s%$SYNCDIR%%g"` #keep path
+ 				TARGET="$BCKDEV""syncfiles/"
+				PARENTS="--parents"
+ 			fi
+			if [ "$INSPECT" = "false" ]; then
+				cp -fp $CP_U $PARENTS "$FILE" "$TARGET"
+			fi
+			echo "        $FILE" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pupbck-cpfiles
+		cat $WORKDIR/pbackup-tmp >> $LOG2
+	fi
+done < $WORKDIR/pbackup-include
+if [ "$INSPECT" = "false" ]; then
+	TXT_FINISH="$LOC350"
+else
+	TXT_FINISH="$LOC351"
+fi
+finish
+}
+
+make_searchlist(){
+DEPTH=100 #search recursively (find)
+PRINTF="%p\n" #print only name as default (find)
+PRINTF_DIR="%p\n"
+#get nr of days for alterative save-to-date
+TMP=`cat $WORKDIR/pbackup-BCKDATE_TO | sed -e "s/\// /g" | awk '{print $2} {print $1} {print $3}'`
+BCKDATE_TO1=`echo $TMP | sed -e "s/ /\//g"`
+TMP=`date -d $BCKDATE_TO1 +%s`
+TMP2=`expr $TMP / 60 / 60 / 24`
+DAYS_TO=`expr $TODAY_DAYS - $TMP2`
+if [ $DAYS_TO != 0 ]; then DAYS_TO=`expr $DAYS_TO - 1`; fi #be sure to include today
+#---
+CTIME_TO="-$DAYS"
+if [ "$CHKSYNC" = "true" ]; then
+	FIND_NAME="*"
+	if [ "$CHKSYNCATTRIBUTES" = "true" ]; then
+		PRINTF="%p|%s|%Ts|%u|%g|%m\n" #print file's attributes (find)
+		PRINTF_DIR="%p|%s|%u|%g|%m\n" #mkdir gets trouble with mtime
+	else
+		PRINTF="%p|%s\n" #comparing size is safe over different filesystems 
+		PRINTF_DIR="%p|%s\n" 
+	fi
+	SYMLN="$CHKSYNCSYMLN"
+else
+	if [ "$CHKREC" = "false" ]; then DEPTH=1; fi #set maxdepth (find)
+	SYMLN="$CHKSYMLN"
+	if [ $DAYS_TO != 0 ]; then CTIME_TO="+$DAYS_TO"; fi
+fi
+if [ $DAYS_TO -gt $DAYS ]; then ERROR="Save-to-date is newer than Save-from-date."; error_dialog; fi
+if [ $SYMLN = "true" ]; then
+	SYM_FIND="-L"; FOLLOW_SYM="-L"
+else #FOLLOW_SYM points to cp
+	SYM_FIND="-P"; FOLLOW_SYM="-d"
+fi
+echo "$BCKDIR ..." >>$LOG
+echo "$BCKDIR ..." >> $LOG2
+if [ -n "$BCKDIR" ]; then
+	echo "$LOC468" >> $LOG
+	echo "$LOC468" >> $LOG2
+	find -P "$BCKDIR" -maxdepth $DEPTH -noleaf -type l -mtime "$CTIME_TO" -mtime -$DAYS -name "$FIND_NAME" -printf "$PRINTF_DIR" >> $WORKDIR/pupbck-links
+	find $SYM_FIND "$BCKDIR" -maxdepth $DEPTH -noleaf -type f -mtime "$CTIME_TO" -mtime -$DAYS -name "$FIND_NAME" -printf "$PRINTF" >> $WORKDIR/pupbck-files
+	find $SYM_FIND "$BCKDIR" -maxdepth $DEPTH -noleaf -type d -mtime "$CTIME_TO" -mtime -$DAYS -name "$FIND_NAME" -printf "$PRINTF_DIR" >> $WORKDIR/pupbck-dirs
+	#Exclude from list
+	if [ "$CHKSYNC" = "true" ]; then
+		TMPEXCLUDE=`grep "/" $WORKDIR/pbackup-exclude_sync` #Check file exist and not empty
+		cp $WORKDIR/pbackup-exclude_sync $WORKDIR/pbackup-exclude
+	else
+		TMPEXCLUDE=`grep "/" $WORKDIR/pbackup-exclude_backup` #Check file exist and not empty
+		cp $WORKDIR/pbackup-exclude_backup $WORKDIR/pbackup-exclude
+		#add empty dirs to pupbck-files (for TAR and MKISOFS.)
+		echo "$LOC469" >> $LOG
+		echo "$LOC469" >> $LOG2
+		while read TMP; do 
+			TMP2=`ls "$TMP" 2> /dev/null`
+			if test -z $TMP2 > /dev/null 2>&1; then
+				echo $TMP >> $WORKDIR/pupbck-files
+			fi
+		done < $WORKDIR/pupbck-dirs
+	fi
+	if [ "$TMPEXCLUDE" ]; then #start check of excluded files
+		echo "$LOC470" >> $LOG
+		echo "$LOC470" >> $LOG2
+		echo "" > $WORKDIR/pupbck-tmpf
+		echo "" > $WORKDIR/pupbck-tmpl
+		echo "" > $WORKDIR/pupbck-tmpd
+		while read TMP; do 
+			find "$TMP" -noleaf -mtime -$DAYS -name "$FIND_NAME" -type f -printf "$PRINTF" >> $WORKDIR/pupbck-tmpf #excluded files 
+			find "$TMP" -noleaf -mtime -$DAYS -name "$FIND_NAME" -type l -printf "$PRINTF" >> $WORKDIR/pupbck-tmpl #excluded symlinks
+			find "$TMP" -noleaf -mtime -$DAYS -name "$FIND_NAME" -type d -printf "$PRINTF" >> $WORKDIR/pupbck-tmpd #excluded dirs
+		done < $WORKDIR/pbackup-exclude
+		diff $WORKDIR/pupbck-files $WORKDIR/pupbck-tmpf > $WORKDIR/pupbck-tmp2f
+		diff $WORKDIR/pupbck-links $WORKDIR/pupbck-tmpl > $WORKDIR/pupbck-tmp2l
+		diff $WORKDIR/pupbck-dirs $WORKDIR/pupbck-tmpd > $WORKDIR/pupbck-tmp2d
+		echo > $WORKDIR/pupbck-files
+		echo > $WORKDIR/pupbck-links
+		echo > $WORKDIR/pupbck-dirs
+		while read J; do #find only 'diff file1'
+			TMP2=`echo $J | grep "< /"`
+			if [ "$TMP2" ]; then
+				echo $TMP2 >> $WORKDIR/pupbck-files
+			fi
+		done < $WORKDIR/pupbck-tmp2f
+		while read J; do #find only 'diff file1'
+			TMP2=`echo $J | grep "< /"`
+			if [ "$TMP2" ]; then
+				echo $TMP2 >> $WORKDIR/pupbck-links
+			fi
+		done < $WORKDIR/pupbck-tmp2l
+		while read J; do #find only 'diff file1'
+			TMP2=`echo $J | grep "< /"`
+			if [ "$TMP2" ]; then
+				echo $TMP2 >> $WORKDIR/pupbck-dirs
+			fi
+		done < $WORKDIR/pupbck-tmp2d
+	fi
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-files # back to normal
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-links
+	sed -i -e "s/< \//\//g" $WORKDIR/pupbck-dirs
+	sort -u --output=$WORKDIR/pupbck-files $WORKDIR/pupbck-files
+	sort -u --output=$WORKDIR/pupbck-links $WORKDIR/pupbck-links
+	sort -u --output=$WORKDIR/pupbck-dirs $WORKDIR/pupbck-dirs
+fi
+}
+
+chain(){
+CHAINPROFILE="$PROFILE"
+CHAINLOOP="true"
+BACKUPS_COUNT=0
+BACKUPS_TOTAL=`echo "$TASKCHAIN" | wc -w`
+while read PROFILE; do #run one profile each loop
+	[ ! "$PROFILE" ] && break
+	#quiet mode: check if it is a chain task
+	if [ "`grep 'CHAIN' $HOME/.pbackup/profiles/$PROFILE`" ]; then
+		echo ...error: $PROFILE is a chain
+		exit
+	fi
+	#---
+	BACKUPS_COUNT=`expr $BACKUPS_COUNT + 1`
+	export CONF="$HOME/.pbackup/profiles/$PROFILE"
+	if [ -z `find "$CONF" 2> /dev/null` ]; then #another backup runs
+		echo "Unknown task: $PROFILE"
+		exit
+	fi
+	get_config
+	make_backup
+done < $WORKDIR/pbackup-chain
+}
+
+make_backup(){
+cleanup
+SAVEMODE=`cat $WORKDIR/pbackup-SAVEMODE` #gui entry must save in files to render inside gtkdialog
+BCKDEV=`cat $WORKDIR/pbackup-BCKDEV`
+export IMG=`echo $TMPDIR"pupbck.img"`
+convert_date
+if test "$DAYS" -lt "0"; then ERROR="$LOC385 $TODAY"; error_dialog; fi
+if [ $INSPECT = "true" ] && [ $CHAIN = "true" ]; then ERROR="$LOC400"; error_dialog; fi
+if [ $Q != 1 ];then #Quiet mode
+	"$PROG_PATH"func -logbox &
+fi
+#============ Chain ==============
+if [ "$CHAINLOOP" = "true" ]; then
+	GUISAVETASK=""
+	if [ $BACKUPS_COUNT -gt 1 ]; then
+		cat $WORKDIR/pbackup-chainlog 1> $LOG 2> /dev/null
+		cat $WORKDIR/pbackup-chainlog2 1> $LOG2 2> /dev/null
+	fi
+else
+	GUISAVETASK="<checkbox><label>$LOC516 </label><variable>SAVE_TASK</variable><default>true</default></checkbox>"
+fi
+#====== automounting of harddrives =========
+if [ "$SAVEMODE" = "HD" ]; then
+	TMP=`echo "$BCKDEV" | grep "/mnt/"` #is target dir pointing inside /mnt/
+	if [ $TMP ]; then DEVICE=`echo "$TMP" | cut -d / -f 3`; fi #find devicename
+	TMP=`mount | grep "$DEVICE"`
+	if [ -z "$TMP" ]; then #is device mounted
+		if [ "$CHKAUTOMOUNT" = "true" ]; then
+			echo "$LOC473 /dev/$DEVICE..." >> $LOG
+			mount -t auto /dev/$DEVICE /mnt/$DEVICE
+			AUTOMOUNT="true"
+			GUIAUTOMOUNT="<checkbox><variable>AUTOMOUNT</variable><label>$LOC342</label><default>$AUTOMOUNT</default></checkbox>"
+			sleep 3
+		else
+			GUIAUTOMOUNT=""
+			if [ "$WARN_MOUNT" = "true" ]; then
+				WARNING="<b>$LOC422</b>"; warning_dialog
+			fi
+		fi
+	fi
+fi
+#============= syncing ==============
+if [ "$CHKSYNC" = "true" ]; then
+	if [ "$SAVEMODE" != "HD" ]; then ERROR="$LOC383"; error_dialog #can't burn syncing
+	else
+		TMPBCKDATE_FROM=$BCKDATE_FROM
+		BCKDATE_FROM="01/01/1970" #overide date if syncing
+		convert_date
+		BCKDATE_FROM=$TMPBCKDATE_FROM #back to normal
+		syncing
+	fi
+fi
+#============= Search =============
+while read BCKDIR; do
+	make_searchlist #create textfile with filenames
+done < $WORKDIR/pbackup-include
+#===== Backup inspect =============
+GUIDOREALBACKUP=""
+if [ $INSPECT = "true" ]; then
+	GUIDOREALBACKUP="<checkbox><label>$LOC341</label><variable>DOREALBACKUP</variable></checkbox>"
+	echo -e "\n$LOC471\n$LOC472" >> $LOG2
+	cat $WORKDIR/pupbck-files >> $LOG2
+	cat $WORKDIR/pupbck-links >> $LOG2
+	TXT_FINISH="$LOC352"
+	finish
+fi
+#--
+if [ "$SAVEMODE" != "HD" ]; then 
+	umount $BCKDEV > /dev/null 2>&1
+	cat $WORKDIR/pupbck-links >> $WORKDIR/pupbck-files #doesn't divide links and files when burning
+	sort -u --output=$WORKDIR/pbackup-tmp $WORKDIR/pupbck-files
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pupbck-files
+fi
+TMP=`grep "/" $WORKDIR/pupbck-files`
+if [ -z $TMP ] > /dev/null 2>&1; then #No files found
+	if [ "$CHKINCREMENTAL" = "true" ] && [ "$LASTSTATUS" = "$LOC491" ]; then #status quo
+		STATUS_QUO="true"
+		finish
+	fi
+	ERROR="$LOC386"
+	error_dialog
+fi
+if [ "$CHKFULLBACKUP" = "false" ]; then
+	BACKUPDIR_DATE="Backup_""$BCKDATE_FROM2""---$TODAY"
+else
+	BACKUPDIR_DATE="Backup_$TODAY"
+fi
+#===== COMPRESS ============================= 
+if [ "$SAVEMODE" = "HD" ]; then
+	TARFILE=`echo "$BCKDEV$BACKUPDIR_DATE"`
+else
+	TARFILE=`echo "$TMPDIR$BACKUPDIR_DATE"`
+fi
+if [ $CHKCOMPRESS = "true" ]; then
+	echo "$LOC460" >> $LOG; echo "$LOC460" >> $LOG2
+	cat $WORKDIR/pupbck-files >> $LOG2
+	if test $CHKSYMLN = "true"; then
+		tar -cph -T $WORKDIR/pupbck-files -f "$TARFILE" >> $LOG 2>&1 #if HD, then copy *.tgz to path (not $WORKDIR/)
+	else
+		tar -cp -T $WORKDIR/pupbck-files -f "$TARFILE" >> $LOG 2>&1
+	fi
+	gzip -f -S .tgz $TARFILE >> $LOG 2>&1
+fi
+#===== MKISOFS ============================== 
+if [ "$CHKJOLIET" = "true" ]; then J="-J"; else J=""; fi
+if [ "$CHKSYMLN" = "true" ]; then FOLLOW_SYM="-f"; else FOLLOW_SYM=""; fi
+case $SAVEMODE in
+"CD")
+	if [ "`which $MKISOFS`" = "" ]; then ERROR="$LOC405""$MKISOFS, $CDRECORD"; error_dialog; fi
+	if test "$CHKMULTISESSION" = "false";then
+		echo -e "$MKISOFS -R -D $J $FOLLOW_SYM -o $IMG -p "Pbackup" -graft-points \c" > $WORKDIR/pupbck-mkisofs
+	else
+		$CDRECORD -msinfo dev=$BCKDEV 1> $WORKDIR/pupbck-tmp 2>> $LOG # checking CD for previous
+		SECTIONS=`grep "," $WORKDIR/pupbck-tmp`
+		if test -z $SECTIONS; then # No previous backup found
+			echo -e "$MKISOFS -R $J $FOLLOW_SYM -D -p "Pbackup" -o $IMG -graft-points \c" > $WORKDIR/pupbck-mkisofs
+		else
+			echo -e "$MKISOFS -R $J $FOLLOW_SYM -D -o $IMG -C $SECTIONS -M $BCKDEV -p "Pbackup" -graft-points \c" > $WORKDIR/pupbck-mkisofs
+		fi
+	fi
+	if test "$CHKCOMPRESS" = "false"; then
+		cat $WORKDIR/pbackup-include | awk '{printf("\"%s%s\"=\"%s\" ", '\"$BACKUPDIR_DATE\"', $0, $0);}' | sort -u >> $WORKDIR/pupbck-mkisofs
+	else
+		TMP=`basename "$TARFILE"` 
+		echo -e "\"$TMP.tgz\"=\"$TARFILE.tgz\"" >> $WORKDIR/pupbck-mkisofs
+	fi
+	chmod 777 $WORKDIR/pupbck-mkisofs
+	. $WORKDIR/pupbck-mkisofs >> $LOG  2>&1
+	if [ $? != 0 ]; then error_check; fi
+#===== CDRECORD ===========================
+	MULTI=""
+	if [ "$CHKMULTISESSION" = "true" ]; then MULTI="-multi"; fi
+	$CDRECORD -tao $MULTI dev=$BCKDEV $IMG >> $LOG  2>&1
+	if [ $? != 0 ]; then error_check; fi;;
+#===== GROWISOFS ==========================
+"DVD")
+	if [ "`which growisofs`" = "" ]; then ERROR="$LOC405""growisofs"; error_dialog; fi
+	if test "$CHKMULTISESSION" = "false";then
+		echo -e "growisofs -Z $BCKDEV -R $J $FOLLOW_SYM -D -dvd-compat -graft-points \c" > $WORKDIR/pupbck-mkisofs
+	else
+		mount -t iso9660 $BCKDEV $MNTPNT >> $LOG 2>&1
+		if [ $? -eq 0 ];then
+			echo -e "growisofs -M $BCKDEV -R $J $FOLLOW_SYM -D -graft-points \c" > $WORKDIR/pupbck-mkisofs
+			umount $MNTPNT
+		else
+			echo -e "growisofs -Z $BCKDEV -R $J $FOLLOW_SYM -D -graft-points \c" > $WORKDIR/pupbck-mkisofs		
+		fi
+	fi
+	if [ "$CHKCOMPRESS" = "false" ]; then
+		cat $WORKDIR/pbackup-include | awk '{printf("\"%s%s\"=\"%s\" ", '\"$BACKUPDIR_DATE\"', $0, $0);}' | sort -u >> $WORKDIR/pupbck-mkisofs
+	else
+		TMP=`basename "$TARFILE"` 
+		echo -e "\"$TMP.tgz\"=\"$TARFILE.tgz\"" >> $WORKDIR/pupbck-mkisofs
+	fi
+	chmod 777 $WORKDIR/pupbck-mkisofs
+	$WORKDIR/pupbck-mkisofs >> $LOG  2>&1
+	if [ $? != 0 ]; then error_check; fi;;
+#===== COPY TO HD ==========================
+"HD")
+	if [ $CHKCOMPRESS = "false" ]; then
+		echo "$LOC474" >> $LOG
+		echo "$LOC474" >> $LOG2
+		HD_DIR=`echo "$BCKDEV""$BACKUPDIR_DATE"`
+		mkdir -p "$HD_DIR" > /dev/null 2>&1
+		while read TMP; do
+			if [ "$CHKSYMLN" = "true" ]; then
+				cp -fpL --parents "$TMP" "$HD_DIR"
+			else
+				cp -fpd --parents "$TMP" "$HD_DIR"
+			fi
+		done < $WORKDIR/pupbck-files
+		if [ "$CHKSYMLN" = "false" ]; then 
+			while read TMP; do #update symlinks
+				cp -fpds --parents "$TMP" "$HD_DIR"
+			done < $WORKDIR/pupbck-links
+		fi
+		while read TMP; do #empty dirs
+			TMP2=`ls $TMP > /dev/null 2>&1`
+			if [ -z "$TMP2" ];then mkdir "$TMP" > /dev/null 2>&1; fi #this makes only empty dirs
+		done < $WORKDIR/pupbck-dirs
+	fi;;
+#===== TRANSFER TO SERVER ==========================
+"FTP")
+	if [ "`which curl`" = "" ]; then ERROR="$LOC405""curl"; error_dialog; fi #check dependencies
+	echo "$LOC475" >> $LOG; echo "$LOC475" >> $LOG2
+	#ensure that $FTPSERVER has prefix
+	[ ! "`echo "$FTPSERVER" | grep 'ftp://'`" ] && FTPSERVER="ftp://$FTPSERVER"
+	if [ $CHKCOMPRESS = "false" ]; then
+		if [ "$CHKSYMLN" = "true" ]; then
+			#Curl follow symlink anyhow, so if 'follow symlink' is false, symlinks are not
+			#transferred at all.
+			cat $WORKDIR/pupbck-links >> $WORKDIR/pupbck-files #Transfer as is
+		fi
+		while read I; do
+			echo $I >> $LOG2
+			TMP=`dirname $I`
+			FTPDIR=`echo "$BACKUPDIR_DATE""$TMP""/"`
+		 	curl --ftp-create-dirs --progress-bar -T "$I" $FTPSERVER"$FTPSERVERDIR""$FTPDIR" -u $FTPUSERNAME":"$FTPPASSWORD >> $LOG 2>&1
+			error_check
+		done < $WORKDIR/pupbck-files
+ 
+	else
+		FTPDIR=`echo "$BACKUPDIR_DATE""/"`
+		FTPSERVERDIR=`echo "$FTPSERVERDIR""/" | sed -e "s/\/\//\//g"` #Must have a / at the end
+	 	curl --ftp-create-dirs --progress-bar -T "$TARFILE".tgz $FTPSERVER"$FTPSERVERDIR" -u $FTPUSERNAME":"$FTPPASSWORD >> $LOG 2>&1
+		error_check
+	fi
+	TXT_FINISH="$LOC354";;
+esac
+if [ $SAVEMODE != "FTP" ]; then
+	TXT_FINISH="$LOC353"
+fi
+finish
+}
+
+finish(){
+if [ "$INSPECT" = "true" ]; then  #inspection
+	LASTSTATUS="$LOC493"
+else
+	if [ "$STATUS_QUO" = "true" ]; then
+		TXT_FINISH="$LOC355"
+		OPEN_FILEMANAGER="false"
+		LASTSTATUS="$LOC494"
+	else	
+		LASTSTATUS="$LOC491" #success
+	fi
+fi
+LASTSUCCESS=`date +%s`
+LASTRUNTXT=`date +%d.%b\ %H:%M:%S`
+if [ "$INSPECT" = "false" ]; then BCKDATE_FROM=`date +%d/%m/%Y`; fi
+if [ $Q = 1 ];then
+	WRITE_RC="false"; . "$PROG_PATH"func_write_config; cleanup ; rm $WORKDIR/* > /dev/null 2>&1
+	echo "...Finished backup: $PROFILE"
+	unmount
+	if [ $BACKUPS_COUNT = $BACKUPS_TOTAL ]; then exit 0; fi
+	continue
+fi
+WRITE_RC="true"
+if [ $INSPECT = false ]; then
+	case $SAVEMODE in
+	"FTP")	echo;;
+	"HD")	if [ "$OPEN_FILEMANAGER" != "false" ]; then
+				$FILEMANAGER "$BCKDEV" &
+			fi
+			;;
+	*)		eject
+			$CDRECORD -load dev=$BCKDEV
+			FRAME="Info"; TXT1="$LOC356"; IMG="dialog-info"
+			. "$PROG_PATH"box_ok
+			echo "$LOC461" >> $LOG
+			sleep 10
+			mount -t iso9660 $BCKDEV $MNTPNT > /dev/null 2>&1
+			if [ "$OPEN_FILEMANAGER" != "false" ]; then $FILEMANAGER "$MNTPNT"; fi
+			rm -f `echo "$TARFILE.tgz"` > /dev/null 2>&1;;
+	esac
+fi
+kill_logbox
+INSPECT="false"
+#If chain is in loop, write config and continue with next task.
+if [ "$CHAINLOOP" = "true" ]; then
+	export CONF="$HOME/.pbackup/profiles/$PROFILE"; . "$PROG_PATH"func_write_config
+	if [ $BACKUPS_COUNT -lt $BACKUPS_TOTAL ]; then 
+		cat $LOG >> $WORKDIR/pbackup-chainlog #To show log of all tasks
+		cat $LOG2 >> $WORKDIR/pbackup-chainlog2
+		continue
+	fi
+fi
+export finish_box="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+<vbox>
+  <frame $LOC340>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-dialog-info\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT_FINISH\"</label></text></frame>
+   <frame Log>
+    <edit><input file>$LOG2</input><width>350</width><height>200</height></edit></frame>
+$GUIDOREALBACKUP
+$GUIAUTOMOUNT
+$GUISAVETASK
+ <hbox>
+  <button><input file icon=\"gtk-apply\"></input><label>$LOC343</label></button>
+  <text><label>\"\"</label></text>
+ </hbox></vbox></window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=finish_box --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+#write config
+if [ "$CHAINLOOP" = "true" ]; then #write info of chain-task
+	CHAINLOOP="false"
+	PROFILE="$CHAINPROFILE"
+	LASTRUNTXT="---"; LASTSTATUS="---"
+	export CONF="$HOME/.pbackup/profiles/$PROFILE"; CHAIN="true"; . "$PROG_PATH"func_write_config
+else
+	. "$PROG_PATH"func_write_config #ordinary backup
+fi
+#---
+if [ "$DOREALBACKUP" = "true" ]; then DOREALBACKUP="false"; make_backup; fi
+if [ "$FILEMANAGER" = "rox" ]; then
+	$FILEMANAGER -D "$MNTPNT" > /dev/null 2>&1; $FILEMANAGER -D "$BCKDEV" > /dev/null 2>&1
+fi
+unmount
+cleanup ; rm $WORKDIR/* > /dev/null 2>&1; exit 0
+}
+
+error_dialog (){
+kill_logbox
+LASTSTATUS="$LOC492"; LASTRUNTXT=`date +%d.%b\ %H:%M:%S`
+. "$PROG_PATH"func_write_config
+if [ $Q = 1 ];then
+	cleanup; rm $WORKDIR/* > /dev/null 2>&1
+	echo "...Pbackup reported errors, and did not finish."
+	exit
+else
+	export error_box="
+	<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+	<vbox>
+	  <frame $LOC370>
+       <pixmap icon_size=\"6\"><input file stock=\"gtk-dialog-error\"></input></pixmap>
+	   <text use-markup=\"true\"><label>\"<b>$ERROR</b>\"</label></text>
+	   <text><label>$LOC374</label></text></frame>
+	  <frame $LOC371>
+	   <edit><input file>$WORKDIR/pupbck-log</input><width>350</width><height>80</height></edit></frame>
+	 <hbox>
+      <pixmap><input file>$TAB130</input></pixmap>
+      <button>
+	   <input file icon=\"gtk-apply\"></input>
+	   <label>$LOC372</label>
+	   <action type=\"exit\">10</action>
+	  </button>
+	  <button><input file icon=\"gtk-cancel\"></input><label>$LOC373</label></button>
+	 </hbox></vbox></window>"
+	I=$IFS; IFS=""
+	for STATEMENTS in $(gtkdialog3 --program=error_box --center); do
+		eval $STATEMENTS > /dev/null 2>&1
+	done
+	IFS=$I
+	if test $EXIT = 10 > /dev/null 2>&1; then make_backup; fi
+fi
+unmount
+get_config
+main_window
+}
+
+error_check (){
+ERROR=0
+if [ $SAVEMODE = "FTP" ]; then
+	#FTP
+	if test "`grep "Login incorrect" $LOG`";	then ERROR="$LOC403"; error_dialog; fi
+	if test "`grep "t open" $LOG`";				then ERROR="$LOC386"; error_dialog; fi
+	if test "`grep "resolve host" $LOG`";		then ERROR="$LOC404"; error_dialog; fi
+else
+	if test "`grep "No disk" $LOG`";			then ERROR="$LOC387"; error_dialog; fi
+	if test "`grep "Cannot load" $LOG`";		then ERROR="$LOC388"; error_dialog; fi
+	if test "`grep "as recordable DVD" $LOG`";	then ERROR="$LOC390"; error_dialog; fi
+	if test "`grep "LOAD TRAY failed" $LOG`";	then ERROR="$LOC391"; error_dialog; fi
+	if test "`grep "Joliet" $LOG`";				then ERROR="$LOC392"; error_dialog; fi
+	if test "`grep "No such device" $LOG`";		then ERROR="$LOC393"; error_dialog; fi
+	if test "`grep "overburn" $LOG`";			then ERROR="$LOC394"; error_dialog; fi
+	if test "`grep "No space left" $LOG`";		then
+		rm $TMPDIR/pupbck.img
+		ERROR="$LOC389"; error_dialog
+	fi
+	if test "`grep "list too long" $LOG`";		then
+		TMP=`ls -1aR "$BCKDIR" | wc -w` 
+		ERROR=`echo -e "$LOC395 $TMP"`; error_dialog;
+	fi
+	if test "`grep "Invalid argument" $LOG`";	then
+		if test $COUNT -lt 1; then #settings in multisession are probably changed, run once more (often working).
+			COUNT=`expr $COUNT + 1`
+			kill_logbox
+			make_backup;
+		else
+			ERROR="$LOC396"; error_dialog
+		fi
+	fi
+	ERROR="$LOC397"; error_dialog
+fi
+}
+
+warning_dialog (){
+if [ $Q != 1 ];then
+	export warning_box="
+	<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+	<vbox>
+	  <frame $LOC410>
+       <pixmap icon_size=\"6\"><input file stock=\"gtk-dialog-question\"></input></pixmap>
+	   <text use-markup=\"true\"><label>\"$WARNING\"</label></text>
+	   <text><label>$LOC413</label></text>
+      </frame>
+	 <hbox>
+	  <button><input file icon=\"gtk-cancel\"></input><label>$LOC411</label><action type=\"exit\">99</action></button>
+	  <text><label>\"    \"</label></text>
+	  <button><input file icon=\"gtk-apply\"></input><label>$LOC412</label><action type=\"exit\">10</action></button>
+	 </hbox></vbox></window>"
+	I=$IFS; IFS=""
+	for STATEMENTS in $(gtkdialog3 --program=warning_box --center); do
+		eval $STATEMENTS > /dev/null 2>&1
+	done
+	IFS=$I
+	if test $EXIT != 10 > /dev/null 2>&1; then
+		kill_logbox
+		get_config
+		main_window;
+	fi
+fi
+}
+
+wizard (){
+PROFILE_OLD="$PROFILE"
+default_variables
+. $HOME/.pbackup/pbackuphlp
+wizard1
+}
+
+wizard1 (){
+gui_main #get variables
+GUI="$GUI_BACKUP_TYPE"; STEP=1; TXTSTEP="$LOC712"; TXT="$HLPTXT2"; BACK="false"; 
+wizard_gui
+if [ $EXIT = 199 ]; then wizard2; else PROFILE="$PROFILE_OLD"; get_config; main_window; fi
+}
+
+wizard2 (){
+if [ "$CHKINCREMENTAL" = "true" ]; then
+	VISIBLE_DATE="enabled" #enable date
+else
+	VISIBLE_DATE="disabled" #enable date
+fi
+gui_main
+GUI="$GUI_MAIN_SETTINGS"; STEP=2; TXTSTEP="$LOC713"; TXT="$HLPTXT4"; BACK="true"; NEXTTEXT="$LOC_ADVANCED"; BUTTON_FINISH="true"
+BUTTON_ADVANCED="<button><input file stock=\"gtk-go-forward\"></input><label>$LOC_ADVANCED</label><action type=\"exit\">191</action></button>"
+wizard_gui
+case $EXIT in
+	190)	wizard1;;
+	191)	SET_SCHEDULE="false"
+			echo "new" > $WORKDIR/pbackup-tmp
+			save_task; main_window;;
+esac
+if [ $EXIT = 199 ]; then wizard3; else PROFILE="$PROFILE_OLD"; get_config; main_window; fi
+}
+
+wizard3 (){
+BACK="true"
+if [ $CHKSYNC = "true" ]; then
+	GUI="$GUI_SYNC_OPTIONS"; STEP=3; TXTSTEP="$LOC716"; TXT="$HLPTXT61"
+else
+	GUI="$GUI_BACKUP_OPTIONS"; STEP=3; TXTSTEP="$LOC714"; TXT="$HLPTXT51"
+fi
+wizard_gui
+if [ $EXIT = 190 ]; then wizard2; fi
+if [ $EXIT = 199 ]; then wizard4; else PROFILE="$PROFILE_OLD"; get_config; main_window; fi
+}
+
+wizard4 (){
+BACK="true"
+gui_main
+if [ $CHKSYNC = "true" ]; then
+	GUI="$GUI_SYNC_SETTINGS"; STEP=4; TXTSTEP="$LOC717"; TXT="$HLPTXT62"
+	wizard_gui
+else
+	GUI="$GUI_BACKUP_SETTINGS"; STEP=4; TXTSTEP="$LOC715"; TXT="$HLPTXT52"
+	wizard_gui
+fi
+case $EXIT in
+	41)	set_syncaction; wizard4;;
+	190) wizard3;;
+	199) wizard5;;
+	*) PROFILE="$PROFILE_OLD"; get_config; main_window;;
+esac
+}
+
+wizard5 (){
+GUI="$GUI_MISC"; STEP=5; TXTSTEP="$LOC280"; TXT="$HLPTXT7"; BACK="true"
+wizard_gui
+case $EXIT in
+	190) 	wizard4;;
+	199) 	echo "new" > $WORKDIR/pbackup-tmp; SET_SCHEDULE="true"
+			save_task
+			. $PROG_PATH/func_cron_profile
+			build_task_items
+			main_window
+			;;
+	*) 		PROFILE="$PROFILE_OLD"; get_config; main_window;; #reset all settings
+esac
+}
+
+wizard_gui (){
+if [ "$NEXTTEXT" != "$LOC_ADVANCED" ]; then	NEXTTEXT="$LOC_NEXT"; fi
+if [ "$BUTTON_FINISH" = "true" ]; then BUTTON_FINISH="<button><input file stock=\"gtk-go-forward\"></input><label>$LOC_FINISH</label><action type=\"exit\">191</action></button>"; fi
+if [ "$BACK" = "true" ]; then BUTTON_BACK="<button><input file stock=\"gtk-go-back\"></input><label>$LOC_BACK</label><action type=\"exit\">190</action></button>"; fi
+export wizard_gui="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+ <vbox>
+  <hbox>
+   $GUI
+   <vbox>
+    <frame $TXTSTEP>
+     <pixmap icon_size=\"6\"><input file stock=\"gtk-refresh\"></input></pixmap>
+     <text use-markup=\"true\"><label>\"<b>$STEP / 5</b>\"</label></text>
+     <text use-markup=\"true\"><label>\"<b>$TXTSTEP</b>\"</label></text>
+     <text><label>__________________________________</label></text>
+     <hbox>
+      <button>
+       <input file icon=\"gtk-cancel\"></input>
+       <action type=\"exit\">198</action>
+      </button>
+      $BUTTON_BACK
+      <button>
+       <input file stock=\"gtk-go-forward\"></input>
+       <label>$NEXTTEXT</label>
+       <action type=\"exit\">199</action>
+      </button>
+      $BUTTON_FINISH
+     </hbox>
+    </frame>
+   </vbox>
+  </hbox>
+  <text use-markup=\"true\"><label>\"$TXT\"</label></text>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 --program=wizard_gui --center); do
+	eval $STATEMENTS > /dev/null 2>&1
+done
+IFS=$I
+NEXTTEXT=""; BUTTON_BACK=""; BUTTON_FINISH=""
+}
+
+#======================= SETTINGS =========================
+
+set_syncaction (){
+FRAME="$LOC540"; WIDTH=550
+ITEMS="<item>1|$LOC550|$LOC551</item><item>2|$LOC552|$LOC553</item><item>3|$LOC554|$LOC555</item>"
+. "$PROG_PATH"box_list
+if [ "$EXIT" = "99" ]; then 
+	SYNCACTION="$TREE"
+fi
+case "$SYNCACTION" in #Define text for syncaction
+	1) TEXTSYNCACTION="$LOC550";;
+	2) TEXTSYNCACTION="$LOC552";;
+	3) TEXTSYNCACTION="$LOC554";;
+esac
+}
+
+save_task (){
+if [ "`cat $WORKDIR/pbackup-tmp`" = "new" ]; then
+	IMG="new"; FRAME="$LOC152";	TXT1="$LOC507"; DEFAULT="$PROFILE"
+	. "$PROG_PATH"box_input
+	if [ $EXIT = 99 ]; then
+		PROFILE=`echo "$ENTRY" | sed -e "s/ /_/g"`
+		if [ `find "$HOME/.pbackup/profiles/$ENTRY" 2> /dev/null` ]; then #profile exist
+			TXT2="<b>$LOC407</b>"
+			. "$PROG_PATH"func -box_yesno
+			if [ $EXIT != 99 ]; then main_window; fi
+		fi
+		if [ "$SET_SCHEDULE" != "false" ]; then . "$PROG_PATH"cron_profile; fi #simple wiz - No schedule
+		SET_SCHEDULE="true"
+	else
+		get_config; main_window
+	fi
+	LASTRUNTXT="---"; LASTSTATUS="$LOC490"
+fi
+export CONF="$HOME/.pbackup/profiles/$PROFILE"; WRITE_RC="true"; . "$PROG_PATH"func_write_config
+build_task_items #refresh <tree>
+}
+
+convert_date(){ #get nr of days beetween backupday and today
+if test "$CHKSYNC" = "true"; then BCKDATE_FROM="01/01/1970"; fi #syncing doesn't take effect of date setting
+if test "$CHKFULLBACKUP" = "true"; then BCKDATE_FROM="01/01/1970"; fi #Full backup
+TMP=`echo $BCKDATE_FROM | sed -e "s/\// /g" | awk '{print $2} {print $1} {print $3}'`
+BCKDATE_FROM1=`echo $TMP | sed -e "s/ /\//g"` 				#for date
+YEAR=`echo "$BCKDATE_FROM1" | cut -d / -f 3`
+if [ $YEAR -lt 1970 ]; then BCKDATE_FROM="01/01/1970"; ERROR="$LOC398"; error_dialog; fi
+TMP=`echo $BCKDATE_FROM | sed -e "s/\// /g" | awk '{print $3} {print $2} {print $1}'`
+BCKDATE_FROM2=`echo $TMP | sed -e "s/ /-/g"`				#for directory name
+BCKDATE_FROM3=`echo $BCKDATE_FROM | sed -e "s/\// /g"` 		#for Xdialog - calender
+TMP=`date -d $BCKDATE_FROM1 +%s`
+BCKDATE_DAYS=`expr $TMP / 60 / 60 / 24`
+DAYS=`expr $TODAY_DAYS - $BCKDATE_DAYS`
+if [ $DAYS = 0 ]; then	DAYS=1; fi #Possible to do 2 backups in 1 day
+}
+
+main_window (){
+COUNT=0 #For error-check - run growisofs twice
+if [ "$CHKINCREMENTAL" = "true" ]; then VISIBLE_DATE="enabled"; else VISIBLE_DATE="disabled"; fi
+# build input for save-to-entry
+SAVEMODE=`cat $WORKDIR/pbackup-SAVEMODE`
+BCKDEV=`cat $WORKDIR/pbackup-BCKDEV`
+echo "$SAVEMODE - $BCKDEV" > $WORKDIR/pbackup-ENTRY_SAVE_TO
+#load variable gtkdialog code
+if [ "$CHAIN" = "true" ]; then
+	#build list of chaind tasks
+	echo -e "\c" > $WORKDIR/pbackup-chain
+	for TMP in $TASKCHAIN; do
+		echo $TMP >> $WORKDIR/pbackup-chain
+	done
+	GUI_MAIN="
+	<frame $LOC124>
+	 <hbox>
+	  <tree rules_hint=\"true\" headers_visible=\"false\">
+	   <label>b</label>
+	   <variable>TREE_CHAIN</variable>
+	   <input>cat $WORKDIR/pbackup-chain</input>
+	   <width>200</width><height>100</height>
+	  </tree>
+	  <vbox>
+	   <button>
+	    <input file icon=\"gtk-add\"></input>
+	    <action>. $PROG_PATH/func -chain_add</action>
+	    <action>refresh:TREE_CHAIN</action>
+	   </button>
+	   <button>
+	    <input file icon=\"gtk-remove\"></input>
+	    <action>. $PROG_PATH/func -chain_del \$TREE_CHAIN</action>
+	    <action>refresh:TREE_CHAIN</action>
+	   </button>	  
+	  </vbox>
+	 </hbox>
+	</frame>"
+	GUI_TABS=""
+else
+	gui_main
+fi
+echo 100 > $WORKDIR/pbackup-splash #to end progressbar
+#---
+export pbackup="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+<vbox>
+ <menubar>
+  <menu>
+   <menuitem icon=\"gtk-new\">
+    <label>$LOC158...</label>
+    <action>echo new > $WORKDIR/pbackup-tmp</action>
+    <action type=\"exit\">60</action>
+   </menuitem>
+   <menuitem icon=\"gtk-new\">
+    <label>$LOC152...</label>
+    <action>echo new > $WORKDIR/pbackup-tmp</action>
+    <action type=\"exit\">61</action>
+   </menuitem>
+   <menuitem icon=\"gtk-open\">
+    <label>$LOC154...</label>
+    <action type=\"exit\">63</action>
+   </menuitem>
+   <menuitem icon=\"gtk-save\">
+    <label>$LOC151</label>
+    <action type=\"exit\">61</action>
+   </menuitem>
+   <menuitem icon=\"gtk-delete\">
+    <label>$LOC153...</label>
+    <action>. $PROG_PATH/func_delete_task</action>
+    <action type=\"exit\">render</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem>
+    <label>$LOC155...</label>
+    <action type=\"exit\">65</action>
+   </menuitem>
+   <menuitem icon=\"gtk-media-record\">
+    <label>$LOC157...</label>
+    <action>. $PROG_PATH/func -view_active_task &</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem>
+    <label>$LOC440...</label>
+    <action>. $PROG_PATH/prestore &</action>
+   </menuitem>
+   <menuitem>
+    <label>$LOC165...</label>
+    <action>. $PROG_PATH/func_cron_profile</action>
+    <action type=\"exit\">render</action>
+   </menuitem>
+   <menuitem icon=\"gtk-find\">
+    <label>$LOC160</label>
+   <action type=\"exit\">98</action>
+   </menuitem>
+   <menuitem icon=\"gtk-save\">
+    <label>$LOC161</label>
+    <action type=\"exit\">99</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem icon=\"gtk-quit\">
+    <label>$LOC163</label>
+    <action type=\"exit\">*</action>
+   </menuitem>
+   <label>$LOC150</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-preferences\">
+    <label>$LOC225...</label>
+    <action type=\"exit\">73</action>
+   </menuitem>
+   <menuitem icon=\"gtk-preferences\">
+    <label>$LOC171...</label>
+    <action>. $PROG_PATH/func -external_filemanager</action>
+   </menuitem>
+   <menuitem icon=\"gtk-preferences\">
+    <label>$LOC173...</label>
+    <action>. $PROG_PATH/func -external_cron_editor</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem>
+    <label>$LOC172</label>
+    <action type=\"exit\">72</action>
+   </menuitem>
+   <menuitem icon=\"gtk-clear\">
+    <label>$LOC174...</label>
+    <action>. $PROG_PATH/func -clear_history</action>
+   </menuitem>
+   <separator></separator>
+   $LANGUAGES
+   <label>$LOC170</label>
+  </menu>
+  <menu>
+   <menuitem icon=\"gtk-help\">
+    <label>$LOC190</label>
+    <action>. $PROG_PATH/func -help &</action>
+   </menuitem>
+   <menuitem icon=\"gtk-about\">
+    <label>$LOC191</label>
+    <action>. $PROG_PATH/func -about &</action>
+   </menuitem>
+   <label>$LOC190</label>
+  </menu>
+ </menubar>     
+ $GUI_MAIN
+ <notebook labels=\" $LOC200 | $LOC210 | $LOC230 | $LOC280 \">
+  <vbox>
+   <tree rules_hint=\"true\" hover_selection=\"true\">
+    <width>500</width><height>180</height>
+    <label>$LOC260|$LOC261|$LOC262|$LOC263|$LOC264</label>
+    <variable>TREE</variable>
+    $TREE_ITEMS
+    <action signal=\"button-release-event\" type=\"exit\">64</action>
+   </tree>
+  </vbox>
+  $GUI_TABS
+ </notebook>
+ <hbox>
+  <button>
+   <label>$LOC163</label>
+   <input file icon=\"gtk-quit\"></input>
+   <action type=\"exit\">*</action>
+  </button>
+  <text><label>\"$LOC130\"</label></text>
+  <button>
+   <label>$LOC128</label>
+   <input file icon=\"gtk-find\"></input>
+   <action type=\"exit\">98</action>
+  </button>
+  <button>
+   <label>$LOC129</label>
+   <input file icon=\"gtk-save\"></input>
+   <action type=\"exit\">99</action>
+  </button>
+ </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=pbackup --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+case $EXIT in
+	41)	set_syncaction;;
+	60) wizard;;
+	61)	save_task;; #save / save as / new
+	63)	#open task
+		echo > $WORKDIR/pbackup-tmp
+		for I in `find $HOME/.pbackup/profiles/ -type f -printf "%f "`; do
+			echo "<item>""$I""</item>" >> $WORKDIR/pbackup-tmp
+		done
+		ITEMS=`cat $WORKDIR/pbackup-tmp`; FRAME="$LOC638"; IMG="open"
+		. "$PROG_PATH"box_list
+		if [ $EXIT = 99 ];then
+			PROFILE="$TREE"
+			if [ -n "$PROFILE" ]; then export CONF="$HOME/.pbackup/profiles/$PROFILE"; get_config; fi
+		fi;;
+	64)	#load task when clicking in <tree> 
+		if [ -n $TREE ]; then 
+			PROFILE="$TREE"
+			export CONF="$HOME/.pbackup/profiles/$PROFILE"; get_config
+		fi;;
+	65) #chain tasks
+		#define name of task
+		FRAME="$LOC155"; TXT1="$LOC630"; DEFAULT="chain_default"
+		. "$PROG_PATH"box_input
+		if [ $EXIT = 99 ]; then
+			PROFILE=`echo "$ENTRY" | sed -e "s/ /_/g"`
+			if [ `find "$HOME/.pbackup/profiles/$PROFILE" 2> /dev/null` ]; then #profile exist
+				TXT2="<b>$LOC407</b>"
+				. "$PROG_PATH"func -box_yesno
+				if [ $EXIT != 99 ]; then main_window; fi
+			fi
+		else
+			main_window
+		fi
+		#save new task
+		TASKCHAIN=""; LASTRUNTXT="---"; LASTSTATUS="---"
+		export CONF="$HOME/.pbackup/profiles/$PROFILE"; CHAIN="true"; . "$PROG_PATH"func_write_config
+		build_task_items #refresh <tree>
+		;;
+	70) #set language
+		TMP=`grep LANGUAGE= "$HOME"/.pbackup/pbackuprc | sed -e s/^.*\=//g` 
+		export LANGUAGE=`cat $WORKDIR/pbackup-tmp`
+		sed -i -e "s/$TMP/$LANGUAGE/g" "$HOME"/.pbackup/pbackuprc
+		. "$PROG_PATH"locals/$LANGUAGE
+		install
+		build_task_items;;
+	72) default_variables;; #reset all settings
+	73)	#Set temp dir
+		CHOOSEDIR="true"; TITLE="$LOC225"; DIR="$TMPDIR"; . "$PROG_PATH"box_chooser
+		if [ $EXIT = 99 ]; then
+			TMPDIR="$RESULT"
+			if [ ! "$TMPDIR" ]; then
+				FRAME="$LOC_ERROR"; TXT2="$LOC375"; IMG="dialog-error"
+				. "$PROG_PATH"box_ok
+			 	TMPDIR='/tmp/'
+			fi
+			WRITE_RC=true; SAVE_TASK=false; . "$PROG_PATH"func_write_config
+		fi;;
+	98) INSPECT="true"; make_backup;;
+	99) if [ "$CHAIN" = "true" ]; then
+			chain
+		else
+			make_backup
+		fi;;
+	render)
+		echo -e "\c";;
+	*)	cleanup; rm -f $WORKDIR/* > /dev/null 2>&1
+		exit;;
+esac
+build_task_items
+main_window
+}
+
+gui_main(){
+#The point of splitting gui-code is to use it in the wizard.
+#Also, this gtkdialog code doesn't show when chain is active
+GUI_BACKUP_TYPE="
+<frame>
+<vbox>
+<radiobutton draw_indicator=\"false\">
+ <label>$LOC111</label>
+ <variable>CHKINCREMENTAL</variable>
+ <default>$CHKINCREMENTAL</default>
+ <action>if true enable:BCKDATE_FROM</action>
+ <action>if true enable:BUTTON_BCKDATE_FROM</action>
+ <action>if true enable:TXTDATE</action>
+ <action>if true enable:BCKDATE_TO</action>
+ <action>if true enable:BUTTON_BCKDATE_TO</action>
+ <action>if true enable:TXTBCK2</action>
+ <action>if false disable:BCKDATE_FROM</action>
+ <action>if false disable:BUTTON_BCKDATE_FROM</action>
+ <action>if false disable:BCKDATE_TO</action>
+ <action>if false disable:BUTTON_BCKDATE_TO</action>
+ <action>if false disable:TXTBCK2</action>
+ <action>if false disable:TXTDATE</action>
+</radiobutton>
+<radiobutton draw_indicator=\"false\">
+ <label>$LOC112</label>
+ <variable>CHKFULLBACKUP</variable>
+ <default>$CHKFULLBACKUP</default>
+</radiobutton>
+<radiobutton draw_indicator=\"false\">
+ <label>$LOC113</label>
+ <variable>CHKSYNC</variable>
+ <default>$CHKSYNC</default>
+</radiobutton>
+<pixmap><input file>$TAB130</input></pixmap>
+</vbox>
+</frame>"
+GUI_MAIN_SETTINGS="
+<frame>
+<hbox>
+ <vbox>
+  <pixmap><input file>$TAB80</input></pixmap>
+  <text><label>\"\"</label></text>
+  <text><label>$LOC121</label></text>
+ </vbox>
+ <tree headers_visible=\"false\">
+  <label>a</label>
+  <variable>TREE_INCLUDE</variable>
+  <input>cat $WORKDIR/pbackup-include</input>
+  <width>250</width><height>60</height>
+ </tree>
+ <vbox>
+  <button>
+   <input file icon=\"gtk-add\"></input>
+   <action>. $PROG_PATH/func -save_from_add</action>
+   <action>refresh:TREE_INCLUDE</action>
+  </button>
+  <button>
+   <input file icon=\"gtk-remove\"></input>
+   <action>echo \"$TREE_INCLUDE\" > $WORKDIR/pbackup-tree</action>
+   <action>. $PROG_PATH/func -save_from_del \$TREE_INCLUDE</action>
+   <action>refresh:TREE_INCLUDE</action>
+  </button>
+ </vbox>
+</hbox>
+<vbox>
+ <hbox>
+  <vbox>
+   <pixmap><input file>$TAB80</input></pixmap>
+   <text><label>$LOC122</label></text>
+  </vbox>
+   <entry editable=\"false\">
+    <variable>ENTRY_SAVE_TO</variable>
+    <input>cat $WORKDIR/pbackup-ENTRY_SAVE_TO</input>
+   </entry>
+   <button>
+    <input file icon=\"gtk-execute\"></input>
+    <action>. $PROG_PATH/func_save_to</action>
+    <action>refresh:ENTRY_SAVE_TO</action>
+   </button>
+ </hbox>
+ <hbox>
+  <vbox>
+   <pixmap><input file>$TAB130</input></pixmap>
+   <hbox>
+    <text>
+     <variable>TXTDATE</variable>
+     <label>$LOC123</label>
+     <visible>$VISIBLE_DATE</visible>
+    </text>
+   </hbox>
+  </vbox>
+  <entry>
+   <variable>BCKDATE_FROM</variable>
+   <input>cat $WORKDIR/pbackup-BCKDATE_FROM</input>
+   <visible>$VISIBLE_DATE</visible>
+  </entry>
+  <button>
+   <variable>BUTTON_BCKDATE_FROM</variable>
+   <input file icon=\"gtk-execute\"></input>
+   <visible>$VISIBLE_DATE</visible>
+   <action>. $PROG_PATH/func_date_from</action>
+   <action>refresh: BCKDATE_FROM</action>
+   <action>enable: BCKDATE_FROM</action>
+  </button>
+ </hbox>
+</vbox>
+</frame>"
+GUI_MAIN="
+<hbox>
+$GUI_BACKUP_TYPE
+$GUI_MAIN_SETTINGS
+</hbox>"
+GUI_BACKUP_OPTIONS="
+<frame $LOC211>
+ <vbox>
+  <pixmap><input file>$TAB130</input></pixmap>
+  <checkbox><label>$LOC212</label><variable>CHKREC</variable><default>$CHKREC</default></checkbox>
+  <checkbox>
+   <label>$LOC213</label>
+   <variable>CHKSYMLN</variable>
+   <default>$CHKSYMLN</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKCOMPRESS</variable>
+   <label>$LOC214</label>
+   <default>$CHKCOMPRESS</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKMULTISESSION</variable>
+   <label>$LOC215</label>
+   <default>$CHKMULTISESSION</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKJOLIET</variable>
+   <label>$LOC216</label>
+   <default>$CHKJOLIET</default>
+  </checkbox>
+ </vbox>
+</frame>"
+GUI_BACKUP_SETTINGS="
+<frame $LOC220>
+ <vbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox><text><variable>TXTBCK1</variable><label>$LOC221</label></text></hbox>
+   </vbox>
+   <tree headers_visible=\"false\">
+    <label>a</label>
+    <variable>TREE_EXCLUDE_BACKUP</variable>
+    <input>cat $WORKDIR/pbackup-exclude_backup</input>
+    <width>200</width><height>40</height>
+   </tree>
+   <vbox>
+    <button>
+     <variable>BUTTON1</variable>
+     <input file icon=\"gtk-add\"></input>
+     <action>. $PROG_PATH/func -exclude_backup_add</action>
+     <action>refresh:TREE_EXCLUDE_BACKUP</action>
+    </button>
+    <button>
+     <variable>BUTTON2</variable>
+     <input file icon=\"gtk-remove\"></input>
+     <action>. $PROG_PATH/func -exclude_backup_del \$TREE_EXCLUDE_BACKUP</action>
+     <action>refresh:TREE_EXCLUDE_BACKUP</action>
+    </button>
+   </vbox>
+  </hbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox>
+     <text>
+      <variable>TXTBCK2</variable>
+      <label>$LOC222</label>
+      <visible>$VISIBLE_DATE</visible>
+     </text>
+    </hbox>
+   </vbox>
+   <entry>
+    <variable>BCKDATE_TO</variable>
+    <input>cat $WORKDIR/pbackup-BCKDATE_TO</input>
+    <visible>$VISIBLE_DATE</visible>
+   </entry>
+   <button>
+    <variable>BUTTON_BCKDATE_TO</variable>
+    <input file icon=\"gtk-execute\"></input>
+    <visible>$VISIBLE_DATE</visible>
+    <action>. $PROG_PATH/func_date_to</action>
+    <action>refresh: BCKDATE_TO</action>
+   </button>
+  </hbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox>
+     <text><variable>TXTBCK3</variable><label>$LOC223</label></text>
+    </hbox>
+   </vbox>
+   <entry accept=\"filename\"><variable>FIND_NAME</variable><input>echo '$FIND_NAME'</input></entry>
+   <text><label>\"       \"</label></text>
+  </hbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox>
+     <text><variable>TXTBCK4</variable><label>$LOC224</label></text>
+    </hbox>
+   </vbox>
+   <entry accept=\"directory\"><variable>MNTPNT</variable><input>echo $MNTPNT</input></entry>
+   <button>
+    <variable>BUTTON3</variable>
+    <input file icon=\"gtk-open\"></input>
+    <action type=\"fileselect\">MNTPNT</action>
+   </button>
+  </hbox>
+ </vbox>
+</frame>"
+GUI_SYNC_OPTIONS="
+<frame $LOC231>
+ <vbox>
+  <pixmap><input file>$TAB130</input></pixmap>
+  <checkbox>
+   <variable>CHKTRASH</variable>
+   <label>$LOC232</label>
+   <default>$CHKTRASH</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKLEADING_PATH</variable>
+   <label>$LOC233</label>
+   <default>$CHKLEADING_PATH</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKSYNCATTRIBUTES</variable>
+   <label>$LOC234</label>
+   <default>$CHKSYNCATTRIBUTES</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKSYNCSYMLN</variable>
+   <label>$LOC235</label>
+   <default>$CHKSYNCSYMLN</default>
+  </checkbox>
+  <checkbox>
+   <variable>CHKSYNCUPDATESYM</variable>
+   <label>$LOC236</label>
+   <default>$CHKSYNCUPDATESYM</default>
+  </checkbox>
+ </vbox>
+</frame>"
+GUI_SYNC_SETTINGS="
+<frame $LOC240>
+ <vbox>
+  <text><variable>TXTSYNC1</variable><label>$LOC241</label></text>
+  <hbox>
+   <pixmap><input file>$TAB130</input></pixmap>
+   <entry>
+    <variable>TEXTSYNCACTION</variable>
+    <input>echo $TEXTSYNCACTION</input>
+   </entry>
+   <button>
+    <variable>BUTTON5</variable>
+    <input file icon=\"gtk-execute\"></input>
+    <action type=\"exit\">41</action>
+   </button>
+  </hbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox>
+     <text>
+      <variable>TXTSYNC2</variable>
+      <label>$LOC242</label>
+     </text>
+    </hbox>
+   </vbox>
+   <tree headers_visible=\"false\">
+    <label>a</label>
+    <variable>TREE_EXCLUDE_SYNC</variable>
+    <input>cat $WORKDIR/pbackup-exclude_sync</input>
+    <width>200</width><height>40</height>
+   </tree>
+   <vbox>
+    <button>
+     <variable>BUTTON6</variable>
+     <input file icon=\"gtk-add\"></input>
+     <action>. $PROG_PATH/func -exclude_sync_add</action>
+     <action>refresh:TREE_EXCLUDE_SYNC</action>
+    </button>
+    <button>
+     <variable>BUTTON7</variable>
+     <input file icon=\"gtk-remove\"></input>
+     <action>. $PROG_PATH/func -exclude_sync_del \$TREE_EXCLUDE_SYNC</action>
+     <action>refresh:TREE_EXCLUDE_SYNC</action>
+    </button>
+   </vbox>
+  </hbox>
+  <hbox>
+   <vbox>
+    <pixmap><input file>$TAB130</input></pixmap>
+    <hbox>
+     <text>
+      <variable>TXTSYNC3</variable>
+      <label>$LOC243</label>
+     </text>
+    </hbox>
+   </vbox>
+   <entry accept=\"directory\">
+    <variable>TRASHDIR</variable>
+    <input>echo $TRASHDIR</input>
+   </entry>
+   <button>
+    <variable>BUTTON8</variable>
+    <input file icon=\"gtk-open\"></input>
+    <action type=\"fileselect\">TRASHDIR</action>
+   </button>
+  </hbox>
+ </vbox>
+</frame>"
+ GUI_MISC="
+<vbox>
+<frame $LOC283>
+ <checkbox>
+  <variable>CHKAUTOMOUNT</variable>
+  <label>$LOC284</label>
+  <default>$CHKAUTOMOUNT</default>
+ </checkbox>
+ <checkbox>
+  <label>$LOC285</label>
+  <variable>CHK_WRITEHIST</variable>
+  <default>$CHK_WRITEHIST</default>
+ </checkbox>
+</frame>
+<frame $LOC290>
+ <checkbox>
+  <variable>WARN_MOUNT</variable>
+  <label>$LOC292</label>
+  <default>$WARN_MOUNT</default>
+ </checkbox>
+ <checkbox>
+  <variable>WARN_FS</variable>
+  <label>$LOC291</label>
+  <default>$WARN_FS</default>
+ </checkbox>
+ <checkbox>
+  <variable>WARN_LEADPATH</variable>
+  <default>$WARN_LEADPATH</default>
+  <label>$LOC293</label>
+ </checkbox>
+</frame>
+</vbox>"
+GUI_TABS="
+<vbox>
+<hbox>
+$GUI_BACKUP_OPTIONS
+$GUI_BACKUP_SETTINGS
+</hbox>
+</vbox>
+<vbox>
+<hbox>
+$GUI_SYNC_OPTIONS
+$GUI_SYNC_SETTINGS
+</hbox>
+</vbox>
+$GUI_MISC
+"
+}
+
+#========================================= PROGRAM =========================================
+#define profile(s)
+case "$1" in
+-v) echo Pbackup $VERSION
+	exit
+	;;
+-h | --help) echo 'format: pbackup [OPTION]
+-v                   Show version
+-h --help            Show this help text
+-r                   Reset all settings to default values
+-q task1 [task2...]  Run backup tasks (not chain) quiet (in background).'
+	exit
+	;;
+-q)	#quiet mode - allows several profiles in chain
+	echo -e $2"\n"$3"\n"$4"\n"$5"\n"$6"\n"$7"\n"$8"\n"$9 > $WORKDIR/pbackup-chain
+	PROFILE=$2
+	if [ "$2" ]; then 
+		echo 'Running...'
+	else
+		echo 'No profiles are defined.'
+		echo 'Usage: pbackup -q "taskname"'
+		exit
+	fi
+	;;
+-r) rm $HOME/.pbackup/pbackuprc
+	exit
+	;;
+*)
+	#Splash
+	echo "Loading..." > $WORKDIR/pbackup-splashtext
+	echo 0 > $WORKDIR/pbackup-splash #to activate progress bar
+	"$PROG_PATH"box_splash &
+	#Find CD / DVD drives. Code taken from Probedisk and Bck2CD.sh.
+	ALL_DEV="`ls -1 /sys/block | grep -E '^scd|^sr' | tr '\n' ' '``ls -1 /proc/ide 2> /dev/null | grep '^hd' | tr '\n' ' '`"
+	echo > $WORKDIR/pbackup-tmp$$
+	for I in $ALL_DEV; do
+		case $I in
+			hd*) # ide device, look in /proc/ide for info
+				MEDIA="`cat /proc/ide/$I/media`"
+				INFO="`cat /proc/ide/$I/model`";;
+			scd*|sr*) #  scsi cdroms
+				MEDIA="cdrom"
+				VENDOR="`cat /sys/block/$I/device/vendor`"
+				MODEL="`cat /sys/block/$I/device/model`"
+				INFO="$VENDOR$MODEL";;
+		esac
+		echo "/dev/$I|$MEDIA|$INFO" >> $WORKDIR/pbackup-tmp$$
+	done
+	export CD_DRIVES="`grep -i "cd" $WORKDIR/pbackup-tmp$$ | cut -f 1,3 -d "|" | tr " " "_" | tr "|" " " | tr '$' "_"`"
+	DETECTED_BURNER="`echo "$CD_DRIVES"  | grep -iE 'rw|writer' | cut -f 1 -d " " | head -n 1 | tr -d "\n"`"
+	if [ ! "`echo $DETECTED_BURNER`" ]; then DETECTED_BURNER="/dev/cdrom"; fi
+	#version upgrade
+	CURRENT_VERSION=`grep VERSION "$HOME"/.pbackup/pbackuprc`
+	if [ -z "$CURRENT_VERSION" ]; then #no pbackuprc, first run, or older than 0.8.0 
+		#Make files for user with users permissions in $HOME. 
+		mkdir $HOME/.pbackup/profiles > /dev/null 2>&1
+		mkdir $HOME/.pbackup/history > /dev/null 2>&1
+		echo -e "\c" > $HOME/.pbackup/history/history
+		default_variables
+		export CONF="$HOME/.pbackup/profiles/$PROFILE"
+		SAVE_TASK="false"; WRITE_RC="true"; . "$PROG_PATH"func_write_config
+		FIRST="true"
+	fi
+	if [ `echo $CURRENT_VERSION  | sed -e s/^.*\=//g | tr -d "."` -lt 291 > /dev/null 2>&1 ]; then #Older than 2.9.1
+		sed -i -e "s/$CURRENT_VERSION/VERSION=$VERSION/g" $HOME/.pbackup/pbackuprc
+		for I in `ls $HOME/.pbackup/profiles`; do
+			sed -i -e 's/MIR/SYNC/g' "$HOME/.pbackup/profiles/$I" #code cleanup. MIR(ror) is old.
+		done
+	fi
+	if [ `echo $CURRENT_VERSION  | sed -e s/^.*\=//g | tr -d "."` -lt 303 > /dev/null 2>&1 ]; then #Older than 3.0.3
+		sed -i -e "s/$CURRENT_VERSION/VERSION=$VERSION/g" $HOME/.pbackup/pbackuprc
+		TMP=`grep 'LANGUAGE' $HOME/.pbackup/pbackuprc`
+		sed -i -e "s/$TMP/export LANGUAGE=auto/g" $HOME/.pbackup/pbackuprc
+	fi
+	if [ `echo $CURRENT_VERSION  | sed -e s/^.*\=//g | tr -d "."` -lt 310 > /dev/null 2>&1 ]; then #Older than 3.1.0
+		sed -i -e "s/$CURRENT_VERSION/VERSION=$VERSION/g" $HOME/.pbackup/pbackuprc
+		rm /root/Startup/crond
+		cron_check
+	fi
+	if [ `echo $CURRENT_VERSION  | sed -e s/^.*\=//g | tr -d "."` -lt 319 > /dev/null 2>&1 ]; then #Older than 3.1.8
+		sed -i -e "s/$CURRENT_VERSION/VERSION=$VERSION/g" $HOME/.pbackup/pbackuprc
+	fi
+	#read config files
+	. $HOME/.pbackup/pbackuprc > /dev/null 2>&1
+	export CONF="$HOME/.pbackup/profiles/$PROFILE"
+	find $CONF > /dev/null 2>&1 #does task-file exist?
+	if [ $? != 0 ]; then #no tasks, run first-box
+		FIRST="true"
+	fi
+	;;
+esac
+INSPECT="false"
+SAVE_TASK="true"
+TODAY=`date +%Y-%m-%d_%H.%M.%S` #should have been %H:%M:%S but VFAT couldn't handle it.
+TODAY_SEC=`date +%s`
+TODAY_DAYS=`expr $TODAY_SEC / 60 / 60 / 24`
+echo `date +%d\/%m\/%Y` > $WORKDIR/pbackup-BCKDATE_TO
+export LOG="$WORKDIR/pupbck-log" #Do not change. error_dialog points to file.
+LOG2="$WORKDIR/pupbck-log2" #Log2 keeps more info. Logbox is too slow. Show all info at finish.
+. "$PROG_PATH"locals/english #always run to fill gaps in translation, and for quiet mode
+if [ "$1" = "-q" ];then #Quiet mode
+	Q=1
+	COUNT=0 #For error-check - run growisofs twice
+	chain
+else
+	Q=0
+	if [ $LANGUAGE = auto ]; then
+		ENVIRONMENT_LANG=`echo $LANG | sed "s/\(..\).*/\1/"` #detect environment language 
+		case $ENVIRONMENT_LANG in
+			aa)	L=afar ;;
+			ab)	L=abkhazian ;;
+			ae)	L=avestan ;;
+			af)	L=afrikaans ;;
+			ak)	L=akans ;;
+			am)	L=amharic ;;
+			an)	L=aragonese ;;
+			ar)	L=arabic ;;
+			as)	L=assamese ;;
+			av)	L=avaric ;;
+			ay)	L=aymara ;;
+			az)	L=azerbaijani ;;
+			be)	L=belarusian ;;
+			bg)	L=bulgarian ;;
+			bh)	L=bihari ;;
+			bi)	L=bislama ;;
+			bm)	L=bambara ;;
+			bn)	L=bengali ;;
+			bo)	L=tibetan ;;
+			br)	L=breton ;;
+			bs)	L=bosnian ;;
+			ca)	L=catalan ;;
+			ce)	L=chechen ;;
+			ch)	L=chamorro ;;
+			co)	L=corsican ;;
+			cr)	L=cree ;;
+			cs)	L=czech ;;
+			cu)	L=church_slavic ;;
+			cv)	L=chuvash ;;
+			cy)	L=welsh ;;
+			da)	L=danish ;;
+			de)	L=german ;;
+			dv)	L=divehi ;;
+			dz)	L=dzonkha ;;
+			ee)	L=ewe ;;
+			el)	L=greek ;;
+			en)	L=english ;;
+			eo)	L=esperanto ;;
+			es)	L=spanish ;;
+			et)	L=estonian ;;
+			eu)	L=basque ;;
+			fa)	L=persian ;;
+			ff)	L=fulah ;;
+			fi)	L=finnish ;;
+			fj)	L=fijian ;;
+			fo)	L=faroese ;;
+			fr)	L=french ;;
+			fy)	L=western frisian ;;
+			ga)	L=irish ;;
+			gd)	L=gaelic ;;
+			gl)	L=galician ;;
+			gn)	L=guarani ;;
+			gu)	L=gujarati ;;
+			gv)	L=manx ;;
+			ha)	L=hausa ;;
+			he)	L=hebrew ;;
+			hi)	L=hindi ;;
+			ho)	L=hiri_motu ;;
+			hr)	L=croatian ;;
+			ht)	L=haitian ;;
+			hu)	L=hungarian ;;
+			hy)	L=armenian ;;
+			hz)	L=herero ;;
+			ia)	L=interlingua ;;
+			ie)	L=interlingue ;;
+			id)	L=indonesian ;;
+			ig)	L=igbo ;;
+			ii)	L=nuosu ;;
+			ik)	L=inupiaq ;;
+			io)	L=ido ;;
+			is)	L=icelandic ;;
+			it)	L=italian ;;
+			iu)	L=inuktitut ;;
+			ja)	L=japanese ;;
+			jv)	L=javanese ;;
+			ka)	L=georgian ;;
+			kg)	L=kongo ;;
+			ki)	L=gikuyu ;;
+			kj)	L=kuanyama ;;
+			kk)	L=kazakh ;;
+			kl)	L=greenlandic ;;
+			km)	L=central_khmer ;;
+			kn)	L=kannada ;;
+			ko)	L=korean ;;
+			kr)	L=kanuri ;;
+			ks)	L=kashmiri ;;
+			kv)	L=komi ;;
+			kw)	L=cornish ;;
+			ky)	L=kirghiz ;;
+			la)	L=latin ;;
+			lb)	L=luxembourgish ;;
+			lg)	L=ganda ;;
+			li)	L=limburgan ;;
+			ln)	L=lingala ;;
+			lo)	L=lao ;;
+			lt)	L=lithuanian ;;
+			lu)	L=luba-katanga ;;
+			lv)	L=latvian ;;
+			mh)	L=mashallese ;;
+			mg)	L=malagasy ;;
+			mi)	L=maori ;;
+			mk)	L=macedonian ;;
+			ml)	L=malayalam ;;
+			mn)	L=mongolian ;;
+			mr)	L=marathi ;;
+			ms)	L=malay ;;
+			mt)	L=maltese ;;
+			my)	L=burmese ;;
+			na)	L=nauru ;;
+			nb)	L=norwegian_bokmål ;;
+			nd)	L=ndebele_north ;;
+			ne)	L=nepali ;;
+			ng)	L=ndonga ;;
+			nl)	L=dutch ;;
+			nn)	L=norwegian_nynorsk ;;
+			no)	L=norwegian ;;
+			nr)	L=ndebele_south ;;
+			nv)	L=navajo ;;
+			ny)	L=chichewa ;;
+			oc)	L=occitan ;;
+			oj)	L=ojibwa ;;
+			om)	L=oromo ;;
+			or)	L=oriya ;;
+			os)	L=ossetian ;;
+			pa)	L=panjabi ;;
+			pi)	L=pali ;;
+			pl)	L=polish ;;
+			ps)	L=pushto ;;
+			pt)	L=portuguese ;;
+			qu)	L=quechua ;;
+			rm)	L=romansh ;;
+			rn)	L=rundi ;;
+			ro)	L=romanian ;;
+			ru)	L=russian ;;
+			rw)	L=kinyarwanda ;;
+			sa)	L=sanskrit ;;
+			sc)	L=sardinian ;;
+			sd)	L=sindi ;;
+			se)	L=nothern_sami ;;
+			sg)	L=sango ;;
+			sk)	L=slovak ;;
+			sl)	L=slovenian ;;
+			sm)	L=samoan ;;
+			sn)	L=shona ;;
+			so)	L=somali ;;
+			sq)	L=albanian ;;
+			sr)	L=serbian ;;
+			ss)	L=swati ;;
+			st)	L=sotho_southern ;;
+			su)	L=sundanese ;;
+			sv)	L=swedish ;;
+			sw)	L=swahili ;;
+			ta)	L=tamil ;;
+			te)	L=telugu ;;
+			tg)	L=tajik ;;
+			th)	L=thai ;;
+			ti)	L=tigrinya ;;
+			tk)	L=turkmen ;;
+			tl)	L=tagalog ;;
+			tn)	L=tswana ;;
+			to)	L=tonga ;;
+			tr)	L=turkish ;;
+			ts)	L=tsonga ;;
+			tt)	L=tatar ;;
+			tw)	L=twi ;;
+			ty)	L=tahitian ;;
+			ug)	L=uighur ;;
+			uk)	L=ukrainian ;;
+			ur)	L=urdu ;;
+			uz)	L=uzbek ;;
+			ve)	L=venda ;;
+			vi)	L=vietnamese ;;
+			vo)	L=volapük ;;
+			wa)	L=walloon ;;
+			wo)	L=wolof ;;
+			xh)	L=xhosa ;;
+			yi)	L=yiddish ;;
+			yo)	L=yoruba ;;
+			za)	L=zhuang ;;
+			zh)	L=chinese ;;		
+			zu)	L=zulu ;;
+			*)	L=english ;; #just in case
+		esac
+		export LANGUAGE=$L
+	fi
+	#Stop if log exist, and has been changed the last 120 min. (User has quit with windowmanager)
+	if [ "`find $WORKDIR/pupbck-log2 -cmin -120 2> /dev/null`" ]; then
+		TXT1="$LOC639"
+		. $PROG_PATH/box_yesno
+		if [ $EXIT = 98 ]; then
+			echo 100 > $WORKDIR/pbackup-splash #to end progressbar
+			exit
+		fi
+	fi
+	echo Pbackup $VERSION > $WORKDIR/pupbck-log2 #something must be there to avoid several instances.
+	#---
+	if [ "$LANGUAGE" != "english" ]; then . "$PROG_PATH"locals/$LANGUAGE; fi #language
+	get_config
+	#builds menulist of available languages
+	LANGUAGES=`ls "$PROG_PATH"locals | awk '{print "<menuitem icon=\"gtk-select-font\"><label>"$1"</label><action>echo "$1" > $WORKDIR/pbackup-tmp</action><action type=\"exit\">70</action></menuitem>"}'`
+	#Define text for syncaction
+	case "$SYNCACTION" in
+		1) TEXTSYNCACTION="$LOC550";;
+		2) TEXTSYNCACTION="$LOC552";;
+		3) TEXTSYNCACTION="$LOC554";;
+	esac
+	#Check if it is first run
+	if [ "$FIRST" = "true" ]; then
+		echo 100 > $WORKDIR/pbackup-splash #to end progressbar
+		install
+		export first_box="
+		<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+		 <vbox>
+		  <frame Welcome>
+		   <pixmap icon_size=\"6\"><input file stock=\"gtk-refresh\"></input></pixmap>
+		   <text use-markup=\"true\"><label>\"<b>Pbackup $VERSION</b>\"</label></text>
+		   <text><label>___________________________________________</label></text>
+		   <text><label>$LOC510</label></text>
+		   <radiobutton><label>$LOC502</label><variable>GO_WIZARD</variable></radiobutton>
+		   <radiobutton><label>$LOC511</label></radiobutton>
+		  </frame>
+		  <hbox>
+		   <button>
+		    <input file icon=\"gtk-apply\"></input>
+		    <label>$LOC_OK</label>
+		   </button>
+		  </hbox>
+		 </vbox>
+		</window>"
+		I=$IFS; IFS=""
+		for STATEMENTS in $(gtkdialog3 --program=first_box --center); do
+			eval $STATEMENTS > /dev/null 2>&1
+		done
+		IFS=$I
+		if [ "$GO_WIZARD" = "true" ]; then
+			wizard
+		else
+			default_variables
+			export CONF="$HOME/.pbackup/profiles/$PROFILE"
+			LASTSTATUS="Not used" #Language is not yet defined
+			SAVE_TASK="true"; WRITE_RC="true"; . "$PROG_PATH"func_write_config
+			get_config
+		fi
+	else
+		#check if scheduled backup is set 
+		if [ -n "`grep "pbackup" /var/spool/cron/crontabs"$HOME"`" ]; then
+			cron_check #then check if deamon is running
+		fi
+	fi
+	main_window	
+fi

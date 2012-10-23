@@ -1,0 +1,373 @@
+#! /bin/sh
+#Pburn - Burning gui
+#Sigmund Berglund, copyright 2007-2010
+
+#------------------------------
+#This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 2.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+#Update infotext
+. $APPDIR/func -info_burn
+#GTK-theme
+if [ -f $HOME/.gtkrc-2.0 ]; then export GTK2_RC_FILES="$HOME/.gtkrc-2.0" #get active theme
+	elif [ -f /etc/gtk-2.0/gtkrc ]; then GTK_OLD_PUPPY=':/etc/gtk-2.0/gtkrc' #/etc/gtk-2.0/gtkrc is for < Puppy4
+fi
+export GTK2_RC_FILES="$GTK2_RC_FILES$GTK_OLD_PUPPY:$APPDIR/themes/$THEME/gtk/gtkrc"
+#make items for <combobox> (devices)
+echo -n > $WORKDIR/tmp
+for I in `echo "$CD_DRIVES" | cut -d " " -f 1`; do
+	echo "<item>""$I""</item>" >> $WORKDIR/tmp
+done
+export ITEMS_DEVICES_COMBO=($(<$WORKDIR/tmp))
+OPEN_FILE=("$(<"$WORKDIR/open_file")")
+#what's visible
+if [ "$BURN_DATA" = "true" ]; then
+	echo data > $WORKDIR/BURNLIST_MODE #normal startup. Others are handled in -open
+	VISIBLE_MOVE_UPDOWN=disabled
+	VISIBLE_NEWDIR=enabled
+else
+	VISIBLE_MOVE_UPDOWN=enabled
+	VISIBLE_NEWDIR=disabled
+fi
+#generate gtk-bookmarks
+if [ -s $HOME/.gtk-bookmarks ]; then
+	BOOKMARKS=""
+	cut -d/ -f3- $HOME/.gtk-bookmarks | cut -d' ' -f1 | sed -e 's/%20/ /g' | grep -v "^$" > $WORKDIR/tmp
+	while read I; do
+		BOOKMARKS="$BOOKMARKS
+		<menuitem stock=\"gtk-directory\" label=\"$I\">
+		 <action>DIR=\"$I\"; . $APPDIR/func -browser_go_to_dir</action>
+		 <action type=\"refresh\">DIR</action>
+		 <action>refresh:CHOOSER</action>
+		</menuitem>"
+	done < $WORKDIR/tmp
+fi
+#check pfileaserch
+if [ "$BOOLEAN_PFILESEARCH" = "true" ]; then
+   MENU_PFILESEARCH="<menuitem stock=\"gtk-find\" label=\"$LOC117\">
+    <action>$APPDIR/func -pfilesearch</action>
+    <action>refresh:CHOOSER</action>
+   </menuitem>
+   <separator></separator>"
+fi
+
+#define theme-picture
+[ -f $APPDIR/themes/$THEME/heading-main.png ] && PIC="<hbox><pixmap><input file>$APPDIR/themes/$THEME/heading-main_left.png</input></pixmap><pixmap><input file>$APPDIR/themes/$THEME/heading-main.png</input></pixmap></hbox>"
+
+S="
+<window title=\"Pburn $VERSION - $OPEN_FILE\" icon-name=\"gtk-cdrom\" default_height=\"570\" default_width=\"790\">
+<vbox>
+ <menubar>
+  <menu>
+   <menuitem stock=\"gtk-new\"><action>. $APPDIR/func -new</action><action>refresh:BURNLIST</action></menuitem>
+   <menuitem stock=\"gtk-open\"><action>EXIT:open</action></menuitem>
+   <menuitem stock=\"gtk-save\"><action>. $APPDIR/func -save</action></menuitem>
+   <menuitem stock=\"gtk-save-as\"><action>SAVEAS=true; . $APPDIR/func -save</action></menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC104\">
+    <action>. $APPDIR/func -import_session</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-open\" label=\"${LOC108}...\">
+    <action>GO_CHOOSER=true; . $APPDIR/func -add_list</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-open\"  label=\"$LOC107...\">
+    <action>. $APPDIR/func -import_iso</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-save-as\" label=\"$LOC105...\">
+    <action>BURN=export_iso; . $APPDIR/func_burn_options</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-preferences\" label=\"$LOC106...\">
+    <action>. $APPDIR/func -config</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-quit\"><action>EXIT:abort</action></menuitem>
+   <label>$LOC100</label>
+  </menu>
+  <menu>
+   $MENU_PFILESEARCH
+   <menuitem stock=\"gtk-add\" label=\"$LOC150\">
+    <action>ADD=\"$LOC150 [$LOC211]\"; BUTTON=3; . $APPDIR/func -add</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-open\" label=\"$LOC111...\">
+    <action>. $APPDIR/func -burnlist_create_new_dir</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-convert\" label=\"$LOC112...\">
+    <action>. $APPDIR/func -burnlist_rename</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-remove\" label=\"$LOC113\">
+    <action>. $APPDIR/func -burnlist_remove</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-add\" label=\"$LOC151\">
+    <action>ADD=\"$LOC151\"; BUTTON=3; . $APPDIR/func -add</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-add\" label=\"$LOC152\">
+    <action>ADD=\"$LOC152\"; BUTTON=3; . $APPDIR/func -add</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-add\" label=\"$LOC153\">
+    <action>ADD=\"$LOC153\"; BUTTON=3; . $APPDIR/func -add</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-add\" label=\"$LOC154\">
+    <action>ADD=\"$LOC154\"; BUTTON=3; . $APPDIR/func -add</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-add\" label=\"$LOC116\">
+    <action>. $APPDIR/func -add_list</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <label>$LOC110</label>
+  </menu>
+  <menu>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC124...\">
+    <action>BURN=iso; . $APPDIR/func_burn_options</action>
+    <action>. $APPDIR/func -calculate_needed_space</action>
+    <action>refresh:BURNLIST</action>
+   </menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC121...\"><action>BURN=data; . $APPDIR/func_burn_options</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC122...\"><action>BURN=audio; . $APPDIR/func_burn_options</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC129...\"><action>BURN=video; . $APPDIR/func_burn_options</action></menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-copy\" label=\"$LOC125...\"><action>BURN=copy; . $APPDIR/func_burn_options</action></menuitem>
+   <menuitem stock=\"gtk-copy\" label=\"$LOC128...\"><action>BURN=copy_audio; . $APPDIR/func_burn_options</action></menuitem>
+   <menuitem stock=\"gtk-copy\" label=\"$LOC160...\"><action>BURN=copy_video; . $APPDIR/func_burn_options</action></menuitem>
+   <menuitem stock=\"gtk-clear\" label=\"$LOC126...\"><action>BURN=blank; . $APPDIR/func_burn_options</action><action>refresh:BURNLIST</action></menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC123...\"><action>TOC=true; . $APPDIR/func_toc_cue</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC127...\"><action>CUE=true; . $APPDIR/func_toc_cue</action></menuitem>
+   <label>$LOC120</label>
+  </menu>
+  <menu>
+   <menuitem stock=\"gtk-info\" label=\"$LOC136...\"><action>. $APPDIR/func -disc_info</action></menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC135 CD...\"><action>. $APPDIR/func -fixate_CD</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC135 DVD...\"><action>. $APPDIR/func -fixate_DVD</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC134...\"><action>. $APPDIR/func -c2scan</action></menuitem>
+   <separator></separator>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC132\"><action>. $APPDIR/func -eject</action></menuitem>
+   <menuitem stock=\"gtk-cdrom\" label=\"$LOC133\"><action>. $APPDIR/func -load_tray</action></menuitem>
+   <label>$LOC130</label>
+  </menu>
+  <menu>
+   <menuitem stock=\"gtk-help\"><action>. $APPDIR/func -help &</action></menuitem>
+   <menuitem stock=\"gtk-about\"><action>. $APPDIR/func -about &</action></menuitem>
+   <label>$LOC140</label>
+  </menu>
+ </menubar>
+ <hbox homogeneous=\"true\">
+  <hbox>
+   <button>
+    <label>\"   $LOC120 $LOC124   \"</label>
+    <action>BURN=iso; . $APPDIR/func_burn_options</action>
+    <action>. $APPDIR/func -calculate_needed_space</action>
+    <action>refresh:BURNLIST</action>
+   </button>
+   <button label=\"   $LOC126   \"><action>BURN=blank; . $APPDIR/func_burn_options</action></button>
+   <button label=\"   $LOC125   \"><action>BURN=copy; . $APPDIR/func_burn_options</action></button>
+   <button label=\"   $LOC128   \"><action>BURN=copy_audio; . $APPDIR/func_burn_options</action></button>
+   <button label=\"   $LOC160   \"><action>BURN=copy_video; . $APPDIR/func_burn_options</action></button>
+  </hbox>
+ </hbox>
+  <hbox>
+  <frame $LOC200>
+   <hbox>
+     <vbox>
+      <radiobutton label=\"$LOC201\">
+       <variable>BURN_DATA</variable>
+       <default>$BURN_DATA</default>
+       <action>if true . $APPDIR/func -calculate_needed_space; . $APPDIR/func -info_burn; echo data > $WORKDIR/BURNLIST_MODE</action>
+       <action>if true refresh:INFO</action>
+       <action>if true refresh:BURNLIST</action>
+       <action>if true disable:MOVE_UP</action>
+       <action>if true disable:MOVE_DOWN</action>
+       <action>if true enable:BUTTON_NEWDIR</action>
+      </radiobutton>
+      <radiobutton label=\"$LOC202\">
+       <variable>BURN_AUDIO</variable>
+       <default>$BURN_AUDIO</default>
+       <action>if true . $APPDIR/func -calculate_needed_space; . $APPDIR/func -info_burn; echo audio > $WORKDIR/BURNLIST_MODE</action>
+       <action>if true refresh:INFO</action>
+       <action>if true refresh:BURNLIST</action>
+       <action>if true enable:MOVE_UP</action>
+       <action>if true enable:MOVE_DOWN</action>
+       <action>if true disable:BUTTON_NEWDIR</action>
+      </radiobutton>
+      <radiobutton label=\"$LOC219\">
+       <variable>BURN_VIDEO</variable>
+       <default>$BURN_VIDEO</default>
+       <action>if true . $APPDIR/func -calculate_needed_space; . $APPDIR/func -info_burn; echo video > $WORKDIR/BURNLIST_MODE</action>
+       <action>if true refresh:INFO</action>
+       <action>if true refresh:BURNLIST</action>
+       <action>if true enable:MOVE_UP</action>
+       <action>if true enable:MOVE_DOWN</action>
+       <action>if true disable:BUTTON_NEWDIR</action>
+      </radiobutton>
+     </vbox>
+     <text><label>\"      \"</label></text>
+     <edit editable=\"false\" left_margin=\"10\">
+      <variable>INFO</variable>
+      <input file>$WORKDIR/info</input>
+      <visible>disabled</visible>
+      <width>100</width><height>70</height>
+     </edit>
+     <text><label>\"      \"</label></text>
+     <button tooltip-text=\" $LOC801 \" height-request=\"72\" width-request=\"72\">
+      $LABEL_BUTTON_BURN
+      <action>. $APPDIR/func_burn_options</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+    </hbox>
+   </frame>
+  </hbox>
+  $PIC
+  <hbox space-expand=\"true\" space-fill=\"true\">
+   <frame $LOC204>
+    <hbox>
+     <menubar>
+      <menu>
+       <menuitem stock=\"gtk-home\" label=\"$LOC221\">
+        <action>DIR=$HOME; . $APPDIR/func -browser_go_to_dir</action>
+        <action>refresh:DIR</action>
+        <action>refresh:CHOOSER</action>
+       </menuitem>
+       <menuitem stock=\"gtk-directory\" label=\"$LOC220\">
+        <action>DIR='$HOME/Desktop/'; . $APPDIR/func -browser_go_to_dir</action>
+        <action>refresh:DIR</action>
+        <action>refresh:CHOOSER</action>
+       </menuitem>
+       <menuitem stock=\"gtk-harddisk\" label=\"$LOC249\">
+        <action>DIR='/'; . $APPDIR/func -browser_go_to_dir</action>
+        <action>refresh:DIR</action>
+        <action>refresh:CHOOSER</action>
+       </menuitem>
+       <separator></separator>
+       $BOOKMARKS
+       <label>..</label>
+      </menu>
+     </menubar>
+     <entry activates-default=\"true\"><variable>DIR</variable><input>cat $WORKDIR/dir</input></entry>
+     <button tooltip-text=\" $LOC809 \" can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+      <input file stock=\"gtk-find\"></input>
+      <action>. $APPDIR/func -browser_go_to_dir</action>
+      <action>refresh:CHOOSER</action>
+      <action>refresh:DIR</action>
+     </button>
+    </hbox>
+    <tree headers_visible=\"false\" exported_column=\"2\">
+     <label>\"a|b|c\"</label>
+     <variable>CHOOSER</variable>
+     <input icon_column=\"0\">cat $WORKDIR/ls</input>
+     <height>100</height><width>200</width>
+     <action signal=\"button-release-event\">
+       ADD=\"$LOC150 [$LOC211]\"					;\
+       . $APPDIR/func -add						 \
+     </action>
+     <action signal=\"button-release-event\">refresh:BURNLIST</action>
+     <action>. $APPDIR/func -browser_change_dir</action>
+     <action>refresh:CHOOSER</action>
+     <action>refresh:DIR</action>
+    </tree>
+    
+    <progressbar>
+     <label>\" \"</label>
+     <input>"'while [ ! -f $WORKDIR/end_while ]; do if [ "`cddetect_quick -d$BURNDEV`" !=  "`cat $WORKDIR/cddetect 2> /dev/null`" ] || [ ! -s $WORKDIR/cddetect ] || [ "`cat $WORKDIR/burn`" != "`cat $WORKDIR/burn_old`" ]; then nice -n -18 $APPDIR/func -update_sizebar; fi; sleep 0.3; done'"</input>
+    </progressbar>
+   </frame>
+   <frame $LOC212>
+    <tree rules_hint=\"true\"> ## hover-selection=\"true\"
+     <label>\"$LOC208                                                               |$LOC213\"</label>
+     <variable>BURNLIST</variable>
+     <height>1</height><width>400</width>
+     <input icon_column=\"0\">cat $WORKDIR/burn</input>
+     ##<action signal=\"button-press-event\">. $APPDIR/func -burnlist_right-menu</action>
+     ##<action signal=\"button-press-event\">refresh:BURNLIST</action>
+     <action>. $APPDIR/func -burnlist_change_dir</action>
+     <action>refresh:BURNLIST</action>
+    </tree>
+    <hbox>
+     <button tooltip-text=\" $LOC808 \">
+      <input file stock=\"gtk-add\"></input>
+      <action>BUTTON=3; ADD=\"$LOC150 [$LOC211]\"; . $APPDIR/func -add</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+     <button tooltip-text=\" $LOC807 \">
+      <variable>BUTTON_REMOVE</variable>
+      <input file stock=\"gtk-remove\"></input>
+      <action>. $APPDIR/func -burnlist_remove</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+     <text><label>\"  \"</label></text>
+     <button tooltip-text=\" $LOC805 \">
+      <variable>BUTTON_NEWDIR</variable>
+      <input file stock=\"gtk-open\"></input>
+      <visible>$VISIBLE_NEWDIR</visible>
+      <action>. $APPDIR/func -burnlist_create_new_dir</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+     <button tooltip-text=\" $LOC806 \">
+      <variable>BUTTON_RENAME</variable>
+      <input file stock=\"gtk-convert\"></input>
+      <action>. $APPDIR/func -burnlist_rename</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+     <text><label>\"  \"</label></text>
+     <button tooltip-text=\" $LOC803 \">
+      <variable>MOVE_UP</variable>
+      <input file stock=\"gtk-go-up\"></input>
+      <visible>$VISIBLE_MOVE_UPDOWN</visible>
+      <action>DIRECTION=up; . $APPDIR/func -move_up_down; . $APPDIR/func -info_burn</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+     <button tooltip-text=\" $LOC804 \">
+      <variable>MOVE_DOWN</variable>
+      <input file stock=\"gtk-go-down\"></input>
+      <visible>$VISIBLE_MOVE_UPDOWN</visible>
+      <action>DIRECTION=down;. $APPDIR/func -move_up_down; . $APPDIR/func -info_burn</action>
+      <action>refresh:BURNLIST</action>
+     </button>
+    </hbox>
+   </frame>
+  </hbox>
+  </vbox>
+ <action signal=\"show\">echo 100 > $WORKDIR/splash</action>
+ <action signal=\"hide\">exit:Exit</action>
+</window>"
+
+[ $SHOW_TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+echo "$S" | sed 's/##.*//' > $WORKDIR/xml_Pburn #I use double hash (##) for comments. --> as #FF0000
+
+#show gui
+I=$IFS; IFS=""
+for STATEMENTS in  $($GTKDIALOG -f $WORKDIR/xml_Pburn 2> /dev/null); do
+	eval $STATEMENTS 2> /dev/null
+done
+IFS=$I
+case $EXIT in
+	open)	   
+		for I in `ps | grep -Fi burn | grep -F end_while | awk '{print $1}'`; do kill -9 $I 2> /dev/null; done
+		OPEN_DIALOG=true; . $APPDIR/func -open
+		GTK2_RC_FILES=""
+		. $APPDIR/func_gui
+		;;
+	*)	
+		. $APPDIR/func -new
+		echo end > $WORKDIR/end_while #stop disc_checking_daemon (progressbar)
+		for I in `ps | grep pburn | awk '{print $1}'`; do kill -9 $I 2> /dev/null; done
+		exit
+		;;
+esac

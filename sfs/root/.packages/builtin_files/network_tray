@@ -1,0 +1,47 @@
+/root
+/root/Startup
+ network_tray
+/usr
+/usr/local
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm
+/usr/sbin
+ changenettrayicons
+/usr/share
+/usr/share/network_tray
+/usr/share/network_tray/business
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm
+/usr/share/network_tray/puppy
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm
+/usr/share/network_tray/standard
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm
+/usr/share/network_tray/traditional
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm
+/usr/share/network_tray/ttuuxxx
+ networkblank.xpm
+ networkboth.xpm
+ networkdead.xpm
+ networkin.xpm
+ networkout.xpm

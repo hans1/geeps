@@ -1,0 +1,9 @@
+/usr
+/usr/sbin
+ getflash
+/usr/share
+/usr/share/applications
+ getflash.desktop
+/usr/share/icons
+ flashblock.png
+ flash-player-properties.png

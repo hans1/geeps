@@ -1,0 +1,11 @@
+/usr
+/usr/bin
+ superscan
+/usr/share
+/usr/share/applications
+ Superscan-network-scanner.desktop
+/usr/share/superscan
+/usr/share/superscan/pixmaps
+ glade.xpm
+ PenguinWithBlackGlasses.xpm
+ PenguinWithWrench.xpm

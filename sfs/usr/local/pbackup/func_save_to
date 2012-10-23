@@ -1,0 +1,19 @@
+#!/bin/bash
+
+FRAME="$LOC519"
+ITEMS="<item stock=\"gtk-cdrom\">CD|$LOC520</item><item stock=\"gtk-cdrom\">DVD|$LOC521</item><item stock=\"gtk-open\">HD|$LOC522</item><item stock=\"gtk-network\">FTP|$LOC523</item>"
+. "$PROG_PATH"box_list
+if [ $EXIT = 99 ]; then 
+	TMPSAVEMODE=$TREE #TMPSAVEMODE to see if user cancel operation
+	case $TREE in
+		CD)	. "$PROG_PATH"func_select_cd-dvd;;
+		DVD) . "$PROG_PATH"func_select_cd-dvd;;
+		HD) CHOOSEDIR="true"; TITLE="$LOC122"; DIR="/"; . "$PROG_PATH"box_chooser
+			if [ $EXIT = 99 ]; then
+				echo $TMPSAVEMODE > $WORKDIR/pbackup-SAVEMODE #gui entry must save in files to render inside gtkdialog
+				echo $RESULT > $WORKDIR/pbackup-BCKDEV
+				echo "$TMPSAVEMODE - $RESULT" > $WORKDIR/pbackup-ENTRY_SAVE_TO
+			fi;;
+		FTP) . "$PROG_PATH"func_ftp;;
+	esac
+fi

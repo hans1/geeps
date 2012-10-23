@@ -1,0 +1,14 @@
+#!/bin/bash
+
+PROGRAM=`echo "$*" | cut -b 2-`
+if [ -z "$PROGRAM" ]; then TXT1="<b>$LOC710</b>"
+	. "$PROGPATH"box_ok
+	exit
+else
+	echo > /tmp/pfind-error$PROGPID
+	"$PROGRAM" 2> /tmp/pfind-error$PROGPID
+	TXT1=`cat /tmp/pfind-error$PROGPID`
+	if [ -n "$TXT1" ]; then . "$PROGPATH"box_ok; fi #error
+fi
+
+

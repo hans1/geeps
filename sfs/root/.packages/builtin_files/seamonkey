@@ -1,0 +1,111 @@
+/usr
+/usr/bin
+ mozilla
+ seamonkey
+/usr/lib
+/usr/lib/seamonkey
+ application.ini
+ blocklist.xml
+/usr/lib/seamonkey/chrome
+/usr/lib/seamonkey/chrome/icons
+/usr/lib/seamonkey/chrome/icons/default
+ abcardWindow16.png
+ abcardWindow48.png
+ abcardWindow.png
+ ablistWindow16.png
+ ablistWindow48.png
+ ablistWindow.png
+ addressbookWindow16.png
+ addressbookWindow48.png
+ addressbookWindow.png
+ bmPropsWindow16.png
+ bmPropsWindow48.png
+ bmPropsWindow.png
+ bookmark-window16.png
+ bookmark-window48.png
+ bookmark-window.png
+ default16.png
+ default48.png
+ default.png
+ downloadManager16.png
+ downloadManager48.png
+ downloadManager.png
+ editorWindow16.png
+ editorWindow48.png
+ editorWindow.png
+ findBookmarkWindow16.png
+ findBookmarkWindow48.png
+ findBookmarkWindow.png
+ findHistoryWindow16.png
+ findHistoryWindow48.png
+ findHistoryWindow.png
+ history-window16.png
+ history-window48.png
+ history-window.png
+ JSConsoleWindow16.png
+ JSConsoleWindow48.png
+ JSConsoleWindow.png
+ main-window16.png
+ main-window48.png
+ main-window.png
+ messengerWindow16.png
+ messengerWindow48.png
+ messengerWindow.png
+ msgcomposeWindow16.png
+ msgcomposeWindow48.png
+ msgcomposeWindow.png
+ seamonkey.png
+ venkman-window16.png
+ venkman-window48.png
+ venkman-window.png
+/usr/lib/seamonkey/components
+ binary.manifest
+ libdbusservice.so
+ libsuite.so
+/usr/lib/seamonkey/defaults
+/usr/lib/seamonkey/defaults/messenger
+ mailViews.dat
+/usr/lib/seamonkey/defaults/pref
+ channel-prefs.js
+/usr/lib/seamonkey/defaults/profile
+ localstore.rdf
+ panels.rdf
+ prefs.js
+/usr/lib/seamonkey/dictionaries
+ en-US.aff
+ en-US.dic
+/usr/lib/seamonkey/distribution
+/usr/lib/seamonkey/distribution/extensions
+ {59c81df5-4b7a-477b-912d-4e0fdf64e5f2}.xpi
+ {f13b157f-b174-47e7-a34d-4815ddfdfeb8}.xpi
+ inspector@mozilla.org.xpi
+/usr/lib/seamonkey/extensions
+ {972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi
+/usr/lib/seamonkey/isp
+ Bogofilter.sfd
+ DSPAM.sfd
+ movemail.rdf
+ POPFile.sfd
+ rss.rdf
+ SpamAssassin.sfd
+ SpamPal.sfd
+/usr/lib/seamonkey/jsloader
+/usr/lib/seamonkey/jsloader/resource
+/usr/lib/seamonkey/searchplugins
+ creativecommons.xml
+ google.xml
+ wikipedia.xml
+ yahoo.xml
+/usr/local
+/usr/local/bin
+ mozaddressbook
+ mozedit
+ mozmail
+ mozstart
+ netscape
+/usr/share
+/usr/share/applications
+ SeaMonkey-Addressbook.desktop
+ SeaMonkey-Composer-html-editor.desktop
+ SeaMonkey-mail-and-news.desktop
+ SeaMonkey-web-browser.desktop

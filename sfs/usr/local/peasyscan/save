@@ -1,0 +1,38 @@
+#!/bin/sh
+
+if [ -z "$SAVEFILENAME" ]; then
+  Xdialog --title " " --msgbox "No Save file selected!" 0 0
+  exit
+fi
+
+if [ -e "$SAVEFILENAME" ]; then
+  Xdialog --title " " --yesno "File exists! Overwrite it?" 0 0
+  [ $? -eq 1 ] && exit
+fi
+
+touch "$SAVEFILENAME" 2> /dev/null
+if [ $? -eq 1 ]; then
+  Xdialog --title " " --msgbox "Invalid filename!" 0 0
+  exit
+fi
+rm "$SAVEFILENAME"
+ 
+if [ ! -e /tmp/out.pnm ]; then
+  Xdialog --title " " --msgbox "Nothing was scanned!" 0 0
+  exit
+fi 
+
+if [ "$F1" = "true" ]; then
+  pnmtopng /tmp/out.pnm > $SAVEFILENAME
+elif [ "$F2" = "true" ]; then
+  pnmtojpeg /tmp/out.pnm > $SAVEFILENAME
+elif [ "$F3" = "true" ]; then
+  pnmtops -noturn /tmp/out.pnm > /tmp/out.ps #pipe split so Lupu runs faster
+  ps2pdf /tmp/out.ps $SAVEFILENAME
+  rm /tmp/out.ps
+elif [ "$F4" = "true" ]; then     
+  $PEASYPATH/ocr &
+elif [ "$F5" = "true" ]; then     
+  $PEASYPATH/copier &   
+fi
+Xdialog --title " " --infobox "Image saved to $SAVEFILENAME" 0 0 2000

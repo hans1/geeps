@@ -1,0 +1,72 @@
+#!/bin/sh
+# A script to change the XkbOption "grp" variable in xorg.conf
+# Part of the Puppy XkbConfigurator
+
+##--------variables---------->>
+INFILE='/etc/X11/xorg.conf'
+OUTFILE='/etc/X11/xorg.conf.tmp4'
+OPTION='grp'
+LIST="/etc/X11/xkb/rules/xorg.lst"
+# exported the following from main
+#ERRMSG='Xdialog --title "ERROR" --msgbox "An Error has occured! Try again." 0 0'
+#SUCCESS='Xdialog --title "Success!" --no-buttons --infobox "Changes applied successfuly!" 0 0 2000'
+
+# the full line containing XkbOptions:
+ORIGINAL=`fgrep '"XkbOptions"' $INFILE | grep -v '^#'`
+
+#find current variants and layouts:
+CURRENT=`echo "$ORIGINAL" | cut -d'"' -f4`
+
+# check if already have one, find description and add to message.
+EXIST=`echo -n "$CURRENT" | tr ',' '\n' | fgrep "$OPTION:"`
+
+if [ ! "$EXIST" = "" ]; then
+	INFO=`fgrep -w "$EXIST" $LIST`
+	MESSAGE="You are currently using the following group setting:
+	"$INFO"
+
+To change it, select a new one below, then press OK.
+To remove it, select it below and press OK.
+To abort press cancel."
+else
+	MESSAGE="Please select the setting you would like to use,
+ then press OK.
+To abort, press cancel."
+fi
+
+# give choice dialog
+CHOICE=`Xdialog --stdout --title "Configure Xkb Option" --left --menubox "$MESSAGE" 25 75 10 grp:switch "R-Alt switches group while pressed." grp:lswitch "Left Alt key switches group while pressed." grp:lwin_switch "Left Win-key switches group while pressed." grp:rwin_switch "Right Win-key switches group while pressed." grp:win_switch "Both Win-keys switch group while pressed." grp:rctrl_switch "Right Ctrl key switches group while pressed." grp:toggle "Right Alt key changes group." grp:lalt_toggle "Left Alt key changes group." grp:caps_toggle "CapsLock key changes group." grp:shift_caps_toggle "Shift+CapsLock changes group." grp:shifts_toggle "Both Shift keys together change group." grp:alts_toggle "Both Alt keys together change group." grp:ctrls_toggle "Both Ctrl keys together change group." grp:ctrl_shift_toggle "Control+Shift changes group." grp:ctrl_alt_toggle "Alt+Control changes group." grp:alt_shift_toggle "Alt+Shift changes group." grp:menu_toggle "Menu key changes group." grp:lwin_toggle "Left Win-key changes group." grp:rwin_toggle "Right Win-key changes group." grp:lshift_toggle "Left Shift key changes group." grp:rshift_toggle "Right Shift key changes group." grp:lctrl_toggle "Left Ctrl key changes group." grp:rctrl_toggle "Right Ctrl key changes group."`
+[ ! $? -eq 0 ] && echo "cancelled" && exit 
+echo "$CHOICE"
+
+if [ ! "$EXIST" = "" ]; then # if there's one already
+	if [ "$CHOICE" = "$EXIST" ]; then # the same -> remove
+		NEW=`echo -n $CURRENT | tr ',' '\n' | fgrep -v $CHOICE | tr '\n' ',' | tr -s ',' | sed 's/^,//;s/,$//'`
+	else # change
+		NEW=`echo "$CURRENT" | sed "s/$EXIST/$CHOICE/"`
+	fi
+else
+	NEW="$CURRENT,$CHOICE"
+	[ "$CURRENT" = "" ] && NEW="$CHOICE"
+fi
+
+# add new variant to line, or entire line, if it doesn't exist:
+if [ "$ORIGINAL" = "" ] ;then
+	ORIGINAL=`fgrep '"XkbVariant"' $INFILE | grep -v '^#'`
+	[ "$ORIGINAL" = "" ] && ORIGINAL=`fgrep '"XkbLayout"' $INFILE | grep -v '^#'`
+	MODIFIED="$ORIGINAL\n	Option 		\"XkbOptions\"   \"$NEW\""
+else
+	MODIFIED=`echo "$ORIGINAL" | sed "s%\"$CURRENT\"%\"$NEW\"%"`
+fi
+
+# add to file
+cat $INFILE | sed "s%$ORIGINAL%$MODIFIED%" >$OUTFILE
+
+if ! fgrep -q '"XkbOptions"' $OUTFILE ;then
+	eval $ERRMSG
+	rm -f $OUTFILE
+else
+	mv -f $OUTFILE $INFILE
+	eval $SUCCESS
+fi
+exit

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=pClock Time tools
+Icon=mini-clock.xpm
+Comment=pClock Time tools
+Exec=pclock
+Terminal=false
+Type=Application
+Categories=X-PersonalUtility
+GenericName=pClock Time tools

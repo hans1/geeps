@@ -1,0 +1,413 @@
+#!/bin/sh
+#Pmusic
+#Copyright 2008,2009,2010,2011,2012
+#Sigmund Berglund - Valåmoen, Norway.
+
+#------------------------------
+#This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation version 2.
+
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+VERSION="2.5.3" #REMEMBER to set version in $APPDIR/pmusicrc
+export AUDIO_FORMATS="\.aac$|\.ac3$|\.aif$|\.aiff$|\.ape$|\.asf$|\.au$|\.flac$|\.gsm$|\.m4a$|\.mp1$|\.mp2$|\.mp3$|\.mp4$|\.mpc$|\.ogg$|\.ra$|\.raw$|\.shn$|\.voc$|\.wav$|\.wma$|\.wv$"
+export STDERR=/dev/null #--debug will change this to stderr
+
+#Ftp settings to grab index files and faq...
+export FTP_SERVER='http://www.meownplanet.net/zigbert'
+export FTP_USER='puppy'
+export FTP_PASSWORD='linux'
+export PING_SERVER='puppylinux.com'
+
+#Pmusic work-dir
+export WORKDIR=$HOME/.pmusic/tmp
+[ ! -d $WORKDIR ] && FIRSTRUN=true
+[ "$FIRSTRUN" = "true" ] && mkdir -p $WORKDIR/generated_playlists #makes all dirs in path
+
+#define pmusic application path
+export APPDIR=`dirname $0`
+[ $APPDIR = '.' ] && export APPDIR=`pwd`
+echo $APPDIR > $WORKDIR/APPDIR
+
+#set gtkdialog executable - puppy specific
+if type gtkdialog4 > /dev/null 2>&1; then
+	export GTKDIALOG=gtkdialog4
+else
+	export GTKDIALOG=gtkdialog
+fi
+
+#setup config file
+export CONFIG=$HOME/.pmusic/pmusicrc
+
+#version upgrade
+[ ! -f $CONFIG ] && cp -f $APPDIR/pmusicrc $HOME/.pmusic/pmusicrc #no config --> copy 
+[ `grep -F VERSION $CONFIG | cut -d= -f2` != $VERSION > /dev/null 2>&1 ] && cp -f $APPDIR/pmusicrc $HOME/.pmusic/pmusicrc #Other than this release
+
+#read config
+. $CONFIG
+
+#first run
+#Does your old pmusic version require to run 'firstrun'
+[ ! -f $WORKDIR/playlist5 ] && FIRSTRUN=true #introduced in 2.3.0
+if [ "$FIRSTRUN" = "true" ]; then
+	echo 1 > $WORKDIR/PLAYLIST1234 #which playlist should be active
+	$APPDIR/func -statusbar_playlist & #make sure the statusbar shows active playlist
+	echo -n > $WORKDIR/playlist #content of the Pmusic playlist
+	echo -n > $WORKDIR/PLAYLIST #the variable $PLAYLIST
+	echo -n > $WORKDIR/radiohits_presets
+	echo -n > $HOME/.pmusic/index_recent
+	echo -n > $HOME/.pmusic/index_rating
+	for I in $(seq 1 9); do echo -n > $WORKDIR/playlist$I; done
+	echo 0 > $WORKDIR/SLEEP_COUNT #see func_progressbar
+	echo 0 > $WORKDIR/VOLUME #will be updated after gui-load
+	echo 0 > $WORKDIR/BALANCE #will be updated after gui-load
+	echo 0 > $WORKDIR/PERCENT_BAR #value (percent) of progress. see func_progressbar
+	echo false > $WORKDIR/SEARCH_MYMUSIC
+	echo -e "Home directory|  $HOME/\nReference sounds|  /usr/share/audio" > $HOME/.pmusic/bookmarks
+	#show icon for album art
+	cp -f $APPDIR/themes/$THEME/album_art.png $HOME/.pmusic/nowplaying_albumart.jpg 2> $STDERR 
+	cp -f $APPDIR/themes/$THEME/album_art.png $WORKDIR/trackinfo_albumart.jpg 2> $STDERR
+	#update browser 
+	export SOURCE="  $HOME"
+	echo "$HOME" > $WORKDIR/filebrowser_dir
+	$APPDIR/func -browse &
+	#define playmode/addmode
+	echo noloop > $WORKDIR/PLAYMODE #loop gives not wanted behaviour if pmusic is used as default audioplayer
+	cp -f $APPDIR/themes/$THEME/icon_playmode_loop.png $WORKDIR/icon_playmode.png
+	echo tail > $WORKDIR/ADDMODE
+	cp -f $APPDIR/themes/$THEME/icon_addmode_tail.png $WORKDIR/icon_addmode.png
+	#make sure the pmusic icon is reachable for the <window> widget
+	if [ ! -f /usr/share/icons/hicolor/22x22/apps/pmusic.png ]; then
+		ln -s $APPDIR/pmusic20.png /usr/share/icons/hicolor/22x22/apps/pmusic.png
+		gtk-update-icon-cache -f -i /usr/share/icons/hicolor
+	fi
+	#start song to offer at least one music track :) 
+	LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/tmp #check connection
+	if [ "`grep 'connected' $WORKDIR/tmp`" ]; then
+		echo -e 'gtk-media-play|04:20|Hoovers - Ride with me|001 http://api.jamendo.com/get2/stream/track/redirect/?streamencoding=mp31&id=859750' > $WORKDIR/playlist
+	fi
+fi
+
+[ $# = 0 ] && echo "$BROWSERDIR" > $WORKDIR/filebrowser_dir #no parameters is used
+[ ! "`ls -1 /sys/block 2> $STDERR | grep -E '^scd|^sr' | tr '\n' ' '`" ] && export CD_DEV=false
+
+#set language
+NLS=$LANGUAGE #$NLS is temporarly, and only used here
+. $APPDIR/locals/en_US:english #always run to fill gaps in translation
+if [ "$LANGUAGE" = "auto" ]; then
+	NLS="`ls -1 $APPDIR/locals/ | grep ${LANG%.*} | head -n 1`"
+	#fallback to macrolanguage if available (ISO 639-1 two letter code: en, es, fr, etc.)
+	if [ -z $NLS ]; then NLS="`ls -1 $APPDIR/locals/ | grep ${LANG%_*} | head -n 1`"; fi
+fi
+if [ "$NLS" != "en_US:english" ] && [ "$NLS" ] && [ -s $APPDIR/locals/$NLS ]; then . $APPDIR/locals/$NLS; fi
+
+#reset frontend specific options before reading parameters
+rm $WORKDIR/DONT_SAVE_PRESET 2> $STDERR #this is set true by -j switch
+OVERRIDE_PMUSIC_PRESET='' #NowPlaying returns this value, and we need to clear it for an ordinary run
+
+#parameters
+while [ $# != 0 ]; do
+	I=1
+	while [ $I -lt `echo $# | wc -c` ]; do
+		if [ -d "$1" ]; then #add content of directory
+			if [ "$RECURSIVE" ]; then MAXDEPTH=100; else MAXDEPTH=1; fi
+			find "$1" -maxdepth $MAXDEPTH -name "*" -type f -printf "%p\n" > $WORKDIR/pmusic.dir
+			grep -iE "$AUDIO_FORMATS" $WORKDIR/pmusic.dir > $WORKDIR/tmp
+			mv $WORKDIR/tmp $WORKDIR/pmusic.dir
+			export SOURCE="  $WORKDIR/pmusic.dir"
+			if [ ! "$ADD_FILE" ]; then $APPDIR/func_store_playlist; $APPDIR/func -new; fi #save last playlist 
+			. $APPDIR/func_add -add
+			ADD_FILE=true #in case user wants to add more than 1 song
+			sleep 0.2 #be sure the splash screen is gone
+		elif [ "$1" = "-a" ] && [ "`echo "$2" | grep -F 'radio:'`" ]; then #open radio categories from external open-window (like Classical PMUSIC_PRESET)
+			export SOURCE="  $2"
+			. $APPDIR/func_add -add
+			shift
+		elif [ "$1" = "-a" ] && [ ! "`echo "$2" | grep -F '/'`" ]; then #open manager windows for Podcast, Bookmarks, index...
+			export SOURCE="  $2"
+			. $APPDIR/func_add -add
+			ADD_FILE=true
+			shift
+		elif [ "`echo "$1" | grep -F '/'`" ]; then #try to open ALL files and URLs
+			if [ "$JUST_PLAY" = "true" ]; then # -B switch is used. play as fast as possible
+				ffmpeg -i "$1" 2> $WORKDIR/tmp
+				LENGTH=`grep Duration $WORKDIR/tmp | awk '{print $2}' | cut -d"." -f1 | cut -d":" -f2-`
+				[ "$LENGTH" = "N/A," ] && LENGTH='00:00'
+				#build command --- split echos to ensnure filenames that contaions ' will play
+				echo '#!/bin/sh' > $WORKDIR/exec
+				if [ "$LENGTH" = "00:00" ] || [ "$LENGTH" = "00:01" ] && [ ! "`grep -F '://' $WORKDIR/PLAYLIST`" ]; then #if length is under 2 sec --> piping ffmpeg | aplay fails
+					echo -n "ffmpeg -i '" >> $WORKDIR/exec
+					echo -n "${1}" | sed s/\'/\'\"\'\"\'/g >> $WORKDIR/exec #if filename contains ' this won't play else we put it into ""
+					echo "' -f au -y $WORKDIR/pmusic.au"  >> $WORKDIR/exec
+					echo "aplay $WORKDIR/pmusic.au" >> $WORKDIR/exec
+				else #Normal way
+					echo -n "exec ffmpeg -i '" >> $WORKDIR/exec
+					echo -n "${1}" | sed s/\'/\'\"\'\"\'/g >> $WORKDIR/exec #if filename contains ' this won't play else we put it into ""
+					echo "' -f au - | aplay" >> $WORKDIR/exec
+				fi
+				chmod 700 $WORKDIR/exec
+				$WORKDIR/exec 2> $STDERR
+				exit
+			else #add to playlist, index databases.... before playing. (use the ordinary playing structure)
+				if [ "`echo "$1" | grep "^\./"`" ] || [ ! "`echo "$1" | grep -F "/"`" ]; then #path is not specified, -> use current
+					TMP="`basename "$1"`"
+					J="`pwd`/$TMP"
+				else 
+					J="$1"
+				fi
+				export LOC506="$J" #LOC variables is not yet defined
+				if [ ! "$ADD_FILE" ] && [ ! -f $WORKDIR/gui_is_running ]; then $APPDIR/func_store_playlist; $APPDIR/func -new; fi #save last playlist
+				export SOURCE="  $J"
+				. $APPDIR/func_add -add
+				ADD_FILE=true #in case user wants to add more than 1 song
+			fi
+		fi
+		case $1 in
+			-a)	ADD_FILE=true;;
+			-b) NOGUI=true; TRAYAPP=false;;
+			-B) $APPDIR/func_player -stop; JUST_PLAY=true;;
+			-c) #if used in combination with the -j switch, Keep -j before -c
+				$APPDIR/func_store_playlist
+				$APPDIR/func_cd -play_cd &
+				;;
+			-D) echo -e "  \e[04mR E Q U I R E D                            \e[0m"
+				echo -n '    bash                                      '
+				if [ "`which bash`" ]; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -n '    coreutils, awk, sed, diff                 '
+				if [ "`which cp`" ] && [ "`which awk`" ] && [ "`which sed`" ] && [ "`which diff`" ]; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+#				echo -n '      awk                                     '
+#				[ "`which awk`" ] && echo -e "\e[01;32m[OK]\e[0m"|| echo -e "\e[01;31m[MISSING]\e[0m"
+#				echo -n '      sed                                     '
+#				[ "`which sed`" ] && echo -e "\e[01;32m[OK]\e[0m" || echo -e "\e[01;31m[MISSING]\e[0m"
+#				echo -n '      diff                                    '
+#				[ "`which diff`" ] && echo -e "\e[01;32m[OK]\e[0m" || echo -e "\e[01;31m[MISSING]\e[0m"
+				#gtkdialog
+				TMP=`$GTKDIALOG --version | cut -d' ' -f3`
+				echo -n '    gtkdialog                        >= 0.8.0 '
+				if [ "`which $GTKDIALOG`" ] && [ "`echo $TMP | tr -d '.'`" -ge 072 ]; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				#ffmpeg is not that straight forward since compiling from git gives another output
+				TMP=`ffmpeg -version 2> $STDERR | grep -iF 'ffmpeg' | cut -d' ' -f2 | head -c 3`
+				echo -n '    ffmpeg                           >= 0.8   '
+				if [ "`which ffmpeg`" ] && [ "`echo $TMP | tr -d '.' | grep [0-9]`0" -ge 08 ]; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;33m[??]\e[0m"; fi
+				#---
+				echo -n '    aplay  (alsa)                             '
+				if type aplay > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -e "\n  \e[04mR E C O M M E N D E D                      \e[0m"
+				echo -n '    streamripper (extended radio-rip/play)    '
+				if type streamripper > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -n '    cdda2wav     (play/rip audio-CD)          '
+				if type cdda2wav > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -n '    wget         (connection to www)          '
+				if type wget > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -e "\n  \e[04mO P T I O N A L                            \e[0m"
+				echo -n '    Pburn        (burning audio-CD)           '
+				if type pburn > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -n '    pFilesearch  (File-search engine) >= 1.28 '
+				#pfilesearch
+				TMP=`pfilesearch -v | cut -d' ' -f2 | tr -d '.'`
+				if [ "`which pfilesearch`" ] && [ $TMP -ge 128 ]; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				#pschedule
+				echo -n '    Pschedule    (podcast managing)           '
+				if type pschedule > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				echo -n '    pEqualizer   (10 band equalizer)          '
+				if type pequalizer > /dev/null 2>&1; then echo -e "\e[01;32m[OK]\e[0m"; else echo -e "\e[01;31m[MISSING]\e[0m"; fi
+				exit
+				;;
+			--debug) export STDERR=/dev/stderr;;
+			--dump-gtk) DUMP_GTK=true;;
+			-f) echo "$AUDIO_FORMATS" | tr -d '$' | tr '\' ' ' | tr '.' ' ' | tr '|' '\n' #'
+				exit
+				;;
+			-i) case $2 in
+					albumart)	defaultimageviewer $HOME/.pmusic/nowplaying_albumart.jpg;;
+					nowplaying)	cut -d'|' -f1 $HOME/.pmusic/nowplaying;;
+					path)		cut -d'|' -f2 $HOME/.pmusic/nowplaying;;
+					*) 			echo 'Pmusic error: Unknown info';;
+				esac
+				exit 0;;
+			-j) cp -f $WORKDIR/playlist $WORKDIR/playlist.bak #don't interfere with default playlist. Copy back in func -quit
+				echo true > $WORKDIR/DONT_SAVE_PRESET 2> $STDERR
+				;;
+			-p) OVERRIDE_PMUSIC_PRESET="$2"
+				#remove $WORKDIR/xml_Pmusic if not using the -j switch
+				if [ "`echo "$*" | grep -F ' -j'`" ] || [ "$(<$WORKDIR/DONT_SAVE_PRESET)" ]; then
+					true
+				else
+					rm $WORKDIR/xml_Pmusic
+				fi
+				shift;;
+			-P) ENSURE_PLAY=true;;
+			-r) RECURSIVE=true;;
+			-s) case $2 in
+					mute) 		$APPDIR/func_mixer -mute;;
+					next) 		cp -f $WORKDIR/PLAYLIST $WORKDIR/tmpPLAYLIST #RATING:to remember what was played (decrease rating)
+								$APPDIR/func_player -next;;
+					pause) 		$APPDIR/func_player -play -refresh;;
+					prev) 		$APPDIR/func_player -back;;
+					quit) 		$APPDIR/func -quit;;
+					stop) 		$APPDIR/func_player -stop -refresh;;
+					volup) 		$APPDIR/func_mixer -volume_up;;
+					voldown)	$APPDIR/func_mixer -volume_down;;
+					balleft) 	$APPDIR/func_mixer -balance_left;;
+					balright)	$APPDIR/func_mixer -balance_right;;
+					*) 			echo 'Pmusic error: Unknown signal';;
+				esac
+				exit 0;;
+			-t) MIN=`echo $2 | cut -d':' -f1`
+				SEC=`echo $2 | cut -d':' -f2`
+				echo "$[($MIN*60)+$SEC]" > $WORKDIR/SS
+				echo true > $WORKDIR/TIMESTAMP
+				shift
+				;;
+			-T)	THEME="$2"
+				shift
+				;;
+			-u)	. $HOME/.pmusic/pmusicrc
+				echo 'check new podcasts'
+				$APPDIR/func_podcast -u
+				exit
+				;;
+			-U)	export UPDATE_INTERVAL=$2
+				;;
+			-v|--version) echo Pmusic $VERSION; exit;;
+			-h|--help)
+				echo 'Usage: pmusic [OPTION(S)] [FILE(S) / DIR(S) / URL(S)]
+
+				'  "'"pmusic /path/file.mp3"'"' will add file to playlist if pmusic is already
+				  running. If not running, pmusic will start with empty playlist and play file.
+				  To override this dynamic behavior, use the -a/-P switch.
+
+				Options
+				  -a             Add [FILE(S) / DIR(S) / URL(S)] to playlist instead of playing it
+				  -b             Use Pmusic as backend - no GUI
+				  -B             Use only backend - do not interfere with playlist, etc.
+				                 This works as a dead simple command-line player
+				  -c             Loads CD-audio disc into playlist and starts playing
+				  -D             List Pmusic dependencies and if installed on your system
+				      --debug    Show debugging messages
+				      --dump-gtk Print the gtk-code (xml) and exit
+				  -f             List supported audio formats
+				  -h, --help     Show this help message
+				  -i INFO        Show info about playing track
+				                   albumart   - show album art in defaultimageviewer
+				                   nowplaying - Return playing artist - title
+				                   path       - Return full path of playing track
+				  -j             Do NOT save PMUSIC_PRESET settings (like geometry, playlist...)
+				                 Handy in combination with -p
+				  -p PRESET      Use this frontend PRESET instead of the one defined in rc
+				                 Available presets are stored in '$APPDIR'/presets/
+				  -P             Ensure that the defined file will start playing
+				  -r             Add all supported files in directories recursively
+				  -s SIGNAL      Send signal to a running instance of Pmusic
+				                   balleft    - increase balance left by 10%
+				                   balright   - increase balance right by 10%
+				                   mute       - Turn volume On/Off 
+				                   next       - Play next song in playlist
+				                   pause      - Pause/Play audio
+				                   prev       - Play previous song in playlist
+				                   quit       - Quit all pmusic processes
+				                   stop       - Stop playing
+				                   volup      - increase volume by 10%
+				                   voldown    - derease volume by 10%
+				  -t xx:xx       Set the start time offset
+				                 This does not work with the -a switch
+				  -T THEME       Set graphical theme for this instance only 
+				  -u             Update podcasts
+				  -U MILLISEC    Set update interval for progressbar +++
+				                 This is useful to reduce cpu-hunger on low-powered systems
+				                 Default is 1000 = 1 sec
+				  -v, --version  Show Pmusic version
+				  
+				Supported formats (with working alsa and ffmpeg):'"
+				`pmusic -f`
+				
+				Dependencies
+				`pmusic -D`" | tr -d '\011'; exit;; #\011 --> remove tabs
+		esac
+		shift
+		I=$(($I+1))
+	done
+done
+#check if gui exist (open/add from terminal) --> add and quit.
+if [ -f $WORKDIR/gui_is_running ] && [ "$ADD_FILE" ]; then
+	echo true > $WORKDIR/UPDATE_GUI
+	exit 0
+fi
+
+#defaults
+grep -c '^' $WORKDIR/playlist > $WORKDIR/PLAYLIST_NR #count lines
+echo $HOME"/Pmusic.m3u" > $WORKDIR/last_added_playlist
+#set frontend
+[ "$OVERRIDE_PMUSIC_PRESET" ] && export PMUSIC_PRESET=$OVERRIDE_PMUSIC_PRESET
+if [ -f "$APPDIR/presets/$PMUSIC_PRESET" ]; then
+	export PMUSIC_PRESET="$APPDIR/presets/$PMUSIC_PRESET"
+elif [ -f "$PMUSIC_PRESET" ]; then
+	false
+else
+	export PMUSIC_PRESET="$APPDIR/presets/Manager"
+fi
+
+#kill older instances of pmusic, and if gtkdialog didn't quit properly
+kill -9 `cat $WORKDIR/MY_PID 2> $STDERR` 2> $STDERR
+echo $$ > $WORKDIR/MY_PID #store for next instance (new PMUSIC_PRESET or new startup without quit)
+ps > $WORKDIR/tmp
+for I in `grep -i pmusic $WORKDIR/tmp | grep -E "gtkdialog|index|func_progressbar" | grep -vF radiohits_grabber | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+#clean up text in statusbar
+! grep aplay $WORKDIR/tmp > /dev/null && rm -f $WORKDIR/ffmpeg_output
+
+#more firstrun - this will only run if gui shows up. It might be that first run is with parameters like --version.
+if [ "$FIRSTRUN" = "true" ]; then
+	$APPDIR/func_player -play -autoplay &
+fi
+
+#show play or pause button (if present in theme)
+[ -f $APPDIR/themes/$THEME/icon_play.png ] && cp -f $APPDIR/themes/$THEME/icon_play.png $WORKDIR/icon_playpause.png
+ps -eo pid,s,command > $WORKDIR/tmp
+[ "`grep aplay $WORKDIR/tmp | grep ' S '`" ] && [ -f $APPDIR/themes/$THEME/icon_pause.png ] && cp $APPDIR/themes/$THEME/icon_pause.png $WORKDIR/icon_playpause.png 2> $STDERR #playing
+
+#tray app
+if [ $TRAYAPP = true ] && [ -s $APPDIR/pmusic_tray ]; then
+	TMP="`ps`"
+	[ ! "`echo "$TMP" | grep pmusic_tray`" ] && exec $APPDIR/pmusic_tray &
+fi
+
+echo $TRACKINFO_REFRESH > $WORKDIR/TRACKINFO_REFRESH #for func_progressbar. Will be overwritten in LowPowered frontend 
+
+#GTK-theme
+if [ -f "$APPDIR/themes/$THEME/gtkrc" ]; then
+	if [ "`grep -F 'ONLY_THIS_GTKTHEME=true' $APPDIR/themes/$THEME/themerc 2> $STDERR`" ]; then
+		export GTK2_RC_FILES="$APPDIR/themes/$THEME/gtkrc"
+	else
+		[ -f $HOME/.gtkrc-2.0 ] && export GTK2RC="$HOME/.gtkrc-2.0" #get active theme
+		[ -f /etc/gtk-2.0/gtkrc ] && GTK_OLD_PUPPY=':/etc/gtk-2.0/gtkrc' #/etc/gtk-2.0/gtkrc is for < Puppy4
+		export GTK2_RC_FILES="$GTK2RC$GTK_OLD_PUPPY:$APPDIR/themes/$THEME/gtkrc"
+	fi
+fi
+#---
+if [ "$NOGUI" != "true" ]; then
+	#use a unique xml-file for temporary guis to avoid conflict with the xml-backup feature
+	if [ "`cat $WORKDIR/DONT_SAVE_PRESET 2> $STDERR`" = "true" ]; then
+		XML_SUFFIX='_tmp'
+	else
+		XML_SUFFIX=''
+	fi
+
+	#run unique commands/settings to override default settings
+	[ -s ${PMUSIC_PRESET}.pre ] && . ${PMUSIC_PRESET}.pre
+	#build gui if not in xml_Pmusic file
+	if [ "`diff $WORKDIR/xml_Pmusic $WORKDIR/xml_Pmusic.bak 2> /dev/null`" ] || [ ! -f $WORKDIR/xml_Pmusic ] || [ ! -f $WORKDIR/xml_Pmusic.bak ] || [ "$OVERRIDE_PMUSIC_PRESET" ]; then
+		. $PMUSIC_PRESET
+		[ $TOOLTIPS = false ] && GUI="`echo "$GUI" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+		echo "$GUI" | sed 's/##.*//' > $WORKDIR/xml_Pmusic${XML_SUFFIX} #I use double hash (##) for comments. --> as #FF0000 is valid xml-code
+		cp -f $WORKDIR/xml_Pmusic $WORKDIR/xml_Pmusic.bak #does not backup xml_Pmusic${XML_SUFFIX} as this one is for temporary guis only
+	fi
+
+	#include <window> tag here to always keep track of geometry, - Pmusic only updates xml-code if frontend has changed.
+	[ ! "`grep -F '<window' $WORKDIR/xml_Pmusic.bak`" ] && echo '<window title="Pmusic" icon-name="pmusic" default_height="'$HEIGHT'" default_width="'$WIDTH'">'"$(<$WORKDIR/xml_Pmusic.bak)" > $WORKDIR/xml_Pmusic.bak
+	[ ! "`grep -F '<window' $WORKDIR/xml_Pmusic`" ] && echo '<window title="Pmusic" icon-name="pmusic" default_height="'$HEIGHT'" default_width="'$WIDTH'">'"$(<$WORKDIR/xml_Pmusic)" > $WORKDIR/xml_Pmusic
+	#start pequalizer if included in gui
+	[ "`grep -F 'pequalizer/preset' $WORKDIR/xml_Pmusic`" ] && mv -f $HOME/.asoundrc.bak $HOME/.asoundrc
+	#run gui
+	if [ "$DUMP_GTK" = "true" ]; then cat $WORKDIR/xml_Pmusic${XML_SUFFIX}; $APPDIR/func -quit; exit 0; fi
+	$GTKDIALOG -f $WORKDIR/xml_Pmusic${XML_SUFFIX} -G +"$X"+"$Y" 2> $STDERR &
+fi
+

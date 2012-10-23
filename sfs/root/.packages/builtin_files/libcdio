@@ -1,0 +1,34 @@
+/usr
+/usr/bin
+ cdda-player
+ cd-drive
+ cd-info
+ cd-paranoia
+ cd-read
+ iso-info
+ iso-read
+ mmc-tool
+/usr/lib
+ libcdio_cdda.so
+ libcdio_cdda.so.0
+ libcdio_cdda.so.0.0.3
+ libcdio_paranoia.so
+ libcdio_paranoia.so.0
+ libcdio_paranoia.so.0.0.2
+ libcdio.so
+ libcdio++.so
+ libcdio++.so.0
+ libcdio++.so.0.0.0
+ libcdio.so.12
+ libcdio.so.7
+ libcdio.so.7.1.1
+ libiso9660.so
+ libiso9660++.so
+ libiso9660++.so.0
+ libiso9660++.so.0.0.0
+ libiso9660.so.5
+ libiso9660.so.5.1.0
+ libiso9660.so.7
+ libudf.so
+ libudf.so.0
+ libudf.so.0.0.0

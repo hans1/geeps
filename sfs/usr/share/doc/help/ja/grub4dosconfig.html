@@ -1,0 +1,271 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<head>
+<title>Grub4DosConfig help</title>
+<style type="text/css">
+<!--
+ p {margin-left:5%; margin-right:5%;}
+-->
+</style>
+</head>
+<body>
+<div id="top" align="right"><a href="../C/grub4dosconfig.html">English</a></div>
+<h1><img src="../images/gnibbles.png" alt="gnibbles" hspace="8">Grub4DosConfig ブートローダの設定</h1>
+<p>この文書は Grub4DosConfig version 1.7.1のために書かれました</P>
+<h2>目次</h2>
+<ol>
+<li><a href="#about">Grub4Dosとは</a></li>
+ <ul>
+ <li><a href="#online">ネット上の資料</a></li>
+ </ul>
+<li><a href="#install">Grub4Dosのインストール</a></li>
+ <ul>
+ <li><a href="#whatis">インストールされるもの</a></li>
+ <li><a href="#whereto">インストール先</a></li>
+ <li><a href="#pbsinstall">パーティション(PBS)へのインストール</a>(バージョン1.7以降)</li>
+ <li><a href="#noneed">ブートレコードを書き換えない</a></li>
+ <li><a href="#bootflag">ブートフラグが必要なとき</a></li>
+ </ul>
+<li><a href="#bootmenu">起動メニュー</a></li>
+ <ul>
+ <li><a href="#editmenu">起動メニューの編集</a></li>
+ <li><a href="#windows">Windows起動メニュー</a></li>
+ <li><a href="#bootable">Bootable partitions</a></li>
+ <li><a href="#duplicate">フォルダ名の重複</a></li>
+ </ul>
+<li><a href="#editmenulst">menu.lst の編集</a></li>
+ <ul>
+ <li><a href="#incase">編集が必要な場合</a></li>
+ <li><a href="#full">Fullインストールシステムの起動</a></li>
+ <li><a href="#oldmenulst">既存のmenu.lstを参考にする</a></li>
+ <li><a href="#options">ブートオプション（パラメータ）の追加(Frugal/Fullインストール共通)</a></li>
+ <li><a href="#classic">昔のパピー</a></li>
+ <li><a href="#order">項目の順番</a></li>
+ <li><a href="#legacy">Grub4Dos特有のコマンド</a></li>
+ </ul>
+ <li><a href="#additionalmenu">追加されたメニュー項目</a></li>
+ <ul>
+ <li><a href="#chain">PBS(Partiton Boot Secter) へのチェインロード</a></li>
+ <li><a href="#find">Find Grub menu on HDD</a></li>
+ <li><a href="#grub2">Find Grub2</a></li>
+</ul>
+</ol>
+<h2 id="about">1.Grub4Dosとは</h2>
+<p>リナックスや他のOSを起動するブートローダとして定番のものに Grub があります。
+パピーリナックスでも syslinux（フロッピーディスクやUSBメモリなどに対応） とともに Grub が採用されてきました。
+しかし Grubには大きな制限があります。
+リナックス専用となるファイルシステム ext2 または ext3 でフォーマットされたパーティションが必要だということです。
+Grub4Dosは Grubと互換性のある機能を有しつつ、 Windowsで使用される NTFS や FAT ファイルシステムの上にもインストールできます。
+その他にも機能拡張があります。 
+</p>
+<p>(バージョン 1.6での追加)<br>
+grub4dosconfig-0.4.4.v1.5.x による ext4ファイルシステムのサポートは部分的でした。
+これまでは etx4に関して grubの助けを借りなければなりませんでした。
+grub4dosconfig-0.4.4.v1.6 では '<a href="http://nufans.net/grub4dos/wee/">Wee</a>'をMBRに導入することにより ext4 をフルサポートしています。.
+</p>
+<p>(バージョン 1.7での追加)<br>
+起動用コードをパーティション(PBS)にもインストールできるようになりました。
+ファイルシステムとして新たにReiserfsを限定的にサポートします。
+grldrを reiserfs上には置けません。したがってすべてのパーティションが reiserfsであるようなドライブにインストールすることはできません。
+また reiserfsのPBSにインストールすることもできません。
+</p>
+<h3 id="online">ネット上の資料（英文）</h3>
+<ul>
+<li><a href="http://grub4dos.sourceforge.net/wiki/index.php">Grub4Dos Wiki</a></li>
+<li><a href="http://diddy.boot-land.net/grub4dos/Grub4dos.htm">Grub4dos Guide</a></li>
+</ul>
+
+<h2 id="install">2.Grub4Dosのインストール</h2>
+<div align="right"><a href="../C/grub4dosconfig.html#install">English</a></div>
+<h3 id="whatis">インストールされるもの</h3>
+<p>インストールされるGrub4Dosの実態は ブートレコードに格納される起動用コードと、２つの通常ファイル、 grldr と menu.lst です。
+原則的に grldr と menu.lst はインストール先HDDの第1パーティションに保存されます。
+</p>
+<h3 id="whereto">インストール先</h3>
+<p>
+Grub4Dosをどのドライブにインストールするかを最初に選択します。
+起動用のコードは選択されたドライブのMBR(Master Boot Record)に書かれます。
+通常は第1番目の内蔵HDD(sda あるいは hda)のMBRを選択します。
+grldr と menu.lst はインストール先HDDの第1パーティションに保存されます。
+</p>
+<p>
+Grub4Dosを別のHDDにインストールすることもできます。BIOS設定などでこのドライブが起動できることが前提です。
+注意すべきは、パピーが認識するHDDと起動のときBIOSやGrub4Dosが認識するHDDとは呼び方が異なるだけでなく、認識する数や順番が異なるかもしれないということです。
+この問題は後にも出てきます。
+</p>
+<p>内蔵HDDを触らずにUSBメモリにインストールするのも安全な方法かもしれません。
+ただし、あなたのパソコンが USBメモリからの起動に対応していることと、その設定方法をあなたが知っているということが条件になります。
+</p>
+<p>フロッピーディスクドライブがあり、それから起動できるならば、まずはフロッピーディスクにインストールすることをお勧めします。
+できれば新しいフロッピーディスクを用意してください。すでに使ったものでも良いですが、インストールに使用すると、内容はすべて消去されます。
+大事なデータが入っていないか、あらかじめ確認しておいてください。
+</p>
+<h3 id="pbsinstall">パーティション(PBS)へのインストール</h3>
+<p>
+Grub4DosConfigバージョン1.7以降では各ドライブのMBRではなくパーティション（Partition Boot Sector）に起動用コードを書くことができます。
+このパーティションはブート可能フラグがセットされており、MBRはこのブートフラグの付いたパーティションのPBSに制御を移すような仕組みがあるときにこれが使えます。
+あるいは起動するパーティションを選択できるようなブートローダーマネージャを使う場合にこの方法が使えます。
+あなたがブートの仕組みを理解していて、そのような設定ができる場合にのみ、この選択をしてください。
+</p>
+<p>Grub4DosConfigを起動すると、最初はドライブだけが選択肢に現れ、その中のパーティションを選択することはできません。
+パーティション(PBS)に起動用コードを置きたいときは「PBSも表示」のボタンを押してください。
+</p>
+<p>
+パーティションのファイルシステムが ext4であって、そのPBSにインストールしたいときにはGrub4Dosのほかに extlinuxが必要です。
+この extlinuxはバージョン4.0以上でなければならず、また chain.c32も必要です。
+extlinuxのバージョンは端末から 'extlinux --version' とタイプすれば分かります。
+extlinuxのバージョンが4.0未満の場合や chain.c32が無ければそれらをインストールしてください。
+</p>
+<h3 id="noneed">ブートレコードを書き換えない</h3>
+<p>現在のMBRにはWindowsを起動する ntldr など（を起動するコード）が入っていて、それをそのまま使いたいことがあるかもしれません。
+その場合は「ブートレコードは書き換えない」にチェックを入れてください。
+grldr と menu.lst だけが配置されます。
+このような場合、 ntldr などから grldr を起動できる設定が別途必要です。
+<a href="http://diddy.boot-land.net/grub4dos/files/install.htm">Grub4dos Guide</a>（英文）を参考にしてください。
+</p>
+<p>逆にブートレコードが別のものに書き換えられてGrub4Dosをインストールしなおすさいに、以前の'menu.lst'をそのまま残したいときもあるでしょう。
+そのときは「'menu.lst'は書き換えない」にチェックを入れてください。</p>
+<p>フロッピーディスクにインストールするときはチェックに関わらず、常にブートレコード、grldr と menu.lst を書き込みます。</p>
+<h3 id="bootflag">Bootフラグが必要なとき</h3>
+<p>パーティションに付けられるブートフラグ(boot flag)はもともと、マスターブートレコードに対して、次にどのパーティションへチェーンすべきかを指示するものです。
+Grub4Dosがそのマスターブートレコードである場合にはその必要はありません。
+なぜなら Grub4Dosは 'menu.lst'ファイルを読むことで次に何をすべきか分かるからです。
+</p>
+<p>
+ところが、BIOSによってはブートフラグの無いドライブからは起動しないものがあります。
+このときは GParted などのツールで起動ドライブのいずれかのパーティションにブートフラグをセットしてください。
+ブートフラグは1つのドライブについてただ1つのパーティションにしか付けられません。
+しかし安心してください。Grub4Dosはブートフラグに関係なくどのパーティションのOSも起動することができます。
+</p>
+<p>USBメモリなど持ち運びのできるデバイスにインストールするときはブートフラグを付けておくことをお勧めします。
+いま使っているPCでブートフラグなしで起動できたとしても、別のPCでは起動できないかもしれません。</p>
+<h2 id="bootmenu">3.起動メニュー</h2>
+<div align="right"><a href="../C/grub4dosconfig.html#bootmenu">English</a></div>
+<h3 id="editmenu">起動メニューの編集</h3>
+<p>Grub4DosConfigは内蔵あるいは接続されているハードディスクやUSBメモリを調べ、
+インストールされているパピーや他のリナックスOSを検出してリストアップします。</p>
+<p>ここでできることは、起動時にメニューに表示されるタイトルの変更と削除だけです。
+Grub4DosConfigが検出できなかったOSを追加することはできません。また順番を入れ替えることもできません。
+ここでできなかったことは、インストールが済んでから menu.lst を直接編集することで行います。</p>
+<p>箱の中の文字列（タイトル）が起動のときにメニュー項目として表示されます。
+同じタイトルがあるときは区別できるようにタイトルを書き換えておきましょう。日本語の文字はたぶん表示できないでしょう。
+</p>
+<p>メニューに必要のない項目はタイトルを空白にしてください。</p>
+<p>追加ブートオプション(バージョン 1.6での追加)<br>
+Frugal インストールされたパピー用の、フルインストールされたパピーや他のLinux用のブートオプションをそれぞれ追加することができます。
+よく分からなければそのままにしておいてください。</p>
+<h3 id="windows">Windows起動メニュー</h3>
+<p>Windowsがインストールされいるかどうかに関わらず、Windowsに関する項目は少なくとも１行出てきます。
+インストールされておらず、今後もインストールする予定が無ければ、その項目を空白にしてください。
+しかしフロッピーディスクやUSBメモリにインストールするときは、これらをそのまま残しておくのが良いでしょう。別のコンピュータで役立つかもしれないからです。</p>
+<p>ここでも、順番を変えることはできません。
+たとえばWindows XPを起動させたいのならばそれを残し、Vista/2008/7 を使う予定が無ければそれを空白に、9x/Meが必要なければそれも空白にしておきます。
+</p>
+<h3 id="bootable">Bootable partitions</h3>
+<p>
+(バージョン 1.6.3以降)<br />
+ Grub4DosConfigはブート可能フラグの付いたパーティションに対して「(sda2:PBS)」のようなメニュー項目を加えます。
+ ただしこの項目が本当にブート可能であるかどうかは分かりません。フラグが付いていてもブートローダがインストールされていない場合があるからです。
+ この項目はたいていの場合、他のメニューと重複しています。
+ ですが最初はこれを残しておき、これを削除するのはこのパーティションにインストールされたOSが別のメニューから起動できることを確認してからにしてください。
+</p>
+<h3 id="duplicate">フォルダ名の重複</h3>
+<p>別のドライブ、別のパーティションであっても、同じ名前のフォルダを作ってそこにパピーをfrugalインストールしていると起動に失敗します。フォルダ名重複のエラーが出たら、いずれかのフォルダ名を変更してからDrub4DosConfigを再起動してください。</p>
+<h2 id="editmenulst">4.menu.lst の編集</h2>
+<div align="right"><a href="../C/grub4dosconfig.html#editmenulst">English</a></div>
+<p>menu.lst の書式詳細は<a href="http://diddy.boot-land.net/grub4dos/files/menu.htm">Grub4dos Guide</a>（英文）を参照のこと。</p>
+<h3 id="incase">編集が必要な場合</h3>
+<p>パピーがFullインストールされていたり、他のリナックスを起動するためには menu.listを修正しなければならない場合があるでしょう。パピーをFurugalインストールしており、他にはWindowsしか無いならば、Grub4DosConfigが自動作成した menu.lstをたいていはそのまま使用できるはずです。</p>
+<h3 id="full">Fullインストールシステムの起動</h3>
+<p>Fullインストールされたパピー、他のリナックスの起動には落とし穴があります。
+これらを起動するには、インストールされたパーティション、正確にはリナックスカーネル(vmlinuz)の場所の指定と、ルートファイルシステムの場所の指定が必要です。
+このうち前者、カーネルのあるパーティションはGrub4Dosに対する指示で、後者、ルートファイルシステムの場所は起動したリナックスカーネルに対する指示となります。
+</p>
+<p>ここで、(1)Grub4Dosが認識するパーティション、(2)起動されるリナックスカーネルが認識するパーティション、
+さらには(3)現在走っているパピー（のカーネル）が認識するパーティション、これら３つが、呼び方が異なるだけでなく、認識する数や順番が異なるかもしれないということが、大きな落とし穴となります。
+</p>
+<p>
+典型的な場合、たとえば先頭のHDDは　Grub4Dosでは (hd0)、（パピー）リナックスカーネルでは sda、
+その第1パーティションは Grub4Dosでは <b>(hd0,0)</b>、（パピー）リナックスカーネルでは <b>sda1</b>となります。
+</p>
+<p>
+ところが、リナックスカーネルのバージョンによって、あるいはハードによってたとえば先頭のHDDが sda ではなく hda、2番目が hdb、 3番目が sda という場合もあります。
+これらは Grub4Dos ではhd/sdの区別なく順に (hd0)、(hd1)、(hd2) となります。
+これはむしろ単純な場合で、それぞれが認識する数が異なる場合はもっとやっかいになります。
+<p>
+<p>生成された menu.lstの 「root (hd0,4)」などの行にあるhdの後の数字の変更「root (hd<b>1</b>,4)」、「root=/dev/sda5」などの記述を「root=/dev/<b>h</b>da5」に変更したりするなどが必要かもしれません。</p>
+
+<p>(バージョン 1.6での追加)<br>
+grub4dosconfig-0.4.4.v1.6以降は「root (hd<i>n</i>,0)」(<b><i>n</i></b>は数字で、HDDの接続/認識順などで変わる)などに代えて
+各パーティション固有の UUIDを用います。
+これによりあなたは「/dev/sda1」などの部分だけを注意すればよいようになりました.
+
+</p>
+<h3 id="oldmenulst">既存のmenu.lstを参考にする</h3>
+<p>すでにGrubがインストールされているならば、 古いmenu.lstが存在しているはずです。
+それらは /(ルート)、/boot あるいは /boot/grub ディレクトリにあります。日付と時間を付けた menu-2009-08-12-144950.lst などと名前が変更されているかもしれません。
+これらがある場合、それらを参考にします。
+いままでそれで無事に起動していたならば、該当部分（title行から次のtitle行の手前まで）はまるごと引き写しでよいはずです。</p>
+<h3 id="options">起動オプション（パラメータ）の追加(Frugal/Fullインストール共通)</h3>
+<p>
+生成された menu.lstは標準的なブートオプションだけが記載されています。たとえば 「acpi=off」など機器固有に必要なオプションがあれば追記してください。
+</p>
+<p>ドライブがUSB接続のとき、Grub4DosConfigはそれをUSBフラッシュメモリであると「pmedia=usbflash」オプション、USB接続のHDDならば「pmedia=usbhd」を加えます。
+これが間違っていたなら書き換えてください。</p>
+<p>参考：<a href="http://pupweb.org/wikka/BootParms">起動オプション（ブートパラメータ）についての詳細</a></P>
+<h3 id="classic">昔のパピー</h3>
+<p>昔のバージョンのパピー（Puppy-1.x〜3.x）のブートパラメータの指定は最近のもの(Puppy4.x/5.x)とは違っているかもしれません。
+Classic Pup-2.14xに関しては本家フォーラムの<a href="http://www.murga-linux.com/puppy/viewtopic.php?t=42553">該当トピック</a>などを参考にしてください。
+</p>
+<h3 id="order">項目の順番</h3>
+<p>メニューの順番を入れ替えたいときは、title行から次のtitle行の手前までをセットにして前後を入れ替えてください。
+また、何も選択せずに時間が経つと自動的に起動するのは 「default」行で指定された項目となります。先頭が0番。後は1,2...と数えます。
+</p>
+<h3 id="legacy">Grub4Dos特有のコマンド</h3>
+<p>
+あなたが旧いGrubに慣れているならば、Grub4DosConfigが生成する次のようなコマンドは見慣れないかもしれません。
+すなわち「<b>find --set-root</b>」や「<b>uuid</b> xxxx-xxxxx」など。
+これらはパーティションの位置を指定するのに使われています。
+あなたが「root (hd0,1)」のような記述に慣れているならば、それを代わりに使うこともできます。
+Grub4Dosは旧いGrubに対して上位互換性を持っているからです。
+たとえば次の２つの記述はほぼ同じ動作をします。
+<pre># for Grub4Dos only
+title Windows Vista/2008/7 (sda2:PBS)
+  uuid 6C54F6966CE8F58D
+  chainloader +1</pre>
+<pre># both Grub4dos and Grub legacy work
+title Windows Vista/2008/7 (sda2:PBS)
+  root (hd0,1)
+  chainloader +1</pre>
+
+</p>
+<h2 id="additionalmenu">5. 追加されたメニュー項目</h2>
+
+<h3 id="#chain">PBS(Partiton Boot Sector) へのチェインロード</h3>
+<p>
+(バージョン 1.6.3以降)<br />
+ Grub4DosConfigはブート可能フラグの付いたパーティションに対して「(sda2:PBS)」のようなメニュー項目を加えます。
+ ただしこの項目が本当にブート可能であるかどうかは分かりません。フラグが付いていてもブートローダがインストールされていない場合があるからです。
+ この項目はたいていの場合、他のメニューからも起動できるのが普通です。
+ このパーティションにインストールされたOSが別のメニューから起動できるのであれば、この項目を外してしまっても構いません。
+</p>
+<h3 id="find">Find Grub menu on HDD</h3>
+<p>
+フロッピーディスクや USBなどに Grub4Dosをインストールすると、
+この項目がブート時のメニューに加えられます。
+フロッピーやUSBなどから起動しても、このメニューを選べば本体側HDDの起動メニューが参照されます。
+GrubやGrub4Dosをインストールしたが、その後MBRが壊れたなどの場合に
+その救済手段として利用することもできます。
+</p>
+<h3 id="grub2">Find Grub2</h3>
+<p>(バージョン 1.6での追加)<br>
+一部の Linuxでは最近 grubに代えて'Grub2'を使うものがあります。
+'Grub2'と Grub4Dos は共存できます。
+もし'Grub2'を使う Linux をインストールしていて、それを Grub4Dos で起動することに不都合を感じたら、
+ブート時のメニューにあるこの項目を試してください。
+</p>
+<p>以上です。成功を祈ります。<br/>2009年9月, 2010年11月, 2011年1月、2011年10月追記 <i>Shinobar</i></p>
+<div align="center"><a href="#top">↑このページ先頭へ</a></div>
+</body>
+</html>

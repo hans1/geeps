@@ -1,0 +1,13 @@
+#!/bin/sh
+which tesseract > /dev/null
+if [ $? -gt 0 ]; then
+  Xdialog --title " " --msgbox "Tesseract OCR program not found!" 0 0
+  exit
+fi
+
+Xdialog --title " " --infobox "Converting to text ..." 0 0 2000 &
+
+pnmtotiff /tmp/out.pnm > /tmp/out.tif
+tesseract /tmp/out.tif /tmp/out
+cp /tmp/out.txt $SAVEFILENAME
+rm -f /tmp/out.tif /tmp/out.txt

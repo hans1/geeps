@@ -1,0 +1,21 @@
+/etc
+/etc/gtk-2.0
+/usr
+/usr/bin
+ rsvg
+ rsvg-convert
+ rsvg-view
+/usr/lib
+/usr/lib/gdk-pixbuf-2.0
+/usr/lib/gdk-pixbuf-2.0/2.10.0
+/usr/lib/gdk-pixbuf-2.0/2.10.0/loaders
+ libpixbufloader-svg.so
+/usr/lib/gtk-2.0
+/usr/lib/gtk-2.0/2.10.0
+/usr/lib/gtk-2.0/2.10.0/engines
+ libsvg.so
+/usr/lib/mozilla
+/usr/lib/mozilla/plugins
+/usr/share
+/usr/share/pixmaps
+ svg-viewer.svg

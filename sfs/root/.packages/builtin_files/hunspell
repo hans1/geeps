@@ -1,0 +1,17 @@
+/usr
+/usr/bin
+ affixcompress
+ analyze
+ chmorph
+ hunspell
+ hunzip
+ hzip
+ ispellaff2myspell
+ makealias
+ munch
+ unmunch
+ wordforms
+ wordlist2hunspell
+/usr/lib
+ libhunspell-1.2.so.0
+ libhunspell-1.2.so.0.0.0

@@ -1,0 +1,6 @@
+#see /usr/local/jwmconfig2/theme-switcher script.
+MENU_BG=#746C73
+ACTIVE_BG=#9372A4
+FOREGROUND=#000000
+PAGER_BG=#746C73
+FG_SELECTED=#000000 

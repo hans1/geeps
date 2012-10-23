@@ -1,0 +1,10 @@
+/usr
+/usr/local
+/usr/local/screeny
+ screenfunc
+ screeny.sh
+/usr/sbin
+ screeny
+/usr/share
+/usr/share/applications
+ screeny.desktop

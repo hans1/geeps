@@ -1,0 +1,11 @@
+/root
+/root/.desksetup
+ desk.conf
+/usr
+/usr/local
+/usr/local/desksetup
+ desksetup.sh
+ func
+/usr/share
+/usr/share/applications
+ desksetup.desktop

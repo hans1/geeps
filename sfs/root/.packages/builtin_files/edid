@@ -1,0 +1,4 @@
+/usr
+/usr/sbin
+ get-edid
+ parse-edid

@@ -1,0 +1,80 @@
+/usr
+/usr/lib
+/usr/lib/libgphoto2
+/usr/lib/libgphoto2/2.4.11
+ adc65.so
+ agfa_cl20.so
+ aox.so
+ ax203.so
+ barbie.so
+ canon.so
+ casio_qv.so
+ clicksmart310.so
+ digigr8.so
+ digita.so
+ dimagev.so
+ dimera3500.so
+ directory.so
+ enigma13.so
+ fuji.so
+ gsmart300.so
+ hp215.so
+ iclick.so
+ jamcam.so
+ jd11.so
+ jl2005a.so
+ jl2005c.so
+ kodak_dc120.so
+ kodak_dc210.so
+ kodak_dc240.so
+ kodak_dc3200.so
+ kodak_ez200.so
+ konica_qm150.so
+ konica.so
+ largan.so
+ lg_gsm.so
+ mars.so
+ mustek.so
+ panasonic_coolshot.so
+ panasonic_dc1000.so
+ panasonic_dc1580.so
+ panasonic_l859.so
+ pccam300.so
+ pccam600.so
+ polaroid_pdc320.so
+ polaroid_pdc640.so
+ polaroid_pdc700.so
+ ptp2.so
+ ricoh_g3.so
+ ricoh.so
+ samsung.so
+ sierra.so
+ sipix_blink2.so
+ sipix_web2.so
+ smal.so
+ sonix.so
+ sony_dscf1.so
+ sony_dscf55.so
+ soundvision.so
+ spca50x.so
+ sq905.so
+ st2205.so
+ stv0674.so
+ stv0680.so
+ sx330z.so
+ topfield.so
+ toshiba_pdrm11.so
+/usr/lib/libgphoto2_port
+/usr/lib/libgphoto2_port/0.8.0
+ disk.so
+ ptpip.so
+ serial.so
+ usbdiskdirect.so
+ usbscsi.so
+ usb.so
+/usr/lib/udev
+ check-ptp-camera
+/usr/share
+/usr/share/libgphoto2
+/usr/share/libgphoto2/2.4.11
+/usr/share/libgphoto2/2.4.11/konica

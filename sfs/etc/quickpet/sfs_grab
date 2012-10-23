@@ -1,0 +1,52 @@
+#!/bin/sh
+. /etc/rc.d/PUPSTATE
+#TREE_ITEM="`cat  $WORKDIR/Sfs-puppy-lucid-official|cut -d '|' -f 2,10`"
+case $PUPMODE in
+2|3|77)ALTTEXT="$LOC_901" ;;
+#OPTION="-file /etc/sfs_downloaded.qp"
+*)ALTTEXT="$LOC_902" ;;
+esac
+if [ -f /tmp/currently_loaded_sfs ];then OPTION="-file /tmp/currently_loaded_sfs"
+ else OPTION="$LOC_903"
+fi
+KILLQP(){
+	kill `ps | grep -w "quickpack" | awk '{print $1}'` 2>/dev/null
+}
+export -f KILLQP
+. /etc/rc.d/BOOTCONFIG
+if [ $PUPMODE = 5 ];then DEVXBTN=""
+ else
+ #SFSDEVX="${DISTRO_FILE_PREFIX}_devx_${DISTRO_VERSION}.sfs"
+ SFSDEVX="devx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+ DEVX_LOADED=`echo $LASTUNIONRECORD|grep $SFSDEVX`
+ if [ "$DEVX_LOADED" = "" ];then 
+  DEVXBTN="
+  <button tooltip-text=\"click to get development sfs\">  
+   <label>GNU Compiler $SFSDEVX</label>                                             
+   <input file>/usr/local/quickpet/icons/GCC_icon.png</input>
+   <action>echo \"$URLREPO/${SFSDEVX}\" > /tmp/grabthesfs</action>
+   <action>sfs_installation.sh &</action>
+   <action>KILLQP</action>
+  </button>
+  "
+  else
+  DEVXBTN=""
+ fi
+fi
+
+SFSGUI="<vbox>
+$DEVXBTN
+  <hbox>
+   <text use-markup=\"true\" width-request=\"360\"><label>\"$LOC_910 <b>Sfs</b> $LOC_911${ALTTEXT}\"</label></text>
+   <button tooltip-text=\"$LOC_910tt\">
+    <input file stock=\"gtk-info\"></input>
+    <action>xmessage -nearmouse -bg lightgreen $OPTION</action>
+   </button>
+  </hbox>
+   <tree>
+     <label>$LOC_920|$LOC_921</label>
+     <variable>SFSCHOICE</variable>
+     <input>\"$SFSTREELIST\"</input>
+     <action signal=\"button-release-event\">PROCESS</action>
+    </tree>
+ </vbox>"

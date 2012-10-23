@@ -1,0 +1,200 @@
+#!/bin/bash
+##Slickpet it_IT 
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=italian
+#translator=Daniel Bonanno ICOA 2010
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="Annulla"
+export LOC_ERROR="Errore"
+export LOC_WARNING="Attenzione"
+export LOC_YES="Si"
+export LOC_NO="No"
+export LOC_QUIT="Esci"
+export LOC_HELP="Aiuto"
+export LOC_INFO="Info"
+export LOC_FILE="File"
+
+#browser installer
+export LOC_001="Benvenuto in"
+export LOC_002="Collegarsi a Internet e scegliere un Browser."
+export LOC_003="Note"
+export LOC_004="Se hai meno di 256 MB di RAM è consigliabile creare un file di salvataggio prima di installare un browser."
+export LOC_005="Browser Generico - installato"
+export LOC_006="Premi ed installa Firefox"
+export LOC_007="Premi ed installa Seamonkey"
+export LOC_008="Premi ed installa Chromium"
+export LOC_009="Premi ed installa Opera"
+export LOC_010="Premi per rendere il browser generico il browser predefinito dal sistema."
+
+#yaf messages
+export LOC_101="ERRORE durante il download. Connettersi ad Internet"
+export LOC_102="Attendere ..."
+export LOC_103="ERRORE: Sito di aggiornamento irraggiungibile. Verificare connessione o riprovare più tardi"
+export LOC_104="Hai l'ultimo aggiornamento di Slacko Puppy"
+export LOC_105="Nessun aggiornamento disponibile per Slacko Puppy"
+export LOC_106a="Attendere la fine del"
+export LOC_106b="download. Verrà richiesto di confermare l'installazione"
+export LOC_107="TimeOut di connessione. Riprovare più tardi"
+export LOC_108="ERRORE durante il download. Riprovare più tardi. Il download iniziato sarà recuperato."
+export LOC_109="ERRORE nell'installazione, provare di nuovo"
+export LOC_110="Istallazione riuscita"
+export LOC_111=" nuovo browser predefinito"
+export LOC_112="Slickpet è già in esecuzione. Attendere ..."
+export LOC_113="Ricerca pacchetto in corso. Attendere ..."
+
+#xmessages
+export LOC_201="Una finestra del browser si aprirà a breve per 
+proporre una scelta dei pacchetti di aggiornamento di 
+Slacko Puppy. Se non venisse visualizzata e il browser è
+attivo, ingrandirla. Se si esegue 
+PuppyBrowser come browser predefinito è necessario 
+ trascinare l'icona di aggiornamento per il iniziare il download 
+ed il recupero del il pacchetto.
+    I pacchetti vengono salvati in /root, /root/Downloads o
+/Root/my-documenti come impostazione predefinita.
+È possibile modificare queste impostazioni nelle preferenze
+del tuo browser.
+    Quando il download del pacchetto è completato, andate
+nella cartellin cui è salvato e fate clic su di esso per inizire
+l'installazione.
+    L'aggiornamento può essere disinstallato con Puppy Package 
+Manager"
+export LOC_202="Benvenuti in Slacko Puppy's Slickpet
+Ci sono tre tabelle principali per Pet, scegliere i pacchetti Pet per Puppy 
+è molto semplice. Una volta effettuata la selezione fare clic sull'icona 
+è il pacchetto PET verrà scaricato da un archivio Puppy. Questa operazione
+potrebbe richiedere tempo su connessioni lente vi preghiamo quindi di essere pazienti.
+Quindi il PPM (Puppy Package Manager) si aprirà e vi farà alcune semplici domande ,
+fino a quando selezionando OK verrà installato il pacchetto pronto per essere usato. A quel punto 
+verrà visualizzato un messaggio di conferma nella parte superiore dello schermo.
+In caso di eccessiva lentezza avrete la possibilità di scegliere l'archivio Puppy
+repository che funziona meglio per voi. Se un archivo non funziona o è troppo lento 
+si può cambiare con un altro.
+    E' èrevista una tabella Driver in modo da poter installare quello appropriato per il 
+vostro hardware specifico. Per Nvidia ci sono ulteriori driver 
+nel menu principale di Puppy Package Manager. Per Radeon e Intel il pacchetto Mesa
+è raccomandato. Per alcuni utenti Radeon potrebbe essere necessario il driver Radeon HD.
+Esiste anche una scheda aggiuntiva denominata Update. valida per l'aggiornamento Slacko Puppy
+riportante le correzioni e le caratteristiche dell'aggiornamento di Slickpet
+comprensiva dei nuovi programmi disponibile per Slacko Puppy.
+Se avete problemi vi è un file di aiuto nel menu Support.
+Non dimenticare che è possibile installare pacchetti dal Puppy Package
+Manager tramite il menu principale Puppy. Anche Slacko Lynx deb può essere installato.
+Godetevi Slacko Puppy"
+export LOC_203="Si prega di notare che le seguenti voci sono link a
+applicazioni compilate e preparati da appassionati di
+Puppy Linux. Nessuna garanzia viene offerta. La maggior parte cade
+sotto la licenza GNU GPL e varianti. Alcuni
+di questi programmi sono mantenuti regolarmente
+quindi non saranno disponibili degli 
+archivi. Troverete il più delle volte l'ultima
+versione stabile che vi permetterà di avere un sistema operativo
+all'avanguardia.
+Dovrete avere un browser installato per usare questa
+funzione. Fare clic sull'icona di navigazione sul desktop
+per scaricare e installare un browser."
+export LOC_204="Se Slickpet non dovesse funzionare non bisogna preoccuparsi.
+Puoi cliccare Slickpet sul web e una pagina si aprirà in modo da farti scaricare i
+pacchetti con dei weblink. Avrai anche accesso agli aggiornamenti da quella pagina. Ci sono collegamenti
+per altri programmi utilizzabili in Slacko Puppy nella scheda Altri programmi.
+È possibile modificare l'archivio usato per il download nel menu File - Preferenze per sceglierne uno più vicino
+a te o un Mirror che funzioni meglio per voi. La vostra scelta sarà salvata.
+i pacchetti scaricati vengono memorizzati in pupsave/installation. Potete vedere cosà è in essa contenuto
+facendo clic sul menu Download Directory e potete anche spostare questi pacchetti se lo desiderate. È inoltre possibile
+ripulire la vostra directory di download tramite la voce di menù Rimuovi pacchetti scaricati.
+C'è anche un menu per i file SFS. Questi sono pacchetti speciali di solito creati da programmi molto grandi
+e che possono essere istallati fuori dalla vostra cartella pupsave. Per maggiori informazioni clicca
+la voce di menu SFS Support.
+Godetevi utilizzando Slacko Puppy!
+Il team di Puppy."
+
+#gtkdialog
+#prefs
+export LOC_300="Puppy Package Manager"
+export LOC_301="Scelta opzioni per Slickpet"
+export LOC_302="Premi OK per applicare le modifiche"
+export LOC_303="Scegli un archivio"
+#main gui
+export LOC_304="Preferenze"
+export LOC_305="on the Web"
+export LOC_306="Legal"
+export LOC_307="Supporto"
+export LOC_308="Leggimi"
+export LOC_309="Benvenuto"
+export LOC_310="Questa è un'alternativa veloce a Puppy Package Manager. Cliccando sull'icona scelta potrete automaticamente scaricare e installare la selezione scelta"
+export LOC_311="Pet Popolari"
+export LOC_312="Pet Internet"
+export LOC_313="Pet Utili"
+export LOC_314="Driver"
+export LOC_315="Update"
+export LOC_316="Scegli il pacchetto da installare"
+export LOC_317="Scegli browser o client per l'installazione"
+export LOC_318="Scegli il pacchetto Pet"
+export LOC_319="Scegli il Driver"
+export LOC_350="Altri Pet"
+export LOC_351="Download Directory"
+export LOC_352="Rimuovi pacchetti scaricati"
+export LOC_355="About"
+#Tooltips
+export LOC_353="Premi qui per vedere tutti i pacchetti scaricati. Trascinare e rilasciare in un'altra posizione, se si desidera salvarli e cancellare la cartella di download. potrete risparmiare un po 'di spazio nella pupsave"
+export LOC_354="Premi qui per cancellare tutti i pacchetti scaricati"
+#pets
+export LOC_320="Gimp  Image Editor Potente" 
+export LOC_321="Psip Puppyphone  Telefonia Internet"
+export LOC_322="Browser-default Cambiare browser predefinito"
+export LOC_323="Cloud  Applicazioni basate su Internet"
+export LOC_324="Wine Eseguire programmi Windows"
+export LOC_325=""
+#export LOC_326="Google Earth Requires High Graphics" ###ADDED July 13
+#internet
+export LOC_501="Firefox  Popolare browser Mozilla"
+export LOC_502="Dillo  Piccolo, browser leggero"
+export LOC_503="Chromium  Ubuntu browser Chrome"
+export LOC_504="Opera  Suite veloce del browser"
+#export LOC_505="Thunderbird  Mozilla Mail Client"
+#export LOC_506="Kompozer  Web Site Manager"
+export LOC_508="Pidgin  Completo client Chat"
+export LOC_TOR="Tor Browser  navigare in modo sicuro"
+#more pets
+#export LOC_601="Vlc Versatile Media Player 28MB"
+#export LOC_602="Dia Diagram Editor 4.3MB"
+#export LOC_603="Cinelerra Video Edititing  15MB"
+#export LOC_604="JRE Java Runtime Environment 36MB"
+#export LOC_605="Pdfedit  PDF Editor 5.2MB"
+#export LOC_606="Inkscape Vector Drawing Editor 23MB"
+#drivers
+export LOC_390="Alcuni sistemi richiedono driver supplementare per usufruire al meglio di alcune funzionalità"
+export LOC_391="RadeonHD ultimi modelli schede video ATI 372KB"
+export LOC_392="Nvidia 195 ultimi modelli schede video Nvidia"
+export LOC_392g="Nvidia-glx 195 Fultimi modelli schede video Nvidia"
+export LOC_392x="Mesa -GLX ultimi modelli schede video Radeon e Intel 14MB"
+export LOC_392j="Nvidia-glx 256.35 ultimi modelli schedevideo Nvidia V14MB"
+export LOC_392tt="Altro driver nvidia sono utilizzabili da Puppy Package Manager"
+export LOC_392vid="Premi qui per il test della scheda video"
+export LOC_392ttvid="Verifica la scheda grafica in modo da poter determinare di quali driver necessita"
+export LOC_700="\n If you know that it is a fairly recent \n model  then click \"No\" and \n Install the Nvidia driver in Slickpet.\n Other wise click \"Yes\" and your browser \n will take you to the Nvidia website. \n There are other Nvidia drivers in PPM. \n The model of your card is: \n "
+export LOC_701="\n Usa Mesa pet in Slickpet"
+export LOC_702="Presente"
+export LOC_703="Presente"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language###########
+export LOC_704="Scheda Video"
+#Update
+export LOC_500="Gli aggiornamenti offerti in Slacko Puppy presenteranno le ultime patch e fix per Slickpet compresi gli aggiornamenti con gli ultimi programmi per poter mantenere il sistema operativo aggiornato."
+
+#Xdialog
+export LOC_401="Installa Slacko Puppy Driver"
+export LOC_402="Hai scelto di installare"
+export LOC_403="Una volta che il
+driver video .pet è installato è necessario uscire al
+prompt ... Menu>> Spegni>> Esci al Prompt. Poi
+è necessario digitare 'xorgwizard' nel prompt.
+Una volta che l'installazione sarà completa
+deve digitare 'xwin' per riavviare X.
+Vuoi continuare?"
+#Clear Downloads
+export LOC_801="Annulla Download"
+export LOC_802="Hai scelto di annullare il Dawnload di Pet. \nSei sicuro?"
+
+#END
+

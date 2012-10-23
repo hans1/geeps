@@ -1,0 +1,286 @@
+#!/bin/bash
+#Pbackup
+#Copyright 2006, 2007, 2008
+#Sigmund Berglund
+
+#------------------------------
+#Pbackup is released under the GNU General Public License (GPL). You have the right to use and modify this software in any way you like, so long as any derivative works remain under a GPL license.
+    
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
+#See the GNU General Public License homepage for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+#These are functions working inside GTKdialog (Both Pbackup and Prestore)
+
+restore_file (){
+if [ "`echo "$RESTOREDEVICE" | grep -o "ftp"`" = "ftp" ]; then
+	ZIPPED=`echo "$RESTOREDEVICE" | grep -o "tgz"`
+	if [ "$ZIPPED" = "tgz" ]; then #Not possible to restore from a compressed FTP archive
+		FRAME="Error"; IMG="dialog-error"; TXT2="<b>$LOC402</b>"
+		. "$PROG_PATH"box_ok
+		return
+	fi
+	if [ `find "$FILE" -type f` ]; then #Check if file exist, Overwrite ?
+		TXT1="$FILE"
+		TXT2="$LOC407"; . "$PROG_PATH"box_yesno
+		if [ $EXIT != 99 ]; then return; fi # Do not overwrite
+	fi
+	restore_ftp
+	return
+fi
+TMP=`find "$RESTOREDEVICE"` > /dev/null 2>&1 #check if path exist
+ZIPPED=`echo "$TMP" | grep -o "tgz"`
+if [ -z "$TMP" ]; then #Device not mounted
+	FRAME="Error"; TXT2="$LOC401"; IMG="dialog-error"
+	. "$PROG_PATH"box_ok; return
+fi
+if [ $ZIPPED ]; then #compressed
+	FILE=`echo "$FILE" | cut -b 2-`
+	cd / #for tar
+fi
+if [ -n "`find "$FILE" -type f`" ]; then #Check if file exist, Overwrite ?
+	TXT1="$FILE"
+	TXT2="$LOC407"; . "$PROG_PATH"box_yesno
+	if [ $EXIT != 99 ]; then return; fi #Overwrite
+	if [ "$ZIPPED" = "tgz" ]; then
+		unzip -o "$RESTOREDEVICE" "$FILE"
+	else
+		mkdir -p "`dirname "$FILE"`" 2> /dev/null
+		cp -fp "$RESTOREFILE" "$FILE"
+	fi
+else
+	if [ "$ZIPPED" = "tgz" ]; then
+		tar -zxf "$RESTOREDEVICE" "$FILE"	
+	else
+		mkdir -p "`dirname "$FILE"`" 2> /dev/null
+		cp -p "$RESTOREFILE" "$FILE"
+	fi
+fi
+}
+
+restore_ftp (){
+FRAME="Error"; IMG="dialog-error"
+#get username and password
+TMP=`grep -m 1 "$BACKUP_ID" $HOME/.pbackup/history/history | sed -e "s/ | /|/g" | cut -d "|" -f 2` #profile
+FTPUSERNAME=`grep FTPUSERNAME= $HOME/.pbackup/profiles/$TMP | sed -e s/^.*\=//g`
+FTPPASSWORD=`grep FTPPASSWORD= $HOME/.pbackup/profiles/$TMP | sed -e s/^.*\=//g`
+#---
+curl -o $FILE ftp://"$RESTOREDEVICE""$FILE" -u $FTPUSERNAME":"$FTPPASSWORD > $WORKDIR/pbackup-tmp 2>&1
+#error check
+if test "`grep "Login incorrect" $WORKDIR/pbackup-tmp`"; then TXT2="$LOC403"; . "$PROG_PATH"box_ok; fi
+if test "`grep "No such" $WORKDIR/pbackup-tmp`"; then TXT2="$LOC401"; . "$PROG_PATH"box_ok; fi
+if test "`grep "failed" $WORKDIR/pbackup-tmp`";	then TXT2="$LOC404"; . "$PROG_PATH"box_ok; fi
+if test "`grep "given directory" $WORKDIR/pbackup-tmp`"; then TXT2="$LOC406"; . "$PROG_PATH"box_ok; fi
+}
+PARAMETER2="`echo "$*" | cut -d " " -f 2-`"
+case $1 in
+#-------------------------
+-chain_add)
+	find $HOME/.pbackup/profiles/ -type f -printf "%f\n" > $WORKDIR/pbackup-tmp
+	echo -e "\c" > $WORKDIR/pbackup-tmp2
+	while read I; do
+		if [ ! "`grep 'CHAIN=' $HOME/.pbackup/profiles/$I`" ]; then #only add profile to list if is NOT a chain
+			echo -e "$I $I \"off\" \n" >> $WORKDIR/pbackup-tmp2
+		fi
+	done < $WORKDIR/pbackup-tmp
+	sort -ui --output=$WORKDIR/pbackup-tmp2 $WORKDIR/pbackup-tmp2
+	TMP="`cat $WORKDIR/pbackup-tmp2`"
+	TASKCHAIN=`Xdialog --stdout --title "Pbackup" --screen-center --cancel-label "$LOC_CANCEL" --ok-label "$LOC_OK" --no-tags --checklist "$LOC631" 0x0 7 $TMP`
+	if [ $? = 0 ]; then
+		TASKCHAIN=`echo "$TASKCHAIN" | sed -e "s/\//\\n/g"`
+		echo "$TASKCHAIN" >> $WORKDIR/pbackup-chain
+		sort -ui --output=$WORKDIR/pbackup-chain $WORKDIR/pbackup-chain #only list job once 
+	fi
+	;;
+-chain_del)
+	#remove also empty lines
+	grep -vw "$PARAMETER2" $WORKDIR/pbackup-chain | grep -v "^$" > $WORKDIR/pbackup-tmp
+	sync
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pbackup-chain
+	;;
+-save_from_add)
+	CHOOSEDIR="false"; TITLE="$LOC121"; DIR=/; . "$PROG_PATH"box_chooser
+	if [ $EXIT = 99 ]; then echo "$RESULT" >> $WORKDIR/pbackup-include; fi
+	;;
+-save_from_del)
+	#remove also empty lines
+	grep -vw "$PARAMETER2" $WORKDIR/pbackup-include | grep -v "^$" > $WORKDIR/pbackup-tmp
+	sync
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pbackup-include
+	;;
+-exclude_backup_add)
+	CHOOSEDIR="false"; TITLE="$LOC503"; DIR=/; . "$PROG_PATH"box_chooser
+	if [ $EXIT = 99 ];then echo "$RESULT" >> $WORKDIR/pbackup-exclude_backup; fi
+	;;
+-exclude_backup_del)
+	#remove also empty lines
+	grep -vw "$PARAMETER2" $WORKDIR/pbackup-exclude_backup | grep -v "^$" > $WORKDIR/pbackup-tmp
+	sync
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pbackup-exclude_backup
+	;;
+-exclude_sync_add)
+	CHOOSEDIR="false"; TITLE="$LOC504"; DIR=/; . "$PROG_PATH"box_chooser
+	if [ $EXIT = 99 ];then echo "$RESULT" >> $WORKDIR/pbackup-exclude_sync; fi
+	;;
+-exclude_sync_del)
+	#remove also empty lines
+	grep -vw "$PARAMETER2" $WORKDIR/pbackup-exclude_sync | grep -v "^$" > $WORKDIR/pbackup-tmp
+	sync
+	mv -f $WORKDIR/pbackup-tmp $WORKDIR/pbackup-exclude_sync
+	;;
+-about)
+	export Pbackup_about="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+ <vbox>
+  <notebook labels=\"About|License|Credits\">
+   <vbox>
+    <pixmap icon_size=\"6\"><input file stock=\"gtk-refresh\"></input></pixmap>
+    <text use-markup=\"true\"><label>\"<b>Pbackup $VERSION</b>\"</label></text>
+    <text use-markup=\"true\"><label>Sigmund Berglund, Copyright 2006-2009</label></text>
+    <text><label>\"\"</label></text>
+     <button>
+      <label>\"http://www.murga-linux.com/puppy/viewtopic.php?t=10975\"</label>
+      <action>$BROWSER http:\/\/www.murga-linux.com\/puppy\/viewtopic.php?t=10975</action>
+     </button>
+   </vbox>
+   <vbox>
+    <text use-markup=\"true\"><label>\"Pbackup is released under the <b>GNU General Public License</b> (GPL). You have the right to use and modify this software in any way you like, so long as any derivative works remain under a GPL license.\"</label></text>
+    <text use-markup=\"true\"><label>\"This program is distributed in the hope that it will be useful, but <b>WITHOUT ANY WARRANTY</b>. See the GNU General Public License homepage for more details.\"</label></text>
+    <hbox>
+     <button>
+      <label>\"http://www.gnu.org/licenses/\"</label>
+      <action>$BROWSER http:\/\/www.gnu.org\/licenses\/</action>
+     </button>
+    </hbox>
+   </vbox>
+   <vbox>
+    <edit><default>\"Transtalors:
+French - Jean-Jacques Moulinier
+German - Thorsten Köbe
+Japanese - Jimmy Lu
+Norwegian - Sigmund Berglund 
+Russian - Valeriy Kruvelis
+Spanish - Pedro Worcel
+
+Others:
+PaulBx1
+Veronicathecow
+GeoffS
+Trond Sandmo
+Dougal
+Barry Kauler
+Mark Ulrich
+GuestToo
+Nathan Fisher
+Jason Pline
+HairyWill
+Trapster
+TED DOG
+Sunburnt
+Rarsa
+...and more
+\"</default></edit>
+   </vbox>
+  </notebook>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-apply\"></input>
+    <label>$LOC_OK</label>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+gtkdialog3 --program Pbackup_about --center
+;;
+#-------------------------
+-logbox)
+Xdialog --title "Pbackup...$LOC500" --screen-center --fixed-font --no-ok --cancel-label "$LOC501" --tailbox $LOG 350x400
+EXIT_CODE=$?
+while true; do
+	if [ $EXIT_CODE = 143 ];then #kill prosess
+		rm -f $WORKDIR/pupbck* > /dev/null 2>&1
+		rm -f `echo "$IMG"` > /dev/null 2>&1
+		#kill all pbackup processes
+		for I in `ps -eo pid,command | grep -w --extended-regexp "$MKISOFS|$CDRECORD|growisofs|diff|dd|curl|tar|cp|find" | awk '{print $1}'`; do kill -9 $I; done
+		#kill Pbackup itself
+		cleanup ; rm $WORKDIR/*
+		for I in `ps -eo pid,command | grep -i "pbackup" | awk '{print $1}'`; do kill -9 $I; done
+	fi
+done;;
+#-------------------------
+-view_active_job)
+TXT1="$LOC517"; TXT2="<b>$PROFILE</b>"; IMG="media-record"; . "$PROG_PATH"box_ok;;
+#-------------------------
+-external_filemanager)
+TXT1="$LOC509"; DEFAULT="$FILEMANAGER"; IMG="preferences"; FRAME="$LOC171"
+. "$PROG_PATH"box_input
+if [ $EXIT = 99 ]; then
+	sed -i -e "s/FILEMANAGER=$FILEMANAGER/FILEMANAGER=$ENTRY/g" $HOME/.pbackup/pbackuprc
+	cleanup; rm $WORKDIR/* > /dev/null 2>&1; exit 0
+fi;;
+#-------------------------
+-external_cron_editor)
+TXT1="$LOC509"; DEFAULT="$CRON_EDITOR"; IMG="preferences"; FRAME="$LOC173"
+. "$PROG_PATH"box_input
+if [ $EXIT = 99 ]; then
+	sed -i -e "s/CRON_EDITOR=$CRON_EDITOR/CRON_EDITOR=$ENTRY/g" $HOME/.pbackup/pbackuprc
+	cleanup; rm $WORKDIR/* > /dev/null 2>&1; exit 0
+fi;;
+#-------------------------
+-clear_history)
+TXT1="$LOC632"; TXT2="$LOC633" 
+. "$PROG_PATH"box_yesno
+if [ $EXIT = 99 ]; then
+	BACKUP_ID=""
+	rm -f $HOME/.pbackup/history/* > /dev/null 2>&1
+	echo -e "\c" > $HOME/.pbackup/history/history
+fi;;
+#-------------------------
+-help)
+	if [ -f /usr/share/doc/pbackup/help-$LANGUAGE.html ]; then
+		$BROWSER /usr/share/doc/pbackup/help-$LANGUAGE.html
+	else
+		$BROWSER /usr/share/doc/pbackup/help-english.html
+	fi
+	;;
+#-------------------------
+-box_restore_file)
+#in case cd/dvd: /dev/ --> /mnt/
+RESTOREDEVICE=`grep -m 1 "$BACKUP_ID" $HOME/.pbackup/history/history | sed -e "s/ | /|/g" | cut -d "|" -f 4 | sed -e "s%/dev/%/mnt/%g"` #backup-path
+RESTOREFILE=`echo "$RESTOREDEVICE""$FILE" | sed -e "s/\/\//\//g" | sed -e "s%/dev/%/mnt/%g"`
+IMG="undo"; TXT1="$LOC605"
+TXT3="<b>$LOC635:</b>
+$RESTOREFILE
+
+<b>$LOC636:</b>
+$FILE"
+. "$PROG_PATH"box_yesno
+if [ $EXIT = 99 ]; then	restore_file; fi;;
+#-------------------------
+-box_restore_all)
+RESTOREDEVICE=`grep -m 1 "$BACKUP_ID" $HOME/.pbackup/history/history | sed -e "s/ | /|/g" | cut -d "|" -f 4 | sed -e "s%/dev/%/mnt/%g"` #backup-path
+IMG="undo"; TXT1="$LOC604"; TXT2="<b>$BACKUP_ID</b>"
+. "$PROG_PATH"box_yesno
+if [ $EXIT = 99 ]; then
+	while read FILE; do
+		RESTOREFILE=`echo "$RESTOREDEVICE""$FILE" | sed -e "s/\/\//\//g" | sed -e "s%/dev/%/mnt/%g"`
+		restore_file
+	done < $HOME/.pbackup/history/"$BACKUP_ID"
+fi;;
+#-------------------------
+-prestore_del)
+	rm $HOME/.pbackup/history/"$BACKUP_ID"
+	grep -v "$BACKUP_ID" $HOME/.pbackup/history/history > $WORKDIR/pbackup-tmp
+	mv -f $WORKDIR/pbackup-tmp $HOME/.pbackup/history/history
+	echo > $WORKDIR/pbackup-historyfiles
+	;;
+-prestore_search)
+	grep -l -i "$SEARCHSTRING" $HOME/.pbackup/history/* > $WORKDIR/pbackup-prestore_searchresult
+	sed -i -e "s/^.*\///g" $WORKDIR/pbackup-prestore_searchresult
+	;;
+-prestore_show_files)
+	cp -f "$HOME/.pbackup/history/$BACKUP_ID" $WORKDIR/pbackup-historyfiles
+	;;
+
+#-------------------------
+esac

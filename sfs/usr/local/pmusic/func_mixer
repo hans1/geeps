@@ -1,0 +1,90 @@
+#!/bin/bash
+
+[ ! "$SPEAKER" ] && . $HOME/.pmusic/pmusicrc
+#Detect soundcard
+[ "$SOUND_DEVICE" = "auto" ] && SOUND_DEVICE="`aplay -l | grep -m 1 -F card`" #grab the first card
+CARD_NR="`echo $SOUND_DEVICE | cut -d':' -f1 | cut -d' ' -f2`"
+	
+case $1 in
+-mute)
+	if [ `cat $WORKDIR/func_mixer-MUTE` = true ]; then
+		amixer -c $CARD_NR set "$SPEAKER" unmute > /dev/null 2>&1
+		echo false > $WORKDIR/func_mixer-MUTE
+	else
+		amixer -c $CARD_NR set "$SPEAKER" mute > /dev/null 2>&1
+		echo true > $WORKDIR/func_mixer-MUTE
+	fi
+	;;
+-set_volume)
+	if [ "`amixer -c $CARD_NR get "$SPEAKER" | grep 'Mono:' | cut -d ':' -f 2`" ]; then #mono
+		amixer -c $CARD_NR set "$SPEAKER" $VOLUME"%" > /dev/null 2>&1
+	else
+		[ ! "$BALANCE" ] && BALANCE=100 #in case in balance slider is provided in gui
+		if [ $BALANCE -le 100 ]; then
+			VOL_LEFT=$VOLUME
+			VOL_RIGHT=$((($BALANCE*$VOLUME)/100))
+		else
+			VOL_LEFT=$((((200-$BALANCE)*$VOLUME)/100))
+			VOL_RIGHT=$VOLUME
+		fi
+		amixer -c $CARD_NR set "$SPEAKER" $VOL_LEFT"%",$VOL_RIGHT"%" > /dev/null 2>&1
+	fi
+	;;
+-get_levels)
+	if [ ! "`amixer -c $CARD_NR get "$SPEAKER" | grep 'Mono:' | cut -d ':' -f 2`" ]; then 
+		VOL_L=`amixer -c $CARD_NR get "$SPEAKER" | grep -m1 'Left:' | cut -d '%' -f 1 | cut -d '[' -f 2`
+		VOL_R=`amixer -c $CARD_NR get "$SPEAKER" | grep -m1 'Right:' | cut -d '%' -f 1 | cut -d '[' -f 2`
+		[ $VOL_L = 0 ] && VOL_L=1 #1 to avoid dividing with 0
+		[ $VOL_R = 0 ] && VOL_R=1
+		#check which channel is dominant. Make that the shown volume
+		if [ "$VOL_L" -ge "$VOL_R" ]; then
+			echo $VOL_L > $WORKDIR/VOLUME
+			TMP=$((($VOL_R*100)/$VOL_L)) 
+			echo "$TMP" > $WORKDIR/BALANCE
+		else
+			echo $VOL_R > $WORKDIR/VOLUME
+			TMP=$(((200-($VOL_L*100)/$VOL_R)))
+			echo "$TMP" > $WORKDIR/BALANCE
+		fi
+	else #mono
+		amixer -c $CARD_NR get "$SPEAKER" | grep 'Mono:' | cut -d '%' -f 1 | cut -d '[' -f 2 > $WORKDIR/VOLUME
+		echo 100 > $WORKDIR/BALANCE
+	fi
+	;;
+-volume_up)
+	$APPDIR/func_mixer -get_levels
+	VOLUME=($(<"$WORKDIR/VOLUME"))
+	VOLUME=$(($VOLUME+10))
+	BALANCE=($(<"$WORKDIR/BALANCE"))
+	[ "$VOLUME" -lt 1 ] && VOLUME=0
+	[ "$VOLUME" -gt 99 ] && VOLUME=100
+	. $APPDIR/func_mixer -set_volume
+	;;
+-volume_down)
+	$APPDIR/func_mixer -get_levels
+	VOLUME=($(<"$WORKDIR/VOLUME"))
+	VOLUME=$(($VOLUME-10))
+	BALANCE=($(<"$WORKDIR/BALANCE"))
+	[ "$VOLUME" -lt 1 ] && VOLUME=0
+	[ "$VOLUME" -gt 99 ] && VOLUME=100
+	. $APPDIR/func_mixer -set_volume
+	;;
+-balance_right)
+	$APPDIR/func_mixer -get_levels
+	VOLUME=($(<"$WORKDIR/VOLUME"))
+	BALANCE=($(<"$WORKDIR/BALANCE"))
+	BALANCE=$(($BALANCE+20))
+	[ "$BALANCE" -lt 1 ] && BALANCE=0
+	[ "$BALANCE" -gt 199 ] && BALANCE=200
+	. $APPDIR/func_mixer -set_volume
+	;;
+-balance_left)
+	$APPDIR/func_mixer -get_levels
+	VOLUME=($(<"$WORKDIR/VOLUME"))
+	BALANCE=($(<"$WORKDIR/BALANCE"))
+	BALANCE=$(($BALANCE-20))
+	[ "$BALANCE" -lt 1 ] && BALANCE=0
+	[ "$BALANCE" -gt 199 ] && BALANCE=200
+	. $APPDIR/func_mixer -set_volume
+	;;
+esac

@@ -1,0 +1,90 @@
+-----------------------------------------------------------------
+ReplaceIt : Simple but effective text file string replacement tool
+
+Inspiration:
+	I needed a tool to make my life easier when it came to 
+writing install scripts for various different OS's and Distributions
+of OS's.  One of the biggest troubles is making alterations to 
+existing text configuration files.
+
+	I was too lazy to work out how to mix grep, sed, awk head
+tail and any other "normal" unix type tools to combine to attain
+the required effect.  I also wanted it to be a BSD-type licence
+as I believe in it.
+
+	So, in a couple of hours (it took longer to write these
+documents than replaceit!!) I created ReplaceIt.
+
+Enjoy.
+
+Licence:
+	BSD-type
+
+Limitations:
+	Currently (version 1.0.0) only replaces one instance per
+line.
+
+Usage:
+	(see the output from running ./replaceit for more details)
+
+	ReplaceIt has three compulsorary parameters, along followed
+by zero or more optional "rule-tokens". Each rule token consists of
+an optional modifier character [+,-,{,}] and a string.  
+
+The meaning of the optional modifier character is as follows:
+
+	+ : Ignore this char and consider the rest of the string
+		literally. (we use this if we want to have a '-'
+		in our string as the first char, ie, "+-option"
+
+	- : The string following must NOT be present on the line
+
+	} : The string following must appear AFTER the string to be
+		replaced.
+
+	{ : The string following must appear BEFORE the string to be
+		replaced.
+
+
+
+
+Contact:
+	You may contact me with the following details regarding
+bugs, feature updates, questions etc.
+
+	Email:	pldaniels@pldaniels.com
+	IRC:	inflex, irc.freshmeat.net, #xamime
+	AOL:	Screen-name "cinflex"
+	ICQ:	103642862
+	WWW:	http://pldaniels.com
+
+
+
+
+Examples:
+
+
+	./replaceit --input=myfile "replace" "with-this"
+
+Will replace the first occurance of "replace" with "with-this" 
+(no quotes) in every line of the file "myfile".
+
+
+	./replaceit --input=myfile "replace" "with-this" "has this"
+
+Will replace "replace" with "with-this" only if the line also has
+the string "has this" in it.
+
+
+	./replaceit --input=file "rep" "with" "has this" "-not this"
+
+Will replace "rep" with "with" if the line has "has this" but NOT "not this" in it.
+
+
+	./replaceit --input=file "rep" "with" "+-something" "{extra"
+
+Will replace "rep" with "with" if the line has the string 
+"-something" in it, and the string "extra" appears BEFORE the string
+"rep".
+
+-------------------------------------------------------------END.

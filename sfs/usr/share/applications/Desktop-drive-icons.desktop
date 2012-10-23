@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Desktop drive icons manager
+Name[ru]=Значки дисков на рабочем столе
+Name[de]=Desktop Laufwerk Icons Verwaltung
+Name[es]=Administrador de íconos de Escritorio
+Name[hu_HU]=Asztali ikon kezelő
+Name[ja]=デスクトップドライブアイコン管理
+Name[zh_CN]=桌面驱动器图标管理器
+Name[zh_TW]=桌面 磁碟/光碟 圖示管理
+Icon=mini-hdisk.xpm
+Comment=Desktop drive icons manager
+Exec=eventmanager desktop
+Terminal=false
+Type=Application
+Categories=X-Desktop
+GenericName=eventmanager

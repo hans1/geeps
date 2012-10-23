@@ -1,0 +1,25 @@
+#Maintainer: George Vlahavas <vlahavas~at~gmail~dot~com>
+
+pkgname=opencore-amr
+pkgver=0.1.2
+pkgrel=1gv
+arch=i486
+source=(http://downloads.sourceforge.net/project/opencore-amr/opencore-amr/$pkgver/opencore-amr-$pkgver.tar.gz)
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo")
+url=http://sourceforge.net/projects/opencore-amr/
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"opencore-amr (AMR Narrowband and Wideband speech codec)"
+"opencore-amr is a library of OpenCORE Framework implementation of"
+"Adaptive Multi Rate Narrowband and Wideband speech codec"
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var --sysconfdir=/etc --disable-static
+	make || return 1
+	make install DESTDIR=$startdir/pkg
+} 

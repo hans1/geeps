@@ -1,0 +1,157 @@
+#!/bin/sh
+#functions for pupRadio #by 01micko.. 01micko@gmail.com 
+#gpl2 licence
+
+WORKINGDIR="$HOME/.pupradio"
+
+BOOK_DIR=$WORKINGDIR/bookmarks
+
+TBOOK_DIR=$WORKINGDIR/tbookmarks
+
+. $WORKINGDIR/stations
+
+. $WORKINGDIR/urls
+
+
+OLD_NAME=`grep "CH$RNUMBER" $WORKINGDIR/stations`
+NEW_NAME="CH$RNUMBER=\"$STATION\""
+
+OLD_URL=`grep "URL$RNUMBER" $WORKINGDIR/urls`
+NEW_URL="URL$RNUMBER=\"$RSURL\""
+
+. $WORKINGDIR/tel-stations
+
+. $WORKINGDIR/tel-urls
+
+
+OLD_TNAME=`grep "TCH$NUMBER" $WORKINGDIR/tel-stations`
+NEW_TNAME="TCH$NUMBER=\"$CHANNEL\""
+
+OLD_TURL=`grep "TURL$NUMBER" $WORKINGDIR/tel-urls`
+NEW_TURL="TURL$NUMBER=\"$SURL\""
+
+echo "PLAYER="$PLAYER"" > $WORKINGDIR/config
+
+if [[ "`which gxine`" != "" ]];then
+GXINEVER=`gxine --help | grep '^gxine ' | cut -f 2 -d ' ' 2>/dev/null`
+fi
+
+if [ "$PLAYER" = "mplayer" ]; then OPT="-fs" ; ROPT="-really-quiet"; fi
+if [ "$PLAYER" = "gxine" ]; then  
+ if [ "$GXINEVER" = "0.5.904" ]; then OPT="" 
+    else OPT="-fs"
+ fi
+fi
+if [ "$PLAYER" = "xine" ]; then OPT="-F" ;fi
+if [ "$PLAYER" = "gnome-mplayer" ]; then OPT="--g-fatal-warnings -q" ;fi
+if [ "$PLAYER" = "vlc" ]; then OPT="-f" ;fi
+
+#HELP=`cat $WORKINGDIR/help`
+
+function killplayer() #gnome-mplayer not quitting cleanly for radio
+{	if [ "$PLAYER" = "gnome-mplayer" ];then for i in `ps | grep "gnome-mplayer" | awk '{print $1}'`
+			do kill -9 $i
+			killall mplayer 2>/dev/null
+			done 2>/dev/null
+			else killall $PLAYER 2>/dev/null
+	fi
+}
+export -f killplayer
+
+#messages
+MSG1=$(gettext "Now playing")
+MSG2=$(gettext "please wait, starting")
+case $1 in
+1)killplayer; $PLAYER $ROPT $URL1 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH1" &
+	echo "$PLAYER $ROPT $URL1 &" > $WORKINGDIR/last-played
+;;
+2)killplayer; $PLAYER $ROPT $URL2 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH2" &
+	echo "$PLAYER $ROPT $URL2 &" > $WORKINGDIR/last-played
+;;
+3)killplayer; $PLAYER $ROPT $URL3 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH3" &
+	echo "$PLAYER $ROPT $URL3 &" > $WORKINGDIR/last-played
+;;
+4)killplayer; $PLAYER $ROPT $URL4 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH4" &
+	echo "$PLAYER $ROPT $URL4 &" > $WORKINGDIR/last-played
+;; 
+5)killplayer; $PLAYER $ROPT $URL5 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH5" &
+	echo "$PLAYER $ROPT $URL5 &" > $WORKINGDIR/last-played
+;;
+6)killplayer; $PLAYER $ROPT $URL6 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH6" &
+	echo "$PLAYER $ROPT $URL6 &" > $WORKINGDIR/last-played
+;; 
+7)killplayer; $PLAYER $ROPT $URL7 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH7" &
+	echo "$PLAYER $ROPT $URL7 &" > $WORKINGDIR/last-played
+;;
+8)killplayer; $PLAYER $ROPT $URL8 &   killall xmessage 2>/dev/null; xmessage -center -timeout 15 "$MSG1 $CH8" &
+	echo "$PLAYER $ROPT $URL8 &" > $WORKINGDIR/last-played
+;; 
+T1)killplayer; $PLAYER $OPT $ROPT $TURL1 &  xmessage -center  -timeout 5 "$MSG2 $TCH1" &
+;;
+T2)killplayer; $PLAYER $OPT $ROPT $TURL2 &  xmessage -center  -timeout 5 "$MSG2 $TCH2" &
+;;
+T3)killplayer; $PLAYER $OPT $ROPT $TURL3 &  xmessage -center  -timeout 5 "$MSG2 $TCH3" &
+;;
+T4)killplayer; $PLAYER $OPT $ROPT $TURL4 &  xmessage -center  -timeout 5 "$MSG2 $TCH4" &
+;; 
+T5)killplayer; $PLAYER $OPT $ROPT $TURL5 &  xmessage -center  -timeout 5 "$MSG2 $TCH5" &
+;;
+T6)killplayer; $PLAYER $OPT $ROPT $TURL6 &  xmessage -center  -timeout 5 "$MSG2 $TCH6" &
+;;
+T7)killplayer; $PLAYER $OPT $ROPT $TURL7 &  xmessage -center  -timeout 5 "$MSG2 $TCH7" &
+;;
+T8)killplayer; $PLAYER $OPT $ROPT $TURL8 &  xmessage -center  -timeout 5 "$MSG2 $TCH8" &
+;; 
+apply) sed -i -e "s%$OLD_NAME$%$NEW_NAME%" $WORKINGDIR/stations
+           sed -i -e "s%$OLD_URL$%$NEW_URL%" $WORKINGDIR/urls
+;;
+Tapply) sed -i -e "s%$OLD_TNAME$%$NEW_TNAME%" $WORKINGDIR/tel-stations
+            sed -i -e "s%$OLD_TURL$%$NEW_TURL%" $WORKINGDIR/tel-urls
+;;
+playnow)killplayer; $PLAYER $ROPT $RSURL &
+	echo "$PLAYER $RSURL &" > $WORKINGDIR/last-played
+;;
+Tplaynow)killplayer; $PLAYER $OPT $ROPT $SURL &
+;;
+radd)STAT=`echo "$STATION" | awk '{print $1}'`
+		echo "$RSURL" >> $BOOK_DIR/$STAT
+;;
+tadd)CHAN=`echo "$CHANNEL" | awk '{print $1}'`
+		echo "$SURL" >> $TBOOK_DIR/$CHAN
+;;
+rplay) TOPLAY=`cat $BOOK_DIR/"$PLAYSTATION"`
+          killplayer; $PLAYER $ROPT $TOPLAY &
+          echo "$PLAYER $ROPT $TOPLAY &"  > $WORKINGDIR/last-played
+;;
+tplay) TOWATCH=`cat $TBOOK_DIR/"$PLAYCHANNEL"`
+          killplayer; $PLAYER $OPT $ROPT $TOWATCH &
+;;
+restart)killplayer
+	    killall xmessage 2>/dev/null &
+			for i in `ps | grep "PUPRADIO" | awk '{print $1}'`
+				do kill -9 $i
+				done
+			$APP_DIR/pupradio &
+;;
+stop)   killplayer
+		killall xmessage 2>/dev/null &
+;;
+help)# xmessage -center   "$HELP" & #now a web page
+		LN="`echo $LANG|cut -d '_' -f1`"
+		case $LN in
+		en)file:///usr/share/doc/pupradiohelp.html ;;
+		*) HELPFILE=file:///usr/share/doc/pupradiohelp${LN}.html ;;
+		esac
+		defaultbrowser -new-window $HELPFILE &
+;;
+quit)  killplayer
+	   killall xmessage 2>/dev/null &
+	  
+		for i in `ps | grep "PUPRADIO" | awk '{print $1}'`
+			do kill -9 $i
+			done 2>/dev/null
+		
+		exit 
+;;
+
+esac

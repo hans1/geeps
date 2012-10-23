@@ -1,0 +1,217 @@
+# Icewm menu for Puppy
+# For Puppy 1.0.6 GuestToo, 2005, updated for latest Puppy by BK
+# BK: XDG version, Puppy 2.14. icewm-xdgmenu create by rarsa.
+# /usr/sbin/fixmenus script converts this to /root/.icewm/menu
+
+menu	"Desktop" x24 {
+prog "Chtheme GTK theme chooser" "mini.window3d.xpm" gtk-chtheme
+prog "Configure Xlock screen locking" "mini-lock.xpm" /usr/local/apps/Xlock/AppRun -configure
+prog "Desksetup Templates for Desk Icons" "mini-desktop.xpm" /usr/local/desksetup/desksetup.sh
+prog "Desktop drive icons manager" "mini-hdisk.xpm" eventmanager desktop
+prog "Desktop icon switcher" "mini-icons.xpm" icon_switcher
+prog "FlSynclient configure your touchpad " "flsynclient.png" flsynclient
+prog "JWM configuration" "mini.window3d.xpm" jwmconfig
+prog "Nathan Wallpaper Setter" "wallpaper.png" wallpaper
+prog "Pcur cursor selector" "default_left_ptr.png" pcur
+prog "ScreenSaver Control" "/usr/local/PupControl/icons/screen20.png" /usr/local/PupControl/SS-control
+prog "Set global font size" "mini-x.xpm" set-xftdpi
+prog "pupX set properties of X" "mini.window3d.xpm" pupx
+separator
+prog "Countrywizard Country Settings" "mini-font.xpm" countrywizard
+prog "Psync Time Server Synchronisation" "mini-clock.xpm" /usr/local/psync/psync
+prog "Set date and time" "mini-clock.xpm" set-time-for-puppy
+separator
+prog "Gfontsel font viewer" "mini-font.xpm" gfontsel
+prog "Xclipboard" "mini-clipboard.xpm" xclipboard 
+prog "Xfontsel font viewer" "mini-font.xpm" xfontsel -bg "#e0ffe0"
+}
+menu	"System" pc24 {
+prog "CPU Frequency Scaling Tool" "/usr/share/icons/devices/cpu.png" wcpufreq
+prog "CUPS manage printing" "tb_print.xpm" cups_shell
+prog "HardInfo hardware information" "hardinfo.png" hardinfo
+prog "Htop Process Viewer" "/usr/local/lib/X11/mini-icons/mini-eyes.xpm" /usr/bin/rxvt -e htop
+prog "IPInfo network information" "mini-telnet.xpm" ipinfo
+prog "Pprocess process manager" "mini-run.xpm" pprocess
+prog "Pup-SysInfo system information" "/usr/local/PupControl/icons/Pup-SysInfo20.png" /usr/local/PupControl/func -sysinfo_mono
+prog "PupScan interface information" "Card.xpm" pupscan
+prog "Top view running processes" "mini-run.xpm" rxvt -font 7x14 -bg "#c0c0c0" -fg black -T Top -n Top -e top
+prog "Xlock lock screen" "mini-lock.xpm" /usr/local/apps/Xlock/AppRun -locknow
+separator
+prog "Format floppy disk" "mini-diskette.xpm" Floppy_Formatter
+prog "GParted partition manager" "gparted.xpm" gparted_shell
+prog "Grub Legacy bootloader config" "grubconfig.xpm" grubconfig
+prog "Grub4Dos bootloader config" "gnibbles.png" grub4dosconfig
+prog "Pdisk partition manager" "Pdisk.xpm" Pdisk
+separator
+prog "BootManager configure bootup" "so.xpm" bootmanager
+prog "LoginManager configure login" "so.xpm" loginmanager
+prog "Pschedule task on time" "mini-clock.xpm" /usr/local/pschedule/pschedule
+prog "Puppy Event Manager" "so.xpm" eventmanager
+}
+menu "Setup" configuration24 {
+menu "Setup Puppy" "mini-dog.xpm" {
+prog "Check dependencies installed pkg" "pet16.xpm" /usr/local/petget/check_deps.sh
+prog "Default-Programs-Chooser" "pet48.png" defaults-chooser
+prog "Personalize - Settings" "greypuplogo24.png" firstrun
+prog "Puppy Package Manager" "pet16.xpm" /usr/local/petget/pkg_chooser.sh
+prog "SFS-Load on-the-fly" "squashfs-image.png" sfs_load
+prog "Slickpet Install Popular Programs" "pet16.xpm" quickpet
+prog "Wizard Wizard" "mini-dog.xpm" wizardwizard
+}
+separator
+prog "ALSA sound Wizard" "wizard16.xpm" alsawizard
+prog "CD/DVD drive Wizard" "wizard16.xpm" cdburner-wizard
+prog "CUPS Printer Wizard" "wizard16.xpm" cups_shell
+prog "Internet Connection Wizard" "wizard16.xpm" connectwizard
+prog "Linux-Firewall Wizard" "wizard16.xpm" rxvt -e firewallinstallshell
+prog "Mouse/keyboard Wizard" "wizard16.xpm" input-wizard
+prog "Multiple Sound Card Wizard" "wizard16.xpm" Multiple-Sound-Card-Wizard
+prog "Xorg Video Wizard" "wizard16.xpm" xorgwizard
+separator
+prog "BootFlash install Puppy to USB" "mini-ray.xpm" /usr/sbin/bootflash
+prog "Grub4Dos bootloader config" "gnibbles.png" grub4dosconfig
+prog "Puppy universal installer" "mini-ray.xpm" /usr/sbin/puppyinstaller
+prog "Remaster Puppy live-CD" "mini-ray.xpm" /usr/sbin/remasterpup2
+prog "Remove builtin packages" "mini-ray.xpm" /usr/sbin/remove_builtin
+prog "WakePup create boot floppy" "mini-ray.xpm" wakepup2
+}
+
+separator
+
+menu "Utility" utility24 {
+prog "Icon Browser" "/usr/share/icons/hicolor/16x16/apps/yad.png" yad-icon-browser
+prog "MoManager create non-English Puppy" "chooselocale.xpm" momanager
+prog "PupControl panel" "/usr/local/PupControl/icons/control-panel_20.png" PupControl
+prog "SFSconvert version converter" "/usr/local/apps/ROX-Filer/ROX/MIME/application-x-squashfs-image.png" /usr/local/sfsconvert/sfsconvert
+prog "XArchive archiver" "package.xpm" xarchive
+prog "Xdelta file difference manager" "gz.xpm" xdelta_gui
+prog "Xfdiff-cut compare two files" "xfdiff.png" xfdiff-cut
+separator
+prog "Pbackup Backup and Sync" "mini-diskette.xpm" pbackup
+prog "Pmirror backup a directory" "mini-folder.xpm" /usr/local/pmirror/pmirror
+prog "Pudd copy drive/partition" "mini-diskette.xpm" Pudd
+prog "Resize personal storage file" "so.xpm" resizepfile.sh
+prog "Snap2 snapshot backup" "snap2.xpm" snap2
+separator
+prog "Gexec execute a command" "gexec.xpm" gexec
+prog "Urxvt terminal emulator" "mini-sh.xpm" urxvt
+prog "Xconsole monitor console" "mini-sh1.xpm" xconsole -verbose
+}
+menu "Filesystem" folder24 {
+prog "ROX-Filer file manager" "mini-filemgr.xpm" rox
+separator
+prog "Pmount mount/unmount drives" "mini-diskette.xpm" pmount
+separator
+prog "Gdmap graphical disk usage" "gdmap.xpm" gdmap
+prog "PRename batch file renamer, simple" "prename.png" prename
+prog "Partview free space in drives" "disk.tcl.xpm" partview
+prog "gFnRename batch file renamer" "gfnrename.png" gfnrename
+separator
+prog "GWhere disk cataloger" "gwhere.xpm" gwhere
+prog "Pfind file finder" "mini-search.xpm" pfind
+}
+menu "Graphic" paint24 {
+prog "Viewnior image viewer" "viewnior.png" viewnior
+separator
+prog "InkLite vector editor" "inkscape.xpm" inkscapelite
+prog "mtPaint image editor" "/usr/share/pixmaps/mtpaint.png" /usr/bin/mtpaint
+separator
+prog "Gcolor2 color chooser" "gcolor2.png" gcolor2
+prog "Peasyscan simple image scanner" "peasyscan.xpm" peasyscan
+prog "PupCamera digital camera access" "mini-camera.xpm" pupcamera
+prog "Screeny Capture Windows and Fullscreen" "mini-display.xpm" screeny
+prog "Xsane image scanner" "scanner16.xpm" xsaneshell
+prog "mtPaint-snapshot screen capture" "mini-camera.xpm" mtpaintsnapshot.sh
+}
+menu "Document" word24 {
+prog "Abiword wordprocessor" "abiword_16.xpm" abiword
+prog "SeaMonkey Composer html editor" "seamonkey16.xpm" mozedit
+separator
+prog "Geany Text Editor" "/usr/share/icons/hicolor/48x48/apps/geany.png" geany  
+prog "Leafpad Simple Text Editor" "leafpad.png" leafpad
+prog "MP console editor" "mp16.xpm" rxvt -geometry 80x25 -e mp
+prog "e3 console editor" "mini-edit.xpm" rxvt -geometry 80x25 -e e3ne
+separator
+prog "PZCHMView CHM Viewer" "mini-book1.xpm" pzchmview
+prog "Pdict online dictionary" "mini-book1.xpm" pdict
+prog "PeasyPDF Help" "mini-pdf.xpm" defaultbrowser /usr/share/doc/PeasyPDF.html
+prog "ePDFViewer" "/usr/share/epdfview/pixmaps/icon_epdfview-24.png" epdfview
+prog "puppyPDF convert file to PDF" "mini-pdf.xpm" puppypdf
+}
+menu "Business" spread24 {
+prog "Gnumeric" "/usr/share/icons/hicolor/48x48/apps/gnumeric.png" gnumeric
+prog "Homebank personal accounting" "/usr/share/icons/hicolor/16x16/apps/homebank.png" /usr/bin/homebank
+separator
+prog "Calculator simple and scientific calculations" "/usr/share/pixmaps/galculator.png" galculator
+prog "Gmeasures units converter" "gmeasures.xpm" gmeasures
+prog "Xcalc scientific calculator" "mini-calc.xpm" xcalc
+}
+menu "Personal" date24 {
+prog "Bcrypt file encryption" "gz.xpm" bcrypt_gui
+prog "DidiWiki personal wiki" "wiki_16.xpm" didiwiki-gui
+prog "Figaros Password Manager 2" "fpm2.png" fpm2
+prog "NoteCase notes manager" "notecase16.xpm" notecase
+prog "Osmo personal organizer" "osmo.png" osmo
+prog "PPLOG personal blog" "mini-book2.xpm" pplog_gui
+prog "SeaMonkey Addressbook" "seamonkey16.xpm" mozaddressbook
+separator
+prog "pClock Time tools" "mini-clock.xpm" pclock
+prog "pTiming event timer system" "mini-clock.xpm" ptiming
+}
+menu "Network" connect24 {
+prog "Firewallstate Firewall Tray Icon" "mini-firewall.xpm" /usr/local/firewallstate
+prog "Gpptp PPTP VPN client" "pc-2x.xpm" gpptp
+prog "Growl Security Enhancements" "tin-hat.png" growl
+prog "Linux-Firewall firewall" "mini-firewall.xpm" rxvt -e firewallinstallshell
+prog "PcurlFtp file sharing" "pc-2x.xpm" rox -d /root/File-Sharing
+prog "Pnethood Samba shares" "pc-2x.xpm" pnethood
+prog "PureFTPd FTP server" "pc2www.xpm" run-pureftpd
+prog "Superscan network scanner" "pc-2x.xpm" superscan
+prog "XChat IRC" "/usr/share/pixmaps/xchat.png" xchat
+prog "pns-tool connect from commandline" "networkout.xpm" pns-tool-wrapper
+}
+menu "Internet" www24 {
+prog "GetFlash Install Flashplayer" "/usr/share/icons/flash-player-properties.png" getflash
+prog "Meebo MSN/Yahoo/IRC chat" "chat16.xpm" meeboview
+prog "PMirrorget website downloader" "/usr/share/midi-icons/webedit48.png" pmwget
+prog "Pup-Advert-Blocker block online ads" "adblock.xpm" pup-advert-blocker
+prog "Pwsget secure file downloader" "pwget.png" pwsget
+prog "SeaMonkey mail and news" "seamonkey16.xpm" mozmail
+prog "SeaMonkey web browser" "seamonkey16.xpm" seamonkey
+prog "Secure ssh remote login" "mini-sh1.xpm" securetelnetshell
+prog "Ssh-gui secure remote login" "mini-sh1.xpm" ssh-gui
+prog "Transmission" "/usr/share/icons/hicolor/24x24/apps/transmission.png" transmission-gtk  
+prog "gFTP ftp client" "mini-ftp.xpm" gftp
+}
+menu "Multimedia" multimedia24 {
+prog "CD player/ripper (Pmusic)" "mini-cd.xpm" pmusic_CD 
+prog "FFConvert multimedia converter" "ffconvert.png" ffconvert
+prog "GNOME MPlayer" "/usr/share/icons/hicolor/48x48/apps/gnome-mplayer.png" gnome-mplayer
+prog "Mixer generic sound mixer" "mini-sound.xpm" defaultmixer
+prog "Pdvdrsab DVD rip/shrink/author/burn" "mini-cd.xpm" pdvdrsab
+prog "Pmusic -player -manager -grabber" "/usr/local/pmusic/pmusic20.png" pmusic
+prog "mhWaveEdit audio recorder/editor" "mhwaveedit.xpm" mhwaveedit
+prog "pEqualizer Graphical Equalizer" "/usr/share/icons/hicolor/24x24/apps/eq.png" /usr/local/pequalizer/pequalizer
+prog "pupRadio/pupTelly streaming media" "Animation.xpm" pupradio
+separator
+prog "Burniso2cd burn iso file to CD/DVD" "mini-cd.xpm" burniso2cd
+prog "ISOMaster iso file editor" "mini-cd.xpm" isomaster
+prog "Pburn CD/DVD/Blu-ray writer" "/usr/local/pburn/pburn20.png" pburn
+}
+menu "Fun" games24 {
+prog "Rubix cube" "cube16.xpm" rubix
+prog "Xsoldier - space arcade" "xsoldier.xpm" xsoldier
+}
+
+separator
+
+prog	Help help24 defaulthtmlviewer file:///usr/share/doc/index.html
+
+menu	"Shutdown" shutdown24 {
+prog "Restart with JWM" mini-windows restartwm jwm
+restart "Restart IceWM" mini-windows icewm
+restart "Restart IceWM-lite" mini-windows icewm-lite
+prog "Restart X server" mini-x restartwm
+prog "Shutdown Computer" mini-stop wmpoweroff
+prog "Reboot Computer"  mini-arrow-right wmreboot
+}

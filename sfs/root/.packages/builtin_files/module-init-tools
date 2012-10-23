@@ -1,0 +1,11 @@
+/bin
+ lsmod
+/lib
+/sbin
+ depmod
+ insmod
+ lsmod
+ modinfo
+ modinfo.bin
+ modprobe
+ rmmod

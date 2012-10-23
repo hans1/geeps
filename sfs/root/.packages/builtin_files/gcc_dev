@@ -1,0 +1,25 @@
+/lib
+/usr
+/usr/bin
+/usr/lib
+ libgcc_s.so
+ libgmp.so
+ libgmp.so.10
+ libgmpxx.so
+ libgmpxx.so.4
+ libgomp.so
+ libgomp.so.1
+ libmpfr.so
+ libmpfr.so.4
+ libmp.so
+ libmp.so.3
+ libmudflap.so
+ libmudflap.so.0
+ libmudflapth.so
+ libmudflapth.so.0
+ libssp.so
+ libssp.so.0
+ libstdc++.so
+ libstdc++.so.6
+/usr/man
+/usr/man/man1

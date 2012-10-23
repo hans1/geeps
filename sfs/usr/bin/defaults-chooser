@@ -1,0 +1,538 @@
+#!/bin/sh
+
+# defaults-changer
+# by sc0ttman
+# free to all (obviously), edit as you like :D
+
+echo "$1"
+
+# chroot into a new root, then run stuff, if the new root exists
+if [ -e "$1" ];then
+	export newroot="$1"
+	export prefix="chroot $newroot "
+	echo "using a new root: $newroot..."
+fi
+
+
+set -a # export all functions
+
+# create functions
+
+get_default () {
+	# set vars to be used later
+	export FILE="$newroot/usr/local/bin/default$1"
+	# get the last line of the file, $FILE
+	export LINE=`tail -1 $FILE`
+	# strip out 'exec ', ' "$@"', and all whitespace from the end of the last line of the file
+	export NEWFILE=`sed -e 's|"\$\@"||g' -e 's|exec ||g' -e 's|[ ]*$||' $FILE`
+	# create a temp file, for tail to work on
+	echo "$NEWFILE" > /tmp/NEWFILE
+	# get the last line of the file
+	export NEWLINE=`tail -1 /tmp/NEWFILE`
+	echo "${NEWLINE##*[a-z]*/}" # cut off all leading paths (matches all after final */)
+	rm /tmp/NEWFILE
+}
+
+# update the default*** files
+update_defaults () {
+
+	# change all the default*** files, using the 'defaults-changer' util
+	defaults-changer 'audiomixer' "$AUDIOMIXER" "$newroot"
+	defaults-changer 'barehtmlviewer' "$BAREHTMLVIEWER" "$newroot"
+	defaults-changer 'browser' "$BROWSER" "$newroot"
+	defaults-changer 'calendar' "$CALENDAR" "$newroot"
+	defaults-changer 'connect' "$CONNECT" "$newroot"
+	defaults-changer 'contact' "$CONTACT" "$newroot"
+	defaults-changer 'draw' "$DRAW" "$newroot"
+	defaults-changer 'email' "$EMAIL" "$newroot"
+	defaults-changer 'htmleditor' "$HTMLEDITOR" "$newroot"
+	defaults-changer 'htmlviewer' "$HTMLVIEWER" "$newroot"
+	defaults-changer 'imageeditor' "$IMAGEEDITOR" "$newroot"
+	defaults-changer 'imageviewer' "$IMAGEVIEWER" "$newroot"
+	defaults-changer 'mediaplayer' "$MEDIAPLAYER" "$newroot"
+	defaults-changer 'audioplayer' "$MUSICPLAYER" "$newroot"
+	defaults-changer 'musicplayer' "$MUSICPLAYER" "$newroot"
+	defaults-changer 'paint' "$PAINT" "$newroot"
+	defaults-changer 'search' "$SEARCH" "$newroot"
+	defaults-changer 'spreadsheet' "$SPREADSHEET" "$newroot"
+	defaults-changer 'texteditor' "$TEXTEDITOR" "$newroot"
+	defaults-changer 'textviewer' "$TEXTVIEWER" "$newroot"
+	defaults-changer 'wordprocessor' "$WORDPROCESSOR" "$newroot"
+	
+	# update user
+	Xdialog --title 'Defaults updated' --msgbox 'Your default apps have been updated.' 0 0
+}
+
+# set app vars 
+export VERSION='0.8'
+# gui option vars
+export AUDIOMIXER=`get_default audiomixer`
+export BAREHTMLVIEWER=`get_default barehtmlviewer`
+export BROWSER=`get_default browser`
+export CALENDAR=`get_default calendar`
+export CONNECT=`get_default connect`
+export CONTACT=`get_default contact`
+export DRAW=`get_default draw`
+export EMAIL=`get_default email`
+export HTMLEDITOR=`get_default htmleditor`
+export HTMLVIEWER=`get_default htmlviewer`
+export IMAGEEDITOR=`get_default imageeditor`
+export IMAGEVIEWER=`get_default imageviewer`
+export MEDIAPLAYER=`get_default mediaplayer`
+export MUSICPLAYER=`get_default musicplayer`
+export PAINT=`get_default paint`
+export SEARCH=`get_default search`
+export SPREADSHEET=`get_default spreadsheet`
+export TEXTEDITOR=`get_default texteditor`
+export TEXTVIEWER=`get_default textviewer`
+export WORDPROCESSOR=`get_default wordprocessor`
+
+# build GUI elements
+AUDIOMIXER_ARRAY=("aumix" "mixmos" "sgmixer" "retrovol" "rxvt -e alsamixer" "kalsamixer" "calfmixer")
+AUDIOMIXER_ITEMS="<item>$AUDIOMIXER</item>" #stored value should be first in list
+for i in "${AUDIOMIXER_ARRAY[@]}"
+do
+	if [ "$i" != "$AUDIOMIXER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			AUDIOMIXER_ITEMS=`echo "$AUDIOMIXER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+BAREHTMLVIEWER_ARRAY=("defaultbrowser" "mozstart" "PuppyBrowser" "dillo" "hv3" "mini-web" "skipstone" "midori" "operamini")
+BAREHTMLVIEWER_ITEMS="<item>$BAREHTMLVIEWER</item>" #stored value should be first in list
+for i in "${BAREHTMLVIEWER_ARRAY[@]}"
+do
+	if [ "$i" != "$BAREHTMLVIEWER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			BAREHTMLVIEWER_ITEMS=`echo "$BAREHTMLVIEWER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+BROWSER_ARRAY=("browser-installer" "chrome" "dillo" "rxvt -e elinks" "firefox" "flock" "hv3" "konquerer" "midori" "icecat" "rxvt -e lynx" "opera" "seamonkey")
+BROWSER_ITEMS="<item>$BROWSER</item>" #stored value should be first in list
+for i in "${BROWSER_ARRAY[@]}"
+do
+	if [ "$i" != "$BROWSER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			BROWSER_ITEMS=`echo "$BROWSER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+CALENDAR_ARRAY=("osmo" "ical" "calcurse" "notecase")
+CALENDAR_ITEMS="<item>$CALENDAR</item>" #stored value should be first in list
+for i in "${CALENDAR_ARRAY[@]}"
+do
+	if [ "$i" != "$CALENDAR" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			CALENDAR_ITEMS=`echo "$CALENDAR_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+CONNECT_ARRAY=("net-setup.sh" "connectwizard" "connectwizard_2nd" "clinet" "frisbee" "Pwireless2" "sns")
+CONNECT_ITEMS="<item>$CONNECT</item>" #stored value should be first in list
+for i in "${CONNECT_ARRAY[@]}"
+do
+	if [ "$i" != "$CONNECT" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			CONNECT_ITEMS=`echo "$CONNECT_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+CONTACT_ARRAY=("ical" "osmo" "mozmail" "sylpheed" "thunderbird" "mtcelledit")
+CONTACT_ITEMS="<item>$CONTACT</item>" #stored value should be first in list
+for i in "${CONTACT_ARRAY[@]}"
+do
+	if [ "$i" != "$CONTACT" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			CONTACT_ITEMS=`echo "$CONTACT_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+DRAW_ARRAY=("inkscape" "inkscapelite" "gimp" "sodipodi" "impress" "mtpaint" "sdraw" "gpaint" "rgbpaint" "xpaint" "ooolight")
+DRAW_ITEMS="<item>$DRAW</item>" #stored value should be first in list
+for i in "${DRAW_ARRAY[@]}"
+do
+	if [ "$i" != "$DRAW" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			DRAW_ITEMS=`echo "$DRAW_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+EMAIL_ARRAY=("rxvt -e alpine" "claws" "claws-mail" "mozmail" "sylpheed" "thunderbird")
+EMAIL_ITEMS="<item>$EMAIL</item>" #stored value should be first in list
+for i in "${EMAIL_ARRAY[@]}"
+do
+	if [ "$i" != "$EMAIL" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			EMAIL_ITEMS=`echo "$EMAIL_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+HTMLEDITOR_ARRAY=("mozedit" "geany" "leafpad" "nicoedit" "komposer" "nvu" "bluefish" "mtleafpad")
+HTMLEDITOR_ITEMS="<item>$HTMLEDITOR</item>" #stored value should be first in list
+for i in "${HTMLEDITOR_ARRAY[@]}"
+do
+	if [ "$i" != "$HTMLEDITOR" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			HTMLEDITOR_ITEMS=`echo "$HTMLEDITOR_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+HTMLVIEWER_ARRAY=("defaultbrowser" "chrome" "dillo" "elinks" "firefox" "icecat" "hv3" "xlynx" "opera" "seamonkey" "bluefish" "mtleafpad")
+HTMLVIEWER_ITEMS="<item>$HTMLVIEWER</item>" #stored value should be first in list
+for i in "${HTMLVIEWER_ARRAY[@]}"
+do
+	if [ "$i" != "$HTMLVIEWER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			HTMLVIEWER_ITEMS=`echo "$HTMLVIEWER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+IMAGEEDITOR_ARRAY=("inkscape" "inkscapelite" "gimp" "mtpaint" "sdraw" "ooolight" "sodipodi" "rgbpaint")
+IMAGEEDITOR_ITEMS="<item>$IMAGEEDITOR</item>" #stored value should be first in list
+for i in "${IMAGEEDITOR_ARRAY[@]}"
+do
+	if [ "$i" != "$IMAGEEDITOR" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			IMAGEEDITOR_ITEMS=`echo "$IMAGEEDITOR_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+IMAGEVIEWER_ARRAY=("gtksee" "gpicview" "fotoxx" "xnview" "slideshow" "ghunter" "viewnior")
+IMAGEVIEWER_ITEMS="<item>$IMAGEVIEWER</item>" #stored value should be first in list
+for i in "${IMAGEVIEWER_ARRAY[@]}"
+do
+	if [ "$i" != "$IMAGEVIEWER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			IMAGEVIEWER_ITEMS=`echo "$IMAGEVIEWER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+MEDIAPLAYER_ARRAY=("caffeine" "ffplay" "ffplay.sh" "gxine" "gmplayer" "gnome-player" "kmplayer" "mplayer" "umplayer" "smplayer" "vlc" "vlc-gtk" "xine" "totem")
+MEDIAPLAYER_ITEMS="<item>$MEDIAPLAYER</item>" #stored value should be first in list
+for i in "${MEDIAPLAYER_ARRAY[@]}"
+do
+	if [ "$i" != "$MEDIAPLAYER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			MEDIAPLAYER_ITEMS=`echo "$MEDIAPLAYER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+MUSICPLAYER_ARRAY=("audacious" "aqualung" "deadbeef" "pmusic" "mocp" "moc" "mpg123" "mpg321" "mplayer" "smplayer" "gmplayer" "umplayer" "potamus" "rxvt -e cmus" "gnome-player" "gxine" "xineui" "bmp" "vlc-gtk" "xhippo")
+MUSICPLAYER_ITEMS="<item>$MUSICPLAYER</item>" #stored value should be first in list
+for i in "${MUSICPLAYER_ARRAY[@]}"
+do
+	if [ "$i" != "$MUSICPLAYER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			MUSICPLAYER_ITEMS=`echo "$MUSICPLAYER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+PAINT_ARRAY=("inkscape" "inkscapelite" "kolourpaint" "gimp" "mtpaint" "sdraw" "gpaint" "rgbpaint" "xpaint" "sodipodi" "ooolight")
+PAINT_ITEMS="<item>$PAINT</item>" #stored value should be first in list
+for i in "${PAINT_ARRAY[@]}"
+do
+	if [ "$i" != "$PAINT" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			PAINT_ITEMS=`echo "$PAINT_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+SEARCH_ARRAY=("gtkfind" "pfind" "pfilesearch" "rover_run" "sgsearch")
+SEARCH_ITEMS="<item>$SEARCH</item>" #stored value should be first in list
+for i in "${SEARCH_ARRAY[@]}"
+do
+	if [ "$i" != "$SEARCH" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			SEARCH_ITEMS=`echo "$SEARCH_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+SPREADSHEET_ARRAY=("homebank" "planmaker" "gnumeric" "galculator" "sbase" "scalc" "siag" "ooolight" "mtcelledit")
+SPREADSHEET_ITEMS="<item>$SPREADSHEET</item>" #stored value should be first in list
+for i in "${SPREADSHEET_ARRAY[@]}"
+do
+	if [ "$i" != "$SPREADSHEET" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			SPREADSHEET_ITEMS=`echo "$SPREADSHEET_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+TEXTEDITOR_ARRAY=("beaver" "geany" "leafpad" "mtleafpad" "rxvt -e elvis" "rxvt -e vi" "rxvt -e ex" "gvim" "mp-5" "nicoedit" "rxvt -e mcedit" "rxvt -e me" "rxvt -e mg" "rxvt -e mp" "supernotepad" "xcoral" "tea")
+TEXTEDITOR_ITEMS="<item>$TEXTEDITOR</item>" #stored value should be first in list
+for i in "${TEXTEDITOR_ARRAY[@]}"
+do
+	if [ "$i" != "$TEXTEDITOR" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			TEXTEDITOR_ITEMS=`echo "$TEXTEDITOR_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+TEXTVIEWER_ARRAY=("geany" "leafpad" "mtleafpad" "rxvt -e elvis" "rxvt -e vi" "rxvt -e ex" "gvim" "mp-5" "nicoedit" "rxvt -e mcedit" "rxvt -e me" "rxvt -e mg" "rxvt -e mp" "tea")
+TEXTVIEWER_ITEMS="<item>$TEXTVIEWER</item>" #stored value should be first in list
+for i in "${TEXTVIEWER_ARRAY[@]}"
+do
+	if [ "$i" != "$TEXTVIEWER" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			TEXTVIEWER_ITEMS=`echo "$TEXTVIEWER_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+WORDPROCESSOR_ARRAY=("abiword" "swriter" "textmaker" "pw" "ooolight" "ted")
+WORDPROCESSOR_ITEMS="<item>$WORDPROCESSOR</item>" #stored value should be first in list
+for i in "${WORDPROCESSOR_ARRAY[@]}"
+do
+	if [ "$i" != "$WORDPROCESSOR" ];then # if not the selected item
+		if [  "`${prefix}which ${i#rxvt -e }`" != "" ];then # if the app is installed and ready to execute
+			WORDPROCESSOR_ITEMS=`echo "$WORDPROCESSOR_ITEMS<item>${i}</item>"` # add to list
+		fi
+	fi
+done
+
+# build help GUI
+export HELPGUI='<window title="Default Applications Chooser '$VERSION'" allow-grow="false">
+	<vbox>
+		<vbox homogeneous="true">
+			<frame>
+				<text><label>Helpful Tips:</label></text>
+				<text height-request="5"><label>""</label></text>
+				<text><label>You can add custom commands, parameters and options by typing the desired command in the chosen field and clicking the update button.</label></text>
+				<text height-request="5"><label>""</label></text>
+				<text><label>To load apps through the terminal, simply add "rxvt -e " before the command you wish to execute in the terminal</label></text>
+				<text height-request="5"><label>""</label></text>
+				<text><label>Example: "rxvt -e mp" will load the terminal based editor, called "MP"</label></text>
+				<text height-request="5"><label>""</label></text>
+				<text><label>by sc0ttman</label></text>
+			</frame>
+		</vbox>
+	</vbox>
+</window>'
+
+# build GUI
+export GUI='<window title="Default Applications Chooser '$VERSION'" allow-grow="false">
+	<vbox>
+
+		<vbox>
+			<frame>
+				<text width-request="400">
+					<label>Choose your preferred default programs and applications, which you can then launch from your start menu or desktop.</label>
+				</text>
+			</frame>
+		</vbox>
+
+		<hbox>
+			<frame>
+
+				<hbox>
+					<text><label>Audio Mixer</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>AUDIOMIXER</variable>
+						'$AUDIOMIXER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Bare HTML Viewer</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>BAREHTMLVIEWER</variable>
+						'$BAREHTMLVIEWER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Browser</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>BROWSER</variable>
+						'$BROWSER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Calendar</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>CALENDAR</variable>
+						'$CALENDAR_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Connect</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>CONNECT</variable>
+						'$CONNECT_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Contact</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>CONTACT</variable>
+						'$CONTACT_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Drawing</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>DRAW</variable>
+						'$DRAW_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Email</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>EMAIL</variable>
+						'$EMAIL_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>HTML Editor</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>HTMLEDITOR</variable>
+						'$HTMLEDITOR_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>HTML Viewer</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>HTMLVIEWER</variable>
+						'$HTMLVIEWER_ITEMS'
+					</combobox>
+				</hbox>
+
+			</frame>
+			<frame>
+
+				<hbox>
+					<text><label>Image Editor</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>IMAGEEDITOR</variable>
+						'$IMAGEEDITOR_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Image Viewer</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>IMAGEVIEWER</variable>
+						'$IMAGEVIEWER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Media Player</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>MEDIAPLAYER</variable>
+						'$MEDIAPLAYER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Music Player</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>MUSICPLAYER</variable>
+						'$MUSICPLAYER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Paint</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>PAINT</variable>
+						'$PAINT_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Search</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>SEARCH</variable>
+						'$SEARCH_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Spreadsheet</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>SPREADSHEET</variable>
+						'$SPREADSHEET_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Text Editor</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>TEXTEDITOR</variable>
+						'$TEXTEDITOR_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Text Viewer</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>TEXTVIEWER</variable>
+						'$TEXTVIEWER_ITEMS'
+					</combobox>
+				</hbox>
+
+				<hbox>
+					<text><label>Word Processor</label></text>
+					<combobox tooltip-text="Choose your preferred default program" width-request="150">
+						<variable>WORDPROCESSOR</variable>
+						'$WORDPROCESSOR_ITEMS'
+					</combobox>
+				</hbox>
+
+			</frame>
+		</hbox>
+		<vbox>
+			<frame>
+
+				<hbox>
+				   <button>
+					  <input file stock="gtk-refresh"></input>
+					  <label> Update </label>
+					  <action>update_defaults $newroot</action>
+				   </button>
+				   <button>
+					  <input file stock="gtk-help"></input>
+					  <label> Help </label>
+					  <action>gtkdialog3 --program HELPGUI --center &</action>
+				   </button>
+				   <button>
+					  <input file stock="gtk-cancel"></input>
+					  <label> Exit </label>
+					  <action type="exit">EXIT_NOW</action>
+				   </button>
+				</hbox>
+
+			</frame>
+		</vbox>
+	</vbox>
+</window>'
+
+# load the app
+gtkdialog3 -p GUI --center
+unset GUI

@@ -1,0 +1,190 @@
+#!/bin/bash
+# Version 0.2.0, 8 April 2008 - see version information in main AppRun file.
+
+# Determine the path to this application.
+APPDIR=`dirname "$0"`
+cd "$APPDIR"
+APPDIR="`pwd`"
+
+# Set icon path
+#emptyicon="/usr/local/apps/Trash/trashcan_empty.png"
+emptyicon="/usr/local/lib/X11/pixmaps/trashcan_empty48.png"
+
+# Find the name of the file.
+function notAForwardSlash
+{
+fSlash=/
+   if [[ $1 != $fSlash ]]
+
+        then
+      return 0
+        else
+           return 1
+        fi
+}        
+
+function getFileName
+{
+   STRING="$1"
+
+        LENGTH=${#STRING}
+
+   for ((n=0;n <= $LENGTH; n++))
+        do
+      CHAR=${STRING:$n:1}
+
+      if notAForwardSlash $CHAR
+      then
+         FileName=$FileName$CHAR
+
+      else
+         FileName=""
+      fi
+   done
+}
+
+# Get the name of the item in the Trash.
+getFileName "PATH"
+
+function RemoveItem
+{
+
+# See what is in the trash.
+stuff=`ls /$HOME/.Trash`
+
+getFileName "$APPDIR"
+
+if [ "$FileName" = "$stuff" ]
+then
+
+ln -sf "$emptyicon" "TRASH/.DirIcon"
+
+rox -x TRASH
+
+fi
+
+# Delete this file and directory.
+rm -fr "$APPDIR"
+
+}
+
+function RestoreItem
+{
+
+# Remove existing item.
+rm -fr "PATH"
+# Restore the item.
+mv -f "$APPDIR/Files/$FileName" "PATH"
+
+# Get info from the shortcut file (if exists)
+if [ -e "$APPDIR/shortcut" ]; then
+x_ar=`awk '{print $2}' "$APPDIR/shortcut" | sed -e s/x=//g -e s/\"//g`
+y_ar=`awk '{print $3}' "$APPDIR/shortcut" | sed -e s/y=//g -e s/\"//g`
+# Restore the shortcut on the desktop
+rox --RPC << EOF
+<?xml version="1.0"?>
+<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
+ <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
+  <PinboardAdd>
+   <Path>PATH</Path>
+   <X>$x_ar</X>
+   <Y>$y_ar</Y>
+  </PinboardAdd>
+ </env:Body>
+</env:Envelope>
+EOF
+fi
+
+RemoveItem
+
+}
+
+function DeleteIt
+{
+# Write confirmation dialogue
+MSG=`which gxmessage` || MSG=xmessage
+$MSG -buttons "Yes:21,No" -default No -center -title "Confirm Delete" "Are you sure you want to permanently delete this item?"
+
+# If they chose to cancel.
+[ $? -eq 21 ] || exit
+
+# Remove the item
+RemoveItem
+}
+
+function RestoreIt
+{
+# See if there is already a file or folder of the same name in the same location.
+if [ -e "PATH" ]
+then
+
+MSG=`which gxmessage` || MSG=xmessage
+dowhat=`$MSG -buttons "Cancel,Trash It,Overwrite It" -default "Trash It" -print -center -title "Error" "An item named PATH already exists.
+What would you like to do?"`
+
+# If they chose to cancel.
+if [ "$dowhat" = "Cancel" ]
+then exit
+elif [ "$dowhat" = "Trash It" ]
+then 
+# Otherwise send item to be overwritten to trash
+TRASH/AppRun "PATH"
+fi
+
+fi
+
+# Restore the item.
+RestoreItem
+}
+
+# Check to see if they clicked on the application or dropped a file or directory on the icon.
+test -sd "$@"
+
+# If they just clicked on the icon, or chose the "View File information" option.
+if [ "$?" = "0" ]
+then
+
+# Write the message.
+MSG=`which gxmessage` || MSG=xmessage
+instruction=`$MSG -print -default Cancel -buttons Cancel,Show,Open,Restore,Delete -center -title "Trashed File Information" -file Info`
+
+if [ "$instruction" = "Show" ]
+then rox -d "$APPDIR/Files"
+elif [ "$instruction" = "Open" ]
+then
+rox "$APPDIR/Files/$FileName"
+elif [ "$instruction" = "Restore" ]
+then RestoreIt
+elif [ "$instruction" = "Delete" ]
+then DeleteIt
+fi
+
+# If they chose the "Restore" option.
+elif [ "$1" = "-restore" ]
+then
+RestoreIt
+
+# If they chose to open the item.
+elif [ "$1" = "-open-file" ]
+then
+rox "$APPDIR/Files/$FileName"
+
+# If they chose to see the item.
+elif [ "$1" = "-see-file" ]
+then
+rox -d "$APPDIR/Files"
+
+# If they chose to delete the file
+elif [ "$1" = "-delete" ]
+then
+DeleteIt
+
+else
+
+# If they dropped something to the icon.
+
+# Write the error message.
+MSG=`which gxmessage` || MSG=xmessage
+$MSG -buttons "Okay" -default Okay -center -title 	"Error" "You can't drop items onto things that are in the Trash."
+
+fi

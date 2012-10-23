@@ -1,0 +1,15 @@
+/usr
+/usr/bin
+ speexdec
+ speexenc
+/usr/lib
+ libspeexdsp.so
+ libspeexdsp.so.1
+ libspeexdsp.so.1.5.0
+ libspeex.so
+ libspeex.so.1
+ libspeex.so.1.5.0
+/usr/src
+/usr/src/speex-1.2rc1
+ build-speex.sh
+ SLKBUILD

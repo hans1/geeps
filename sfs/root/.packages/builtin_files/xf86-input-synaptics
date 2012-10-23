@@ -1,0 +1,13 @@
+/usr
+/usr/bin
+ synclient
+ syndaemon
+/usr/lib
+/usr/lib/xorg
+/usr/lib/xorg/modules
+/usr/lib/xorg/modules/input
+ synaptics_drv.so
+/usr/share
+/usr/share/X11
+/usr/share/X11/xorg.conf.d
+ 50-synaptics.conf

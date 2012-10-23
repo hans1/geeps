@@ -1,0 +1,207 @@
+#!/bin/sh
+# rcrsn51 2011-08-09
+# version 1.4
+
+export PEASYPATH="/tmp/PeasyPDF"
+
+STARTNEW () { 
+  mkdir -p $PEASYPATH
+  rm -f $PEASYPATH/*
+  echo "0" > $PEASYPATH/filecounter
+  Xdialog --msgbox "New project started in $PEASYPATH" 5 45
+}
+
+export -f STARTNEW
+
+ONEADD () {
+    F="$1"
+
+    FC=`cat $PEASYPATH/filecounter`
+    let FC=FC+1
+    FN=`printf "%2.2d" $FC`".pdf"
+    echo $FC > $PEASYPATH/filecounter
+
+    OPTIONS="-noturn"
+
+    TYPE=`file "$F" | cut -d ":" -f 2 | cut -d " " -f 2`
+    case $TYPE in
+    JPEG)
+      jpegtopnm "$F" | pnmtops $OPTIONS > /tmp/pptemp.ps 
+      # pipe split to make Lupu run faster
+      ps2pdf /tmp/pptemp.ps $PEASYPATH/$FN
+      rm /tmp/pptemp.ps
+      ;;
+    PNG)
+      pngtopnm "$F" | pnmtops $OPTIONS > /tmp/pptemp.ps
+      ps2pdf /tmp/pptemp.ps $PEASYPATH/$FN
+      rm /tmp/pptemp.ps
+      ;;
+    PDF)
+      if [ "${F:0:1}" = "/" ]; then
+        ln -s "$F" $PEASYPATH/$FN
+      else
+        ln -s `pwd`/"$F" $PEASYPATH/$FN
+      fi
+      ;;
+    PostScript)
+      ps2pdf "$F" $PEASYPATH/$FN
+      ;;
+    *)
+      Xdialog --msgbox "Wrong type of file!" 5 30
+      ;;
+    esac
+}
+
+export -f ONEADD
+
+STARTADD () {
+  if [ ! -f $PEASYPATH/filecounter ]; then
+    Xdialog --msgbox "Please start a new project!" 5 30
+    exit
+  fi
+
+  if [ -z "$FILENAME" ]; then
+    Xdialog --msgbox "Nothing to add!" 5 25
+    exit
+  fi
+  
+  Xdialog --msgbox "Adding ..." 5 20 &
+  MSGPID=$!
+
+  if [ "$SPACEYES" = "true" ]; then
+    ONEADD "$FILENAME"
+  else
+    for F in $FILENAME; do
+      ONEADD $F
+    done
+  fi
+
+  kill $MSGPID
+}
+
+export -f STARTADD
+
+STARTGLUE () {
+  if [ ! -f $PEASYPATH/filecounter ]; then
+    Xdialog --msgbox "Please start a new project!" 5 30
+    exit
+  fi
+
+  TITLE="Drag two PNG or JPG files into these boxes.\n\n They will be glued together into one PDF file\n and added to the project.\n\n You can then use $PEASYPATH/GLUED.JPG"
+
+  Xdialog --separator ":" --2inputs "$TITLE"  20 45 "File #1" "" "File #2" "" 2> /tmp/glueout
+  [ $? -gt 0 ] && exit
+  TWOFILES=`cat /tmp/glueout`
+  F1=${TWOFILES%:*}
+  F2=${TWOFILES#*:}
+
+  TYPE1=`file "$F1" | cut -d ":" -f 2 | cut -d " " -f 2`
+  case $TYPE1 in
+    JPEG)
+      jpegtopnm "$F1" > /tmp/glue1.pnm
+      ;;
+    PNG)
+      pngtopnm "$F1" > /tmp/glue1.pnm
+      ;;
+    esac
+  
+  TYPE2=`file "$F2" | cut -d ":" -f 2 | cut -d " " -f 2`
+  case $TYPE2 in
+    JPEG)
+      jpegtopnm "$F2" > /tmp/glue2.pnm
+      ;;
+    PNG)
+      pngtopnm "$F2" > /tmp/glue2.pnm
+      ;;
+    esac
+ 
+  if [ -f /tmp/glue1.pnm -a -f /tmp/glue2.pnm ]; then
+    pnmcat -tb -white /tmp/glue1.pnm /usr/share/pixmaps/spacer.pnm /tmp/glue2.pnm > /tmp/glue3.pnm
+    pnmtops -noturn /tmp/glue3.pnm > /tmp/glue3.ps
+    pnmtojpeg  /tmp/glue3.pnm > $PEASYPATH/GLUED.JPG
+    ONEADD "/tmp/glue3.ps"
+    rm /tmp/glue1.pnm /tmp/glue2.pnm /tmp/glue3.pnm /tmp/glue3.ps
+    Xdialog --msgbox "Files are glued." 5 30 
+  else
+    Xdialog --msgbox "You can only glue PNG and JPG files!" 5 40 
+  fi
+}
+
+export -f STARTGLUE
+
+STARTSAVE () {
+
+  rm -f $PEASYPATH/DOCUMENT.PDF
+
+  ls $PEASYPATH/*.pdf > /dev/null
+  if [ $? -gt 0 ]; then
+    Xdialog --msgbox "Nothing to save!" 5 25 
+    exit
+  fi
+
+  Xdialog --msgbox "Saving ..." 5 20 &
+  MSGPID=$!
+  
+  gs -dBATCH -dNOPAUSE -q -sDEVICE=pdfwrite -sOutputFile=$PEASYPATH/DOCUMENT.PDF $PEASYPATH/*.pdf
+
+  kill $MSGPID
+  Xdialog --msgbox "Project saved as $PEASYPATH/DOCUMENT.PDF" 5 60
+}
+
+export -f STARTSAVE
+
+export DIALOG="
+<window title=\"PeasyPDF v1.4\">
+<vbox>
+  <frame Select a file (PNG, JPG, PS or PDF)>
+    <text><label>Do you want to pick filenames that may  </label></text>
+    <hbox>
+    <text><label>contain spaces?                 </label></text>
+    <radiobutton> 
+       <variable>SPACEYES</variable>
+       <label>Yes</label>
+     </radiobutton>
+     <radiobutton> 
+       <variable>SPACENO</variable>
+       <label>No</label>
+     </radiobutton>
+     </hbox>
+    <text><label>If not, you can also type a list of names.</label></text>
+    <text><label>Or you can use wild cards like *.jpg.         </label></text>
+  </frame> 
+  <frame File>
+    <hbox>
+      <entry accept=\"filename\">
+        <variable>FILENAME</variable>
+       </entry>
+      <button>
+        <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">FILENAME</action>
+      </button>
+    </hbox>
+  </frame>
+  <hbox>
+    <button>
+      <label>New</label>
+      <action>STARTNEW</action>
+    </button>
+    <button>
+      <label>Add</label>
+      <action>STARTADD</action>
+      <action>Clear:FILENAME</action>
+    </button>
+    <button>
+      <label>Glue</label>
+      <action>STARTGLUE &</action>
+    </button>
+    <button>
+      <label>Save</label>
+      <action>STARTSAVE</action>
+    </button>
+    <button><label>Quit</label></button>
+  </hbox>
+</vbox>
+</window>
+"
+
+gtkdialog3 --program DIALOG > /dev/null

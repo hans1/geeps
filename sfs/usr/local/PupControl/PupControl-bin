@@ -1,0 +1,1541 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+WORKDIR="/usr/local/PupControl"
+APPS_DIR="$WORKDIR/defaultapps"
+CPANEL_ICONS_DIR="$WORKDIR/icons"
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#set tintwizard
+if [ "`pidof tint2`" ] && [ "`which tintwizard.py`" ]; then
+. $WORKDIR/func -tintwizard
+fi
+
+#define current window manager
+if [ -f "$HOME/Choices/windowmanager" ]; then
+	CURRWM=`cat "$HOME/Choices/windowmanager"` #TazOC LHP
+else
+	CURRWM=`cat /etc/windowmanager`
+fi
+
+#define special Sans-12 font for PupControl GUI
+CURRFONTNAME=`cat $HOME/.gtkrc-2.0 | grep font_name | cut -d "=" -f2 | cut -d " " -f2 | sed 's/\"//g'` ##define current user-font
+if [ "`cat $HOME/.gtkrc-2.0 | grep font_name | grep Sans`" != "" ] && [ "$CURRFONTNAME" != "Sans" ]; then
+	FONT_NAME="$CURRFONTNAME"
+else
+	FONT_NAME=""
+fi
+if [ -f "/usr/local/PupControl/xresourcesmarker" ]; then #Iguleder derivatives
+	echo "Xft.dpi: 78" > $HOME/.Xresources
+	FONT_SIZE="10"
+else
+	FONT_SIZE="12"
+fi
+echo "style \"specialsize\"
+{
+  font_name=\"$FONT_NAME Sans $FONT_SIZE\"
+}
+widget \"*\" style \"specialsize\"
+class \"*\" style \"specialsize\"" > "$WORKDIR/gtkrc_size"
+
+export GTK2_RC_FILES="$WORKDIR/gtkrc_size:${HOME}/.gtkrc-2.0"
+
+#define current global screen dpi
+CURRDPI=`cat $HOME/.Xresources | grep "^Xft\\.dpi:" | tr '\t' ' ' | tr -s ' ' | cut -f 2 -d ' '`
+if [ "`pidof xfwm4`" ]; then
+ XFWM4="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+ XFDPI=`cat $XFWM4 | grep '"DPI' | awk '{print $4}' | cut -d "=" -f2 | sed -e 's/\"//g' -e 's/\/>//g'`
+ [ "$XFDPI" = "" -o "$XFDPI" = "-1" ] && XFDPI="96"
+fi
+
+#define distro name
+DISTRO_NAME=`cat /etc/DISTRO_SPECS | grep DISTRO_NAME | cut -d "=" -f2 | sed s/\'//g`
+
+#define text width-request for the Liberation/Luxi Sans font in Puppy derivatives (LHP)
+if [ "$CURRFONTNAME" = "Liberation" -o "$CURRFONTNAME" = "Luxi" ]; then
+	if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"495" #based on default 96-dpi global font size (Xfce)
+	elif [[ $CURRDPI = "144" ]]; then TEXT_WIDTH=$"715"
+	elif [[ $CURRDPI = "138" ]]; then TEXT_WIDTH=$"680"
+	elif [[ $CURRDPI = "132" ]]; then TEXT_WIDTH=$"630"
+	elif [[ $CURRDPI = "126" ]]; then TEXT_WIDTH=$"615"
+	elif [[ $CURRDPI = "120" ]]; then TEXT_WIDTH=$"605"
+	elif [[ $CURRDPI = "114" ]]; then TEXT_WIDTH=$"570"
+	elif [[ $CURRDPI = "108" ]]; then TEXT_WIDTH=$"555"
+	elif [[ $CURRDPI = "102" ]]; then TEXT_WIDTH=$"530"
+	elif [[ $CURRDPI = "96" ]]; then TEXT_WIDTH=$"495"
+	elif [[ $CURRDPI = "90" ]]; then TEXT_WIDTH=$"480"
+	elif [[ $CURRDPI = "84" ]]; then TEXT_WIDTH=$"465"
+	elif [[ $CURRDPI = "78" ]]; then TEXT_WIDTH=$"450"
+	elif [[ $CURRDPI = "72" ]]; then TEXT_WIDTH=$"420"
+	elif [[ $CURRDPI = "66" ]]; then TEXT_WIDTH=$"400"
+	fi
+
+#define text width-request for Sans or DejaVu Sans font in Saluki implementation of xfwm4
+elif [ "$DISTRO_NAME" = "Saluki" ] && [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then
+	if [[ $XFDPI -ge 117 ]] && [[ $XFDPI -lt 123 ]]; then TEXT_WIDTH=$"655"
+	elif [[ $XFDPI -ge 111 ]] && [[ $XFDPI -lt 117 ]]; then TEXT_WIDTH=$"630"
+	elif [[ $XFDPI -ge 105 ]] && [[ $XFDPI -lt 111 ]]; then TEXT_WIDTH=$"595"
+	elif [[ $XFDPI -ge 99 ]] && [[ $XFDPI -lt 105 ]]; then TEXT_WIDTH=$"565"
+	elif [[ $XFDPI -ge 93 ]] && [[ $XFDPI -lt 99 ]]; then TEXT_WIDTH=$"530"
+	elif [[ $XFDPI -ge 87 ]] && [[ $XFDPI -lt 93 ]]; then TEXT_WIDTH=$"510"
+	elif [[ $XFDPI -ge 81 ]] && [[ $XFDPI -lt 87 ]]; then TEXT_WIDTH=$"505"
+	elif [[ $XFDPI -ge 75 ]] && [[ $XFDPI -lt 81 ]]; then TEXT_WIDTH=$"495"
+	elif [[ $XFDPI -ge 69 ]] && [[ $XFDPI -lt 75 ]]; then TEXT_WIDTH=$"485"
+	fi
+
+#define text width-request for default Sans or DejaVu Sans font in standard derivatives of Puppy
+elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"540" #based on default 96-dpi global font size (Xfce)
+	elif [[ $CURRDPI = "108" ]]; then TEXT_WIDTH=$"615"
+	elif [[ $CURRDPI = "102" ]]; then TEXT_WIDTH=$"585"
+	elif [[ $CURRDPI = "96" ]]; then TEXT_WIDTH=$"540"
+	elif [[ $CURRDPI = "90" ]]; then TEXT_WIDTH=$"515"
+	elif [[ $CURRDPI = "84" ]]; then TEXT_WIDTH=$"490"
+	elif [[ $CURRDPI = "78" ]]; then TEXT_WIDTH=$"455"
+	elif [[ $CURRDPI = "72" ]]; then TEXT_WIDTH=$"435"
+	elif [[ $CURRDPI = "66" ]]; then TEXT_WIDTH=$"415"
+fi
+
+#define button width-request for MyControl
+if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then MYCONTROL_BUTTON_WIDTH=$"245" #based on default 96-dpi global font size (Xfce)
+	elif [[ $CURRDPI = "150" ]]; then MYCONTROL_BUTTON_WIDTH=$"415"
+	elif [[ $CURRDPI = "144" ]]; then MYCONTROL_BUTTON_WIDTH=$"395"
+	elif [[ $CURRDPI = "138" ]]; then MYCONTROL_BUTTON_WIDTH=$"375"
+	elif [[ $CURRDPI = "132" ]]; then MYCONTROL_BUTTON_WIDTH=$"355"
+	elif [[ $CURRDPI = "126" ]]; then MYCONTROL_BUTTON_WIDTH=$"335"
+	elif [[ $CURRDPI = "120" ]]; then MYCONTROL_BUTTON_WIDTH=$"315"
+	elif [[ $CURRDPI = "114" ]]; then MYCONTROL_BUTTON_WIDTH=$"295"
+	elif [[ $CURRDPI = "108" ]]; then MYCONTROL_BUTTON_WIDTH=$"285"
+	elif [[ $CURRDPI = "102" ]]; then MYCONTROL_BUTTON_WIDTH=$"270"
+	elif [[ $CURRDPI = "96" ]]; then MYCONTROL_BUTTON_WIDTH=$"245"
+	elif [[ $CURRDPI = "90" ]]; then MYCONTROL_BUTTON_WIDTH=$"235"
+	elif [[ $CURRDPI = "84" ]]; then MYCONTROL_BUTTON_WIDTH=$"230"
+	elif [[ $CURRDPI = "78" ]]; then MYCONTROL_BUTTON_WIDTH=$"220"
+	elif [[ $CURRDPI = "72" ]]; then MYCONTROL_BUTTON_WIDTH=$"210"
+fi
+
+#define button width-request for PupControl tray
+if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TRAY_BUTTON_WIDTH=$"78" #based on default 96-dpi global font size (Xfce)
+	elif [[ $CURRDPI = "150" ]]; then TRAY_BUTTON_WIDTH=$"96"
+	elif [[ $CURRDPI = "144" ]]; then TRAY_BUTTON_WIDTH=$"94"
+	elif [[ $CURRDPI = "138" ]]; then TRAY_BUTTON_WIDTH=$"92"
+	elif [[ $CURRDPI = "132" ]]; then TRAY_BUTTON_WIDTH=$"90"
+	elif [[ $CURRDPI = "126" ]]; then TRAY_BUTTON_WIDTH=$"88"
+	elif [[ $CURRDPI = "120" ]]; then TRAY_BUTTON_WIDTH=$"86"
+	elif [[ $CURRDPI = "114" ]]; then TRAY_BUTTON_WIDTH=$"84"
+	elif [[ $CURRDPI = "108" ]]; then TRAY_BUTTON_WIDTH=$"82"
+	elif [[ $CURRDPI = "102" ]]; then TRAY_BUTTON_WIDTH=$"80"
+	elif [[ $CURRDPI = "96" ]]; then TRAY_BUTTON_WIDTH=$"78"
+	elif [[ $CURRDPI = "90" ]]; then TRAY_BUTTON_WIDTH=$"75"
+	elif [[ $CURRDPI = "84" ]]; then TRAY_BUTTON_WIDTH=$"73"
+	elif [[ $CURRDPI = "78" ]]; then TRAY_BUTTON_WIDTH=$"70"
+	elif [[ $CURRDPI = "72" ]]; then TRAY_BUTTON_WIDTH=$"70"
+fi
+
+#define current default applications
+BACKUP=`cat $APPS_DIR/backup | tail -1`
+GRUB=`cat $APPS_DIR/grub | tail -1`
+SCANNER=`cat $APPS_DIR/scanner | tail -1`
+NOTEBOOK=`cat $APPS_DIR/notebook | tail -1`
+ORGANIZER=`cat $APPS_DIR/organizer | tail -1`
+TASK_MANAGER=`cat $APPS_DIR/taskmanager | tail -1 | sed 's/rxvt +sb -fn 9x15 -bg black -fg white -title htop -n htop -e htop/htop/'`
+TIME_MANAGER=`cat $APPS_DIR/timemanager | tail -1 | sed 's/lsalarm/lightSwordAlarm/' | sed 's/sgtt/timetracker/'`
+WIRELESS=`cat $APPS_DIR/wireless | tail -1`
+NETWORK=`cat $APPS_DIR/network | tail -1 | sed 's/net-setup.sh/net-setup.sh (Puppy Network Wizard)/'`
+REMOTE_DESKTOP=`cat $APPS_DIR/remotedesktop | tail -1`
+SAMBA=`cat $APPS_DIR/samba | tail -1`
+VPN_CLIENT=`cat $APPS_DIR/vpnclient | tail -1`
+FILE_MANAGER=`cat $APPS_DIR/filemanager | tail -1 | sed 's/xterm -e mc/mc/' | sed 's/rox \//rox/' | sed 's/Thunar \//Thunar/'`
+FILE_FINDER=`cat $APPS_DIR/filefinder | tail -1`
+FILE_ARCHIVER=`cat $APPS_DIR/archiver | tail -1`
+CONSOLE=`cat $APPS_DIR/console | tail -1`
+
+MYCONTROL1=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL1 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL2=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL2 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL3=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL3 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL4=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL4 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL5=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL5 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL6=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL6 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL7=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL7 | cut -d "=" -f 2 | sed 's/\"//g'`
+MYCONTROL8=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL8 | cut -d "=" -f 2 | sed 's/\"//g'`
+
+MYCONTROL1_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL1 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL2_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL2 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL3_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL3 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL4_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL4 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL5_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL5 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL6_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL6 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL7_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL7 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+MYCONTROL8_NAME=`cat $WORKDIR/pupcontrol.rc | grep -a MYCONTROL8 | cut -d "=" -f 2 | sed 's/\"//g' | awk -F/ '{print $NF}'`
+
+#define programs to set locale and timezone
+if [ "`which quickcountry`" ]; then COUNTRY="quickcountry"
+elif [ "`which countrywizard`" ]; then COUNTRY="countrywizard"
+elif [ "`which countrywizard.qs`" ]; then COUNTRY="countrywizard.qs" #Fluppy
+else COUNTRY="chooselocale & sleep 1.5 && timezone-set"
+fi
+if [ "`which quickcountry`" ]; then COUNTRY_APP="quickcountry"
+elif [ "`which countrywizard`" ]; then COUNTRY_APP="countrywizard"
+elif [ "`which countrywizard.qs`" ]; then COUNTRY_APP="countrywizard.qs" #Fluppy
+else COUNTRY_APP="chooselocale | timezone-set"
+fi
+
+#show icons and text in the PupControl GUI, only if corresponding applications are available
+if [ -f /usr/local/desksetup/desksetup.sh ] && [ "`ps|grep "/usr/local/apps/ROX-Filer/ROX-Filer -p /root/Choices/ROX-Filer/PuppyPin"|grep -v "grep"`" ]; then #01micko desksetup.sh excerpt
+	DESKTOP="
+    <hbox>
+     <button tooltip-text=\" desksetup.sh \">
+      <input file>$CPANEL_ICONS_DIR/desktop20.png</input>
+      <action>/usr/local/desksetup/desksetup.sh &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Desktop Setup </b>- Select layout for desk/drive icons\"</label></text>
+    </hbox>"
+elif [ "`pidof enlightenment`" -o "$CURRWM" = "startkde" ]; then
+	DESKTOP=""
+else
+	DESKTOP="
+    <hbox>
+     <button tooltip-text=\" eventmanager \">
+      <input file>$CPANEL_ICONS_DIR/hdisk20.png</input>
+      <action>eventmanager desktop &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Desktop Drive Icons </b>- Configure hot-plugged devices\"</label></text>
+    </hbox>"
+fi
+
+if [ "`pidof enlightenment`" ]; then
+	ICONS=""
+else
+	ICONS="
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/icons20.png</input>
+      <action>$WORKDIR/func -icons &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Desktop and Menu Icons </b>- Select global icon-set\"</label></text>
+    </hbox>"
+fi
+
+if [ "$DISTRO_NAME" = "Lighthouse64" ] && [ "`which xscreensaver-demo-LHP`" != "" ]; then
+	SCREENLOCK="
+    <hbox>
+     <button tooltip-text=\" SS-control \">
+      <input file>$CPANEL_ICONS_DIR/screen20.png</input>
+      <action>$WORKDIR/SS-control &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  ScreenSaver Control </b>- Screensaver/screenlock/DPMS\"</label></text>
+    </hbox>"
+else
+	SCREENLOCK="
+    <hbox>
+     <button tooltip-text=\" xlock \">
+      <input file>$CPANEL_ICONS_DIR/screen20.png</input>
+      <action>/usr/local/apps/Xlock/AppRun -configure &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Xlock </b>- Set screen lock and graphical screensaver\"</label></text>
+    </hbox>"
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a BACKUP | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	BACKUp="
+    <hbox>
+     <button tooltip-text=\" $BACKUP \">
+      <input file>$CPANEL_ICONS_DIR/disk20.png</input>
+      <action>$APPS_DIR/backup &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Backup Files </b>- Backup files to drive/partition/server\"</label></text>
+    </hbox>"
+else
+	BACKUp=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a GRUB | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	GRUb="
+    <hbox>
+     <button tooltip-text=\" $GRUB \">
+      <input file>$CPANEL_ICONS_DIR/grub20.png</input>
+      <action>$APPS_DIR/grub &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  GRUB </b>- Install and configure generic boot loader\"</label></text>
+    </hbox>"
+else
+	GRUb=""
+fi
+
+if [ -f /usr/local/Startmount/Startmount ]; then
+	STARTMOUNT="
+    <hbox>
+     <button tooltip-text=\" startmount \">
+      <input file>$CPANEL_ICONS_DIR/mount20.png</input>
+      <action>/usr/local/Startmount/Startmount &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Startmount </b>- Select drives/programs to autostart\"</label></text>
+    </hbox>"
+else
+	STARTMOUNT=""
+fi
+
+if [ "`which laptop-tool`" != "" ]; then
+	LAPTOOL="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Laptop Tool \">
+      <input file>$CPANEL_ICONS_DIR/notebook18.png</input>
+      <action>laptop-tool 2>/dev/null &</action>
+     </button>"
+else
+	LAPTOOL=""
+fi
+
+if [ "`which zarfy`" != "" ]; then
+	MONITOR="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Set screen configuration with zarfy \">
+      <input file stock=\"gtk-fullscreen\"></input>
+      <action>zarfy &</action>
+     </button>"
+elif [ "`which lxrandr`" != "" ]; then
+	MONITOR="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Set screen configuration with lxrandr \">
+      <input file stock=\"gtk-fullscreen\"></input>
+      <action>lxrandr &</action>
+     </button>"
+elif [ "`which grandr`" != "" ]; then
+	MONITOR="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Set screen configuration with grandr \">
+      <input file stock=\"gtk-fullscreen\"></input>
+      <action>grandr &</action>
+     </button>"
+else
+	MONITOR=""
+fi
+
+if [ "`which pupcamera`" != "" ]; then
+	CAMERA="
+    <hbox>
+     <button tooltip-text=\" pupcamera \">
+      <input file>$CPANEL_ICONS_DIR/camera20.png</input>
+      <action>pupcamera &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Camera </b>- Download/Save images from digital camera\"</label></text>
+    </hbox>"
+elif [ "`which gtkam`" != "" ]; then
+	CAMERA="
+    <hbox>
+     <button tooltip-text=\" gtkam \">
+      <input file>$CPANEL_ICONS_DIR/camera20.png</input>
+      <action>gtkam &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Camera </b>- Download/Save images from digital camera\"</label></text>
+    </hbox>"
+else
+	CAMERA=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a SCANNER | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	SCAN="
+    <hbox>
+     <button tooltip-text=\" $SCANNER \">
+      <input file>$CPANEL_ICONS_DIR/scanner20.png</input>
+      <action>$APPS_DIR/scanner &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Scanner </b>- Capture graphic image of print media\"</label></text>
+    </hbox>"
+else
+	SCAN=""
+fi
+
+if   [ "`which Multiple-Sound-Card-Wizard`" != "" ]; then SOUNDWIZARD="/tmp/PC-sound"
+elif [ "`which alsawizard-wrapper`" != "" ]; then SOUNDWIZARD="alsawizard-wrapper"
+else SOUNDWIZARD="alsawizard"
+fi
+
+if [ -f /usr/bin/flsynclient ]; then
+	SYNCLIENT="
+    <hbox>
+     <button tooltip-text=\" flsynclient \">
+      <input file>$CPANEL_ICONS_DIR/touchpad20.png</input>
+      <action>flsynclient &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Touchpad </b>- Adjust properties of Synaptics touchpad\"</label></text>
+    </hbox>"
+else
+	SYNCLIENT=""
+fi
+
+if [ "`which guvcview`" -o "`which luvcview`" -o "`which ucview`" ]; then
+	WEBCAM="
+    <hbox>
+     <button tooltip-text=\" guvcview, luvcview, ucview \">
+      <input file>$CPANEL_ICONS_DIR/webcam20.png</input>
+      <action>$WORKDIR/func -webcam &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Webcam </b>- Capture video images with Web camera\"</label></text>
+    </hbox>"
+else
+	WEBCAM=""
+fi
+
+if   [ "`cat /usr/sbin/petget | grep -a "package manager for Puppy Linux"`" != "" ]; then
+	ADD_REMOVE="petget"
+elif [ -f /usr/local/petget/pkg_chooser.sh ]; then
+	ADD_REMOVE="/usr/local/petget/pkg_chooser.sh"
+fi
+
+if   [ "`cat /usr/sbin/petget | grep -a "package manager for Puppy Linux"`" != "" ]; then
+	CHECK_DEPS=""
+else
+	CHECK_DEPS="
+    <hbox>
+     <button tooltip-text=\" check_deps.sh \">
+      <input file>$CPANEL_ICONS_DIR/pet20.png</input>
+      <action>/usr/local/petget/check_deps.sh &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Assess Installed PETS </b>- Check for dependencies\"</label></text>
+    </hbox>"
+fi
+
+if [ "`which wakepup2`" != "" ]; then
+	BOOTDISKETTE="
+    <hbox>
+     <button tooltip-text=\" wakepup2 \">
+      <input file>$CPANEL_ICONS_DIR/disk20.png</input>
+      <action>wakepup2 &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Boot Diskette </b>- Create bootable Puppy diskette\"</label></text>
+    </hbox>"
+else
+	BOOTDISKETTE=""
+fi
+
+if [ "`which bootflash`" != "" ]; then
+	BOOTFLASH="
+    <hbox>
+     <button tooltip-text=\" bootflash \">
+      <input file>$CPANEL_ICONS_DIR/flash20.png</input>
+      <action>bootflash &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Boot Flash </b>- Create bootable Puppy USB drive\"</label></text>
+    </hbox>"
+else
+	BOOTFLASH=""
+fi
+
+if [ "$DISTRO_NAME" = "Akita Linux" ] && [ "`which frugalinstaller`" != "" ]; then
+	FRUGAL_INSTALL="
+    <hbox>
+     <button tooltip-text=\" frugalinstaller \">
+      <input file>$CPANEL_ICONS_DIR/hdisk20.png</input>
+      <action>frugalinstaller &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Frugal Installer </b>- Install Puppy to local hard drive\"</label></text>
+    </hbox>"
+else
+	FRUGAL_INSTALL=""
+fi
+
+if [ "`which puppyinstaller2`" ]; then
+	PUPINSTALLER="puppyinstaller2"
+elif [ "`which puppyinstaller`" ]; then
+	PUPINSTALLER="puppyinstaller"
+fi
+
+if [ "`which slickpet`" != "" ] && [ "`which quickpet`" = "" ]; then ln -snf /usr/sbin/slickpet /usr/sbin/quickpet & fi
+if [ "`which quickpet`" != "" ]; then
+	if [ "$DISTRO_NAME" != "Slacko Puppy" ]; then
+	QUICKPET="
+    <hbox>
+     <button tooltip-text=\" QuickPet Package Manager \">
+      <input file>$CPANEL_ICONS_DIR/pet20.png</input>
+      <action>/usr/sbin/quickpet &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  QuickPet </b>- Install common Puppy PETS quickly\"</label></text>
+    </hbox>"
+	elif [ "$DISTRO_NAME" = "Slacko Puppy" ]; then
+	SLICKPET="
+    <hbox>
+     <button tooltip-text=\" SlickPet Package Manager \">
+      <input file>$CPANEL_ICONS_DIR/pet20.png</input>
+      <action>/usr/sbin/quickpet &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  SlickPet </b>- Install common Puppy PETS quickly\"</label></text>
+    </hbox>"
+	else
+	QUICKPET=""
+	SLICKPET=""
+	fi
+fi
+
+if [ "`which woofy`" != "" ]; then
+	REMASTER="
+    <hbox>
+     <button tooltip-text=\" woofy \">
+      <input file>$CPANEL_ICONS_DIR/remaster20.png</input>
+      <action>woofy &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Remaster Puppy </b>- Build a snapshot of current Puppy\"</label></text>
+    </hbox>"
+else
+	REMASTER="
+    <hbox>
+     <button tooltip-text=\" remasterpup2 \">
+      <input file>$CPANEL_ICONS_DIR/remaster20.png</input>
+      <action>remasterpup2 &</action>
+      <action>sleep 1; remove_builtin &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Remaster Puppy </b>- Build a snapshot of current Puppy\"</label></text>
+    </hbox>"
+fi
+
+if [ "`which sfs_load`" != "" ]; then
+	SFSLOAD="
+    <hbox>
+     <button tooltip-text=\" sfs_load \">
+      <input file>$CPANEL_ICONS_DIR/sfs20.png</input>
+      <action>sfs_load &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  SFS Load </b>- Load Squash File System on-the-fly\"</label></text>
+    </hbox>"
+else
+	SFSLOAD=""
+fi
+
+if [ "`which startups`" != "" ]; then
+	MANAGER2="
+    <hbox>
+     <button tooltip-text=\" startups \">
+      <input file>$CPANEL_ICONS_DIR/execute20.png</input>
+      <action>startups &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Boot/Startup Service Manager </b>- Start system services\"</label></text>
+    </hbox>"
+elif [ "`which glipper_shell`" != "" ]; then
+	MANAGER2="
+    <hbox>
+     <button tooltip-text=\" glipper_shell \">
+      <input file>$CPANEL_ICONS_DIR/glipper20.png</input>
+      <action>glipper_shell &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Clipboard Manager </b>- Enable/Disable Glipper clipboard\"</label></text>
+    </hbox>"
+else
+	MANAGER2=""
+fi
+
+if [ "`which defaults-chooser`" != "" ]; then
+	DEFAULTS="
+    <hbox>    
+     <button tooltip-text=\" defaults-chooser \">
+      <input file>$CPANEL_ICONS_DIR/reboot20.png</input>
+      <action>defaults-chooser &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Default App Manager </b>- Select default applications\"</label></text>
+    </hbox>"
+else
+	DEFAULTS=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a NOTEBOOK | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	NBOOK="
+    <hbox>    
+     <button tooltip-text=\" $NOTEBOOK \">
+      <input file>$CPANEL_ICONS_DIR/notes20.png</input>
+      <action>$APPS_DIR/notebook &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Notes Manager </b>- Save personal notes/reminders\"</label></text>
+    </hbox>"
+else
+	NBOOK=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a TASK_MANAGER | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	TASK_MGR="
+    <hbox>
+     <button tooltip-text=\" $TASK_MANAGER \">
+      <input file>$CPANEL_ICONS_DIR/task20bw.png</input>
+      <action>$APPS_DIR/taskmanager &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Task Manager </b>- Manage system processes/tasks\"</label></text>
+    </hbox>"
+else
+	TASK_MGR=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a TIME_MANAGER | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	TIME_MGR="
+    <hbox>
+     <button tooltip-text=\" $TIME_MANAGER \">
+      <input file>$CPANEL_ICONS_DIR/notification20.png</input>
+      <action>$APPS_DIR/timemanager &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Time Manager </b>- Manage daily time events\"</label></text>
+    </hbox>"
+else
+	TIME_MGR=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a WIRELESS | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	WiRELESS="
+    <hbox>
+     <button tooltip-text=\" $WIRELESS \">
+      <input file>$CPANEL_ICONS_DIR/wireless20.png</input>
+      <action>$APPS_DIR/wireless &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Internet Wireless Connect </b>- Wireless setup utility\"</label></text>
+    </hbox>"
+else
+	WiRELESS=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a REMOTE_DESKTOP | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	REMOTE_DT="
+    <hbox>
+     <button tooltip-text=\" $REMOTE_DESKTOP \">
+      <input file>$CPANEL_ICONS_DIR/remaster20.png</input>
+      <action>$APPS_DIR/remotedesktop &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Remote Desktop </b>- Connect to remote Windows PC\"</label></text>
+    </hbox>"
+else
+	REMOTE_DT=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a SAMBA | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	SMBA="
+    <hbox>
+     <button tooltip-text=\" $SAMBA \">
+      <input file>$CPANEL_ICONS_DIR/samba20.png</input>
+      <action>$APPS_DIR/samba &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Samba </b>- Mount Windows Samba shares on Puppy PC\"</label></text>
+    </hbox>"
+else
+	SMBA=""
+fi
+
+if [ "`cat $WORKDIR/pupcontrol.rc | grep -a VPN_CLIENT | cut -d "=" -f 2 | sed 's/\"//g'`" != "" ]; then
+	VPN="
+    <hbox>
+     <button tooltip-text=\" $VPN_CLIENT \">
+      <input file>$CPANEL_ICONS_DIR/net20.png</input>
+      <action>$APPS_DIR/vpnclient &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  VPN </b>- Connect to virtual private network (PPTP)\"</label></text>
+    </hbox>"
+else
+	VPN=""
+fi
+
+if [ "`which quicksetup`" != "" ]; then
+	QUICKSETUP="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Personalize Settings (quicksetup) \">
+      <input file>$CPANEL_ICONS_DIR/preferences20.png</input>
+      <action>quicksetup &</action>
+     </button>"
+elif [ "`which firstrun`" != "" ]; then
+	QUICKSETUP="
+     <button relief=\"2\" height-request=\"30\" width-request=\"30\" tooltip-text=\" Personalize Settings (firstrun) \">
+      <input file>$CPANEL_ICONS_DIR/preferences20.png</input>
+      <action>firstrun &</action>
+     </button>"
+else
+	QUICKSETUP=""
+fi
+
+if [ "`which partview`" != "" ]; then
+	PARTVIEW="
+    <hbox>
+     <button tooltip-text=\" partview \">
+      <input file>$CPANEL_ICONS_DIR/hdisk20.png</input>
+      <action>$WORKDIR/func -partview &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Drive Space </b>- Show available drive/partition space\"</label></text>
+    </hbox>"
+else
+	PARTVIEW=""
+fi
+
+if [ "`which bcrypt_gui`" != "" ]; then
+	ENCRYPT="
+    <hbox>    
+     <button tooltip-text=\" bcrypt_gui \">
+      <input file>$CPANEL_ICONS_DIR/encrypt20.png</input>
+      <action>bcrypt_gui &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Encrypt File </b>- Cross-platform encryption/decryption\"</label></text>
+    </hbox>"
+else
+	ENCRYPT=""
+fi
+
+if [ "`which ghasher`" != "" -o "`which gtkhash`" != "" ]; then
+	HASH="
+    <hbox>
+     <button tooltip-text=\" Check integrity of file download \">
+      <input file>$CPANEL_ICONS_DIR/gtkhash20.png</input>
+      <action>$WORKDIR/func -gtkhash &</action>  
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Hash Value </b>- Calculate hash checksum (e.g. - MD5)\"</label></text>
+    </hbox>"
+else
+	HASH=""
+fi
+
+if [ "`which xbindkeys-config-wrapper`" != "" -o "`which xbindkeys_config`" != "" -o "`which xbindkeys-config`" != "" -o "`which svenconfig`" != "" ]; then
+	HOTKEYS="
+    <hbox>
+     <button tooltip-text=\" Set keyboard shortcuts to launch programs \">
+      <input file>$CPANEL_ICONS_DIR/keyboard20.png</input>
+      <action>$WORKDIR/func -hotkeys &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Hotkeys Configuration </b>- Set application hotkeys\"</label></text>
+    </hbox>"
+else
+	HOTKEYS=""
+fi
+
+if [ "$DISTRO_NAME" = "Lighthouse64" ] && [ "`which xscreensaver-demo-LHP`" != "" ]; then #TazOC LHP
+	SCREENSAVER=""
+else
+	SCREENSAVER="
+	<hbox>
+     <button tooltip-text=\" SS-control \">
+      <input file>$CPANEL_ICONS_DIR/screen20.png</input>
+      <action>$WORKDIR/SS-control &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  ScreenSaver Control </b>- Enable/Disable ScreenSaver\"</label></text>
+    </hbox>"
+fi
+
+if [ "`which xfprot`" != "" ]; then
+	XFPROT="
+    <hbox>
+     <button tooltip-text=\" Scan system files for viruses \">
+      <input file>$CPANEL_ICONS_DIR/antivirus20.png</input>
+      <action>xfprot &</action>  
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  XF-Prot </b>- Graphical user interface for F-Prot Antivirus\"</label></text>
+    </hbox>"
+else
+	XFPROT=""
+fi
+
+#MyControl about dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/MYCONTROL-about
+echo 'export MYCONTROL_ABOUT_DIALOG="<window title=\"MC\" icon-name=\"gtk-info\" resizable=\"false\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>My</span><span size='"'large'"' color='"'#3272C0'"'>Control</span> $VERSION</b>\"</label></text>
+  <frame About>
+  <text use-markup=\"true\"><label>\"   The MyControl tab provides a convenient   
+   way to append favorite applications to the   
+   PupControl GUI. A program name or path   
+   may be entered directly in the preferences   
+   manager – or with a mouse click, open the   
+   MyControl file selector to find the program   
+   and automatically append the full path. Up   
+   to eight favorite apps may be assigned to   
+   the MyControl selection-tab of PupControl.   
+  \"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button height-request=\"35\">
+      <label>\" Exit  \"</label>
+       <input file stock=\"gtk-close\"></input>
+        <action type=\"exit\">quit_now</action>
+    </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=MYCONTROL_ABOUT_DIALOG' >> /tmp/MYCONTROL-about
+chmod 777 /tmp/MYCONTROL-about
+
+#Power-Off dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PC-poweroff
+echo 'export POWEROFF_DIALOG="<window title=\"PupControl\" icon-name=\"gtk-stop\" resizable=\"false\">
+ <vbox>
+  <frame Power-Off>
+  <text use-markup=\"true\"><label>\"If you remove CD/DVD media from an optical drive,
+please do so before selecting the Power-Off option.\"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button tooltip-text=\" Turn off PC \">
+     <label>\"Power-Off\"</label>
+      <input file stock=\"gtk-disconnect\"></input>
+      <action>wmpoweroff &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+     <button tooltip-text=\" Return to Shutdown Manager \">
+     <label>\"  Cancel   \"</label>
+      <input file stock=\"gtk-close\"></input>
+      <action>/usr/local/PupControl/Shutdown &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=POWEROFF_DIALOG' >> /tmp/PC-poweroff
+chmod 777 /tmp/PC-poweroff
+
+#Printer dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PC-printer
+echo 'export PRINTER_DIALOG="<window title=\"PCP\" icon-name=\"gtk-print\" resizable=\"false\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Printer</span></b>\"</label></text>
+  <pixmap><input file>/usr/local/PupControl/icons/printer20.png</input></pixmap>
+  <frame Options>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Install printer with CUPS \">
+     <label>\"Install\"</label>
+      <action>/usr/local/PupControl/func -printsetup &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Manage printer status/output \">
+     <label>\"Manage\"</label>
+      <action>/usr/local/PupControl/func -printmanager &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\">
+     <label>\"Exit\"</label>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+  </frame>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=PRINTER_DIALOG' >> /tmp/PC-printer
+chmod 777 /tmp/PC-printer
+
+#PupApps dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PupControl-pupapps
+echo 'export PUPAPPS_DIALOG="<window title=\"PupControl\" icon-name=\"gtk-preferences\" resizable=\"false\">
+ <vbox>
+  <frame Install>
+  <text justify=\"2\" use-markup=\"true\"><label>\"<b>Install PupApps Launcher</b>\"</label></text>
+  <text use-markup=\"true\"><label>\"
+  The PupApps utility is an add-on module. Please  
+  install for seamless integration with PupControl.  
+  \"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button tooltip-text=\" Go to download site 
+   in default browser \">
+     <label>\"Download \"</label>
+      <input file stock=\"gtk-add\"></input>
+      <action>defaultbrowser http://www.murga-linux.com/puppy/viewtopic.php?t=61962 &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+     <button tooltip-text=\" Exit without installing \">
+     <label>\"  Cancel    \"</label>
+      <input file stock=\"gtk-quit\"></input>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=PUPAPPS_DIALOG' >> /tmp/PupControl-pupapps
+chmod 777 /tmp/PupControl-pupapps
+
+#PupClockset dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PupControl-pupclockset
+echo 'export PUPCLOCKSET_DIALOG="<window title=\"PupControl\" icon-name=\"gtk-preferences\" resizable=\"false\">
+ <vbox>
+  <frame Install>
+  <text justify=\"2\" use-markup=\"true\"><label>\"<b>Install PupClockset</b>\"</label></text>
+  <text use-markup=\"true\"><label>\"
+  The PupClockset manager is an add-on module.  
+  Install for seamless integration with PupControl.  
+  \"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button tooltip-text=\" Go to download site 
+   in default browser \">
+     <label>\"Download \"</label>
+      <input file stock=\"gtk-add\"></input>
+      <action>defaultbrowser http://www.murga-linux.com/puppy/viewtopic.php?t=61633 &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+     <button tooltip-text=\" Exit without installing \">
+     <label>\"  Cancel    \"</label>
+      <input file stock=\"gtk-quit\"></input>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=PUPCLOCKSET_DIALOG' >> /tmp/PupControl-pupclockset
+chmod 777 /tmp/PupControl-pupclockset
+
+#PupControl help dlg...
+echo '#!/bin/sh
+VERSION="1.8.8"
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PCONTROL-help
+echo 'export PUPCONTROL_HELP_DIALOG="<window title=\"PC\" icon-name=\"gtk-info\" resizable=\"false\">
+ <vbox>
+   <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Pup</span><span size='"'large'"' color='"'#3272C0'"'>Control</span> $VERSION</b>\"</label></text>
+  <frame About>
+  <text use-markup=\"true\"><label>\"   PupControl is the graphical (GUI) control panel   
+   that enables access to more than sixty Puppy   
+   functions. The tab interface sorts utilities and   
+   functions into nine categories, and essential   
+   programs are in the lower tray. Specific apps   
+   may be selected in the preferences manager   
+   or entered manually if not listed as an option.   
+
+       Quick program access is by Ctrl+Shift+C.
+
+          Roger D. Grider, Copyright 2012 GPL3   
+  \"</label></text>
+  </frame>
+
+   <hbox homogeneous=\"true\">
+     <button height-request=\"35\" tooltip-text=\" View help file in default browser \">
+      <label>\" Help \"</label>
+       <input file>/usr/local/PupControl/icons/help20.png</input>
+        <action>defaultbrowser /usr/local/PupControl/Help.html &</action>
+     </button>
+     <button height-request=\"35\" tooltip-text=\" View supported applications in default browser \">
+      <label>\" Apps \"</label>
+       <input file stock=\"gtk-find\"></input>
+        <action>defaultbrowser /usr/local/PupControl/Apps.html &</action>
+     </button>
+     <button height-request=\"35\">
+      <label>\" Exit  \"</label>
+       <input file stock=\"gtk-close\"></input>
+        <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=PUPCONTROL_HELP_DIALOG' >> /tmp/PCONTROL-help
+chmod 777 /tmp/PCONTROL-help
+
+#Reboot dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi' > /tmp/PC-reboot
+echo 'export REBOOT_DIALOG="<window title=\"PupControl\" icon-name=\"gtk-stop\" resizable=\"false\">
+ <vbox>
+  <frame Reboot>
+  <text use-markup=\"true\"><label>\"If you remove CD/DVD media from an optical drive,
+please do so before selecting the Reboot option.\"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button tooltip-text=\" Restart PC \">
+     <label>\"Reboot\"</label>
+      <input file stock=\"gtk-connect\"></input>
+      <action>wmreboot &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+     <button tooltip-text=\" Return to Shutdown Manager \">
+     <label>\"Cancel \"</label>
+      <input file stock=\"gtk-close\"></input>
+      <action>/usr/local/PupControl/Shutdown &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=REBOOT_DIALOG' >> /tmp/PC-reboot
+chmod 777 /tmp/PC-reboot
+
+#Sound Card dlg...
+echo '#!/bin/sh
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+if  [ -f "/usr/bin/alsawizard-wrapper" ]; then
+	 ALSAWIZARD="alsawizard-wrapper"
+else ALSAWIZARD="alsawizard"
+fi' > /tmp/PC-sound
+echo 'export SOUNDCARD_DIALOG="<window title=\"PCP\" icon-name=\"gtk-execute\" resizable=\"false\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Sound Setup</span></b>\"</label></text>
+  <pixmap><input file>/usr/local/PupControl/icons/sound20.png</input></pixmap>
+  <frame Wizards>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" alsawizard \">
+     <label>\"Single card\"</label>
+      <action>"$ALSAWIZARD" &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Multiple-Sound-Card-Wizard \">
+     <label>\"Multi-card\"</label>
+      <action>Multiple-Sound-Card-Wizard &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\">
+     <label>\"Exit\"</label>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+  </frame>
+ </vbox>
+</window>"
+$GTKDIALOG --center --program=SOUNDCARD_DIALOG' >> /tmp/PC-sound
+chmod 777 /tmp/PC-sound
+
+#PupControl dlg...
+export PUPCONTROL="<window title=\"PCP\" icon-name=\"gtk-execute\" resizable=\"false\">
+  <vbox>
+   <text use-markup=\"true\"><label>\"<b><span size='"'x-large'"'>Pup</span><span size='"'x-large'"' color='"'#3272C0'"'>Control</span></b>\"</label></text>
+  <notebook page=\"7\" labels=\"Desktop|Drive|Hardware|Install|Manager|MyControl|Network|Settings|Utility\">
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/cursor20.png</input>
+      <action>$WORKDIR/func -cursor &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Cursor Theme </b>- Set mouse/touchpad screen cursor\"</label></text>
+    </hbox>
+
+	$DESKTOP
+	$ICONS
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/wallpaper20.png</input>
+      <action>$WORKDIR/func -wallpaper &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Desktop Wallpaper </b>- Set screen background image\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/font20.png</input>
+      <action>$WORKDIR/func -gfontsel &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Font Preview </b>- View available screen fonts\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/fontsize20.png</input>
+      <action>$WORKDIR/func -fonts &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Global Font Size </b>- Set DPI of screen fonts\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/themes20.png</input>
+      <action>$WORKDIR/func -gtktheme &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  GTK Theme </b>- Select theme for buttons, scrollbars...\"</label></text>
+    </hbox>
+
+	$SCREENLOCK
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+	$BACKUp
+
+    <hbox>
+     <button tooltip-text=\" cdburner-wizard \">
+      <input file>$CPANEL_ICONS_DIR/cd20.png</input>
+      <action>cdburner-wizard &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  CD/DVD Wizard </b>- Select and set optical drives\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" gparted \">
+      <input file>$CPANEL_ICONS_DIR/partition20.png</input>
+      <action>$WORKDIR/func -gparted &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Gparted </b>- Add, delete or resize drive partitions\"</label></text>
+    </hbox>
+
+	$GRUb
+
+    <hbox>
+     <button tooltip-text=\" Puppy Drive Mounter \">
+      <input file>$CPANEL_ICONS_DIR/mount20.png</input>
+      <action>$WORKDIR/func -mount &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Pmount </b>- Mount and unmount system drives\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" Puppy Universal dd \">
+      <input file>$CPANEL_ICONS_DIR/hdisk20.png</input>
+      <action>Pudd &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Pudd </b>- Copy system drive, partition or image-file\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" resizepfile.sh \">
+      <input file>$CPANEL_ICONS_DIR/reboot20.png</input>
+      <action>resizepfile.sh &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Resize Puppy file </b>- Increase personal storage file\"</label></text>
+    </hbox>
+
+	$STARTMOUNT
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+	$LAPTOOL
+      <text width-request=\"20\"><label>\" \"</label></text>
+	$MONITOR
+      <text width-request=\"20\"><label>\" \"</label></text>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+	$CAMERA
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/keyboard20.png</input>
+      <action>$WORKDIR/func -keymouse &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Keyboard | Mouse | Screensaver </b>- Set properties\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM compatible option \">
+      <input file>$CPANEL_ICONS_DIR/printer20.png</input>
+      <action>/tmp/PC-printer &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Printer </b>- Install printer or manage printer output\"</label></text>
+    </hbox>
+
+	$SCAN
+
+    <hbox>
+     <button tooltip-text=\" Sound card wizard \">
+      <input file>$CPANEL_ICONS_DIR/sound20.png</input>
+      <action>$SOUNDWIZARD &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Sound Setup </b>- Install system audio card driver\"</label></text>
+    </hbox>
+
+	$SYNCLIENT
+
+	$WEBCAM
+
+    <hbox>
+     <button tooltip-text=\" xorgwizard \">
+      <input file>$CPANEL_ICONS_DIR/xorg20.png</input>
+      <action>$WORKDIR/func -xorgwizard &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Xorg Video Wizard </b>- Modify screen configuration\"</label></text>
+    </hbox>
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $ADD_REMOVE \">
+      <input file>$CPANEL_ICONS_DIR/add-remove20.png</input>
+      <action>$ADD_REMOVE &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Add/Remove Programs </b>- Install/Uninstall Puppy PETS\"</label></text>
+    </hbox>
+
+	$CHECK_DEPS
+	$BOOTDISKETTE
+	$BOOTFLASH
+	$FRUGAL_INSTALL
+
+    <hbox>
+     <button tooltip-text=\" $PUPINSTALLER \">
+      <input file>$CPANEL_ICONS_DIR/pupinstall20.png</input>
+      <action>$PUPINSTALLER &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Puppy Universal Installer </b>- Install Puppy to media\"</label></text>
+    </hbox>
+
+	$QUICKPET
+	$REMASTER
+	$SFSLOAD
+	$SLICKPET
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" bootmanager \">
+      <input file>$CPANEL_ICONS_DIR/boot20bw.png</input>
+      <action>bootmanager &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Boot Manager </b>- SFS-files/driver-modules/services\"</label></text>
+    </hbox>
+
+	$MANAGER2
+    $DEFAULTS
+
+    <hbox>
+     <button tooltip-text=\" eventmanager \">
+      <input file>$CPANEL_ICONS_DIR/event20.png</input>
+      <action>eventmanager &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Event Manager </b>- Hot-plugging/save-session/power-off\"</label></text>
+    </hbox>
+
+	$NBOOK
+
+    <hbox>
+     <button tooltip-text=\" $ORGANIZER \">
+      <input file>$CPANEL_ICONS_DIR/schedule20.png</input>
+      <action>$APPS_DIR/organizer &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Schedule Manager </b>- Schedule appointments/tasks\"</label></text>
+    </hbox>
+
+	$TASK_MGR
+	$TIME_MGR
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" MyControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/MYCONTROL-about &</action></button>
+    </hbox>
+
+      <text height-request=\"17\"><label>\"\"</label></text>
+
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 1: $MYCONTROL1_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL1 &</action>
+     </button>
+     <button label=\" 5: $MYCONTROL5_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL5 &</action>
+     </button>
+    </hbox>
+
+    <hbox homogeneous=\"true\">
+     <button label=\" 2: $MYCONTROL2_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL2 &</action>
+     </button>
+     <button label=\" 6: $MYCONTROL6_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL6 &</action>
+     </button>
+    </hbox>
+   </vbox>
+
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 3: $MYCONTROL3_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL3 &</action>
+     </button>
+     <button label=\" 7: $MYCONTROL7_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL7 &</action>
+     </button>
+    </hbox>
+
+    <hbox homogeneous=\"true\">  
+     <button label=\" 4: $MYCONTROL4_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL4 &</action>
+     </button>
+     <button label=\" 8: $MYCONTROL8_NAME\" width-request=\""$MYCONTROL_BUTTON_WIDTH"\" xalign=\"0\">
+      <action>$MYCONTROL8 &</action>
+     </button>
+    </hbox>
+      <text height-request=\"10\"><label>\"\"</label></text>
+   </vbox>
+
+    <hbox homogeneous=\"true\">
+     <button height-request=\"32\" width-request=\"120\" tooltip-text=\" Select MyControl applications \">
+      <label>\"  Select  \"</label>
+      <action>cd /usr; $WORKDIR/PC-pref &</action>     
+      <action type=\"exit\">quit_now</action>
+     </button>
+    </hbox>
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>    
+     <button tooltip-text=\" set firewall \">
+      <input file>$CPANEL_ICONS_DIR/firewall20.png</input>
+      <action>$WORKDIR/func -firewall &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Firewall </b>- Install/Configure firewall (online protection)\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" connectwizard yes \">
+      <input file>$CPANEL_ICONS_DIR/internetconnect20.png</input>
+      <action>connectwizard yes &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Internet Connect </b>- Dialup/Cable/DSL/Wired/Wireless\"</label></text>
+    </hbox>
+
+	$WiRELESS
+
+    <hbox>
+     <button tooltip-text=\" ipinfo2 \">
+      <input file>$CPANEL_ICONS_DIR/systeminfo20.png</input>
+      <action>$WORKDIR/func -ipinfo2 &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Network Information </b>- View network configuration\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $NETWORK \">
+      <input file>$CPANEL_ICONS_DIR/net20.png</input>
+      <action>$APPS_DIR/network &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Network Setup </b>- Test/Configure network interface\"</label></text>
+    </hbox>
+
+	$REMOTE_DT
+	$SMBA
+	$VPN
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+	$QUICKSETUP
+      <text width-request=\"20\"><label>\" \"</label></text>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $COUNTRY_APP \">
+      <input file>$CPANEL_ICONS_DIR/country20.png</input>
+      <action>$COUNTRY &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Country </b>- Set locale (date/font/money) and timezone\"</label></text>
+    </hbox>
+
+     <hbox>
+     <button tooltip-text=\" set BIOS/CMOS clock \">
+      <input file>$CPANEL_ICONS_DIR/clock20.png</input>
+      <action>$WORKDIR/func -hwclock &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Hardware Clock </b>- Set HW clock to localtime or UTC\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" set-time-for-puppy \">
+      <input file>$CPANEL_ICONS_DIR/timedate20.png</input>
+      <action>set-time-for-puppy &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Time | Date </b>- Set the local time and date\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" PupClockset \">
+      <input file>$CPANEL_ICONS_DIR/clockformat20.png</input>
+      <action>$WORKDIR/func -trayclock &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Time Format </b>- Set format of digital-tray clock\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" psync \">
+      <input file>$CPANEL_ICONS_DIR/timeupdate20.png</input>
+      <action>$WORKDIR/func -updatetime &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Time Update </b>- Sync/Update clock with time servers\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" Configure Panel and Tray applications \">
+      <input file>$CPANEL_ICONS_DIR/control-panel_20.png</input>
+      <action>cd /usr; $WORKDIR/PC-pref &</action>     
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  PupControl Preferences </b>- Set control panel options\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" Pup-SysInfo \">
+      <input file>$CPANEL_ICONS_DIR/systeminfo20.png</input>
+      <action>$WORKDIR/func -sysinfo_mono &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  System Information </b>- PC information/benchmarks\"</label></text>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" $CURRWM settings \">
+      <input file>$CPANEL_ICONS_DIR/themes20.png</input>
+      <action>$WORKDIR/func -windowmanager &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Window Manager Settings </b>- Configuration options \"</label></text>
+    </hbox>
+      <text height-request=\"30\"><label>\"\"</label></text>
+   </vbox>
+
+
+   <vbox>
+    <hbox>
+     <button relief=\"2\" height-request=\"30\" width-request=\"33\" tooltip-text=\" PupControl Help \"><input file>$CPANEL_ICONS_DIR/help20.png</input><action>/tmp/PCONTROL-help &</action></button>
+    </hbox>
+
+    <hbox>
+     <button tooltip-text=\" On-demand CPU frequency scaling \">
+      <input file>$CPANEL_ICONS_DIR/cpu20.png</input>
+      <action>$WORKDIR/func -cpufrequency &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  CPU Frequency Scaling </b>- Set dynamic CPU cooling\"</label></text>
+    </hbox>
+
+	$PARTVIEW
+	$ENCRYPT
+	$HASH
+	$HOTKEYS
+
+    <hbox>
+     <button tooltip-text=\" gexec, gmrun, grun, xfrun4 \">
+      <input file>$CPANEL_ICONS_DIR/execute20.png</input>
+      <action>$WORKDIR/func -commandline &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Run Program </b>- Run/Install from command line\"</label></text>
+    </hbox>
+
+	$SCREENSAVER
+	$XFPROT
+   </vbox>
+
+  </notebook>
+    <hbox homogeneous=\"true\">   
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Common Puppy Programs \">
+      <label>Apps</label>
+      <input file>$CPANEL_ICONS_DIR/apps20.png</input>
+      <action>$WORKDIR/func -pupapps &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Manage files with $FILE_MANAGER \">
+      <label>Files </label>
+      <input file>$CPANEL_ICONS_DIR/files20.png</input>
+      <action>$APPS_DIR/filemanager &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Find files with $FILE_FINDER \">
+      <label>Find </label>
+      <input file>$CPANEL_ICONS_DIR/find20.png</input>
+      <action>$APPS_DIR/filefinder &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Archive/Pack files with $FILE_ARCHIVER \">
+      <label>Pack </label>
+      <input file>$CPANEL_ICONS_DIR/pet20.png</input>
+      <action>$APPS_DIR/archiver &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Mount/Unmount drives \">
+      <label>Mnt </label>
+      <input file>$CPANEL_ICONS_DIR/mount20.png</input>
+      <action>$WORKDIR/func -mount &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Console/Terminal - $CONSOLE \">
+      <label>Term</label>
+      <input file>$CPANEL_ICONS_DIR/console20.png</input>
+      <action>$WORKDIR/func -console &</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Shutdown Manager \">
+      <label>SDM</label>
+      <input file>$CPANEL_ICONS_DIR/shutdown20.png</input>
+      <action>$WORKDIR/Shutdown &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+
+     <button height-request=\"35\" width-request=\""$TRAY_BUTTON_WIDTH"\" tooltip-text=\" Close PupControl \">
+      <label>Exit </label>
+      <input file stock=\"gtk-quit\"></input>
+      <action type=\"exit\">quit_now</action>
+     </button>
+    </hbox>
+  </vbox>
+ </window>"
+
+$GTKDIALOG --center --program=PUPCONTROL
+
+unset PUPCONTROL
+
+exit 0

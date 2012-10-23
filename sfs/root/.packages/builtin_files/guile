@@ -1,0 +1,144 @@
+/usr
+/usr/bin
+ guile
+ guile-snarf
+ guile-tools
+/usr/lib
+ libguilereadline-v-17.so
+ libguilereadline-v-17.so.17
+ libguilereadline-v-17.so.17.0.3
+ libguile.so
+ libguile.so.17
+ libguile.so.17.4.0
+ libguile-srfi-srfi-13-14-v-3.so
+ libguile-srfi-srfi-13-14-v-3.so.3
+ libguile-srfi-srfi-13-14-v-3.so.3.0.1
+ libguile-srfi-srfi-1-v-3.so
+ libguile-srfi-srfi-1-v-3.so.3
+ libguile-srfi-srfi-1-v-3.so.3.0.2
+ libguile-srfi-srfi-4-v-3.so
+ libguile-srfi-srfi-4-v-3.so.3
+ libguile-srfi-srfi-4-v-3.so.3.0.1
+ libguile-srfi-srfi-60-v-2.so
+ libguile-srfi-srfi-60-v-2.so.2
+ libguile-srfi-srfi-60-v-2.so.2.0.2
+/usr/share
+/usr/share/emacs
+/usr/share/emacs/site-lisp
+ gds.el
+ gds-scheme.el
+ gds-server.el
+/usr/share/guile
+/usr/share/guile/1.8
+ guile-procedures.txt
+/usr/share/guile/1.8/ice-9
+ and-let-star.scm
+ boot-9.scm
+ buffered-input.scm
+ calling.scm
+ channel.scm
+ common-list.scm
+/usr/share/guile/1.8/ice-9/debugger
+ command-loop.scm
+ commands.scm
+ state.scm
+ trc.scm
+ utils.scm
+/usr/share/guile/1.8/ice-9/debugging
+ example-fns.scm
+ ice-9-debugger-extensions.scm
+ steps.scm
+ trace.scm
+ traps.scm
+ trc.scm
+/usr/share/guile/1.8/lang
+/usr/share/guile/1.8/lang/elisp
+ base.scm
+ example.el
+ interface.scm
+/usr/share/guile/1.8/lang/elisp/internals
+ evaluation.scm
+ format.scm
+ fset.scm
+ lambda.scm
+ load.scm
+ null.scm
+ set.scm
+ signal.scm
+ time.scm
+ trace.scm
+/usr/share/guile/1.8/lang/elisp/primitives
+ buffers.scm
+ char-table.scm
+ features.scm
+ fns.scm
+ format.scm
+ guile.scm
+ keymaps.scm
+ lists.scm
+ load.scm
+ match.scm
+ numbers.scm
+ pure.scm
+ read.scm
+ signal.scm
+ strings.scm
+ symprop.scm
+ syntax.scm
+ system.scm
+ time.scm
+/usr/share/guile/1.8/oop
+/usr/share/guile/1.8/oop/goops
+ accessors.scm
+ active-slot.scm
+ compile.scm
+ composite-slot.scm
+ describe.scm
+ dispatch.scm
+ internal.scm
+ old-define-method.scm
+ save.scm
+ simple.scm
+ stklos.scm
+ util.scm
+/usr/share/guile/1.8/scripts
+ api-diff
+ autofrisk
+ display-commentary
+ doc-snarf
+ frisk
+ generate-autoload
+ lint
+ PROGRAM
+ punify
+ read-rfc822
+ read-scheme-source
+ read-text-outline
+ scan-api
+ snarf-check-and-output-texi
+ snarf-guile-m4-docs
+ summarize-guile-TODO
+ use2dot
+/usr/share/guile/1.8/srfi
+ srfi-10.scm
+ srfi-11.scm
+ srfi-13.scm
+ srfi-14.scm
+ srfi-16.scm
+ srfi-17.scm
+ srfi-19.scm
+ srfi-1.scm
+ srfi-26.scm
+ srfi-2.scm
+ srfi-31.scm
+ srfi-34.scm
+ srfi-35.scm
+ srfi-37.scm
+ srfi-39.scm
+ srfi-4.scm
+ srfi-60.scm
+ srfi-69.scm
+ srfi-6.scm
+ srfi-88.scm
+ srfi-8.scm
+ srfi-9.scm

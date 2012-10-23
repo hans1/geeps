@@ -1,0 +1,31 @@
+/etc
+/etc/network-wizard
+/etc/network-wizard/network
+/etc/network-wizard/network/interfaces
+/etc/network-wizard/wireless
+/etc/network-wizard/wireless/interfaces
+/etc/network-wizard/wireless/profiles
+ autoconnect.conf
+ template.conf
+/etc/network-wizard/wireless/wpa_profiles
+ wpa_supplicant2.conf
+ wpa_supplicant.conf
+/etc/rc.d
+ rc.network
+/usr
+/usr/sbin
+ ndiswrapperGUI.sh
+ net-setup.sh
+ wag-profiles.sh
+/usr/share
+/usr/share/doc
+ net_setup.html
+/usr/share/locale
+/usr/share/locale/en
+/usr/share/locale/en/LC_MESSAGES
+ net-setup.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+ net-setup.mo
+/usr/share/pixmaps
+ net-setup_btnsize.png

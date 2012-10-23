@@ -1,0 +1,209 @@
+/usr
+/usr/lib
+/usr/lib/goffice
+/usr/lib/goffice/0.8.17
+/usr/lib/goffice/0.8.17/plugins
+/usr/lib/goffice/0.8.17/plugins/plot_barcol
+ barcol.so
+ gog-area-prefs.ui
+ gog-barcol-prefs.ui
+ gog-minmax-prefs.ui
+ plot-types.xml
+ plugin.xml
+/usr/lib/goffice/0.8.17/plugins/plot_distrib
+ distrib.so
+ gog-boxplot-prefs.ui
+ gog-double-histogram-prefs.ui
+ gog-histogram-prefs.ui
+ plot-types.xml
+ plugin.xml
+/usr/lib/goffice/0.8.17/plugins/plot_pie
+ gog-pie-prefs.ui
+ gog-pie-series.ui
+ gog-ring-prefs.ui
+ pie.so
+ plot-types.xml
+ plugin.xml
+/usr/lib/goffice/0.8.17/plugins/plot_radar
+ gog-color-polar-prefs.ui
+ gog-polar-prefs.ui
+ plot-types.xml
+ plugin.xml
+ radar.so
+/usr/lib/goffice/0.8.17/plugins/plot_surface
+ gog-xyz-prefs.ui
+ gog-xyz-surface-prefs.ui
+ plot-types.xml
+ plugin.xml
+ surface.so
+/usr/lib/goffice/0.8.17/plugins/plot_xy
+ gog-bubble-prefs.ui
+ gog-xy-color-prefs.ui
+ gog-xy-dropbar-prefs.ui
+ gog-xy-prefs.ui
+ gog-xy-series-prefs.ui
+ plot-types.xml
+ plugin.xml
+ xy.so
+/usr/lib/goffice/0.8.17/plugins/reg_linear
+ linreg.so
+ plugin.xml
+ reg-types.xml
+/usr/lib/goffice/0.8.17/plugins/reg_logfit
+ logfit.so
+ plugin.xml
+ reg-types.xml
+/usr/lib/goffice/0.8.17/plugins/smoothing
+ gog-exp-smooth.ui
+ gog-moving-avg.ui
+ plugin.xml
+ smoothing.so
+ types.xml
+/usr/share
+/usr/share/goffice
+/usr/share/goffice/0.8.17
+/usr/share/goffice/0.8.17/patterns
+ svg-patterns.xml
+/usr/share/goffice/0.8.17/ui
+ go-3d-rotation-sel.ui
+ go-font-sel.ui
+ go-format-sel.ui
+ gog-3d-box-prefs.ui
+ gog-axis-prefs.ui
+ gog-equation-prefs.ui
+ gog-error-bar-prefs.ui
+ gog-graph-prefs.ui
+ gog-guru-type-selector.ui
+ gog-guru.ui
+ gog-object-prefs.ui
+ gog-plot-prefs.ui
+ gog-reg-curve-prefs.ui
+ gog-reg-eqn-prefs.ui
+ gog-series-prefs.ui
+ go-image-save-dialog-extra.ui
+ go-image-sel.ui
+ go-rotation-sel.ui
+ go-style-prefs.ui
+/usr/share/pixmaps
+/usr/share/pixmaps/goffice
+/usr/share/pixmaps/goffice/0.8.17
+ area.xpm
+ bar-hboth.png
+ bar-hminus.png
+ bar-hplus.png
+ bar-none.png
+ bar-vboth.png
+ bar-vminus.png
+ bar-vplus.png
+ bar.xpm
+ bubble.xpm
+ chart_area_1_1.png
+ chart_area_1_2.png
+ chart_area_1_3.png
+ chart_bar_1_1.png
+ chart_bar_1_2.png
+ chart_bar_1_3.png
+ chart_bar_2_1.png
+ chart_bar_2_2.png
+ chart_bar_2_3.png
+ chart_boxplot_1_1.png
+ chart_boxplot_1_2.png
+ chart_boxplot_2_1.png
+ chart_boxplot_2_2.png
+ chart_bubble_1_1.png
+ chart_colored_1_1.png
+ chart_color_polar_1_1.png
+ chart_column_1_1.png
+ chart_column_1_2.png
+ chart_column_1_3.png
+ chart_column_2_1.png
+ chart_column_2_2.png
+ chart_column_2_3.png
+ chart_column_3_1.png
+ chart_cone_1_1.png
+ chart_cone_1_2.png
+ chart_cone_1_3.png
+ chart_cone_2_1.png
+ chart_cone_2_2.png
+ chart_cone_2_3.png
+ chart_cone_3_1.png
+ chart_contour_1_1.png
+ chart_contour_2_1.png
+ chart_cylinder_1_1.png
+ chart_cylinder_1_2.png
+ chart_cylinder_1_3.png
+ chart_cylinder_2_1.png
+ chart_cylinder_2_2.png
+ chart_cylinder_2_3.png
+ chart_cylinder_3_1.png
+ chart_dropbar_1_1.png
+ chart_dropbar_1_2.png
+ chart_dropbar_1_3.png
+ chart_dropbar_1_4.png
+ chart_histogram_1_1.png
+ chart_histogram_1_3.png
+ chart_histogram_1_4.png
+ chart_histogram_2_1.png
+ chart_line_1_1.png
+ chart_line_1_2.png
+ chart_line_1_3.png
+ chart_line_2_1.png
+ chart_line_2_2.png
+ chart_line_2_3.png
+ chart_line_3_1.png
+ chart_minmax_1_1.png
+ chart_minmax_1_2.png
+ chart_minmax_2_1.png
+ chart_minmax_2_2.png
+ chart_pie_1_1.png
+ chart_pie_1_2.png
+ chart_pie_1_3.png
+ chart_pie_2_1.png
+ chart_pie_2_2.png
+ chart_pie_2_3.png
+ chart_pie_3_1.png
+ chart_pie_3_2.png
+ chart_polar_1_1.png
+ chart_prob_1_1.png
+ chart_pyramid_1_1.png
+ chart_pyramid_1_2.png
+ chart_pyramid_1_3.png
+ chart_pyramid_2_1.png
+ chart_pyramid_2_2.png
+ chart_pyramid_2_3.png
+ chart_pyramid_3_1.png
+ chart_radar_1_1.png
+ chart_radar_1_2.png
+ chart_radar_1_3.png
+ chart_ring_1_1.png
+ chart_ring_1_2.png
+ chart_scatter_1_1.png
+ chart_scatter_2_1.png
+ chart_scatter_2_2.png
+ chart_scatter_3_1.png
+ chart_scatter_3_2.png
+ chart_scatter_3_3.png
+ chart_scatter_4_1.png
+ chart_scatter_4_2.png
+ chart_scatter_4_3.png
+ chart_scatter_4_4.png
+ chart_stock_1_1.png
+ chart_stock_1_2.png
+ chart_stock_2_1.png
+ chart_stock_2_2.png
+ chart_surface_2_1.png
+ chart_surface_2_2.png
+ color.xpm
+ column.xpm
+ contour.xpm
+ dist.xpm
+ doughnut.xpm
+ dropbar.xpm
+ linegraph.xpm
+ minmax.xpm
+ pie.xpm
+ polar.png
+ radar.xpm
+ scatter.xpm
+ stock.xpm
+ surface.xpm

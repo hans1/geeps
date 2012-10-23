@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Puppy has different versions of gtkdialog
+GTKDIALOG=""
+if [ "`which gtkdialog3`" != "" ]; then
+GTKDIALOG=gtkdialog3
+elif [ "`which gtkdialog`" != "" ]; then
+GTKDIALOG=gtkdialog
+elif [ "$GTKDIALOG" = "" ]; then
+echo "you need to install gtkdialog"
+exit 0
+fi
+
+
+
+echo "export MAIN_DIALOG='
+<window title=\"Choose which sound card to make the default.\">
+  <vbox>
+    <list>
+	<height>200</height>
+	<width>650</width>
+     <variable>LIST</variable>" >> /tmp/mscw.tmp
+	 
+aplay -l | grep card | sed 's/^/<item> /g' | sed 's/$/ <\/item>/g' >> /tmp/mscw.tmp	 
+	 
+echo "</list>
+    <hbox>
+     <button ok></button>
+     <button cancel></button>
+    </hbox>
+  </vbox>
+</window>
+'" >> /tmp/mscw.tmp	 
+
+. /tmp/mscw.tmp
+
+I=$IFS; IFS=""
+     for STATEMENTS in  $($GTKDIALOG --program MAIN_DIALOG); do
+       eval $STATEMENTS
+     done
+     IFS=$I
+
+     if [ "$EXIT" = "OK" ]; then
+       Card="$(echo $LIST | cut -d ":" -f 1 | sed -e 's/\(^.*\)\(.$\)/\2/')"
+	   Device="$(echo $LIST | cut -d ":" -f 2 | sed -e 's/\(^.*\)\(.$\)/\2/')"
+	   echo "Card="$Card
+	   echo "Device="$Device
+     else
+       echo "You pressed the Cancel button."
+	   exit
+     fi
+cp /etc/asound.conf /etc/asound.conf-old
+rm /etc/asound.conf
+echo "defaults.pcm.card "$Card >> /etc/asound.conf
+echo "defaults.pcm.device "$Device >> /etc/asound.conf
+
+xmessage Reboot for changes to take effect.
+	 

@@ -1,0 +1,1796 @@
+#!/bin/sh
+# grub4dosconfig
+# 12aug11 by Masaki Shinomiya <shino@pos.to>
+# 16aug09 r1 bootup Windows from another drives
+# 17aug09 r2 chain to another menu.lst, wubi and unetbootin support, swap hdd vista too
+# 18aug09 r3 bugfix in using exsisting menu.lst of the installing partition
+# 28aug09 v0.9 bugfix in saving old menu.lst, Find Grub menu on HDD,
+#   sync after install, make mout point for fd0, leave log, helpfile name,
+#   full installed puppy version, usbflash and usbhd
+#   frugal installed on root, avoid duplication of full and frugal
+#   choice of sfs file, backup upper/lower case of 'MENU.LST'
+#   root hd numbers when drives swapped and when ata/sata mixed
+# 31aug09 v.0.9.1 bugfix: choice of sfs file
+# 1sep09 v.0.9.2 no modify menu.lst 
+# 5sep09 v.1.0 ready for Dillo
+# 25sep09 v.1.1 local search, search initrd.gz for frugal puppies
+# 27oct09 v.1.2 no time for previous MBR, improve picking up main sfs file
+# 1nov09 v.1.3 chain from grub(0.97-29ubuntu47) in case ext4, error check if mount failed
+# 2nov09 v.1.4 wubildr of ubuntu linux 9.10
+# v.1.4.1 reference link
+# 21Dec09 v.1.5 drive info., allow no hdd but fd, dialog layout
+# 6jan10 v.1.5.1 which sfs as PUPSFS
+# 14jan10 v.1.5.2 find vmlinuz*, again which sfs as PUPSFS
+# 2nov10 v.1.5.3: finding vmlinz* and initrd* supporting Ubunto lucid, avoid multiple entry for one frugal
+# 8nov10 v.1.6.0: wee for mbr thanks to the installing code by piratesmack, partition UUID
+# 15nov10 v.1.6.1: gettext, bugfix partition UUID, multiple Windows, removed video option from the default
+# 15nov10 v.1.6.1: read_distro_specs, check requiered files
+# 20nov10 v1.6.2: fix RAM mode, fix puppyoptions, single item for single windows, wubi support
+# 27nov10 v1.6.3: bootlace.com for short sectors, bootable partitions, puppy simple file name, classic puppy, tool tips, error check without menu.list, list order, gettext
+# 16jan11 v1.6d9: PBS support, reiserfs support, plop support, bootable PBS
+# 19jan11 v1.6d9.1: fix was failed installing on floppy(thanks to yordanj94), pmedia option
+# 10feb11 v1.7: sort the probepart result, install on internal or removable drives, fix typo at checking boot_part
+# 29oct11 v1.7.1: fix was failed with ext4(thanks to jim3630), drive letter, gtkdialog4 thanks to 01micko, help button, no sort probepart, bootable check
+# 15jan12 v1.7.2: fix was mmc card(ex. mmcblk0p1) failed(thanks to jemimah), which vmlinuz and initrd should be taken(thnaks to Karl)
+MYVERSION=1.7.2
+MYLOG=/tmp/$(basename "$0").log
+echo "$0 $@" > $MYLOG
+echo "version $MYVERSION" >>  $MYLOG
+date  >>  $MYLOG
+
+DEBUGFLAG="yes"
+debug() {
+  [ "$DEBUGFLAG" != "yes" ] && return
+  echo "$@" >&2
+  echo "$@" >> $MYLOG
+} 
+
+# default options
+PUPPYOPTIONS="pfix=fsck"
+LINUXOPTIONS="ro"
+
+export TEXTDOMAIN=$(basename "$0")
+export TEXTDOMAINDIR=/usr/share/locale
+export OUTPUT_CHARSET=UTF-8
+### prub4dosconfig.mo
+_WebPage="http://diddy.boot-land.net/grub4dos/Grub4dos.htm"
+_Title=$(gettext "Grub4DosConfig")
+_Welcome1=$(gettext "Configure bootup loader(Grub4Dos).")
+_Welcome2=$(gettext "Click 'OK' to search installed systems.")
+_Where=$(gettext "Where to install bootup loader(Grub4Dos)?")
+_Where2=$(gettext "Usually on MBR(Master Boot Record)")
+_SearchOnly=$(gettext "Search within only this drive")
+_SearchOnlyP=$(gettext "Search only this drive or partition")
+_Keep=$(gettext "Do not rewrite the existing boot record")
+_KeepMenu=$(gettext "Do not rewrite 'menu.lst'")
+_unlessFloppy=$(gettext "(Tick options ignored as for floppy)")
+_More_info=$(gettext "Grub4Dos Guide")
+_Help=$(gettext "Help")
+_Probing=$(gettext "Searching. Please wait...")
+#_Duplicated=$(gettext "Next puppy directories have same name on multiple partitions. It must confuse the bootup procces. Change the names of the directories and then restart this program.")
+_Quit=$(gettext "Press 'OK' to quit this program.")
+_List=$(gettext "List of detected operating systems")
+_List2=$(gettext "You can rewrite each label. Or, erase. Caution: You cannot change their order.")
+_Frugal=$(gettext "Frugal installed Puppy")
+_Full=$(gettext "Full installed Puppy or other Linux")
+_Win=$(gettext "Windows")
+#_Win2=$(gettext "Grub4DosConfig does not check any Windows installed or not. But you can put items on the menu to bootup Windows if installed.")
+_Chain_frame=$(gettext 'Bootable partitions')
+_Comfirm=$(gettext "Comfirmation")
+_Comfirm1=$(gettext "The boot loader(Grub4Dos) will be installed on")
+#_Comfirm2=$(gettext ".")
+_Comfirm3=$(gettext "Press 'OK' to install. Press 'Cancel' if you do not like to.")
+_Floppy=$(gettext "Insert floppy disk (all the data will be eraesed).")
+_Formating=$(gettext "Formating floppy. Please wait ...")
+_Writing=$(gettext "Installing Grub4Dos. Please wait...")
+_Error=$(gettext "Somewhat error occured.")
+_Success=$(gettext "Grub4Dos successfully installed.")
+_Fairwell1=$(gettext "The file(s),")
+_Fairwell2=$(gettext "is on")
+_Fairwell3=$(gettext "You can edit 'menu.lst' before reboot.")
+_Unmount=$(gettext "If you installed on a removable device, ensure unmount the drive before remove it.")
+_Saved=$(gettext "Old 'menu.lst' found and renamed as follows:")
+_NoBR=$(gettext "Note: the boot record is not changed.")
+_NoMBR=$(gettext "The MBR of the 1st drive has not changed this time. You may need to configure the BIOS or the MBR to make chain to")
+_NoBootFlag=$(gettext "The boot-flag of the partition %s is not set. You may need to set the boot-flag using Gparted.")
+_NoBootMBR=$(gettext "The MBR of the drive %s seems not bootable. You may need to install some bootloader there.")
+#_NoMBR2=$(gettext ".")
+_Edit=$(gettext "Edit 'menu.lst'")
+_no_grub=$(gettext "Grub not found. Grub(other than Grub4Dos) which supports ext4 is required if the 1st partition of the target drive is ext4 file system.")
+# v.1.6
+_online=$(gettext 'Grub4dos Guide online')
+_Puppy_opt=$(gettext "Options")
+_Puppy_opt_tip=$(gettext "You can edit the boot options add to all frugal installed Puppy.")
+_Linux_opt=$(gettext "Options")
+_Linux_opt_tip=$(gettext "You can edit the boot options add to all full installed Linux.")
+_MBR_saved=$(gettext "Old MBR is saved")
+_Restore_MBR=$(gettext "To restore the MBR, type next command on console")
+#_OKtoCont=$(gettext "Press 'Cancel' to quit this program, or 'OK' to continue.")
+_Duplicated_W=$(gettext "Next puppy directories have same name on multiple partitions. It may confuse the bootup procces. Recommended to press 'Cancel' to quit this program, change the names of the directories, and then restart this program.\\nBut you can continue this program pressing 'OK'.")
+_Win3=$(gettext "The first entry is always shown regardless Windows are installed or not. Recommended to keep the entry.")
+_Missing=$(gettext "The Grub4DosConfig seems improperly installed. Missing files")
+_Lacking=$(gettext "Some componets are lacking to perform this function")
+_NoSupport=$(gettext 'No supported filesystems found in')
+_SPT_Err1=$(gettext 'Sectors/Track is expected 63.')
+_SPT_Drive=$(gettext 'But the drive')
+_SPT_Sector=$(gettext 'seems Sectors/Track')
+_SPT_Err2=$(gettext 'The Grub4DosConfig does not support this drive.')
+_SPT_Err3=$(gettext 'Remove all the partitions on the drive (after backing up all the data) and rewrite the partition tabe with Gparted.')
+_Where_tip=$(gettext 'Select the device you would like to boot from. Usually the first drive(MBR), but you can select floppy(fd0) if available, or USB removable devices. You may need to change the BIOS setting.')
+_Ignored=$(gettext "Ignored for floppies")
+_Forced=$(gettext 'Or, for PBS install, it searches only the partiton and is recommended.')
+_SearchOnly_tip=$(gettext 'Limit the search scope so that the installations on other drives are not listed up. Recommended only for removal devices.')
+_Keep_tip="$(gettext 'Only if you do not want to change your existing MBR. Your boot sequence should be ready to start up grubldr.') $_Ignored"
+_KeepMenu_tip="$(gettext 'Only if you want to keep the existing 'menu.lst' and you can handle it manually.') $_Ignored"
+#_LegacyMenu=$(gettext "Legacy compatible 'menu.lst'")
+#_LegacyMenu_tip=$(gettext "Only if you still use legacy grub. You also need to tick on 'Do not rewrite the existing boot record'. The 'menu.lst' is made with legacy grub compatible commands.")
+_Anothermenu_W=$(gettext "A 'menu.lst' found at irregular place")
+_Nomenu_new=$(gettext "Recommended is to make new one")
+_Nomenu_cont=$(gettext "but you can skip to make new one by checking the box on.")
+_Nomenu_W=$(gettext "No 'menu.lst' found.")
+_Not_found=$(gettext 'Not found')
+_Show_partition=$(gettext 'Show PBS')
+_Hide_partition=$(gettext 'Hide PBS')
+_Show_partition_tip=$(gettext 'Show all partitions if you want to install the bootloader on the partition boot sector(PBS).')
+### end of prub4dosconfig.mo
+#-- simple localization for scripts by Shinobar based on MU. 
+# set locale
+for lng in C $(echo $LANGUAGE|cut -d':' -f1) $LC_ALL $LANG;do :;done   # ex.    ja_JP.UTF-8
+# search locale file
+lng1=$(echo $lng|cut -d'.' -f1)      # ex.   ja_JP
+lng2=$(echo $lng|cut -d'_' -f1)   # ex.   ja
+
+#LOCALEDIR=/usr/share/locale
+#[ "$mo" ] || mo=$(basename $0).mo
+#for D in C en $lng2 $lng1 $lng
+#do
+#   F="$LOCALEDIR/$D/LC_MESSAGES/$mo"
+#   [ -f "$F" ] && . "$F"
+#done
+# search help file
+#LOCAL_HELP=grub4dosconfig.html
+[ "$LOCAL_HELP" = "" ] && LOCAL_HELP=$(basename "$0").html
+DOCDIR=/usr/share/doc
+H=""
+for D in $lng $lng1 $lng2 C en
+do
+   F="$DOCDIR/help/$D/$LOCAL_HELP"
+   [ -f "$F" ] && H="$F" && break
+done
+LOCAL_HELP="$DOCDIR/$LOCAL_HELP"
+[ "$H" != "" ] && LOCAL_HELP="$H"
+#LOCAL_HELP="file://$LOCAL_HELP"
+# help handler
+HTMLVIEWERS="$BROWSER defaulthtmlviewer defaultbrowser dillo seamonkey mozilla firefox opera"
+HELPVIEWER=""
+for PROG in $HTMLVIEWERS;do
+  which $PROG >/dev/null && HELPVIEWER=$PROG && break
+done
+ICONS="/usr/local/lib/X11/mini-icons"
+
+splash() {
+  ACTION="$1"
+  MSG="$2"
+  if [ "$ACTION" = "start" ]
+  then
+  	DIALOG="<window title=\"$_Title\"><hbox>
+  	  <pixmap><input file>$ICONS/mini-clock.xpm</input></pixmap>
+  	  <text><input>echo -en \"$MSG\"</input></text>
+</hbox></window>"
+  	$GTKDIALOG -p DIALOG  -c &>/dev/null &
+  	XPID=$!
+  	return
+  fi
+  [ "$XPID" = "" ] && return
+  kill $XPID &>/dev/null
+  XPID=""
+  return
+}
+probing() {
+  splash "$1" "$_Probing"
+}
+make_help_button() {
+  SECTION=$1
+  [ "$SECTION" ] && SECTION='#'$SECTION
+ echo '<button tooltip-text="'${_Help}'"><input file stock="gtk-help"></input><action>'${HELPVIEWER}' file://'${LOCAL_HELP}${SECTION}' &</action><label>'$(gettext "Help")'</label></button>'
+}
+umountmine() {
+	[ "$SMOUNTED" != "" ] && mount |grep -q " $SMOUNTED " && umount $SMOUNTED && SMOUNTED=""
+}
+
+mountpoint() {
+  PART=$(echo $1|cut -d '|' -f 1|cut -d '/' -f 3)
+  FS=$(echo $1|cut -d '|' -f 2)
+  umountmine
+  MP=$(mount | grep "^/dev/$PART[ ]" | head -n 1 | cut -d ' ' -f 3)
+  if [ "$MP" = "" ]; then
+	MP="/mnt/$PART"
+	mount | grep -q " $MP " &&  umount "$MP"
+	[ -d "$MP" ] || mkdir -p "$MP"
+	OPT=""
+	[ "$FS" = "vfat" ] && OPT='-o iocharset=utf8'
+	mount -t $FS $OPT /dev/$PART "$MP" >>  $MYLOG 2>&1 && SMOUNTED="$MP" || MP=""
+	[ "$MP" = "" ] && return 1
+  fi
+    #echo $MP
+  return 0
+}
+
+read_distro_specs() {
+  TOPDIR=$1
+  DISTRO_NAME=""
+  DISTRO_VERSION=""
+  [ "$KEYFILE" = "" ] && echo "Unknown" && return
+  KFILE=$(echo "$KEYFILE" | cut -d',' -f1)
+  KBASE=$(basename "$KFILE")
+  SUBDIR=$(basename "$(dirname "/$KFILE")")
+  [ "$SUBDIR" = "/" ] && SUBDIR=""
+  # PLOP
+  [ "$KBASE" = "plpbt.bin" ] && echo "PLOP_boot_manager" && return
+  # frugal installed Puppy
+  if [ "$KBASE" = "puppy.sfs" ]; then
+    # simple file name
+    DISTRO_IDSTRING=$(tail -c 16 $TOPDIR$KEYFILE)
+    DISTRO_VERSION=$(echo $DISTRO_IDSTRING| cut -b1-6| tr -dc 'a-z0-9')
+    MAJOR=$(echo $DISTRO_VERSION | cut -b1-4)
+    MINOR=$(echo $DISTRO_VERSION | cut -b5-6| tr -dc '0-9')
+    [ "$MINOR" = "" ] && MINOR=0
+    [ $MINOR -eq 0 ] && DISTRO_VERSION=$MAJOR || DISTRO_VERSION=$MAJOR-$MINOR
+    [ "$DISTRO_VERSION" != "" ] || DISTRO_VERSION=$SUBDIR
+    echo "Puppy_$DISTRO_VERSION"
+    return
+  fi
+  if echo $KBASE  | grep -q '.sfs$'; then
+    DESTRO_NAME=$(basename $KBASE .sfs| tr '-' '_')
+    [ "$SUBDIR" = "puppylivecdbuild" ] && DESTRO_NAME="${DESTRO_NAME}_custom"
+    echo $DESTRO_NAME
+    return
+  fi
+  # full installed Puppy
+  [ -f $TOPDIR/etc/rc.d/PUPSTATE ] && DISTRO_NAME="Puppy"
+  [ -f $TOPDIR/etc/puppyversion ] && DISTRO_NAME="Puppy" && DISTRO_VERSION="$(cat $TOPDIR/etc/puppyversion)" #old pre-w464 install.
+  [ -f $TOPDIR/etc/DISTRO_SPECS ] && source $TOPDIR/etc/DISTRO_SPECS
+  [ "$DISTRO_VERSION" != "" ] && DISTRO_NAME="$DISTRO_NAME $DISTRO_VERSION"
+  # other linux
+  if [ "$DISTRO_NAME" = "" ]; then
+     if [ -f $TOPDIR/etc/vine-release ] ; then
+      DISTRO_NAME=$(head -n 1 $TOPDIR/etc/vine-release)
+     elif [ -f $TOPDIR/etc/lsb-release ] ; then
+       source $TOPDIR/etc/lsb-release
+	 DISTRO_NAME=$DISTRIB_DESCRIPTION
+     fi
+     if [ "$KBASE" = "menu.lst" ]; then
+       DISTRO_NAME=$(grep -v '^[[:blank:]]*#' $TOPDIR$KEYFILE | grep '^[[:blank:]]*title'| head -n 1 | sed -e 's/^[[:blank:]]*title.//i')
+       echo "$DISTRO_NAME" | grep -q 'find[[:blank:]]*/' && DISTRO_NAME=$(echo "$DISTRO_NAME" | cut -d'/' -f2)
+       #cp -f $TOPDIR$KEYFILE /tmp/$(echo $KEYFILE| tr '/' '_')
+     fi
+     [ "$DISTRO_NAME" = "" ] && DISTRO_NAME="Linux"
+    [ "$SUBDIR" != "" ] && DISTRO_NAME="$DISTRO_NAME $SUBDIR"
+  fi 
+  #if [ "$DISTRO_NAME" = "" ] && echo $KEYFILE | grep -q '^/.*/';then
+  #  DISTRO_NAME=$(echo $KEYFILE | cut -d'/' -f2) 
+  #fi
+  # Windows
+  case $KEYFILE in
+  /bootmgr)  DISTRO_NAME="Windows Vista/2008/7" ;;
+  /ntldr) DISTRO_NAME="Windows NT/2000/2003/Xp"
+    [ -f $TOPDIR/boot.ini ] && DISTRO_NAME=$(grep 'WINDOWS=' $TOPDIR/boot.ini| head -n 1| cut -d'=' -f2| cut -d'/' -f1|  tr -d '"' | trim)
+    [ "$DISTRO_NAME" = "" ] && DISTRO_NAME="Windows NT/2000/2003/Xp"
+    ;;
+  /io.sys) DISTRO_NAME="Windows 9x/Me";;
+  esac
+  [ "$DISTRO_NAME" = "" ] && DISTRO_NAME="Unknown"
+  echo "$DISTRO_NAME" | trim | tr ' ' '_'
+}
+# v1.7.2: ex. mmcblk0p1 to be mmcblk0
+part2drive() {
+	sed -e 's/[0-9]*$//' -e 's/p$//'
+}
+# [hs]d[a-z][0-9] --> (hdX,Y)
+# ex. sda2 --> (hd0,1)
+X=0
+Y=0
+partname2num() {
+  PART=$1
+  DRIVE=$(echo $PART | part2drive) # v1.7.2
+  N=$(echo $PART | sed -e 's/^.*[a-z]//'| tr -dc [0-9])  # v1.7.2
+  Y=$(expr $N - 1)
+  X=0
+  [ "$SWAPPED" != "" ] && return
+  for L in $DRIVES
+  do
+    [ "$L" = "$DRIVE" ] && break
+    X=$(expr $X + 1)  
+  done
+  [ "$REPLACE" = "" ] && return
+  X=$(expr $X + 1)
+  [ "$DRIVE" = "$WHERETO" ] && X=0
+}
+
+swapping() {
+  SWAPPED=""
+  DRIVE=$(echo $1| part2drive) # v1.7.2
+  [ "$DRIVE" = "$TODRIVE" ] && return
+  X=0
+  case "$DRIVE" in
+  *[0-9]) PART1="${DRIVE}p1" ;;
+  *)      PART1="${DRIVE}1" ;;
+  esac
+  partname2num "$PART1"
+  echo "  map (hd$X) (hd0)
+  map (hd0) (hd$X)"
+  [ "$LEGACY_MENU" = "true" ] && return
+  echo "  map --hook"
+  SWAPPED="true"
+  X=0
+}
+
+setroot() {
+	[ "$PBSINSTALL" != "" ] && SET_ROOT="" && return 1
+	TYPE=$(echo "$PCPARTS"|grep -w "/dev/$PART"| cut -d'|' -f2)
+	#debug "PART=$PART; TYPE=$TYPE;"
+	UUID=""
+    if [ "$BULKIDS" != "" -a "$LEGACY_MENU" != "true" ] && echo $TYPE| grep -qE 'vfat|ntfs|ext'; then
+      for W in $(echo "$BULKIDS"| grep -w "^/dev/$PART" | cut -d':' -f2);do
+        echo $W|grep -qw 'UUID' || continue
+        UUID=$(echo $W|cut -d'=' -f2| tr -d '"')
+      done
+    fi
+    [ "$UUID" != ""  ] && SET_ROOT="uuid $UUID" && return 0
+      X=0
+      Y=0
+      partname2num $PART
+      SET_ROOT="root (hd$X,$Y)"
+      return 0
+}
+
+strip_blanks() {
+  echo $@ | sed -e 's/^[[:blank:]]*//' -e 's/[[:blank:]]*$//'
+}
+
+trim() {
+ read myL;echo $myL| sed -e 's/^[^[:graph:]]*//' -e 's/[^[:graph:]]*$//'
+}
+
+LABELS=""
+unique() {
+#echo "$LABELS"
+#echo "$L"
+  mySUFF=0
+  myLABEL="$L"
+  while [ "$LABELS" != "" ] && echo "$LABELS" | grep -q "^$myLABEL$"
+  do
+    mySUFF=$(expr $mySUFF + 1)
+    myLABEL="$L $mySUFF"
+  done
+  LABELS="$LABELS
+$myLABEL"
+  L="$myLABEL"
+}
+
+make_label() {
+   P=$(echo $ITEM|cut -d'|' -f1|cut -d',' -f1)
+   echo "$P" | grep -q '/' && P=$(dirname "/$P")
+   P1=$(echo $P|cut -d'/' -f 2)
+   P2=$(echo $P|cut -d'/' -f 3)
+   P=$P1
+   [ "$P2" != "" ] && P="$P1/$P2"
+   L="$(echo $ITEM|cut -d'|' -f2 | tr '_' ' ')"
+   L="$(echo $L|cut -c1|tr 'a-z' 'A-Z')$(echo $L|cut -c2-)"
+   #unique
+   [ "$PBR" != "" ] && L="$L ($P1$PBR)" || L="$L ($P)"
+}
+
+kbyte2() {
+	S=$1
+	case $S in
+	*GB) echo $S; return
+	;;
+	*MB) KB=$(($(echo $S| cut -d'.' -f1|tr -dc '0-9') * 1024))
+	;;
+	*) KB=$(echo $S|tr -dc '0-9')
+	;;
+	esac
+	[ "$KB" = "" ] && KB=0 
+	if [ $KB -lt 1024 ]
+	then echo ${KB}kB; return
+	fi
+	MB=$(expr $KB / 1024) # mega bytes
+	[ $MB -lt 1024 ] && echo "${MB}MB" || echo "$(dc $MB 1024 \/ p|sed -e 's/\(^.*\..\).*/\1/')GB"
+}
+error_missing() {
+ local myFATAL=""
+ case "$1" in
+ *-fatal) shift; myFATAL="yes";;
+ esac
+ local myMSG="$1"
+ local myMISSINGS="$2"
+ BUTTONS='<button ok></button>'
+ if [ "$myFATAL" != "" ]; then
+  myFATAL="<text><label>$_Quit</label></text>"
+ else
+  BUTTONS='<button cancel></button>
+    <button><input file stock="gtk-ok"></input><label>'$(gettext 'Proceed anyway')'</label><action>EXIT:OK</action></button>'
+ fi
+ if [ "$myMISSINGS" != "" ]; then
+   myMSG="$myMSG:$(echo $myMISSINGS| sed -e 's/ /, /'|tr '@' ' ')"
+ fi
+ [ $# -gt 2 ] && myMSG="$@" # v1.7.1
+ echo "$myMSG" >&2
+ [ "$HELP_SECTION" ] && BUTTONS=$BUTTONS$(make_help_button  "$HELP_SECTION")
+ HELP_SECTION=""
+ DIALOG="<window title=\"$_Title - Error\"><vbox>
+   <pixmap icon_size=\"5\">
+    <input file stock=\"gtk-dialog-error\"></input>
+   </pixmap>
+ <frame>
+ <text><input>echo -en \"$myMSG\"</input></text>
+  </frame>
+  $myFATAL
+  <hbox>$BUTTONS</hbox>
+  </vbox></window>"
+ splash stop
+ RET=$($GTKDIALOG -p DIALOG -c || echo "$DIALOG" >&2)
+ [ "$FATAL" = "" ] || exit 1
+ # v1.7.1
+ eval "$RET"
+ [ "$EXIT" = "OK" ] #|| exit 1
+}
+
+LAST_BOOT_PART_DRIVE=""
+LAST_BOOT_PART=""
+boot_part() {
+  myDRIVEDEV=$(echo $1| part2drive) # v1.7.2
+  echo $myDRIVEDEV | grep -q '/' || myDRIVEDEV="/dev/$myDRIVEDEV"
+  [ "$myDRIVEDEV" = "$LAST_BOOT_PART_DRIVE" ] && echo "$LAST_BOOT_PART" && return
+  LAST_BOOT_PART_DRIVE=$myDRIVEDEV
+  LAST_BOOT_PART=$(LANG=C fdisk -l $myDRIVEDEV| grep "^/dev/.*[*]" | cut -d' ' -f1| cut -d'/' -f3)
+  echo $LAST_BOOT_PART
+}
+is_bootable() { # v1.7.1
+  DEV=$1
+  echo $1 | grep -q '/' || DEV="/dev/$1"
+  [ "$(hexdump -n 512 $DEV | tail -n 2 | head -n 1 | cut -d' ' -f9)" = "aa55" ] || return
+  local myDRIVE=$(echo $DEV| part2drive) # v1.7.2
+  [ "$DEV" = "$myDRIVE" ] && return
+  [ "$DEV" = "$(boot_part $DEV)" ] 
+}
+
+PARAM1=$1
+PARAM2=$2
+for P in gtkdialog4 gtkdialog3; do
+  which $P &>/dev/null && GTKDIALOG=$P && break
+done
+if [ "$GTKDIALOG" = "" ]; then
+  echo "'gtkdialog3' not found." >&2
+  exit 1
+fi
+PROBEDISK=$(which probedisk2) || PROBEDISK=$(which probedisk) || exit 
+export DIALOG=""
+export XPID=""
+export SMOUNTED=""
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+APPLIBDIR=/usr/lib/grub4dos
+
+# check running under X
+if [ "$DISPLAY" = "" ]
+then
+	echo "$(basename $0) requires X running. Try 'startx' and re-run '$0'. Good bye."
+	exit 1
+fi
+
+probing start
+# requiered files
+MISSINGS=""
+for F in grldr; do #wee.mbr grub.exe
+  [ -s "$APPLIBDIR/$F" ] || MISSINGS="$MISSINGS $APPLIBDIR/$F"
+done
+BINSTALLER=""
+for P in bootlace.com grubinst ;do
+  which $P &>/dev/null && BINSTALLER=$P && break
+done
+debug "BINSTALLER=$BINSTALLER"
+[ "$BINSTALLER" != "" ]|| MISSINGS="$MISSINGS /usr/sbin/bootlace.com"
+GRUBLOADER="grldr"
+[ -s "$APPLIBDIR/$GRUBLOADER" ] || GRUBLOADER=""
+ALLOW_PBS="yes"
+OPT=""
+[ "$BINSTALLER" != "" -a "$GRUBLOADER" != "" ] || OPT="--fatal" 
+HELP_SECTION=""
+[ "$MISSINGS" ] && error_missing $OPT "$_Missing" "$MISSINGS"
+
+# 14jan10 v.1.5.2 again which sfs as PUPSFS
+[ -f /etc/rc.d/PUPSTATE ] && . /etc/rc.d/PUPSTATE
+MYSFSFILE=$(echo $PUPSFS|cut -d',' -f3)
+MYSFSBASE=$(basename "$MYSFSFILE")
+PUPPYPREFIX=$(echo $MYSFSBASE|sed -e 's/[0-9].*$//')
+MYPART=$(echo $PUPSFS|cut -d',' -f1)
+MYDRIVE=$(echo $MYPART| part2drive) # v1.7.2
+MYPUPPY=$MYPART$MYSFSFILE
+
+# where to install
+DISKS=$(probedisk2)
+[ "$DISKS" = "" ] && DISKS=$(probedisk)
+PBS_SUPPORT=""	# installing to Partition Boot Sector not supported
+LOCAL_SEARCH=""  # search OS from limited area or global
+PLOCAL=""
+[ "$PARAM1" = "PBS" ] && PBS_SUPPORT="yes" && PARAM1="" 
+[ "$PARAM2" != "" ] && LOCAL_SEARCH="yes"
+[ "$ALLOW_PBS" = "yes" ] || PBS_SUPPORT=""
+BULKIDS="" # partition info
+which blkid &>/dev/null && BULKIDS=$(blkid)
+PCPARTS=$(probepart -k|grep -E 'vfat|ntfs|ext|reiserfs')  # 7feb11 v1.7: sort # v1.7.1: no sort
+PLACELIST=""
+CASEFLOPPY=""
+NOWDRIVE=""
+DRIVES=""
+FIRSTDRIVE=""
+for L in $PCPARTS
+do
+  PART=$(echo $L|cut -d '|' -f 1 | cut -d '/' -f 3)
+  TYPE=$(echo $L|cut -d '|' -f 2)
+  DRIVE=$(echo $PART| part2drive) # v1.7.2
+  if [ "$DRIVE" != "$NOWDRIVE" ]; then
+    DRIVESIZE=$(LANG=C fdisk -l /dev/$DRIVE| cut -s -d':' -f2| head -n 1| cut -d',' -f1| tr -d ' ')
+    DRIVEINFO=$(echo "$DISKS"|grep "^/dev/$DRIVE|"| cut -d '|' -f 3|tr ' ' '_')
+    DRIVEINFO="$(kbyte2 ${DRIVESIZE})_$DRIVEINFO"
+    if [ "$NOWDRIVE" = "" ]; then
+      FIRSTDRIVE="$DRIVE"
+	  DRIVES="$DRIVE"
+      PLACELIST="${DRIVE}(MBR)_$DRIVEINFO"
+      if [ -b /dev/fd0 ]; then
+        PLACELIST="$PLACELIST
+fd0_(FLOPPY_DISK)"
+        CASEFLOPPY="<text><label>$_unlessFloppy</label></text>"
+      fi
+    else
+	  DRIVES="$DRIVES
+$DRIVE"
+      PLACELIST="$PLACELIST
+${DRIVE}_$DRIVEINFO"
+    fi
+    NOWDRIVE=$DRIVE
+  fi
+  if [ "$PBS_SUPPORT" = "yes" ]; then
+    KFULL=$(echo $L|cut -d '|' -f 3)
+    ALINE=$(echo "$BULKIDS"| grep "^/dev/$PART:")
+    LABEL=""
+    for ITEM in $ALINE; do
+      echo $ITEM | grep -q 'LABEL=' && LABEL=$(echo $ITEM| cut -d'=' -f2| tr -d '"')
+    done
+    PLACELIST="$PLACELIST
+${PART}_(${TYPE})_$(kbyte2 $KFULL)_$LABEL"
+  fi
+done
+[ "PLACELIST" = "" ] && [ -b /dev/fd0 ] && PLACELIST="fd0_(FLOPPY_DISK)"
+debug "$PLACELIST"
+if [ "$PARAM1" != "" ]; then
+  FIRSTLINE=$(echo -e "$PLACELIST"| grep "^${PARAM1}_")
+  PLACELIST="$FIRSTLINE
+  $(echo -e "$PLACELIST"| grep -v "^${PARAM1}_")"
+else
+  LACELIST=$(echo -e "$PLACELIST")
+fi
+SEARHDEFALT=""
+[ "$LOCAL_SEARCH" != "" ] && SEARCHDEFAULT="<default>true</default>"
+DIALOG="<window title=\"$_Title\"><vbox>
+  <text><label>Grub4DosConfig v.$MYVERSION</label></text>
+  <frame $_Where>
+   <text><label>$_Where2</label></text>
+   <combobox allow-empty=\"false\" tooltip-text=\"$_Where_tip\">
+   <variable>WHERETO</variable>"
+#DEFAULT="<default>true</default>"
+for ITEM in $PLACELIST
+do
+  DIALOG="$DIALOG
+  <item>$(echo $ITEM | tr '_' ' ')</item>"
+  #DEFAULT=""
+done
+PBSBUTTON=""
+SHOWPBS=$(gettext 'Refresh')
+TIPS=$(gettext 'Probe devices again.')
+LOCALTIP="$_SearchOnly_tip $_Ignored"
+[ "$PBS_SUPPORT" = "yes" ] && LOCALTIP="$_SearchOnly_tip $_Forced $_Ignored"
+if [ "$ALLOW_PBS" = "yes" -a  "$PBS_SUPPORT" != "yes" ]; then
+  SHOWPBS=$_Show_partition
+  TIPS=$_Show_partition_tip
+fi
+  #[ "$PBS_SUPPORT" ] && SHOWPBS=$_Hide_partition
+PBSBUTTON="<button tooltip-text=\"$TIPS\"><input file stock=\"gtk-refresh\"></input><label>$SHOWPBS</label><action>EXIT:REFRESH</action></button>"
+
+#  <checkbox tooltip-text=\"$_LegacyMenu_tip\"><label>$_LegacyMenu</label><variable>LEGACY_MENU</variable></checkbox>
+DIALOG="$DIALOG
+  </combobox>
+  <checkbox tooltip-text=\"$LOCALTIP\"><label>$_SearchOnlyP</label><variable>LOCAL_SEARCH</variable>$SEARCHDEFAULT</checkbox>
+  <checkbox tooltip-text=\"$_KeepMenu_tip\"><label>$_KeepMenu</label><variable>KEEP_MENU</variable></checkbox>
+  <checkbox tooltip-text=\"$_Keep_tip\"><label>$_Keep</label><variable>KEEP_BOOT_RECORD</variable></checkbox>
+ $CASEFLOPPY
+  <hbox>
+  <button tooltip-text=\"$_online\"><input file stock=\"gtk-info\"></input><label>$_More_info</label><action>defaulthtmlviewer $_WebPage &</action></button>
+  "$(make_help_button)"
+  </hbox>
+  </frame>
+  <text><label>$_Welcome2</label></text>
+  <hbox>
+  <button ok></button>
+  $PBSBUTTON
+  <button cancel></button>
+  </hbox>
+  </vbox></window>"
+probing end
+eval $($GTKDIALOG -p DIALOG -c | grep '^\w\w*=' || echo "$DIALOG" >&2)
+[ "$EXIT" = "REFRESH" ] && exec $0 PBS
+[ "$EXIT" = "OK" ] || exit
+MBR=""
+REPLACE=""
+FLOPPY=""
+PBSINSTALL=""
+BOOTLOADER=""
+if echo $WHERETO | grep -q 'MBR' ; then
+  MBR="(MBR)"
+elif echo $WHERETO | grep -q 'FLOPPY' ; then
+  FLOPPY="(FLOPPY DISK)"
+fi
+WHERETO=$(echo $WHERETO| sed -e 's/[^0-9a-z].*$//')
+if [ "$FLOPPY" != "" ]; then
+  LPART="fd0|vfat"
+  LOCAL_SEARCH="false"
+  BOOTLOADER="bootlace.com"
+  TODRIVE="fd0"
+else
+  DRIVE=$(echo $WHERETO | part2drive) # v1.7.2
+  DPARTS=$(echo "$PCPARTS"|grep "/$DRIVE")
+  TODRIVE=$DRIVE
+  if echo $WHERETO | grep -q [0-9]; then
+    PBSINSTALL="yes"
+    [ "$LOCAL_SEARCH" = "true" ] && PLOCAL="yes"
+    DPARTS=$(echo "$PCPARTS" | grep -w "$WHERETO")
+  fi
+  LPART=$(echo "$DPARTS"| grep -E 'vfat|ntfs|ext' | head -n 1 | cut -d ' ' -f 1)
+  if [ "$LPART" = "" ]; then
+    debug "WHERETO=$WHERETO;"
+     PARTS=$(probepart| grep "/$WHERETO"|sed -e 's/[0-9]*$//')
+     PARTS=$(echo $PARTS|sed -e 's/ /\\n/')
+     debug "$PARTS"
+     HELP_SECTION=""
+     error_missing --fatal "$_NoSupport:\n$PARTS"
+     exit 1
+  fi
+  [ "$LOCAL_SEARCH" = "true" ] && PCPARTS="$DPARTS"
+  [ "$DRIVE" != "$FIRSTDRIVE" ] && REPLACE="yes"
+  [ "$FLOPPY" = "" ] && TOREMOVABLE=$(cat /sys/block/$TODRIVE/removable) || TOREMOVABLE="0"
+  if [ "$MBR" = ""  -a "$LOCAL_SEARCH" != "true" ]; then
+   # change the search order
+   TOPARTS=$(echo "$PCPARTS"| grep "^/dev/$TODRIVE")
+    PCPARTS="$TOPARTS
+ $(echo "$PCPARTS"| grep -v "^/dev/$TODRIVE")"
+  fi
+  debug "PCPARTS:
+$PCPARTS
+"
+ # v1.6.3 check partition file system
+ if [ "$KEEP_BOOT_RECORD" != "yes" ]; then
+   debug "LPART:$LPART"
+   TYPE=$(echo $LPART | cut -d'|' -f2)
+   BOOTLOADER="bootlace.com"
+   if [ "$TYPE" = "ext4" ]; then
+     if [ "$PBSINSTALL" != "" ]; then
+       BOOTLOADER="extlinux"
+     else
+       BOOTLOADER="wee"
+     fi
+   fi
+ fi
+ if [ "$BOOTLOADER" = "extlinux" ] ; then
+   # extlinux version >= 4.0 ?
+	  #GRUBLOADER="grub.exe"
+	  MISSINGS=""
+	  CHAINLOADER=""
+	  for D in /usr/lib/syslinux $APPLIBDIR; do
+	    [ -s "$D/chain.c32" ] && CHAINLOADER="$D/chain.c32" && break
+	  done
+	  debug "CHAINLOADER=$CHAINLOADER"
+	  [ "$CHAINLOADER" != "" ] || MISSINGS="$APPLIBDIR/chain.c32"
+	  MVER=$(extlinux --version 2>&1| tr -s ' '| cut -d' ' -f2| cut -d'.' -f1| tr -dc '0-9')
+	  [ "$MVER" != "" ] || MVER=0
+	  if [ $MVER -lt 4 ]; then
+	    BOOTLOADER=""
+	    MISSINGS="$MISSINGS extlinux/syslinux(version@>=@4.0)"
+	  fi
+	  HELP_SECTION=""
+	  [ "$MISSINGS" = "" ] || error_missing --fatal "$_Lacking" "$MISSINGS"
+ fi
+ if [ "$BOOTLOADER" = "wee" ] ; then
+   if [ ! -s "$APPLIBDIR/wee.mbr" ]; then
+     HELP_SECTION=""
+     error_missing --fatal "$_Lacking" "$APPLIBDIR/wee.mbr"
+   fi
+   # v1.6.3: check sctors/track # v1.7.1: fdisk option, LPART # v1.7.2 revert fdisk option but seperate (-u - l)
+   S=$(LANG=C fdisk -u -l /dev/$DRIVE | grep -w "^/dev/$PART"| tr -d '*'| tr -s ' '| cut -d' ' -f2 | tr -dc '0-9')
+   debug "The first partition starts from: $S(LBA)"
+   [ "$S" != "" ] || S=63	# pass through if estimation above failed
+   if [ $S -lt 63 ] ; then
+      HELP_SECTION=""
+      error_missing --fatal "$_SPT_Err1 $_SPT_Drive: '$DRIVE' $_SPT_Sector= $SPT\n$_SPT_Err2 $_SPT_Err3"
+      exit 1
+   fi
+ fi
+fi
+#debug "$LPART"
+# v1.7.1: boot flag check
+if [ "$FLOPPY" = "" ]; then 
+  if [ "$(boot_part $TODRIVE)" = "" ]; then
+    HELP_SECTION="bootflag"
+    error_missing $(printf "$(gettext 'Boot flag not found on %s.')" $TODRIVE)'\n'\
+$(gettext "Some BIOS does not boot from the drive which has no boot flag. Click 'Cancel' here and set the boot flag by using GParted or something. But you can proceed installing grub4dos first.") || exit
+  fi
+fi
+#probing start
+if [ "$KEEP_MENU" = "true" ]; then
+  probing start
+  MENUFILE=""
+  for L in $PCPARTS
+  do
+    mountpoint $L || continue
+    TOPDIR=$MP
+    for D in /  /boot/grub /grub; do
+      [ "$D" = "/" ] && MENUFILE="$TOPDIR/menu.lst" || MENUFILE="$TOPDIR$D/menu.lst"
+      [ -s "$MENUFILE" ] && break
+      MENUFILE="" 
+    done
+    [ "$MENUFILE" != "" ] && break
+  done
+  MENUFILE=$(echo "$MENUFILE"|sed -e "s,^$TOPDIR/,$PART/,")
+  NEWMENU="$(echo $LPART | cut -d'|' -f1| cut -d'/' -f3)/menu.lst"
+  if [ "$MENUFILE" != "$NEWMENU" ]; then
+    KEEP_MENU="false"
+    if [ "$MENUFILE" != "" ]; then
+      debug "'$MENUFILE' found."
+      MSG="$_Anothermenu_W: $MENUFILE"
+    else
+      debug "'menu.lst' not found."
+      MSG="$_Nomenu_W"
+    fi
+    MSG="\\n$MSG\\n$_Nomenu_new: $NEWMENU\\n$_Nomenu_cont"
+    DIALOG="<window title=\"$_Title\"><vbox>
+   <frame Warning>
+   <hbox>
+     <pixmap icon_size=\"5\">
+       <input file stock=\"gtk-dialog-warning\"></input>
+     </pixmap>
+     <text><input>echo -en \"$MSG\"</input></text>
+   </hbox>
+   <checkbox tooltip-text=\"$_KeepMenu_tip\"><label>$_KeepMenu</label><variable>KEEP_MENU</variable></checkbox>
+ </frame>
+  <hbox>
+   <button ok></button>
+   <button cancel></button>
+  "$(make_help_button)"
+  </hbox>
+  </vbox></window>"
+    probing stop
+    RET=$($GTKDIALOG -p DIALOG -c | grep -E '^[A-Z_]*=' || echo "$DIALOG" >&2)
+    #debug "$RET"
+    eval "$RET"
+    [ "$EXIT" = "OK" ] || exit
+    #probing start
+  fi
+  probing stop
+fi
+
+if [ "$KEEP_MENU" != "true" ] ; then ### long skip
+# search
+probing start
+#[ "$FLOPPY" = "" ] && TOREMOVABLE=$(cat /sys/block/$TODRIVE/removable) || TOREMOVABLE="0"
+PUPPIES=""
+FULLINSTS=""
+WININTS=""
+CHAINS=""
+BOOTMGRS=""
+DUP=""
+ #find boot flags
+ #DRIVES=$(echo "$PCPARTS"|cut -d'|' -f1| cut -d'/' -f3| tr -d '0-9'| uniq)
+ BOOTPARTS=""
+ if [ "$PBSINSTALL" = "" ]; then
+  DRVS=$DRIVES
+  [ "$LOCAL_SEARCH" = "true" ] && DRVS=$TODRIVE
+  for D in $DRVS; do
+   B=$(LANG=C fdisk -l /dev/$D| grep -E "^/dev/$D.*[*]") || continue
+   B=$(echo $B| cut -d' ' -f1| cut -d'/' -f3)
+   #echo "$PCPARTS"| grep -qw $B || continue
+   BOOTPARTS="$BOOTPARTS
+$B"
+  done
+ fi
+#debug "$BOOTPARTS"
+for L in $PCPARTS
+do
+  mountpoint $L || continue
+  TOPDIR=$MP
+  KEYFILE=""
+  # Puppy
+  PUPDIRS="$(ls $TOPDIR/initrd.gz $TOPDIR/*/initrd.gz 2>/dev/null | sed -e "s,/initrd.gz$,,")"
+  #debug "$PUPDIRS"
+  for D in $PUPDIRS
+  do
+	[ -f $D/vmlinuz ] || continue
+    # 6jan10 v.1.5.1 which sfs as PUPSFS
+    # 26nov10 v1.6.3: simple file name
+    PUPSFS="$D/puppy.sfs"; [ -s "$PUPSFS" ]  || PUPSFS=""
+	[ "$PUPSFS" = "" ] && [ "$PUPPYPREFIX" != "" ] && PUPSFS="$(ls $D/$PUPPYPREFIX[0-9][0-9][0-9]*.sfs 2>/dev/null|tail -n 1)"
+	[ "$PUPSFS" = "" ] && PUPSFS="$(ls $D/pup[_-][0-9][0-9][0-9]*.sfs 2>/dev/null|tail -n 1)"
+	[ "$PUPSFS" = "" ] && PUPSFS="$(ls $D/?pup-[0-9][0-9][0-9]*.sfs 2>/dev/null|tail -n 1)"
+	[ "$PUPSFS" = "" ] && PUPSFS="$(ls $D/[a-y][0-9a-z][0-9a-z][-_][0-9][0-9][0-9].sfs 2>/dev/null|tail -n 1)"
+	[ "$PUPSFS" = "" ] && PUPSFS="$(ls $D/[a-y][0-9a-z][0-9a-z][0-9a-z][-_][0-9][0-9][0-9].sfs 2>/dev/null|tail -n 1)"
+	[ "$PUPSFS" = "" ] && PUPSFS="$(ls $D/[a-y]*[-_][0-9]*.sfs 2>/dev/null|tail -n 1)"
+	if [ "$PUPSFS" != "" ]; then
+	  #ENTRY=$(echo "$PUPSFS"|sed -e "s,^$TOPDIR/,$PART/,")
+	  KEYFILE=$(echo "$PUPSFS"|sed -e "s,^$TOPDIR/,/,")
+	  PDIR=$(echo "$KEYFILE"| cut -d '/' -f 2)
+	  #echo "$PDIR"
+	  echo "$PUPPIES"| grep -q "/$PDIR/" && DUP="$DUP $PDIR"
+	  ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+	  PUPPIES="$PUPPIES
+$ITEM"
+    else
+      KEYFILE=$(echo "$D/initrd.gz,$D/vmlinuz"|sed -e "s,$TOPDIR/,/,g")
+      ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+    FULLINSTS="$FULLINSTS
+$ITEM"
+    fi
+  done
+  ROOTPUPPY=$(echo "$PUPPIES" | grep -E "^$PART/[^/]*.sfs" | tail -n 1)
+  # kernel
+  for BOOTDIR in / /boot; do
+    [ "$BOOTDIR" = "/boot" ] && BOOT=boot/ || BOOT="" 
+    K=$(cd $TOPDIR; ls -1 ${BOOT}vmlinuz* 2>/dev/null) || continue
+    # v1.7.2: which vmlinuz should be taken
+    if [ $(echo "$K"| wc -l) -eq 1 ]; then
+      KEYFILE=$K
+    else
+      KEYFILE=$(echo "$K" | grep 'vmlinuz$')
+      [ "$KEYFILE" ] || KEYFILE=$(echo "$K"| grep -vw 'old'| tail -n 1)
+      [ "$KEYFILE" ] || KEYFILE=$(echo "$K"| tail -n 1 )
+    fi
+    [ "$KEYFILE" ] || continue
+    [ "$(echo "$KEYFILE" | cut -c 1)" != "/" ] && KEYFILE="/$KEYFILE"
+    VMBASE=$(basename "$KEYFILE")
+    VMSUFFIX=$(echo $VMBASE| sed -e 's/^vmlinuz//')
+    # v1.7.2: which initrd should be taken
+    if [ -f $TOPDIR/${BOOT}vmlinuz ]; then
+      KEYFILE=/${BOOT}vmlinuz
+      for F in /${BOOT}initrd.lz /${BOOT}initrd.gz /${BOOT}initrd.img /${BOOT}bzImage /grub/menu.lst
+      do [ -f $TOPDIR$F ] && KEYFILE="$F,$KEYFILE" && break
+      done
+    else
+      for F in /$(cd $TOPDIR; ls -1 ${BOOT}initrd$VMSUFFIX* ${BOOT}bzImage$VMSUFFIX 2>/dev/null; ls -1 ${BOOT}initrd* ${BOOT}bzImage* 2>/dev/null| grep -v 'old' tail -n 1; ls -1 ${BOOT}initrd* ${BOOT}bzImage* 2>/dev/null| tail - 1) /grub/menu.lst
+      do [ -f $TOPDIR$F ] && KEYFILE="$F,$KEYFILE" && break
+      done
+    fi
+    if [ "$KEYFILE" = "/initrd.gz,/vmlinuz" -a "$ROOTPUPPY" != "" ]; then
+      KEYFILE="/$(echo $ROOTPUPPY| cut -d'/' -f2)"
+    else
+      ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+      FULLINSTS="$FULLINSTS
+$ITEM"
+    fi
+    break
+  done
+  # Wubi
+  if [ -f $TOPDIR/ubuntu/disks/boot/grub/menu.lst ];then # ununtu on Windows
+    KEYFILE=/ubuntu/disks/boot/grub/menu.lst
+    ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+    FULLINSTS="$FULLINSTS
+$ITEM"
+  fi
+  for D in ubuntu jolicloud; do
+   if [ -f $TOPDIR/$D/winboot/wubildr.mbr ];then # ununtu on Windows
+    KEYFILE=/$D/winboot/menu.lst
+    ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+    FULLINSTS="$FULLINSTS
+$ITEM"
+   fi
+  done
+  if [ -f $TOPDIR/ubnldr.mbr -a -f $TOPDIR/unetbtin/menu.lst ];then # ununtu on Windows
+    KEYFILE=/unetbtin/menu.lst
+    ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+    FULLINSTS="$FULLINSTS
+$ITEM"
+  fi
+  # windows
+  for F in bootmgr ntldr io.sys ; do
+    if [ -f $TOPDIR/$F ]; then
+      KEYFILE="/$F"
+      ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+      WININSTS="$WININSTS
+$ITEM"
+      break
+    fi
+  done
+  # chains
+  if echo "$BOOTPARTS" | grep -qw "$PART" || is_bootable $PART; then
+      #KEYFILE="$KEYFILE"
+      ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+      CHAINS="$CHAINS
+$ITEM"
+  fi
+  # plop
+  if [ "$PLOPINSTS" = "" ]; then
+   KEYFILE=""
+   for D in /boot/ /; do
+    F="${D}plpbt.bin"
+    [ -s $TOPDIR$F ] && KEYFILE="$F" && break
+   done
+   if [ "$KEYFILE" != "" ]; then
+     ITEM="$PART$KEYFILE|$(read_distro_specs $TOPDIR)"
+     BOOTMGRS="$BOOTMGRS
+$ITEM"
+   fi
+  fi
+  #
+  KEYFILE=""
+  umountmine
+done
+PUPPIES=$(echo "$PUPPIES"| grep '/')
+FULLINSTS=$(echo "$FULLINSTS"| grep '/')
+WININSTS=$(echo "$WININSTS"| grep '/')
+CHAINS=$(echo "$CHAINS" | grep '|')
+BOOTMGRS=$(echo "$BOOTMGRS"| grep 'plpbt.bin'| head -n 1) # take only the 1st PLOP
+
+# pmedia option
+PUPPYDRIVE=$(echo "$PUPPIES"| cut -d'/' -f1| part2drive | uniq) # v1.7.2
+#debug "PUPPYDRIVE=$PUPPYDRIVE;"
+if [ $(echo "$PUPPYDRIVE" | wc -l) -eq 1 ]; then
+    DRIVE=$PUPPYDRIVE
+    PMEDIA="atahd"
+    REMOVABLE="$(cat /sys/block/$DRIVE/removable)"
+    #$PROBEDISK | grep "/dev/$DRIVE|" | grep -q -i 'usb' && MEDIA="usbhd"
+    [ "$REMOVABLE" = "1" ] && PMEDIA="usbflash"
+    PMEDIAOPT="pmedia=$PMEDIA"
+    PUPPYOPTIONS="$PMEDIAOPT $PUPPYOPTIONS"
+fi
+
+# which puppy is better at the top?
+NPUP=$(echo "$PUPPIES"| wc -l)
+if [ "$MYPUPPY" != "" -a $NPUP -gt 1 ]; then
+  MYPUPPY=$(echo "$PUPPIES"| grep -w "$MYPUPPY")
+  [ "$MYPUPPY" = "" ] && MYPUPPY=$(echo "$PUPPIES"| grep -w $(basename "/$MYPUPPY") | head -n 1)
+  [ "$FLOPPY" = "" ] && TOREMOVABLE=$(cat /sys/block/$TODRIVE/removable) || TOREMOVABLE="0"
+  [ "$(echo $MYDRIVE| cut -b2)" = "d" ] && MYREMOVABLE=$(cat /sys/block/$MYDRIVE/removable)|| MYREMOVABLE="1"
+  [ "$MYPUPPY" = "" ] && MYPUPPY=$(echo "$PUPPIES"| grep -Ew "^$TODRIVE.*$MYSFSBASE"| head -n 1)
+  if [ "$MYPUPPY" = "" -a "$TOREMOVABLE" = "0" ]; then  
+      for P in $(echo "$PUPPIES"| grep -w "$MYSFSBASE"); do
+          D=$(echo $P|cut -d'/' -f1| tr -d '0-9')
+          [ "$(cat /sys/block/$D/removable)" = "0" ] && MYPUPPY=$P && break
+      done
+  fi
+  if [ "$MYPUPPY" != "" ]; then
+    PUPPIES=$(echo "$PUPPIES"| grep -vx "$MYPUPPY")
+    PUPPIES="$MYPUPPY
+$PUPPIES"
+  fi
+  if [ "$TOREMOVABLE" = "1" -o "$MYREMOVABLE" = "1" ]; then
+    MYPUPPY=$(echo "$PUPPIES"| grep -Ew "^$TODRIVE.*$MYSFSBASE"| head -n 1)
+    [ "$MYPUPPY" = "" ] && MYPUPPY=$(echo "$PUPPIES"| grep "^$TODRIVE"| head -n 1)
+    if [ "$MYPUPPY" != "" ]; then
+      PUPPIES=$(echo "$PUPPIES"| grep -vx "$MYPUPPY")
+      PUPPIES="$MYPUPPY
+$PUPPIES"
+    fi
+  fi
+fi
+PUPPIES=$(echo "$PUPPIES"| grep '/')
+debug "$PUPPIES"
+debug "$FULLINSTS"
+debug "$WININSTS"
+debug "$CHAINS"
+debug "$BOOTMGRS"
+#probing end
+
+#DUP="" # for debugging
+# directry name duplication
+if [ "$DUP" != "" ]; then
+ DUPS=""
+ for PDIR in $DUP
+ do
+    DUPFILES=$(echo -e "$PUPPIES"|grep  "^[^/]*/$PDIR/")
+    for F in $DUPFILES
+    do
+      ONEDUP=$(echo $F| sed -e 's,/[^/]*$,,')
+      DUPS="$DUPS
+   <text><label>$ONEDUP</label></text>"
+   done
+ done
+ DIALOG="<window title=\"$_Title\"><vbox>
+   <frame Warning>
+   <hbox>
+     <pixmap icon_size=\"5\">
+       <input file stock=\"gtk-dialog-warning\"></input>
+     </pixmap>
+     <text><input>echo -en \"$_Duplicated_W\"</input></text>
+   </hbox>
+  $DUPS
+  </frame>
+  <hbox>
+   <button ok></button>
+   <button cancel></button>
+    "$(make_help_button "duplicate")"
+  </hbox>
+  </vbox></window>"
+ probing end
+ RET=$($GTKDIALOG -p DIALOG -c | grep -E '^[A-Z]*=')
+ eval "$RET"
+ [ "$EXIT" = "OK" ] || exit
+fi
+
+# make list
+PBR=""	# for making label
+# frugal list
+ NPUP=0
+ FRAME="<frame $_Frugal><vbox>"
+if [ "$PUPPIES" = "" ];then
+  FRAME="$FRAME
+  <text><label>($_Not_found)</label></text>"
+else
+  NPUP=$(echo "$PUPPIES" | wc -l)
+#  FRAME="$FRAME
+#    <text><label>$_Frugal_list</label></text>"
+ I=0
+ for ITEM in $PUPPIES
+ do
+  I=$(expr $I + 1)
+  make_label
+  FRAME="$FRAME
+  <entry><variable>Frugal_$I</variable><default>$L</default></entry>"
+ done
+ # option box
+  FRAME="$FRAME
+  <hbox>
+  <text><label>$_Puppy_opt</label></text>
+  <entry tooltip-text=\"$_Puppy_opt_tip\"><variable>PUPPYOPTIONS</variable><input>echo -en \"$PUPPYOPTIONS\"</input></entry>
+  </hbox>
+"
+fi
+ FRUGALFRAME="$FRAME
+   </vbox></frame>"
+
+# full installs
+FULLFRAME=""
+NFULL=$(echo "$FULLINSTS" | wc -l)
+NFULL=0
+if [ "$FULLINSTS" != "" ];then
+  NFULL=$(echo "$FULLINSTS" | wc -l)
+ ADDOPT=""
+ FRAME="<frame $_Full><vbox>"
+ I=0
+ for ITEM in $FULLINSTS
+ do
+   #echo $ITEM
+   I=$(expr $I + 1)
+   make_label
+   FRAME="$FRAME
+  <entry><variable>Full_$I</variable><default>$L</default></entry>"
+ done
+ # option box
+  FULLFRAME="$FRAME
+  <hbox>
+  <text><label>$_Linux_opt</label></text>
+  <entry tooltip-text=\"$_Linux_opt_tip\"><variable>LINUXOPTIONS</variable><input>echo -en \"$LINUXOPTIONS\"</input></entry>
+  </hbox>
+ </vbox></frame>"
+fi
+
+# entries for Windows
+# <button tooltip-text=\"$_Help\"><input file stock=\"gtk-help\"></input><action>defaulthtmlviewer file://${LOCAL_HELP}#windows &</action></button>
+FRAME=""
+if [ "$LEGACY_MENU" != "true" -a "$PBSINSTALL" = "" ]; then
+  FRAME="  <text><input>echo -en \"$_Win3\"</input></text>
+  <entry><variable>Win_0</variable><default>Windows</default></entry>"
+fi
+NWIN=$(echo -n "$WININSTS" | wc -l)
+[ $NWIN -eq 0 ] && NWIN=1  # v1.7.1
+if [ $NWIN -gt 1 ]; then
+  I=0
+  for ITEM in $WININSTS; do
+    I=$(expr $I + 1)
+    make_label
+    FRAME="$FRAME
+   <entry><variable>Win_$I</variable><default>$L</default></entry>"
+  #[ $NWIN -eq 1 ] && break
+  done
+fi
+if [ "$FRAME" != "" ]; then
+ WINFRAME="<frame $_Win><vbox>
+$FRAME
+  </vbox></frame>"
+fi
+# chainloads and bootmanagers
+NCHAIN=0
+if [ "$CHAINS$BOOTMGRS" != "" ]; then
+ NCHAIN=$(echo "$CHAINS" "$BOOTMGRS"| wc -l)
+ 
+ PBR=":PBS"
+ FRAME="<frame $_Chain_frame><vbox>"
+ I=0
+ for ITEM in $CHAINS; do
+   I=$(expr $I + 1)
+    make_label
+    FRAME="$FRAME
+  <entry><variable>Chain_$I</variable><default>$L</default></entry>"
+  done
+  PBR=""
+  for ITEM in $BOOTMGRS; do
+   I=$(expr $I + 1)
+    make_label
+    FRAME="$FRAME
+  <entry><variable>Chain_$I</variable><default>$L</default></entry>"
+  done
+ CHAINFRAME="$FRAME
+   </vbox></frame>"
+fi
+# main frame
+[ $NWIN -eq 1 ] && NWIN=2
+NL=$NPUP
+NR=$(expr $NWIN + $NCHAIN + 2)
+echo "$NPUP:$NFULL:$NWIN:$NCHAIN"
+LFRAMES="$FRUGALFRAME"
+RFLAMES=""
+[ $NWIN -gt 0 ] && RFRAMES="$WINFRAME"	# v1.7.1: fix typo
+if [ $NCHAIN -gt 0 ]; then
+  RFRAMES="$WINFRAME
+    $CHAINFRAME"
+fi
+if [ $NFULL -gt 0 -a $NL -lt $NR ]; then
+  LFRAMES="$LFRAMES
+  $FULLFRAME"
+elif [ $NFULL -gt 0 ]; then
+  RFRAMES="$FULLFRAME
+  $RFRAMES"
+fi
+RFRAME=""
+if [ "$RFRAMES" != "" ]; then
+  RBOX="<vbox>
+  $RFRAMES
+  </vbox>"
+fi
+DIALOG="<window title=\"$_Title - $_List\"><vbox>
+ <hbox>
+   <vbox>
+     <text><input>echo -en \"$_List2\"</input></text>
+     $LFRAMES
+   </vbox>
+    $RBOX
+ </hbox>
+  <hbox>
+   <button ok></button>
+   <button cancel></button>
+   "$(make_help_button "bootmenu")"
+  </hbox>
+</vbox></window>"
+#echo "$DIALOG"
+probing end
+eval $($GTKDIALOG -p DIALOG -c | grep '^\w\w*=' || debug "$DIALOG")
+[ "$EXIT" = "OK" ] || exit
+fi ### long skip
+
+# confirm
+MORE=""
+if [ "$FLOPPY" != "" ]; then
+    KEEP_BOOT_RECORD=""
+    KEEP_MENU=""
+fi
+
+MORE=""
+[ "$KEEP_BOOT_RECORD" = "true" ] && MORE="$MORE
+<text><label>$_Keep</label></text>"
+[ "$KEEP_MENU" = "true" ] && MORE="$MORE
+<text><label>$_KeepMenu</label></text>"
+
+if [ "$FLOPPY" != "" ]; then
+ LOAD_FLOPPY="<hbox>
+    <pixmap>
+    <input file>/usr/local/lib/X11/pixmaps/floppy24.png</input>
+   </pixmap>
+   <text><label>$_Floppy</label></text>
+   </hbox>"
+ MORE="$MORE
+ $LOAD_FLOPPY"
+fi
+DIALOG="<window title=\"$_Title - $(gettext 'Confirmation')\"><vbox>
+    <frame $_Comfirm>
+   <text use-markup=\"true\"><label>\"$_Comfirm1: <b>$WHERETO$MBR$FLOPPY</b>\"</label></text>
+   $MORE
+   </frame>
+   <text><label>$_Comfirm3</label></text>
+  <hbox>
+   <button ok></button>
+    <button cancel></button>
+  </hbox>
+  </vbox></window>"
+#echo "$DIALOG"
+eval $($GTKDIALOG -p DIALOG -c | grep '^\w\w*=')
+[ "$EXIT" = "OK" ] || exit
+
+# floppy
+if [ "$FLOPPY" != "" ]; then
+  splash start "$_Formating"
+  ERRMSG="<window title=\"$_Title - Error\"><vbox>
+   <pixmap icon_size=\"5\">
+    <input file stock=\"gtk-dialog-error\"></input>
+   </pixmap>
+   <frame>$LOAD_FLOPPY</frame>
+   <text><label>$_Comfirm3</label></text>
+  <hbox>
+   <button ok></button>
+    <button cancel></button>
+  </hbox>
+  </vbox></window>"
+ HAS_MKFS_MSDOS=""
+ which mkfs.msdos &>/dev/null && HAS_MKFS_MSDOS="yes"
+ if [ "$HAS_MKFS_MSDOS" != "" ]; then
+  SUCCESS=""
+  while [ "$SUCCESS" = "" ]; do
+    mount | grep -q '^/dev/fd0[ ]' && umount /dev/fd0 &>/dev/null
+    mkfs.msdos -c /dev/fd0u1440 >>$MYLOG 2>&1  && SUCCESS="yes"
+    if [ "$SUCCESS" = "" ]; then
+      splash end
+      DIALOG="$ERRMSG"
+      eval $($GTKDIALOG -p DIALOG -c | grep '^\w\w*=')
+      [ "$EXIT" = "OK" ] || exit
+      splash start "$_Formating"
+     fi
+  done
+ fi
+  SUCCESS=""
+  while [ "$SUCCESS" = "" ]; do
+    mount | grep -q '^/dev/fd0[ ]' && umount /dev/fd0 &>/dev/null
+    mount | grep -q '/mnt/fd0' && umount /mnt/fd0 &>/dev/null
+    mkdir -p /mnt/fd0 &>/dev/null
+    mount /dev/fd0 /mnt/fd0 >>$MYLOG 2>&1 && SUCCESS="yes"
+    if [ "$SUCCESS" = "" ]; then
+      splash end
+      DIALOG="$ERRMSG"
+      eval $($GTKDIALOG -p DIALOG -c | grep '^\w\w*=')
+      [ "$EXIT" = "OK" ] || exit
+      splash start "$_Formating"
+    fi
+  done
+  #TOPDIR=/mnt/fd0
+  splash end
+fi
+
+# install
+splash start "$_Writing"
+SUCCESS=""
+if mountpoint $LPART ; then 	# long skip if error occured
+ TOPDIR=$MP
+ TOPPART=$PART
+ #TODRIVE=$TOPPART
+ #[ "$FLOPPY" = "" ] && TODRIVE=$(echo $TOPPART| tr -d '0-9')
+ TOPFS=$FS
+ MENU=$TOPDIR/menu.lst
+#echo "$MENU"
+ if [ "$KEEP_MENU" != "true" ] ; then	### skip menu
+# produce menu.list
+ FIND_SETROOT="find --set-root --ignore-floppies --ignore-cd"
+
+# save backup
+ for F in $(find $TOPDIR -maxdepth 1 -iname menu.lst)
+ do
+   STAMP=$(LANG=C stat --format %y $F|cut -d'.' -f 1|tr ' ' '-'|tr -d ':')
+   OLDMENU="menu-$STAMP.lst"
+   mv -f $F $TOPDIR/$OLDMENU
+   SAVEDLST="<text><label>$TOPDIR/$OLDMENU</label></text>"
+ done
+
+ echo "Wrigting... $MENU" >>$MYLOG
+# header
+COLORS="white/blue black/cyan white/black cyan/black"
+[ "$TOREMOVABLE" = "1" ] && COLORS="blue/cyan yellow/blue white/black cyan/black"
+[ "$(echo $TOPPART|tr -dc '0-9')" != "1" ] && COLORS="white/green yellow/blue white/black green/black"
+ cat <<EOF  >  $MENU 2>>$MYLOG
+# menu.lst produced by grub4dosconfig-v$MYVERSION
+color $COLORS
+timeout 10
+default 0
+EOF
+
+#frugal entries
+I=0
+if [ "$PUPPIES" != "" ]; then
+  echo "
+# Frugal installed Puppy"  >>  $MENU
+fi
+RAMLABEL=""
+for ITEM in $PUPPIES
+do
+  I=$(expr $I + 1)
+  eval LABEL=\$\(echo \"\$Frugal_$I\"\|trim\)
+  [ "$LABEL" = "" ] && continue
+  NEWITEM=$(echo $ITEM|cut -d'|' -f1)
+  PART=$(echo $NEWITEM|cut -d '/' -f1)
+  SFSPATH=$(echo $NEWITEM | sed -e 's,^[^/]*,,')
+  SFSBASE=$(basename "$SFSPATH")
+  PUPDIR=$(dirname $SFSPATH)
+  DRIVE=$(echo $ITEM | cut -d '/' -f 1 | part2drive) # v1.7.2
+  PMEDIA=""
+  PFIX=""
+  if [ "$PUPPYOPTIONS" != "" ]; then
+    for W in $PUPPYOPTIONS; do
+      P=$(echo $W | cut -s -d'=' -f1|tr 'A-Z' 'a-z')
+      [ "$P" != "" ] || continue
+      V=$(echo $W | cut -d'=' -f2)
+      case $P in
+        pmedia) PMEDIA=$V;;
+        pfix) PFIX=$V;;
+      esac
+    done
+  fi
+  PMEDIAOPT=""
+  if [ "$PMEDIA" = "" ]; then
+    PMEDIA="atahd"
+    REMOVABLE="$(cat /sys/block/$DRIVE/removable)"
+    #$PROBEDISK | grep "/dev/$DRIVE|" | grep -q -i 'usb' && MEDIA="usbhd"
+    [ "$REMOVABLE" = "1" ] && PMEDIA="usbflash"
+    PMEDIAOPT="pmedia=$PMEDIA"
+  fi
+  if [ "$PUPDIR" = "/" ] ;then
+    PUPDIR=""
+    PSUBDIROPT=""
+    SEARCHPATH="$SFSPATH"
+  else
+    PSUBDIROPT="psubdir=$(echo $PUPDIR| cut -d '/' -f 2)"
+    SEARCHPATH="$PUPDIR/initrd.gz"
+  fi
+  HEAD4=$(echo $SFSBASE | cut -b1-4)
+  MAJOR=$(echo $SFSBASE | cut -b5| tr -dc '0-9')
+  [ "$MAJOR" = "" ] && MAJOR=9
+  CLASSICOPT=""
+  [ "$HEAD4" = "pup_" -a $MAJOR -lt 3 ] && CLASSICOPT="root=/dev/ram0"
+  echo >>  $MENU
+  echo "title $LABEL"  >> $MENU
+    # check duplication
+    if [ "$LEGACY_MENU" = "true" ] || echo "$PUPPIES" | grep -vx "$ITEM" | grep -q  "$SFSPATH"; then
+      setroot && echo "  $SET_ROOT"  >>  $MENU
+    else
+      echo "  $FIND_SETROOT $SEARCHPATH"  >> $MENU
+    fi
+  echo "  kernel $PUPDIR/vmlinuz $CLASSICOPT $PMEDIAOPT $PSUBDIROPT $PUPPYOPTIONS" >> $MENU
+  echo "  initrd $PUPDIR/initrd.gz" >> $MENU
+  if [ "$RAMLABEL" = "" ]; then
+    RAMLABEL="$LABEL RAM mode\nBoot up Puppy without pupsave"
+    echo "$PUPPYOPTIONS" | grep -q 'pfix=' \
+    && RAMOPTIONS=$(echo "$PUPPYOPTIONS" | sed -e 's/pfix=/pfix=ram,/') \
+    || RAMOPTIONS="pfix=ram $PUPPYOPTIONS"
+    echo >>  $MENU
+    echo "title $RAMLABEL"  >> $MENU
+    # check duplication
+    if [ "$LEGACY_MENU" = "true" ] || echo "$PUPPIES" | grep -vx "$ITEM" | grep -q  "$SFSPATH" ; then
+      setroot && echo "  $SET_ROOT"  >>  $MENU
+    else
+      echo "  $FIND_SETROOT $SEARCHPATH"  >> $MENU
+    fi
+    echo "  kernel $PUPDIR/vmlinuz $CLASSICOPT $PMEDIAOPT $PSUBDIROPT $RAMOPTIONS" >> $MENU
+    echo "  initrd $PUPDIR/initrd.gz" >> $MENU
+  fi
+ done
+
+#full installed entries
+ I=0
+if [ "$FULLINSTS" != "" ]; then
+  echo "
+# Full installed Linux"  >>  $MENU
+fi
+ for ITEM in $FULLINSTS
+ do
+  I=$(expr $I + 1)
+  eval LABEL=\$\(echo \"\$Full_$I\"\|trim\)
+  [ "$LABEL" = "" ] && continue
+  NEWITEM=$(echo $ITEM|cut -d'|' -f1)
+  PART=$(echo $NEWITEM|cut -d '/' -f1)
+  KEYFILE=$(echo $NEWITEM | sed -e 's,^[^/]*,,')
+  KEYFILE2=$(echo $KEYFILE| cut -s -d',' -f2)	# can be vmlinuz
+  KEYFILE=$(echo $KEYFILE| cut -d',' -f1)
+  KDIR=$(dirname $KEYFILE)
+  [ "$KDIR" = "/" ] && KDIR=""
+  KBASE=$(basename $KEYFILE)
+  KBASE2=$(basename "$KEYFILE2")
+  echo  >>  $MENU
+  echo "title $LABEL"  >>  $MENU
+  [ "/mnt/$PART" = "$TOPDIR" -a "$KFILE" = "/menu.lst" ] && KFILE=/$OLDMENU
+  if [ "$KBASE" = "menu.lst" ]; then
+    if echo $KDIR | grep -q -E 'ubuntu|unetbtin' ; then
+      echo "  $FIND_SETROOT $KEYFILE"  >>  $MENU
+    else
+     setroot && echo "  $SET_ROOT"  >>  $MENU
+    fi
+    echo "  configfile $KEYFILE"  >>  $MENU
+  elif [ "$KBASE" =  "wubildr.mbr" ]; then
+    if echo $KDIR | grep -q -E 'ubuntu|unetbtin' ; then
+      echo "  $FIND_SETROOT $KEYFILE"  >>  $MENU
+    else
+     setroot && echo "  $SET_ROOT"  >>  $MENU
+    fi
+    echo "  chainloader $KEYFILE"  >>  $MENU
+  else
+    setroot && echo "  $SET_ROOT"  >>  $MENU
+    if [ "$KBASE2" = "" ]; then
+      echo "  kernel $KDIR/$KBASE root=/dev/$PART $LINUXOPTIONS" >>  $MENU
+    else
+      echo "  kernel $KDIR/$KBASE2 root=/dev/$PART $LINUXOPTIONS" >>  $MENU
+      echo "  initrd $KDIR/$KBASE" >>  $MENU
+    fi
+  fi
+ done
+ 
+# need to swap drive number?
+#   SWAP=""
+#   [ "$REPLACE" != "" ] && SWAP="  map (hd1) (hd0)
+#  map (hd0) (hd1)
+#  map --hook"
+#SWAPPED=$SWAP
+
+# Windows
+#NWIN=$(echo "$WININSTS" | wc -l)
+I=0
+COMMENT=""
+for ITEM in ALL $WININSTS; do
+  eval LABEL=\$\(echo \"\$Win_$I\"\|trim\)
+  #debug ":$LABEL:"
+  [ "$LABEL" != "" ] || continue
+  if [ "$COMMENT" = "" ]; then
+    COMMENT="# Windows"
+    echo "
+$COMMENT" >>  $MENU
+  fi
+  if [ $I -eq 0 ]; then
+    echo "# this entry searches Windows on the HDD and boot it up
+title $LABEL\nBoot up Windows if installed" >>  $MENU
+  else
+    echo "
+title $LABEL" >>  $MENU
+  fi
+  if [ $I -eq 0 ]; then
+   [ "$REPLACE" != "" ]  && swapping $FIRSTDRIVE  >>  $MENU
+   cat <<EOF  >>  $MENU
+  errorcheck off
+  $FIND_SETROOT  /bootmgr
+  chainloader /bootmgr
+  $FIND_SETROOT  /ntldr
+  chainloader /ntldr
+  $FIND_SETROOT   /io.sys
+  chainloader /io.sys
+  errorcheck on
+EOF
+  else
+    NEWITEM=$(echo $ITEM|cut -d'|' -f1)
+    PART=$(echo $NEWITEM|cut -d '/' -f1)
+    KEYFILE=$(echo $NEWITEM | sed -e 's,^[^/]*,,')
+   [ "$REPLACE" != "" ]  && swapping $PART  >>  $MENU
+   setroot && echo "  $SET_ROOT"  >>  $MENU
+    echo "  chainloader $KEYFILE" >>  $MENU
+  fi
+  [ $NWIN -eq 1 ] && break
+  I=$(expr $I + 1)
+done
+
+# boot from PBS
+ I=0
+if [ "$CHAINS" != "" ]; then
+  echo "
+# Boot from Partition Boot Sector"  >>  $MENU
+fi
+ for ITEM in $CHAINS
+ do
+  I=$(expr $I + 1)
+  eval LABEL=\$\(echo \"\$Chain_$I\"\|trim\)
+  [ "$LABEL" = "" ] && continue
+  NEWITEM=$(echo $ITEM|cut -d'|' -f1)
+  PART=$(echo $NEWITEM|cut -d '/' -f1)
+  DRIVE=$(echo $PART| part2drive) #v1.7.2
+  KEYFILE=$(echo $NEWITEM | sed -e 's,^[^/]*,,')
+  KEYFILE2=$(echo $KEYFILE| cut -s -d',' -f2)	# can be vmlinuz
+  KEYFILE=$(echo $KEYFILE| cut -d',' -f1)
+  #KDIR=$(dirname $KEYFILE)
+  #[ "$KDIR" = "/" ] && KDIR=""
+  #KBASE=$(basename $KEYFILE)
+  #KBASE2=$(basename "$KEYFILE2")
+  #WINLDR=""
+  #case "$KBASE" in
+  #ntrdr|io.sys) WINLDR=$KBASE ;;	# bootmgr needs not swapping
+  #esac
+  echo  >>  $MENU
+  echo "title $LABEL"  >>  $MENU
+  if [ "$REPLACE" != "" ];then
+    [ "$DRIVE" != "$TODRIVE" ]  && swapping $DRIVE  >>  $MENU
+  elif [ "$DRIVE" != "$FIRSTDRIVE" ]; then
+    swapping $DRIVE  >>  $MENU
+  fi
+  setroot && echo "  $SET_ROOT"  >>  $MENU
+  echo "  chainloader +1" >>  $MENU
+ done
+# PLOP boot manager
+if [ "$BOOTMGRS" != "" ]; then
+  echo "
+# Chain to other boot managers"  >>  $MENU
+ for ITEM in $BOOTMGRS
+ do
+  I=$(expr $I + 1)
+  eval LABEL=\$\(echo \"\$Chain_$I\"\|trim\)
+  [ "$LABEL" = "" ] && continue
+  NEWITEM=$(echo $ITEM|cut -d'|' -f1)
+  PART=$(echo $NEWITEM|cut -d '/' -f1)
+  DRIVE=$(echo $PART| part2drive) #v1.7.2
+  KEYFILE=$(echo $NEWITEM | sed -e 's,^[^/]*,,')
+  KEYFILE2=$(echo $KEYFILE| cut -s -d',' -f2)	# can be vmlinuz
+  KEYFILE=$(echo $KEYFILE| cut -d',' -f1)
+  echo  >>  $MENU
+  echo "title $LABEL"  >>  $MENU
+  if [ "$LEGACY_MENU" = "true" ]; then
+      setroot && echo "  $SET_ROOT"  >>  $MENU
+  else
+    echo "  $FIND_SETROOT $KEYFILE"  >>  $MENU
+  fi
+  echo "  kernel $KEYFILE"  >>  $MENU
+ done
+fi
+# tail
+echo >>  $MENU
+echo "# additionals" >>  $MENU
+if [ "$MBR" = "" -a "$PLOCAL" = "" ]; then
+  echo "title Bootup from HDD\nBootup from the master boot record of the hard disk drive"  >>  $MENU
+  [ "$REPLACE" != "" ]  && swapping $FIRSTDRIVE  >>  $MENU
+  echo "  chainloader (hd$X)+1"  >>  $MENU
+fi
+if [ "$TOREMOVABLE" = "1" -a "$PLOCAL" = "" ]; then
+  if [ "$LEGACY_MENU" != "true" ]; then
+    echo >>  $MENU
+    echo "title Find Grub menu on HDD"  >>  $MENU
+    [ "$REPLACE" != "" ]  && swapping $FIRSTDRIVE  >>  $MENU
+    cat <<EOF  >>  $MENU
+  errorcheck off
+  $FIND_SETROOT /menu.lst && configfile /menu.lst
+  $FIND_SETROOT /boot/grub/menu.lst && configfile /boot/grub/menu.lst
+  $FIND_SETROOT /grub/menu.lst && configfile /grub/menu.lst
+  errorcheck on
+  commandline
+EOF
+   fi
+ fi
+
+ if [ "$LEGACY_MENU" != "true" -a "$PLOCAL" = "" ]; then
+   cat <<EOF  >>  $MENU
+
+title Find Grub2\nBoot up grub2 if installed
+  $FIND_SETROOT /boot/grub/core.img
+  kernel /boot/grub/core.img
+EOF
+  fi
+  cat <<EOF  >>  $MENU
+
+title Grub4Dos commandline\n(for experts only)
+  commandline
+
+title Reboot computer
+  reboot
+
+title Halt computer
+  halt
+EOF
+    sync
+    [ -s "$MENU" ] && SUCCESS="yes" || SUCCESS=""
+    [ "$SUCCESS" = "yes" ] || echo "Failed to make 'menu.lst'." >>$MYLOG
+ fi ### skip menu end
+
+# install boot sector
+SUCCESS=""
+MBROPT=""
+[ "$BINSTALLER" = "bootlace.com" ] && MBROPT="--boot-prevmbr-last --time-out=0"
+if [ "$BOOTLOADER" != "" ]; then
+    # check boot flag and mbr # 7feb11 fix typo
+ if [ "$FLOPPY" = "" ]; then
+    is_bootable /dev/$TODRIVE && BOOTABLEMBR="yes" || BOOTABLEMBR=""
+    [ "$(boot_part /dev/$TODRIVE)" = "$TOPPART" ] && BOOTABLEPBS="yes" || BOOTABLEPBS=""
+    debug "/dev/$TODRIVE Bootalbe: $BOOTABLEMBR, $BOOTABLEPBS"
+ fi
+ SUCCESS=""
+  if [ "$FLOPPY" != "" ];then
+    #mount | grep -q '^/dev/fd0[ ]' && umount /dev/fd0 &>/dev/null
+    OPT="--floppy --chs"
+    echo "Installing bootloader on floppy..." >>$MYLOG
+    debug "$BINSTALLER $OPT /dev/fd0"
+    $BINSTALLER $OPT /dev/fd0 >>$MYLOG 2>&1 && SUCCESS="yes"
+  elif [ "$PBSINSTALL" != "" ]; then
+    EXTFS=""
+    X=0; Y=0
+    partname2num $WHERETO
+    OPT="-v -p=$Y"
+    TARGET=/dev/$TODRIVE
+   if [ "$BINSTALLER" = "bootlace.com" ]; then
+    case $TOPFS in
+    ntfs) OPT="--ntfs"
+	;;
+    vfat) OPT=""
+	;;
+	ext4) BINSTALLER="extlinux"
+	  #MVER=$(extlinux --version 2>&1| tr -s ' '| cut -d' ' -f2| cut -d'.' -f1| tr -dc '0-9')
+	  #[ "$MVER" != "" ] || MVER=0
+	 #if [ $MVER -ge 4 ]; then
+	  cp -vf "$CHAINLOADER" $TOPDIR >>$MYLOG 2>&1 && SUCCESS="yes"
+	  if [ "$SUCCESS" = "yes" ]; then
+      # save backup
+      F="$TOPDIR/extlinux.conf"
+      if [ -s "$F" ]; then
+        STAMP=$(LANG=C stat --format %y "$F"|cut -d'.' -f 1|tr ' ' '-'|tr -d ':')
+        OLDMENU="extlinux.-$STAMP.conf"
+        mv -f "$F" "$TOPDIR/$OLDMENU"
+        SAVEDLST="$SAVELIST<text><label>$TOPDIR/$OLDMENU</label></text>"
+      fi
+	   echo "Writing $TOPDIR/extlinux.conf..." >>$MYLOG
+	   echo "default chain.c32 ntldr=grldr" > $TOPDIR/extlinux.conf || SUCCESS=""
+      fi
+      if [ "$SUCCESS" = "yes" ]; then
+        echo "Installing $BINSTALLER on /dev/$PART(PBS)..." >>$MYLOG
+        debug "extlinux --install $TOPDIR"
+        extlinux --install $TOPDIR >>$MYLOG 2>&1 || SUCCESS=""
+      fi
+    #else
+ 	#    ERRMSG=$(gettext "The 'extlinux' version 4 or later required.")
+	#    debug "$ERRMSG"
+	#    SUCCESS=""
+    #fi
+	;;
+    *)
+     PTABLE=$(LANG=C fdisk -u -l "/dev/$DRIVE")   # v1.7.2
+     N=0
+     for COL in $(echo "$PTABLE"| grep 'heads')
+     do
+      if echo "$COL" | grep -q 'heads'
+      then H=$N
+      elif echo "$COL" | grep -q 'sectors/track'
+      then S=$N
+      fi
+	  N=$COL
+     done
+     ALINE=$(echo "$PTABLE"| grep -w "^/dev/$PART"|tr -d '*'| tr -s ' ')
+     debug "$ALINE"
+     B=$(echo $ALINE|cut -d' ' -f2)
+     T=$(echo $ALINE|cut -d' ' -f4)
+     OPT="--sectors-per-track=$S --heads=$H --start-sector=$B --total-sectors=$T"
+       [ "$S" = "" ] && OPT="error"
+     TARGET=/dev/$TOPART
+	;;
+    esac
+    OPT="--floppy=$Y $OPT"
+    TARGET=/dev/$PART
+   fi
+   if [ "$BINSTALLER" != "extlinux" ]; then
+     echo "Installing bootloader on /dev/$PART(PBS)..." >>$MYLOG
+     $BINSTALLER $OPT $TARGET >>$MYLOG 2>&1  && SUCCESS="yes" || SUCCESS=""
+   fi
+ else
+   if [ "$BOOTLOADER" = "wee" ]; then
+     # Read disk signature and partition table from MBR
+     # and write it to wee.mbr:
+     cp -f /usr/lib/grub4dos/wee.mbr /tmp/wee.mbr >>$MYLOG 2>&1
+     dd if=/dev/$WHERETO bs=1 skip=439 count=72 2>/dev/null | \
+	 dd of=/tmp/wee.mbr bs=1 seek=439 conv=notrunc >>$MYLOG 2>&1
+     MD5SUMNEW=$(md5sum /tmp/wee.mbr | cut -d' ' -f1)
+     # backup MBR
+     MBRBAK=""
+     dd if=/dev/$WHERETO of=/tmp/$WHERETO.mbr bs=512 count=63 >>$MYLOG 2>&1
+     MD5SUMOLD=$(md5sum /tmp/$WHERETO.mbr | cut -d' ' -f1)
+     # Write wee MBR to $MBR_DEV
+     echo "Installing bootloader(Wee) on /dev/$WHERETO ..." >>$MYLOG
+     dd if=/tmp/wee.mbr of=/dev/$WHERETO >>$MYLOG 2>&1  && SUCCESS="yes" || SUCCESS=""
+   else
+     # backup MBR
+     MBRBAK=""
+     dd if=/dev/$WHERETO of=/tmp/$WHERETO.mbr bs=512 count=1 >>$MYLOG 2>&1
+     # Write grub4dos MBR
+     echo "Installing bootloader on /dev/$WHERETO ..." >>$MYLOG
+     $BINSTALLER $MBROPT /dev/$WHERETO  >>$MYLOG 2>&1  && SUCCESS="yes"
+     dd if=/dev/$WHERETO of=/tmp/$WHERETO.mbrnew bs=512 count=1 >>$MYLOG 2>&1
+     MD5SUMOLD=$(md5sum /tmp/$WHERETO.mbr | cut -d' ' -f1)
+     MD5SUMNEW=$(md5sum /tmp/$WHERETO.mbrnew | cut -d' ' -f1) 
+     rm -f /tmp/$WHERETO.mbrnew
+   fi
+   if [ "$MD5SUMNEW" != "$MD5SUMOLD" ]; then
+      echo "Making backup of the MBR(/dev/${WHERETO}) ..." >>$MYLOG
+      cp -vf /tmp/$WHERETO.mbr $TOPDIR/${WHERETO}_mbr.bak >>$MYLOG 2>&1 && MBRBAK="$TOPDIR/${WHERETO}_mbr.bak"
+   fi
+  fi
+  [ "$SUCCESS" = "" ] && echo "Failed to install $BINSTALLER." >>$MYLOG
+ fi
+
+# install grldr
+if [ "$SUCCESS" = "yes" ]; then
+  echo "Installing $GRUBLOADER ..." >>$MYLOG
+  cp -v -f  /usr/lib/grub4dos/$GRUBLOADER  $TOPDIR >>$MYLOG 2>&1 || SUCCESS=""
+  sync || SUCCSESS=""
+  [ -s $TOPDIR/$GRUBLOADER ] || SUCCESS=""
+  [ "$SUCCESS" = "" ] && echo "Failed to install '$GRUBLOADER'." >>$MYLOG
+fi
+
+fi	# long skip if error occured
+splash end
+# finish
+if [ "$SUCCESS" = "" ]; then
+ DIALOG="<window title=\"$_Title - Error\"><vbox>
+   <pixmap icon_size=\"5\">
+    <input file stock=\"gtk-dialog-error\"></input>
+   </pixmap>
+ <frame>
+ <text><label>$_Error</label></text>
+ <button><label>See $MYLOG</label>
+   <action>defaulttextviewer $MYLOG &</action></button>
+  </frame>
+  <text><label>$_Quit</label></text>
+  <hbox>
+   <button ok></button>
+  </hbox>
+  </vbox></window>"
+ $GTKDIALOG -p DIALOG -c &>/dev/null
+ exit 1
+fi
+# success
+WARNMARK="     <pixmap icon_size=\"5\">
+       <input file stock=\"gtk-dialog-warning\"></input>
+     </pixmap>"
+
+FILES="'grldr'"
+[ "$KEEP_MENU" != "true" ] && FILES="$FILES, 'menu.lst'"
+ MORE=""
+[ "$SAVEDLST" != "" ] && MORE="<text><label>$_Saved</label></text>$SAVEDLST"
+if [ "$KEEP_BOOT_RECORD" = "true" ]; then
+  MBR=""
+  MORE="$MORE
+  <text><label>$_NoBR</label></text>"
+elif [ "$MBRBAK" != "" ]; then
+  MORE="$MORE
+<text><input>echo -en \"$_MBR_saved: $MBRBAK\n$_Restore_MBR:\"</input></text>
+<text selectable=\"true\"><input>echo -en \"cat $MBRBAK > /dev/$WHERETO\"</input></text>"
+fi
+ [ "$BOOTLOADER" != "" ] || MBR=""
+ if [ "$MBR" = "" -a "$FLOPPY" = ""  ] ; then
+   MORE="$MORE
+   <text><label>$_NoMBR: $WHERETO</label></text>"
+ fi
+ if [ "$MBR" = "" -a "$FLOPPY" = "" -a "$BOOTABLEMBR" = "" ]; then
+    MORE="$MORE
+    $WARNMARK
+   <text><label>$(printf "$_NoBootMBR" /dev/$TODRIVE)</label></text>"
+   WARNMARK=""
+ fi
+ if [ "$PBSINSTALL" != "" -a "$BOOTABLEPBS" = "" ]; then
+   MORE="$MORE
+   $WARNMARK
+   <text><label>$(printf "$_NoBootFlag" /dev/$TOPPART)</label></text>"
+ fi
+ [ "$FLOPPY" = "" ] && TOREMOVABLE=$(cat /sys/block/$TODRIVE/removable) || TOREMOVABLE="1"
+ if [ "$TOREMOVABLE" != "0" ]; then
+    MORE="$MORE
+   <text><label>$_Unmount</label></text>"
+fi
+
+ DIALOG="<window title=\"$_Title - Success\"><vbox>
+ <frame>
+  <text use-markup=\"true\"><label>\"$_Success $_Fairwell1 $FILES $_Fairwell2 <b>$TOPDIR</b>. $_Fairwell3\"</label></text>
+  $MORE
+  <hbox>
+    <button><input file>/usr/local/lib/X11/pixmaps/edit24.png</input>
+    <label>$_Edit</label><action>defaulttexteditor $TOPDIR/menu.lst &</action></button>
+    <button><label>$(gettext 'See log')</label>
+   <action>defaulttextviewer $MYLOG &</action></button>
+  <button><input file stock=\"gtk-info\"></input><label>$_More_info</label><action>defaulthtmlviewer $_WebPage &</action></button>
+  "$(make_help_button "editmenulst")"
+  </hbox>
+ </frame>
+  <text><label>$_Quit</label></text>
+  <hbox>
+   <button ok></button>
+  </hbox>
+  </vbox></window>"  
+ $GTKDIALOG -p DIALOG -c &>/dev/null
+ rm -f $MYLOG
+ 

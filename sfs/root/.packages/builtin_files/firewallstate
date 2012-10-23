@@ -1,0 +1,21 @@
+/root
+/root/Startup
+ firewallstaterun
+/usr
+/usr/local
+/usr/local/firewallgtk
+ firewallfunc
+ firewallgtk
+/usr/local/firewallstate
+ firewallstate
+ firewallstatererun
+ firewallstaterun
+ ipwget
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ firewall-ok-30.png
+ firewall-warn-30.png
+/usr/share
+/usr/share/applications
+ firewallstate.desktop

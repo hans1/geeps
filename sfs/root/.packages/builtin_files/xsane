@@ -1,0 +1,24 @@
+/usr
+/usr/bin
+ xsane
+ xsaneshell
+/usr/share
+/usr/share/applications
+ Xsane-image-scanner.desktop
+/usr/share/pixmaps
+ xsane.xpm
+/usr/share/sane
+/usr/share/sane/xsane
+ Mustek-logo.xpm
+ Plustek-logo.xpm
+ sane-epson-logo.xpm
+ sane-hp-logo.xpm
+ sane-umax-logo.xpm
+ sane-xsane-logo.xpm
+ UMAX-logo.xpm
+ xsane-calibration.pnm
+ xsane-eula.txt
+ xsane-gpl.txt
+ xsane-logo.xpm
+ xsane-startimage.pnm
+ xsane-style.rc

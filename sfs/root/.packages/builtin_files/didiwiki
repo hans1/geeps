@@ -1,0 +1,10 @@
+/usr
+/usr/bin
+ didiwiki
+/usr/sbin
+ didiwiki-gui
+/usr/share
+/usr/share/applications
+ DidiWiki-personal-wiki.desktop
+/usr/share/doc
+ didiwiki.htm

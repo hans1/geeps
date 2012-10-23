@@ -1,0 +1,229 @@
+#!/bin/bash
+##Slickpet 1.4 sv_SE:svenska 
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=svenska
+#translator=MinHundHettePerro/MHHP - A native swede, who never had a swedish-speaking computer, but still thinks it's important to have things written in one's own language, even though, mostly only the very young Swedes would actually NEED this tranlation (for the understanding of the text, not for using the program ;) ).
+#Översättare=MinHundHettePerro/MHHP - En infödd svensk som aldrig haft en svensktalande dator, men som ändå tycker det är viktigt att ha saker skrivna på sitt eget språk, även om egentligen endast de mycket unga svenskarna verkligen skulle BEHÖVA den här översättningen (för att förstå texten, inte för att använda programmet ;) ).
+#        ****************LATEST 25 September 2011 ************************
+##################                    PLEASE NOTE                               ###############
+#if you are unfamiliar with coding then you may notice "\n" in some lines                     #
+#this means "new line" and it is important. I realise grammar is different in each language   #
+#do place this "\n" every 6 to 10 words or 40 to 50 characters  
+#Also there may be references to "Slacko" or "Lupu", change to "Slacko"                              #
+##################                  THANK  YOU                                  ###############
+
+#Buttons and warnings - Knappar och varningar
+export LOC_OK="Ok"
+export LOC_CANCEL="Avbryt"
+export LOC_ERROR="Fel"
+export LOC_WARNING="Varning"
+export LOC_YES="Ja"
+export LOC_NO="Nej"
+export LOC_QUIT="Avsluta"
+export LOC_HELP="Hjälp"
+export LOC_INFO="Info"
+export LOC_FILE="Arkiv" 
+#export LOC_BRS=" är för närvarande din förvalda webläsare. \nDet rekommenderas att du installerar \nen fullskalig webläsare, speciellt om du vill ladda ner filer."
+export LOC_CANTINSTALL="Du har inte tillräckligt med diskutrymme för att installera "
+export LOC_WARNINGINSTALL="paketet kommer att resultera i mindre än 45 MB \ndiskutrymme efter installationen. \nFortsätta?"
+
+#browser installer #NOT used in Slacko
+
+#yaf messages
+export LOC_101="FEL: Kan inte ladda ner. Vänligen, anslut till Internet."
+export LOC_102="Vänta ..."
+export LOC_103="FEL: Uppdateringssidan svarar inte. Kontrollera din anslutning eller försök igen senare."
+export LOC_104="Du har redan den senaste uppdateringen för Slacko Puppy."
+export LOC_105="För tillfället finns det inga uppdateringar för Slacko Puppy"
+export LOC_106a="Vänta medan"
+export LOC_106b="laddas ner. Du kommer sedan att ombedjas \natt bekräfta installationen."
+export LOC_107="Time-out för anslutningen. Vänligen, försök senare, eller återställ värdet för Time-out under Inställningar."
+export LOC_108="FEL: Nedladdningen misslyckades. Försök igen senare. Om nedladdningen påbörjades, \nkommer den att återupptas där den avbröts."
+export LOC_109="FEL: Installationen av paketet misslyckades, försök igen."
+export LOC_110a="Installationen av"
+export LOC_110b="lyckades."
+export LOC_111=" är nu satt som förvald webläsare."
+export LOC_112="Slickpet körs redan. Vänta ..."
+export LOC_113="Vänta, försöker lokalisera paketet ..."
+#NEW yaf messages
+export LOC_114="Du bör inte ladda ned en drivrutin samtidigt som du laddar ned annat." #NEW 1 December
+export LOC_115="Vänligen undvik annan nedladdning då du laddar ned en drivrutin."
+export LOC_116="Ledsen, ditt paket kunde inte hittas."
+export LOC_117="Du har, för närvarande, maximalt antal sfs-filer laddade. Välj bort några sfs-filer i 'Bootmanager' för att ladda ned fler sfs-filer."
+#xmessages
+#export LOC_201=deprecated
+export LOC_202="Välkommen till Slacko Puppys Slickpet\!
+	Det finns flikar för Pet-paket, Puppys paketformat. Pet-paket är enkla
+	 att använda. När du valt ett paket och klickar på dess ikon så 
+laddas paketet ner från något av Puppys repositorier. Detta kan ta litet tid
+ om du har en långsam anslutning, så ha tålamod. När paketet laddats 
+ned öppnas Puppys Pakethanterare (Puppy Package Manager) som ställer några enkla frågor och, 
+så länge du väljer OK, installerar paketet och gör det redo att användas. 
+Ett meddelande om att installationen lyckats kommer visas längst upp på skärmen.
+	I inställningarna för Slickpet kan du välja det av Puppys filrepositorier 
+	som fungerar bäst för dig. Om något inte fungerar eller är för långsamt 
+	kan du välja ett annat.
+    Det finns en drivrutinsflik, under vilken du kan installera en lämplig
+    grafikdrivrutin för ditt grafikkort. För Nvidia finns det andra drivrutiner i  
+Puppys Pakethanterare i huvudmenyn. För Radeon- och Intelkort
+rekommenderas \"Xorg High\"-paketet.
+	Det finns också en extra flik, Nyheter. Den är för nyheter om Slacko Puppy, 
+med fixar och nya funktioner.
+	Om du stöter på problem, finns en hjälpfil i Hjälpmenyn.
+	Glöm inte att du också kan installera paket från Puppys vanliga	 pakethanterare,
+	 Puppy Package Manager, som du finner i Puppys huvudmeny.
+	Hoppas du blir nöjd med Puppy."
+export LOC_203="Observera att nedanstående är länkar till 
+applikationer som är kompilerade och paketerade av Puppy
+Linux-entusiaster. Ingen garanti lämnas, dock. 
+De flesta faller
+under Gnu GPL-licensen och dess varianter. De flesta av dessa
+program uppdateras regelbundet och är därför inte lämpliga att
+lagra i ett mer statiskt repositorium. Oftast får du här den senaste,
+stabila versionen, så att du håller ditt operativsystem uppdaterat
+med den senaste utvecklingen.
+För att använda den här funktionen måste du ha en webläsare
+installerad. Klicka på webläsarikonen på skrivbordet för att 
+ladda ner och installera en webläsare." #No changes  :)
+export LOC_204="Alla paket finns tillgängliga i Puppys Paket-hanterare, som du öppnar från \"Install\"-ikonen på skrivbordet.
+Du kan klicka på \"Slickpet on The Web\" så öppnas en websida där paketen 
+kan laddas ner från direktlänkar. Länkar finns också till andra program som har rapporterats fungera i Puppy under Fler Program-fliken.
+	Du kan ändra ditt nedladdningsrepositorium i Arkivmenyn - Inställningar, till 
+	en närmare plats eller till en spegelplats som fungerar bättre för dig. Dina inställningar sparas.  Du kan också ändra den förvalda inställningen att nedladdade paket (i /root.quickpet/Downloads) tas bort efter installationen till att spara dessa. 
+	Nedladdade paket sparas i din sparfil (pupsave)/installation. Du kan se 
+	vad som finns där genom att klicka på Nedladdningskatalog-menyn, och även 
+	flytta dessa paket någonannanstans om du skulle vilja. Du kan också rensa 
+	din Nedladdningskatalog med Rensa Nedladdade Paket i menyn om du valt att inte automatiskt ta bort dem.
+	Det finns även en meny för SFS-filer. Detta är ett speciellt paketformat 
+	som vanligen används för relativt stora program, vilka då kan installeras 
+	utan att tära på utrymmet i din sparfil (pupsave). För mer information, klicka på 
+SFS-Information i menyn.
+Upplev Puppy!
+Puppygänget."
+
+#gtkdialog Be careful with escape character "\" here.. 
+#prefs
+export LOC_299="Avmarkera rutan för att behålla dina nedladdade paket."             
+export LOC_302="Paketen raderas från /tmp när du bootat om." 
+export LOC_300="Puppys Pakethanterare \n \"Puppy Package Manager\""
+export LOC_301="Välj alternativ för Slickpet."
+#export LOC_302="Changes will take effect when you click OK"
+export LOC_303="Välj ett repositorium."
+#main gui
+export LOC_304="Inställningar"
+export LOC_305="på nätet"
+export LOC_306="Juridiskt"
+export LOC_307="Hjälp"
+export LOC_308="LäsMig"
+export LOC_309="Välkommen till"
+export LOC_310="Detta är ett snabbalternativ till Puppys vanliga Pakethanterare (Puppy's Package Manager). Om du klickar på en paketikon så laddas paketet automatiskt ner och installeras."
+export LOC_311="Populära Pet-paket"
+export LOC_312="InternetPet-paket"
+export LOC_313="Användbara Pet-paket"
+export LOC_314="Drivrutiner"
+export LOC_315="Nyheter"
+export LOC_316="Välj ett Paket att installera"
+export LOC_317="Välj en Webläsare eller E-postklient att installera"
+export LOC_318="Välj ett Pet-Paket"
+export LOC_319="Välj en Drivrutin"
+export LOC_350="Fler Program"
+export LOC_351="Nedladdningskatalog"
+export LOC_352="Rensa Nedladdade Paket" 
+export LOC_355="Om" 
+export LOC_356="Videorapport" 
+
+#Tooltips
+export LOC_353="Om du klickar här visas nedladdade paket som sparats. Du kan dra dem till och släppa dem någon annanstans om du vill spara dem och rensa nedladdningskatalogen. Detta sparar dig litet utrymme i din sparfil (pupsave-fil)."
+export LOC_354="Klicka här om du vill ta bort alla nedladdade paket"
+export LOC_357="för att ladda ned, användarnamn (user)=puppy, lösenord (password)=linux"
+export LOC_360="Du kan behöva ladda ned beroendefiler (dependencies) till "
+#pets
+export LOC_320="Gimp   Kraftfull Bildredigerare" 
+export LOC_321="Psip Puppyphone  Internet Telefoni"
+#export LOC_321="Pwidgets  Tiny Desktop Apps"
+export LOC_322="Förvald webläsare  Ändra förvald webläsare"
+export LOC_323="Moln .. Internetbaserade program"
+export LOC_324="Wine  Kör Windowsprogram"
+export LOC_327="Gnome Games Lite  Mycket kul"
+#internet
+export LOC_501="Firefox  Populär Mozilla-Webläsare"
+export LOC_502="Dillo  Liten, lättviktig webläsare"
+export LOC_503="Chromium  Ubuntu Chrome-Webläsare"
+export LOC_504="Opera  Snabbt Webläsarpaket"
+export LOC_505="Transmission  P2P-bittorrentklient"
+export LOC_506="Kompozer  Websideshanterare/redigerare"
+export LOC_507="Iron  Chromebaserad Webläsare"
+export LOC_508="Pidgin  Tjatklient (Chat Client)"
+#This is an exztra, TOR browser may be an inclusion
+export LOC_TOR="TOR Browser  Surfa säkert"
+
+#Drivers
+#export LOC_389="Please ensure you have at least 80MB of free space before installing a video driver" ##deprecated 2 Nov
+export LOC_390="En del system kräver att dessa extra drivrutiner installeras för att fullt ut kunna utnyttja dess funktioner." ##ALL NEW
+#export LOC_391="RadeonHD For later model ATI Video Cards 372KB" deprecated, no harm to leave it though
+export LOC_392B="Välj din rekommenderade drivrutin."
+export LOC_392C="Du rekommenderas välja den senaste drivrutinen för ditt kort."
+#export LOC_392Att="This is for older nVidia cards"
+#export LOC_392Btt="This is for middle aged and some newer nVidia cards"
+#export LOC_392Ctt="This is for newer nVidia cards"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.35 14MB"
+export LOC_392x="Mesa -GLX  För Radeon- och Intelkort"
+export LOC_392m="Mesa -GLX För Radeon- och Intelkort"
+export LOC_392h="Klicka här för installationshjälp."
+#export LOC_392j="Nvidia-glx For later model Nvidia Video Cards" deprecated
+export LOC_392a="Nvidia-glx För senare modeller av Nvidias Grafikkort."
+export LOC_392tt="Om du klickar här får du förslag på drivrutiner. Om du inte vet vilken av dem du behöver, klicka på knappen ovanför." 
+export LOC_392ttr="Försäkra dig om att ditt ATI-AMDkort stöds i videotestet."
+export LOC_392vid="Klicka här för att testa ditt grafikkort."
+export LOC_392ttvid="Här undersöks vilket grafikkort du har, så att du kan avgöra vilken drivrutin du behöver." 
+export LOC_701="\n Använd Xorg_High-paketet i Slickpet"
+#export LOC_702="You have"
+#export LOC_703="You have"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language########### deprecated 1 November
+export LOC_704="Grafikkort"
+export LOC_705="Klicka på knappen för att öppna din webläsare och översätta ovanstående text." 
+xport LOC_706="Du måste ha en webläsare med svenska installerat."
+#News
+#Update IS now "News"
+export LOC_500="Den här stora knappen tar dig till Slacko Puppys websida med senaste nyheter om Slacko Puppy. Av och till kommer uppdateringar för Slacko Puppy erbjudas på denna sida."
+export LOC_500B="Den här stora knappen tar dig till Puppys Wikiwebsida, som har senaste nyheter om " 
+
+#Xdialog ###deprecated
+#export LOC_401="Slacko Puppy Driver Install"
+#export LOC_402="You have chosen to install"
+#export LOC_403="\nPlease note: There will be a message pop up when you install \n your nVidia driver, write the information down. \nWould you like to continue?"
+#Clear Downloads
+export LOC_801="Rensa Nedladdade Paket."
+export LOC_802="Du har valt att rensa nedladdade paket. \nÄr du säker?" 
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" varvid du kommer bli tillfrågad om att göra \nom det till ett Pet-paket."
+export LOC_902=". Du kommer då att ombedjas starta om datorn för att slutföra installationen."
+export LOC_903="Inga SFS-filer Laddade"
+export LOC_910="Klicka bara på din önskade"
+export LOC_910tt="klicka för att se laddade sfs-filer"
+export LOC_911="och den kommer att laddas ned"
+export LOC_920="Tillgängliga SFS-filer"
+export LOC_921="Beskrivning"
+export LOC_950="Glöm inte att boota om innan \n installation av fler sfs-filer\!"
+export LOC_951="Du har redan laddat ned"
+export LOC_952="Kontrollera i Bootmanagern för att se om \ndu redan laddat den"
+export LOC_953="Du har inte tillräckligt med diskutrymme för att installera"
+export LOC_954="Avbryter"
+export LOC_955="P.g.a begränsat RAMminne i ditt system\nhar du inte tillräckligt med utrymme för installation"
+export LOC_956="Vänta... \n Stor Sfs-fil, kan ta lång tid att ladda ned"
+#NEW stuff AS OF 1 DECEMBER 2010
+export LOC_960="Klicka på Avsluta om du är osäker, utan att ladda ned"
+export LOC_961a="Klicka på"
+export LOC_961b="-knappen och drivrutinen laddas ner direkt."
+export LOC_962="Klicka på nedladdning"
+export LOC_970a="Du borde verkligen installera en webläsare som kan översätta till svenska om du behöver översätta den här sidan."
+export LOC_970b="Du kan översätta den här sidan om din webläsare stöder översättning."
+#NEW stuff AS OF 6 DECEMBER 2010
+export LOC_971a="uppgraderingen har installerats och verkar fungera. Klicka"
+export LOC_971b="uppgraderingen har installerats och verkar fungera. Du kan testa genom att köra \"glxgears\" i ett terminalfönster. Klicka"
+export LOC_972="har installerats, men drivrutinen verkar inte fungera. Klicka på"
+
+#END
+

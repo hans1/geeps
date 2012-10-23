@@ -1,0 +1,78 @@
+#!/bin/bash
+
+echo "$LOC_LOADING..." > $WORKDIR/splashtext
+$APPDIR/box_splash &
+
+. $APPDIR/gui_menu
+. $APPDIR/gui_misc -eq #include equalizer
+. $APPDIR/gui_toolbar
+. $APPDIR/gui_playlist
+. $APPDIR/gui_navigation
+. $APPDIR/gui_add
+. $APPDIR/gui_mixer
+. $APPDIR/gui_trackinfo -width 360
+
+GUI="
+ <hbox>
+ $GUI_ADD_FIELD
+ <vbox width-request=\"410\">
+ <vbox>
+  $GUI_MENUS
+  $GUI_SEARCH_OPTIONS
+  $GUI_ADD_SEARCH2
+ </vbox>
+  <text height-request=\"5\"><label>\"\"</label></text>
+  <hbox homogeneous=\"true\"><hbox spacing=\"2\">
+   $GUI_BUTTON_OVERVIEW
+   $GUI_BUTTON_PLAYMODE
+   $GUI_BUTTON_ADDMODE
+   $GUI_NAVIGATION
+   $GUI_BUTTON_PLAYLIST_HISTORY_BACK
+   $GUI_BUTTON_NEW
+   $GUI_BUTTON_PLAYLIST_HISTORY_FORWARD
+  </hbox></hbox>
+  $GUI_PROGRESSBAR
+  $GUI_PROGRESS
+  
+ <vbox scrollable=\"true\">
+
+  $(<$WORKDIR/xml_Pmusic_trackinfo)
+  
+  ##mixer
+  <hbox homogeneous=\"true\" space-expand=\"false\" space-fill=\"false\">
+   <hbox>
+    <vbox width-request=\"130\">
+     $GUI_BALANCE
+    </vbox>
+    $GUI_BALANCE_IMG
+   </hbox>
+   <hbox>
+    $GUI_VOLUME_IMG
+    <vbox width-request=\"130\">
+     $GUI_VOLUME
+    </vbox>
+   </hbox>
+  </hbox>"
+  [ "`type pequalizer 2> /dev/null`" ] && GUI="$GUI<hbox homogeneous=\"true\">$GUI_PEQUALIZER</hbox>"
+  GUI="$GUI
+  </vbox>
+ <statusbar has-resize-grip=\"false\">
+  <variable>STATUSBAR</variable>
+  <input file>$WORKDIR/statusbar</input>
+ </statusbar>
+ </vbox>
+ <vbox width-request=\"350\">
+  $GUI_PLAYLIST_FIELD"'
+ </vbox>
+ </hbox>
+ <action signal="show">'$APPDIR'/func_mixer -get_levels</action>
+ <action signal="show">refresh:VOLUME</action>
+ <action signal="show">refresh:BALANCE</action>
+ <action signal="show">echo > '$WORKDIR'/gui_is_running</action>
+ <action signal="show">echo 100 > '$WORKDIR'/splash</action>
+ <action signal="delete-event">mv -f $HOME/.asoundrc $HOME/.asoundrc.bak</action>
+ <action signal="delete-event">rm -f '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">'$APPDIR'/func_config -write_config</action>
+ <action signal="delete-event">'$APPDIR'/func -quit</action>
+ <action signal="delete-event">exit:Exit</action>
+</window>'

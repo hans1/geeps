@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pdict online dictionary
+Name[ru]=Pdict онлайн-словарь
+Name[de]=Pdict Online Woerterbuch
+Name[es]=Pdict-Diccionario en línea
+Name[fr]=Dictionnaire en ligne
+Name[hu_HU]=Pdict online szótár
+Name[ja]=Pdict オンライン辞書
+Name[zh_CN]=Pdict 在线字典
+Icon=mini-book1.xpm
+Comment=Pdict online dictionary
+Exec=pdict
+Terminal=false
+Type=Application
+Categories=X-DocumentUtility
+GenericName=Pdict

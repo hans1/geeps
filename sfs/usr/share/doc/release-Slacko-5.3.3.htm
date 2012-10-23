@@ -1,0 +1,438 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>Puppy Linux Release Announcement</title>
+
+
+
+
+  
+  
+  
+
+
+
+
+
+  
+  
+  
+  
+  
+  
+<meta content="Barry Kauler" name="author">
+</head><body>
+<table style="text-align: left; width: 630px; margin-left: auto; margin-right: auto;" border="0" cellpadding="2" cellspacing="2">
+
+
+
+
+
+
+
+  <tbody>
+    <tr>
+      <td style="vertical-align: top;">
+      <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="2">
+        <tbody>
+          <tr>
+            <td style="vertical-align: top;"><img style="width: 96px; height: 96px;" alt="puppylogo" src="puppylogo96.png"> <br>
+            </td>
+            <td style="vertical-align: top;"><br>
+            </td>
+            <td style="vertical-align: top;">
+            
+<h1>Announcement and release notes for Slacko Puppy 5.3.3</h1>
+<h1>
+</h1>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">Slacko Puppy is built from a "Puppy builder" system named <span style="font-style: italic; font-weight: bold;">Woof</span> (<a href="http://bkhome.org/woof/">http://bkhome.org/woof</a>),
+which can build a Puppy Linux distribution from the binary packages of any other distro.
+There are many "puppies" built with Woof, including Lucid, Wary, Racy, FatDog, and Slacko.<br>
+      </td>
+    </tr>
+    
+    <tr>
+      <td style="vertical-align: top;">Each
+"Puppy distro" built by Woof is a distinctive distribution in its own right, with
+unique features. You choose a puppy based on your particular needs, be
+it specific hardware, software, or access to and compatibility with the
+package repositories of a particular major distro. <br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top; background-color: rgb(204, 204, 204);">
+      <h2 style="color: rgb(0, 0, 0);">Woof release notes</h2>
+
+Woof is the substratum of all puppies built from Woof, so these notes
+are common to all. To see the complete history of Woof, go to my blog:<br>
+&nbsp;<a href="http://bkhome.org/blog/?viewCat=Woof">http://bkhome.org/blog/?viewCat=Woof</a> <br>
+
+Since the commencement of the Woof project in November 2008 there has
+been rapid development, too much to list on this summary page. However, here
+are highlights:<br>
+      <br>
+Since the release of Puppy 4.3.1 (2009-10-17) up to the release of Quirky 1.0 (2010-05-05), in no particular order:<br>
+
+      
+      <ul>
+<li>Significant improvements in using the Aufs layered filesystem <a href="http://bkhome.org/blog/?viewDetailed=01534">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01535">2</a> <br>
+        </li><li>Improved automatic detection &amp; configuration of analog &amp; 3G modems <a href="http://bkhome.org/blog/?viewDetailed=01513">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01436">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01411">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01390">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01286">5</a> <br>
+</li><li>Samba printing issues resolved <a href="http://bkhome.org/blog/?viewDetailed=01496">1</a> <br>
+        </li><li>The Xorg Wizard has improved detection and configurability options <a href="http://bkhome.org/blog/?viewDetailed=01402">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01359">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01333">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01329">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01461">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01213">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01556">7</a> <br>
+</li><li>Many improvements &amp; bugfixes for bootup &amp; shutdown scripts <a href="http://bkhome.org/blog/?viewDetailed=01462">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01446">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01441">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01439">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01370">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01369">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01294">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01219">8</a> <a href="http://bkhome.org/blog/?viewDetailed=01209">9</a> <a href="http://bkhome.org/blog/?viewDetailed=01408">10</a> <br>
+        </li><li>Simple Network Setup (SNS), very simple wired and wireless setup <a href="http://bkhome.org/blog/?viewDetailed=01445">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01431">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01427">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01425">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01430">5</a> <br>
+        </li><li>Recovery after improper shutdown (such as power failure) <a href="http://bkhome.org/blog/?viewDetailed=01441">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01434">2</a> <br>
+        </li><li>Single location for GPL licenses <a href="http://bkhome.org/blog/?viewDetailed=01423">1</a> <br>
+        </li><li>Integrated handling of all the network setup tools <a href="http://bkhome.org/blog/?viewDetailed=01410">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01403">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01276">3</a> <br>
+        </li><li>New small GUI utilities <a href="http://bkhome.org/blog/?viewDetailed=01401">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01267">2</a>  
+        </li><li>PET package creation tools, package management, improved <a href="http://bkhome.org/blog/?viewDetailed=01377">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01331">2</a> <br>
+        </li><li>Some system utility scripts are improved <a href="http://bkhome.org/blog/?viewDetailed=01374">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01371">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01358">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01344">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01321">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01292">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01260">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01254">8</a> <a href="http://bkhome.org/blog/?viewDetailed=01248">9</a> <a href="http://bkhome.org/blog/?viewDetailed=01500">10</a> <a href="http://bkhome.org/blog/?viewDetailed=01552">11</a> <br>
+ </li><li>System services can now be enabled or disabled <a href="http://bkhome.org/blog/?viewDetailed=01355">1</a> <br>
+        </li><li>Improved hardware detection and localisation in the initramfs <a href="http://bkhome.org/blog/?viewDetailed=01316">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01291">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01218">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01289">4</a> <br>
+        </li><li>Woof hosted on Bones version management system <a href="http://bkhome.org/blog/?viewDetailed=01287">1</a> <a href="http://bkhome.org/blog/?viewCat=Bones">2</a> <br>
+        </li><li>Major enhancements to the Woof build scripts, new GUI <a href="http://bkhome.org/blog/?viewDetailed=01255">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01199">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01177">3</a> <br>
+        </li><li>New Woof logo <a href="http://bkhome.org/blog/?viewDetailed=01234">1</a> <br>
+        </li>
+      </ul>
+At the date of release of Quirky 1.1 (2010-05-15):<br>
+
+
+      
+      
+      <ul>
+<li>Puppy Package Manager can now list all packages in a repository <a href="http://bkhome.org/blog/?viewDetailed=01591">1</a> <br>
+        </li><li>Simple Network Setup has improved surety of connection <a href="http://bkhome.org/blog/?viewDetailed=01590">1</a> <br>
+        </li><li>CUPS printing with Samba now works properly <a href="http://bkhome.org/blog/?viewDetailed=01586">1</a> <br>
+        </li><li>First-boot welcome page now starts quickly in low-resource PCs <a href="http://bkhome.org/blog/?viewDetailed=01576">1</a> <br>
+        </li>
+      </ul>
+
+
+At the release of Quirky 1.2 (2010-06-05):<br>
+
+      
+      <ul>
+<li>Gtkdialog-splash is a great replacement for yaf-splash <a href="http://bkhome.org/blog/?viewDetailed=01636">1</a> <br>
+        </li><li>Bug fixes <a href="http://bkhome.org/blog/?viewDetailed=01624">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01607">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01605">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01642">4</a> </li><li>Database of files builtin to the SFS read-only filesystem<span style="color: rgb(102, 0, 0); font-weight: bold;"></span> <a href="http://bkhome.org/blog/?viewDetailed=01620">1</a> <br>
+        </li><li>For the first time, now supports hardware clock set to localtime or UTC <a href="http://bkhome.org/blog/?viewDetailed=01616">1</a>&nbsp;</li><li>Improvements to detection and dialing, analog and 3G modems <a href="http://bkhome.org/blog/?viewDetailed=01639">1</a>&nbsp;</li><li>Widescreen support for Intel GMA3150 <a href="http://bkhome.org/blog/?viewDetailed=01639">1</a> <br>
+        </li><li>Tweaks to CPU frequency scaling, trying on-demand as default<span style="color: rgb(102, 0, 0); font-weight: bold;"></span> <a href="http://bkhome.org/blog/?viewDetailed=01637">1</a>&nbsp;</li>
+      </ul>
+
+
+
+      <span style="color: rgb(102, 0, 0);"></span>At the date of release of Quirky 1.3 (2010-09-22):<br>
+
+      
+      <ul>
+<li>Extended help at bootup <a href="http://bkhome.org/blog/?viewDetailed=01813">1</a> <br>
+        </li><li>Rationalised Puppy filenames and streamlined find at bootup <a href="http://bkhome.org/blog/?viewDetailed=01812">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01810">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01808">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01807">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01806">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01804">6</a> <br>
+        </li><li>Enhanced yaf-splash <a href="http://bkhome.org/blog/?viewDetailed=01811">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01805">2</a> <br>
+        </li><li>Analog/3G modem detection/usage improvements <a href="http://bkhome.org/blog/?viewDetailed=01799">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01791">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01788">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01784">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01745">5</a> <br>
+        </li><li>Utilities improved, bugs fixed <a href="http://bkhome.org/blog/?viewDetailed=01785">1</a>&nbsp;<a href="http://bkhome.org/blog/?viewDetailed=01779">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01778">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01770">4</a>&nbsp;<a href="http://bkhome.org/blog/?viewDetailed=01766">5</a>&nbsp;<a href="http://bkhome.org/blog/?viewDetailed=01753">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01752">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01742">8</a> <a href="http://bkhome.org/blog/?viewDetailed=01733">9</a> <a href="http://bkhome.org/blog/?viewDetailed=01732">10</a> <a href="http://bkhome.org/blog/?viewDetailed=01730">11</a> <a href="http://bkhome.org/blog/?viewDetailed=01725">12</a> <a href="http://bkhome.org/blog/?viewDetailed=01719">13</a> <a href="http://bkhome.org/blog/?viewDetailed=01717">14</a>&nbsp;<a href="http://bkhome.org/blog/?viewDetailed=01662">15</a> <a href="http://bkhome.org/blog/?viewDetailed=01643">16</a>&nbsp;</li><li>Xorg-related improvements <a href="http://bkhome.org/blog/?viewDetailed=01783">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01781">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01767">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01765">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01710">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01654">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01653">7</a> <br>
+        </li><li>Pup Advert Blocker builtin to Woof <a href="http://bkhome.org/blog/?viewDetailed=01777">1</a> <br>
+        </li><li>Network transfer monthly logging <a href="http://bkhome.org/blog/?viewDetailed=01758">1</a> <br>
+        </li><li>Improved 'man' utility <a href="http://bkhome.org/blog/?viewDetailed=01692">1</a> <br>
+        </li><li>Woof supports Slackware .txz packages <a href="http://bkhome.org/blog/?viewDetailed=01677">1</a> <br>
+        </li><li>Clean unmount of 'savefile' <a href="http://bkhome.org/blog/?viewDetailed=01664">1</a> <br>
+        </li><li>DejaVu fonts upgraded <a href="http://bkhome.org/blog/?viewDetailed=01660">1</a>&nbsp;</li><li>Samba CUPs printing, smbspool replacement <a href="http://bkhome.org/blog/?viewDetailed=01724">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01721">2</a> <br>
+        </li>
+      </ul>
+
+      At the date of release of Quirky 1.4 (2010-11-27):<br>
+      <ul>
+        <li>Analog/3G modem detection/usage improvements <a href="http://bkhome.org/blog/?viewDetailed=01934">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01891">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01882">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01841">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01830">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01992">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01983">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01976">8</a> <a href="http://bkhome.org/blog/?viewDetailed=01959">9</a> <br>
+        </li>
+        <li>New Video Upgrade Wizard <a href="http://bkhome.org/blog/?viewDetailed=01932">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01972">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01955">3</a> <br>
+        </li>
+        <li>Many little bug fixes and improvements <a href="http://bkhome.org/blog/?viewDetailed=01929">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01928">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01889">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01872">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01860">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01856">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01840">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01839">8</a> <a href="http://bkhome.org/blog/?viewDetailed=01838">9</a> <a href="http://bkhome.org/blog/?viewDetailed=01828">10</a> <a href="http://bkhome.org/blog/?viewDetailed=01979">11</a> <a href="http://bkhome.org/blog/?viewDetailed=01973">12</a> <a href="http://bkhome.org/blog/?viewDetailed=01956">13</a> <a href="http://bkhome.org/blog/?viewDetailed=01944">14</a> <a href="http://bkhome.org/blog/?viewDetailed=01937">15</a> <a href="http://bkhome.org/blog/?viewDetailed=01936">16</a> <br>
+        </li>
+        <li>DejaVu fonts improved <a href="http://bkhome.org/blog/?viewDetailed=01923">1</a> <br>
+        </li>
+        <li>Improved file locating and handling at bootup and shutdown <a href="http://bkhome.org/blog/?viewDetailed=01922">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01920">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01913">3</a> <a href="http://bkhome.org/blog/?viewDetailed=01873">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01857">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01991">6</a> <br>
+        </li>
+        <li>Ask before upgrading a save-file <a href="http://bkhome.org/blog/?viewDetailed=01902">1</a> <br>
+        </li>
+        <li>Dialog to install Flash Player <a href="http://bkhome.org/blog/?viewDetailed=01897">1</a> <br>
+        </li>
+        <li>/etc/modprobe.conf finally retired <a href="http://bkhome.org/blog/?viewDetailed=01870">1</a> <br>
+        </li>
+        <li>The welcome-first-boot window starts fast, low resources <a href="http://bkhome.org/blog/?viewDetailed=01869">1</a> <br>
+        </li>
+        <li>New GUI for the ALSA Wizard, bugs fixed <a href="http://bkhome.org/blog/?viewDetailed=01865">1</a> <br>
+        </li>
+        <li>Accumulated monthly network transfers, improved <a href="http://bkhome.org/blog/?viewDetailed=01858">1</a>&nbsp;</li>
+        <li>The on-again/off-again UTF8 saga <a href="http://bkhome.org/blog/?viewDetailed=01982">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01977">2</a>&nbsp;</li>
+        <li>File downloading that works <a href="http://bkhome.org/blog/?viewDetailed=01969">1</a>&nbsp;</li>
+        <li>Proxy server setup <a href="http://bkhome.org/blog/?viewDetailed=01968">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01966">2</a>&nbsp;</li>
+
+      </ul>
+At the date of release of Wary 5.0 (2010-12-29):<br>
+      <ul>
+        <li>Scripts moved to new yaf-splash <a href="http://bkhome.org/blog/?viewDetailed=02052">1</a> <br>
+</li>
+        <li>Many little bug fixes and improvements <a href="http://bkhome.org/blog/?viewDetailed=02048">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02041">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02034">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02018">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02013">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02001">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02000">7</a> <a href="http://bkhome.org/blog/?viewDetailed=01991">8</a> <br>
+        </li>
+        <li>New GUI tool to remove read-only packages (for remastering CD) <a href="http://bkhome.org/blog/?viewDetailed=02040">1</a> <br>
+        </li>
+        <li>Improvements to Puppy Package Manager (PPM) <a href="http://bkhome.org/blog/?viewDetailed=02039">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02017">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02014">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02008">4</a> <br>
+        </li>
+        <li>'zzz' Woof branch:</li>
+        <ul>
+          <li>Bug fixes and improvements <a href="http://bkhome.org/blog/?viewDetailed=02036">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02033">2</a> <br>
+          </li>
+          <li>Wireless 3G modem detection and setup <a href="http://bkhome.org/blog/?viewDetailed=02029">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02025">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02024">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02023">4</a> <a href="http://bkhome.org/blog/?viewDetailed=01990">5</a> <a href="http://bkhome.org/blog/?viewDetailed=01989">6</a> <a href="http://bkhome.org/blog/?viewDetailed=01987">7</a> <br>
+          </li>
+          <li>Modified usb-modeswitch and JimTcl <a href="http://bkhome.org/blog/?viewDetailed=02020">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02016">2</a> <a href="http://bkhome.org/blog/?viewDetailed=01988">3</a> <br>
+          </li>
+          <li>PupDial enhancements <a href="http://bkhome.org/blog/?viewDetailed=02010">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02009">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02033">3</a> <br>
+          </li>
+        </ul>
+
+      </ul>
+At the date of release of Wary 5.1 (2011-02-19):<br>
+      <ul>
+        <li>Many system &amp; utility script tweaks and fixes <a href="http://bkhome.org/blog/?viewDetailed=02139">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02132">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02127">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02116">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02103">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02101">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02080">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02146">8</a> <br>
+        </li>
+        <li>UTF-8 locale fixed for Xlib apps <a href="http://bkhome.org/blog/?viewDetailed=02141">1</a>&nbsp; </li>
+        <li>Many analog modem drivers for 2.6.32.28 kernel <a href="http://bkhome.org/blog/?viewDetailed=02140">1</a>&nbsp;</li>
+        <li>Zigbert's alternate PPM UI <a href="http://bkhome.org/blog/?viewDetailed=02092">1</a>&nbsp;</li>
+        <li>Netboot fix <a href="http://bkhome.org/blog/?viewDetailed=02089">1</a> <br>
+        </li>
+        <li>'zzz' Woof branch:</li>
+        <ul>
+          <li>Improved SNS wireless scan <a href="http://bkhome.org/blog/?viewDetailed=02125">1</a>&nbsp;</li>
+          <li>Jimtcl extracted to a separate PET <a href="http://bkhome.org/blog/?viewDetailed=02142">1</a> <br>
+          </li>
+        </ul>
+      </ul>
+At the date of release of Wary 5.1.1 (2011-02-25):<br>
+      <ul>
+        <li>Minor bugfix of Puppy Package Manager <a href="http://bkhome.org/blog/?viewDetailed=02157">1</a>&nbsp;</li>
+        <li>Tweaks saving session to Flash drive <a href="http://bkhome.org/blog/?viewDetailed=02156">1</a> <br>
+        </li>
+        <li>Remove duplicate listing of save-file choices at bootup <a href="http://bkhome.org/blog/?viewDetailed=02155">1</a>&nbsp;</li>
+        <li>nluug.nl repo removed from list (hopefully temporarily) <a href="http://bkhome.org/blog/?viewDetailed=02153">1</a> <br>
+        </li>
+      </ul>
+At the release date of Wary 5.1.2 (2011-05-25):<br>
+      <ul>
+        <li>Woof now supports RPM packages, as does the Puppy Package Manager <a href="http://bkhome.org/blog/?viewDetailed=02302">1</a> <br>
+        </li>
+        <li>Many bug fixes and improvements <a href="http://bkhome.org/blog/?viewDetailed=02301">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02298">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02290">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02289">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02274">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02272">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02271">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02270">8</a> <a href="http://bkhome.org/blog/?viewDetailed=02232">9</a> <a href="http://bkhome.org/blog/?viewDetailed=02231">10</a> <a href="http://bkhome.org/blog/?viewDetailed=02230">11</a> <a href="http://bkhome.org/blog/?viewDetailed=02205">12</a> <a href="http://bkhome.org/blog/?viewDetailed=02172">13</a> <a href="http://bkhome.org/blog/?viewDetailed=02168">14</a> <br>
+        </li>
+        <li>'pup_event' daemon major rewrite (based on 'zzz' PET) <a href="http://bkhome.org/blog/?viewDetailed=02289">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02269">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02163">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02163">4</a> <br>
+        </li>
+        <li>'fido' non-root operation introduced <a href="http://bkhome.org/blog/?viewDetailed=02284">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02267">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02246">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02245">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02244">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02243">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02242">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02241">8</a> <a href="http://bkhome.org/blog/?viewDetailed=02240">9</a> <a href="http://bkhome.org/blog/?viewDetailed=02239">10</a> <br>
+        </li>
+        <li>Sound Wizard frontend window <a href="http://bkhome.org/blog/?viewDetailed=02283">1</a> <br>
+        </li>
+        <li>Unlimited dotted version numbers, have broken out from 3-digit limit <a href="http://bkhome.org/blog/?viewDetailed=02228">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02226">2</a> <br>
+        </li>
+        <li>'welcome1stboot' window rewritten in BaCon <a href="http://bkhome.org/blog/?viewDetailed=02213">1 <br>
+          </a></li>
+        <li>UTF-8 locale names changed from .utf8 to .UTF-8 <a href="http://bkhome.org/blog/?viewDetailed=02208">1</a> <br>
+        </li>
+        <li>SFS downloader GUI <a href="http://bkhome.org/blog/?viewDetailed=02202">1</a> <br>
+        </li>
+      </ul>
+At the release date of Wary 5.1.3 (2011-08-15):<br>
+      <ul>
+        <li>Bugs fixed, scripts improved, utilities updated <a href="http://bkhome.org/blog/?viewDetailed=02396">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02387">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02368">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02358">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02341">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02337">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02336">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02314">8</a> <a href="http://bkhome.org/blog/?viewDetailed=02311">9</a> <a href="http://bkhome.org/blog/?viewDetailed=02307">10</a> <br>
+        </li>
+        <li>Versioning support for dependencies <a href="http://bkhome.org/blog/?viewDetailed=02365">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02363">2</a> <br>
+        </li>
+        <li>'common' repository created <a href="http://bkhome.org/blog/?viewDetailed=02362">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02312">2</a> <br>
+        </li>
+        <li>Enhanced desktop drive icons <a href="http://bkhome.org/blog/?viewDetailed=02360">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02359">2</a> <br>
+        </li>
+        <li>New utilities: exploderpm <a href="http://bkhome.org/blog/?viewDetailed=02318">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02320">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02337">3</a> pngoverlay <a href="http://bkhome.org/blog/?viewDetailed=02359">1</a> </li>
+      </ul>
+      At the release date of Wary 5.1.4 (2011-08-29):<br>
+      <ul>
+        <li>Bugs fixed <a href="http://bkhome.org/blog/?viewDetailed=02440">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02430">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02423">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02416">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02411">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02409">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02403">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02447">8</a> <br>
+        </li>
+        <li>New 'findpkgs' script to find pkgs to use in build <a href="http://bkhome.org/blog/?viewDetailed=02429">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02420">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02419">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02414">4</a> <br>
+        </li>
+        <li>Woof improvements for Slacko (Slackware-based) build <a href="http://bkhome.org/blog/?viewDetailed=02424">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02408">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02431">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02427">4</a> <br>
+        </li>
+        <li>Unique hostname on network <a href="http://bkhome.org/blog/?viewDetailed=02402">1</a> <br>
+        </li>
+      </ul>
+At the release date of Wary 5.2 (2011-10-15):<br>
+<ul>
+  <li>Bugs fixed <a href="http://bkhome.org/blog/?viewDetailed=02537">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02536">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02522">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02514">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02505">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02501">6</a> <br>
+  </li>
+  <li>'pupdialog' drop-in replacement for 'dialog' when X running <a href="http://bkhome.org/blog/?viewDetailed=02536">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02488">2</a> <br>
+  </li>
+  <li>PupCamera: automatic digital camera recognition <a href="http://bkhome.org/blog/?viewDetailed=02529">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02527">2</a> <br>
+  </li>
+  <li>Woof general improvements/rationalizations <a href="http://bkhome.org/blog/?viewDetailed=02525">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02495">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02484">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02468">4</a> <br>
+  </li>
+  <li>X GUI shutdown, even internationalized <a href="http://bkhome.org/blog/?viewDetailed=02506">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02499">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02489">3</a>&nbsp;</li>
+  <li>Support for JWM menu icon <a href="http://bkhome.org/blog/?viewDetailed=02472">1</a> <br>
+  </li>
+</ul>
+
+At the release date of Wary 5.2.2 (2011-11-17):<br>
+
+<ul>
+<li>Semi-automated Flashplayer download fixed <a href="http://bkhome.org/blog/?viewDetailed=02593">1</a> </li><li>Saving session as an encrypted file was partly broken <a href="http://bkhome.org/blog/?viewDetailed=02588">1</a> <br>
+  </li><li>Tweaks, improvements, fixes <a href="http://bkhome.org/blog/?viewDetailed=02585">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02584">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02581">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02560">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02558">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02551">6</a> <a href="http://murga-linux.com/puppy/viewtopic.php?t=71767&amp;start=210">7</a> <a href="http://murga-linux.com/puppy/viewtopic.php?t=71767&amp;start=225">8</a> <a href="http://murga-linux.com/puppy/viewtopic.php?t=71767&amp;start=240">9</a> <br>
+  </li><li>X GUI Quick Setup, fast configuration at first boot <a href="http://bkhome.org/blog/?viewDetailed=02578">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02569">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02550">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02549">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02548">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02547">6</a>&nbsp; </li>
+</ul>
+
+
+At the release date of Wary 5.3 (2012-4-7):<br>
+<ul>
+  <li>There has been a massive restructuring to support 
+internationalization. Puppy can now be very easily changed to operate in
+ any language, right from early bootup. At the heart is an easy-to-use 
+GUI named 'MoManager' that makes translation to any language very easy <a href="http://bkhome.org/blog/?viewDetailed=02759">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02751">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02750">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02748">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02745">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02737">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02728">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02717">8</a> <a href="http://bkhome.org/blog/?viewDetailed=02694">9</a> <a href="http://bkhome.org/blog/?viewDetailed=02693">10</a> <a href="http://bkhome.org/blog/?viewDetailed=02689">11</a> <a href="http://bkhome.org/blog/?viewDetailed=02688">12</a> <a href="http://bkhome.org/blog/?viewDetailed=02687">13</a> <a href="http://bkhome.org/blog/?viewDetailed=02686">14</a> <a href="http://bkhome.org/blog/?viewDetailed=02683">15</a> <a href="http://bkhome.org/blog/?viewDetailed=02682">16</a> <a href="http://bkhome.org/blog/?viewDetailed=02681">17</a> <a href="http://bkhome.org/blog/?viewDetailed=02678">18</a> <a href="http://bkhome.org/blog/?viewDetailed=02676">19</a> <a href="http://bkhome.org/blog/?viewDetailed=02673">20</a> <a href="http://bkhome.org/blog/?viewDetailed=02671">21</a> <a href="http://bkhome.org/blog/?viewDetailed=02670">22</a> <a href="http://bkhome.org/blog/?viewDetailed=02776">23</a>&nbsp; <br>
+  </li>
+  <li>Translation is achieved by a one-stop-shop 'langpack' for each language -- so far we have de, fr, pl, ru, es <a href="http://bkhome.org/blog/?viewDetailed=02772">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02759">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02733">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02724">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02699">5</a> <br>
+  </li>
+  <li>A huge number of important bugfixes and improvements <a href="http://bkhome.org/blog/?viewDetailed=02771">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02770">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02769">3</a> <a href="http://bkhome.org/blog/?viewDetailed=02767">4</a> <a href="http://bkhome.org/blog/?viewDetailed=02764">5</a> <a href="http://bkhome.org/blog/?viewDetailed=02757">6</a> <a href="http://bkhome.org/blog/?viewDetailed=02747">7</a> <a href="http://bkhome.org/blog/?viewDetailed=02740">8</a> <a href="http://bkhome.org/blog/?viewDetailed=02738">9</a> <a href="http://bkhome.org/blog/?viewDetailed=02731">10</a> <a href="http://bkhome.org/blog/?viewDetailed=02721">11</a> <a href="http://bkhome.org/blog/?viewDetailed=02719">12</a> <a href="http://bkhome.org/blog/?viewDetailed=02716">13</a> <a href="http://bkhome.org/blog/?viewDetailed=02715">14</a> <a href="http://bkhome.org/blog/?viewDetailed=02712">15</a> <a href="http://bkhome.org/blog/?viewDetailed=02711">16</a> <a href="http://bkhome.org/blog/?viewDetailed=02710">17</a> <a href="http://bkhome.org/blog/?viewDetailed=02709">18</a> <a href="http://bkhome.org/blog/?viewDetailed=02706">19</a> <a href="http://bkhome.org/blog/?viewDetailed=02702">20</a> <a href="http://bkhome.org/blog/?viewDetailed=02701">21</a> <a href="http://bkhome.org/blog/?viewDetailed=02697">22</a> <a href="http://bkhome.org/blog/?viewDetailed=02696">23</a> <a href="http://bkhome.org/blog/?viewDetailed=02690">24</a> <a href="http://bkhome.org/blog/?viewDetailed=02684">25</a> <a href="http://bkhome.org/blog/?viewDetailed=02663">26</a> <a href="http://bkhome.org/blog/?viewDetailed=02653">27</a> <a href="http://bkhome.org/blog/?viewDetailed=02648">28</a> <a href="http://bkhome.org/blog/?viewDetailed=02638">29</a> <a href="http://bkhome.org/blog/?viewDetailed=02637">30</a> <a href="http://bkhome.org/blog/?viewDetailed=02636">31</a> <a href="http://bkhome.org/blog/?viewDetailed=02635">32</a> <a href="http://bkhome.org/blog/?viewDetailed=02634">33</a> <a href="http://bkhome.org/blog/?viewDetailed=02633">34</a> <a href="http://bkhome.org/blog/?viewDetailed=02632">35</a> <a href="http://bkhome.org/blog/?viewDetailed=02631">36</a> <a href="http://bkhome.org/blog/?viewDetailed=02629">37</a> <a href="http://bkhome.org/blog/?viewDetailed=02628">38</a> <a href="http://bkhome.org/blog/?viewDetailed=02627">39</a> <a href="http://bkhome.org/blog/?viewDetailed=02617">40</a> <a href="http://bkhome.org/blog/?viewDetailed=02614">41</a> <a href="http://bkhome.org/blog/?viewDetailed=02608">42</a> <a href="http://bkhome.org/blog/?viewDetailed=02775">43</a>&nbsp; <br>
+  </li>
+  <li>New 'pupmessage',&nbsp; simple replacement for xmessage <a href="http://bkhome.org/blog/?viewDetailed=02763">1</a> <br>
+  </li>
+  <li>The 'underdog' has made a comeback <a href="http://bkhome.org/blog/?viewDetailed=02668">1</a> <br>
+  </li>
+  <li>Non-root user 'fido' still not ready for regular use, but some progress <a href="http://bkhome.org/blog/?viewDetailed=02644">1</a> <br>
+</li><li>Woof2 supports multi-architecture, and hosted online in a Fossil repository <a href="http://bkhome.org/blog/?viewDetailed=02612">1</a> <a href="http://bkhome.org/blog/?viewDetailed=02611">2</a> <br>
+  </li>
+</ul>
+Please note that some puppies that are not built from the
+latest version of Woof, or remasters of an earlier release of Puppy,
+may not have all of the above features.</td>
+    </tr>
+
+
+    
+    
+    
+    
+    
+<tr>
+  <td style="vertical-align: top;"><br>
+  </td>
+</tr>
+<tr>
+      <td>
+      <h2>Lots of puppies...</h2>
+      </td>
+    </tr>
+    
+    
+
+<tr>
+  <td style="vertical-align: top;">
+    <h3>Spup (Slacko)</h3>
+"Spup" is our generic name for puppies built with Slackware binary 
+packages. The foremost right now is "Slacko", currently one of our official flagship puppies. <a href="http://bkhome.org/blog/?viewDetailed=02621">1</a> <br>
+  </td>
+</tr>
+<tr>
+      <td style="vertical-align: top;">
+      
+      <h3>Upup (Lucid)</h3>
+
+"Upup" is our generic name for puppies built with Ubuntu packages. Our
+latest is "Lucid Puppy", built with Ubuntu Lucid Lynx binary .deb packages. What
+you get is a very small distro (the live-CD is about 130MB) yet with
+just about every application you would need and the speed and
+ease-of-use that Puppy is famous for. All of the advantages of Puppy,
+plus binary compatibility with Ubuntu .deb packages -- Puppy's own
+Puppy Package Manager will install any packages from the vast Ubuntu
+repositories!<br>
+
+The official release of Lucid Puppy (also known as "Lupu") is 5.2.8. <a href="http://bkhome.org/blog/?viewDetailed=02067">1</a> <a href="http://bkhome.org/blog/?viewDetailed=01595">2</a> <a href="http://bkhome.org/blog/?viewDetailed=02418">3</a>&nbsp; <br>
+</td></tr><tr>
+  <td style="vertical-align: top;">
+    <h3>Wary</h3>
+Wary
+is intended to be state-of-the-art, built with the latest Woof and
+recent packages, except for some rollbacks where newer packages are
+considered less than satisfactory. Currently, Wary uses Xorg 7.3 (as, 
+quite
+frankly Xorg 7.4+ have a lot wrong with them). Wary may be your
+better choice for older video hardware. Wary is built with kernel 
+2.6.32.x, to suit older hardware. Also, we have a large collection of 
+drivers for old
+analog modems (we are unable to compile many
+of
+these drivers with later kernels).&nbsp; Wary intro. page: <a href="http://bkhome.org/wary/">http://bkhome.org/wary/</a>&nbsp; Wary blog: <a href="http://bkhome.org/blog/?viewCat=Wary">http://bkhome.org/blog/?viewCat=Wary</a> <br>
+  </td>
+</tr>
+<tr>
+      <td style="vertical-align: top;">
+      
+      <h3>FatDog64</h3>
+
+
+      FatDog64 is compiled from source using T2 and optimised
+for the Intel 64-bit x86 (and compatible) CPUs. This build tends to be
+leading-edge in terms of features and application versions. Fatdog64 
+forked from an older version of Woof, but has implemented many 
+improvements. Another feature of Fatdog64 is browser and other Internet 
+applications run as user 'spot'. <a href="http://distro.ibiblio.org/pub/linux/distributions/fatdog/web/">1</a>&nbsp;
+      </td>
+    </tr>
+    
+<tr>
+      <td style="vertical-align: top;"><br>
+      </td>
+    </tr><tr>
+      <td style="vertical-align: top; background-color: rgb(255, 204, 204);">
+      <h2>So many more puppies!</h2>
+It is so easy to create a custom Puppy, either by using Woof or
+remastering the live-CD (there is an super-easy remaster program in the
+Setup menu), and this has resulted in a huge choice of custom puppies.
+The main problem is finding out just what is available. A good starting
+point is the Community News page:<br>
+      <a href="http://puppylinux.org/news/">http://puppylinux.org/news/</a> <br>
+      </td>
+    </tr>
+
+</tbody>
+</table>
+
+
+
+
+
+
+<br>
+
+
+
+
+<br>
+
+
+
+</body></html>

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Personalize - Settings
+Icon=greypuplogo24.png
+Comment=Screen resolution and country settings 
+Exec=firstrun
+Terminal=false
+Type=Application
+Categories=X-SetupEntry
+GenericName=Personalize Settings

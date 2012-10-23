@@ -1,0 +1,24 @@
+/usr
+/usr/local
+/usr/local/bin
+ xarchive
+/usr/local/lib
+/usr/local/lib/xarchive
+/usr/local/lib/xarchive/wrappers
+ 7za-wrap.sh
+ ace-wrap.sh
+ arj-wrap.sh
+ deb-wrap.sh
+ rar-wrap.sh
+ rpm-wrap.sh
+ tar-wrap.sh
+ zip-wrap.sh
+/usr/local/share
+/usr/local/share/doc
+/usr/local/share/doc/xarchive
+ xarchive.1.txt
+/usr/share
+/usr/share/applications
+ XArchive-archiver.desktop
+/usr/share/doc
+ xarchive.txt

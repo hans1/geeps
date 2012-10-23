@@ -1,0 +1,215 @@
+#!/bin/bash
+##Slickpet v1.3.4  fr_FR
+#language=French
+#translator=BERNARD Alain - Tasgarth 2011 10 03, 21 h 14
+
+#Buttons and warnings
+export LOC_OK="OK"
+export LOC_CANCEL="Annuler"
+export LOC_ERROR="Erreur"
+export LOC_WARNING="Danger"
+export LOC_YES="Oui"
+export LOC_NO="Non"
+export LOC_QUIT="Quitter"
+export LOC_HELP="Aide"
+export LOC_INFO="Info"
+export LOC_FILE="Fichier"
+export LOC_CANTINSTALL="Vous n'avez pas assez d'espace pour installer"
+export LOC_WARNINGINSTALL="Après installation de ce paquet,\n vous disposerez de moins de 45 MB \nDésirez-vous ontinuer?"
+
+#browser installer  #NOT used in Slacko
+
+#yaf messages
+export LOC_101="ERREUR:Téléchargement impossible. Connectez-vous à Internet."
+export LOC_102="Patientez..."
+export LOC_103="ERREUR: Le serveur de mise à jour ne répond pas. Contrôler la connection ou recommencer plus tard"
+export LOC_104="Vous avez la dernière Mise à Jour de  Puppy"
+export LOC_105="Actuellement il n'y a pas de Mises à Jour pour ce Puppy"
+export LOC_106a="Attendez le téléchargement..."
+export LOC_106b="Une confirmation vous sera demandée"
+export LOC_107="Connection trop longue. Essayez plus tard ou réinitialiser la temporisation dans Preferences."
+export LOC_108="ERREUR:Echec du téléchargement. Essayez plus tard. A la reprise il sera complété automatiquement."
+export LOC_109="ERREUR: Echec de l'installation, réessayer."
+export LOC_110a="Installation réussie"
+export LOC_110b=""
+export LOC_111="Ce Navigateur est maintenant celui par défaut"
+export LOC_112="Attendez...Slickpet est déja en fonctionnement"
+export LOC_113="Attendez, recherche de votre paquet..."
+#NEW yaf messages
+export LOC_114="Vous ne pouvez pas télécharger un pilote pendant un autre téléchargement en cours"
+export LOC_115="Abstenez-vous de tout autre téléchargement pendant celui d'un pilote."
+export LOC_116="Pardon, impossible de trouver le paquet demandé"
+export LOC_117="Vous avez atteint le nombre maximum de SFS installés permis. Pour en télécharger plus, vous devez en désintaller avec le 'Bootmanager'."
+#xmessages
+export LOC_202="Bienvenue dans Slickpet de Puppy.
+Il y a des onglets pour les paquets 'pets'.
+Très simplement, la sélection faite, cliquez sur l'icône du paquet pet.
+Il sera téléchargé automatiquement d'un dépôt officiel de Puppy.
+Cela peut prendre du temps pour les connections lentes. Soyez patient.
+ Cela terminé le PPM (Gestionnaire des Paquets) s'ouvre et
+pose quelques questions à valider  par OK pour une installation prète à l'emploi.
+Un message en haut de l'écran en signale la réussite.
+
+Vous pouvez sélectionner le site 'dépôts' le meilleur pour vous.
+ Si l'un est trop lent ou ne fonctionne pas, changez pour un autre.
+
+Un onglet 'Pilotes' vous permet d'installer le pilote Graphique spécifique
+ à votre matériel.
+- Pour Nvidia: D' autres pilotes sont dans le Gestionnaire des Paquets PPM du Menu.
+- Pour Radeon et Intel : 'Mesa Package' est recommandé.
+
+Il y a aussi un onglet 'News' qui contient des correctifs et des actualités.
+En cas de problèmes: Menu >> Support >> Aide
+
+Autre possibilité d'installation : par le Gestionnaire des Paquets (PPM).
+Menu de Puppy >> Configuration >> Setup Puppy >> Gestionnaire des paquets.
+
+Trouvez du plaisir avec Puppy"	
+export LOC_203="Les entrées suivantes sont des liens vers des applications compilées
+ et préparées par des entousiastes de Puppy. Le tout sans garantie.
+  La plupart sont sous Licence Gnu GPL et ses variantes. 
+  
+La plupart sont régulièrement maintenues et donc
+ ne sont pas appropriés pour un hébergement dans un dépôt.
+ Le plus souvent possible, vous aurez la dernière version stable
+ pour conserver le tout au top niveau.
+
+Un Navigateur Internet doit être installé avant de pouvoir utiliser
+ cette caractéristique:
+Onglet  Internet >> Clic sur l'icône du Navigateur >> installer"  #No changes  :)
+export LOC_204="Tous les Paquets contenus dans le Gestionnaire PPM sont opérationnels
+par  l'icône \"Install\" sur le bureau.
+En Cliquant sur l'onglet 'Slickpet sur le web', une page Internet s'ouvrira et 
+vous pourrez télécharger les paquets.
+
+Dans l'onglet 'Plus de programmes' il y a des liens vers d'autres programmes
+connus pour fonctionner sous Puppy.
+
+Vous pouvez changer de 'dépôts' pour un autre jugé meilleur:
+ Menu >> Préférences >> le 'dépôt' de votre choix.
+  Ce choix sera gardé en mémoire.
+ Vous pouvez aussi effacer ou conserver les paquets pet téléchargés
+ dans /root/.slickpet/Downloads et devenus inutiles après installation.
+Les paquets téléchargés sont stockés dans votre 'pupsave/installation'.
+ Vous y verrez le contenu en cliquant sur:
+  Menu >> Fichier >> Répertoire de téléchargements.
+  Il sert à les conserver si vous le désirez. Vous pouvez les déplacer à votre guise.
+ ou aussi vider le répertoire 'téléchargements'.
+Menu >> Fichier >> Effacer les logiciels téléchargés.
+
+Il y a aussi un Onglet pour les fichiers SFS.
+ (Les SFS sont des paquets particuliers pour surtout des programmes volumineux 
+ installés en dehors de votre 'pupsave' pour en  économiser l'espace.)
+ Pour plus d'informations:
+  Menu >> SFS >> SFS Support 
+  
+'Du plaisir avec Puppy!'
+L'équipe Puppy."
+#gtkdialog  Be careful with escape character "\" here.. 
+#prefs
+export LOC_299="Décocher pour conserver vos Paquets téléchargés"
+export LOC_300="Gestionnaire de Paquets PPM"
+export LOC_301="Paramétrer Slickpet"
+export LOC_302="Après un reboot les paquets sont enlevés de /temp"
+export LOC_303="Choisir un dépôt"
+#main gui
+export LOC_304="Préférences"
+export LOC_305="sur le Web"
+export LOC_306="Licence"
+export LOC_307="Support"
+export LOC_308="Avant propos"
+export LOC_309="Bienvenue dans"
+export LOC_310="Autre alternative rapide au Gestionnaire de Paquets PPM de Puppy. 
+Cliquez sur l'icône choisi pour télécharger et installer automatiquement."
+export LOC_311="Populaires"
+export LOC_312="Internet"
+export LOC_313="Utiles"
+export LOC_314="Pilotes"
+export LOC_315="News"
+export LOC_316="Choisir un logiciel à installer"
+export LOC_317="Choisir un Navigateur ou Client Mail"
+export LOC_318="Choisir un Paquet Pet"
+export LOC_319="Choisir un Pilote"
+export LOC_350="Plus de paquets Pets"
+export LOC_351="Répertoire du téléchargement"
+export LOC_352="Effacer les logiciels téléchargés"
+export LOC_355="Au sujet de"
+export LOC_356="Report Video"
+#Tooltips
+export LOC_353="En cliquant ici vous listez les paquets téléchargés si vous les avez sauvegardés. \nVous pouvez les stocker ailleurs par un 'glisser-déposer', libérant ainsi de la place  dans votre pupsave."
+export LOC_354="Cliquer ici pour effacer tous les paquets téléchargés."
+export LOC_357="Pour télécharger, user=puppy, password=linux"
+export LOC_360="Il se peut qu'il faille des dépendances pour "
+#pets
+export LOC_320="Gimp: traitement d'images puissant" 
+export LOC_321="Psip Puppyphone, téléphonie par Internet."
+export LOC_322="Changer de Navigateur par défaut."
+export LOC_323="Cloud: pour programmes basés sur Internet"
+export LOC_324="Wine: Pour utiliser des programmes Windows"
+export LOC_327="Gnome Games Lite: pour le plaisir."
+#internet
+export LOC_501="Firefox Mozilla: Navigateur populaire"
+export LOC_502="Dillo  Tiny: Navigateur d'un poids léger"
+export LOC_503="Chromium Ubuntu: Navigateur Chrome"
+export LOC_504="Opera: Suite Internet rapide"
+export LOC_505="Transmission  Peer to peer:client bit torrent."
+export LOC_506="Kompozer: pour créer des sites Web."
+export LOC_507="Iron: Navigateur à base Chrome"
+export LOC_508="Pidgin: Pour 'chatter' facilement."
+export LOC_TOR="Navigateur TOR: Naviguer en sureté."
+#more pets
+
+#drivers
+export LOC_390="Certains matériels demandent ces pilotes spécifiques pour un meilleur rendu."
+export LOC_392B="Sélectionnez le Pilote recommandé"
+export LOC_392C="L'utilisation du plus récent Pilote est recommandé pour votre carte"
+export LOC_392x="Mesa-GLX: Cartes Graphiques Radeon and Intel"
+export LOC_392m="Mesa -GLX: Cartes Graphiques Radeon and Intel"
+export LOC_392h="Cliquez ici pour une aide à l'installation"
+export LOC_392a="Nvidia-glx: Pour les cartes Nvidia plus récentes"
+export LOC_392tt="En cliquant ici, vous aurez un choix de Pilotes. \nSi vous ne savez pas lequel utiliser cliquez sur le bouton au-dessus"
+export LOC_392ttr="Par le test Video assurez-vous que votre carte ATI-AMD soit supportée"
+export LOC_392vid="Cliquez ici pour tester votre Carte Graphique"
+export LOC_392ttvid="Test pour votre carte Graphique, permettant de déterminer quel Pilote utiliser"
+export LOC_701="\n Utilisez le pet Mesa dans Slickpet."
+
+export LOC_704="" # empty in French language
+export LOC_705="Cliquez sur le bouton pour ouvrir votre Navigateur et... en traduire le contenu." 
+export LOC_706="Pour utiliser la traduction automatique du navigateur, celui-ci doit être paramétré pour le français comme langue"
+
+#News
+#Update IS now "News"
+export LOC_500="Ce bouton imposant vous amenera sur la page des 'News' de Puppy Slacko. Elle contient les dernières actualités concernant le Linux Puppy Slacko, avec, de temps en temps, des Mises à Jour pour Puppy Slacko"
+export LOC_500B="Ce bouton imposant vous amenera sur la 'Wiki' de Puppy contenant les dernières actualités"
+
+#Clear Downloads
+export LOC_801="Effacer les téléchargements"
+export LOC_802="Vous avez choisi d'effacer les Paquets pets téléchargés. \nEn êtes-vous sûr?"
+export LOC_901=" alors il vous sera suggéré d'en faire un Paquet pet"
+export LOC_902=" Vous devrez alors 'rebooter' pour compléter l'installation"
+export LOC_903="Aucun SFS chargé"
+export LOC_910="Simplement cliquer le "
+export LOC_910tt="cliquer pour voir le SFS chargé"
+export LOC_911=" choisi et il sera téléchargé"
+export LOC_920="SFS utilisable"
+export LOC_921="Description"
+export LOC_950="Noubliez pas de 'rebooter' avant \n d'installer d'autres SFS"
+export LOC_951="Vous avez déja téléchargé"
+export LOC_952="Regarder dans le 'Bootmanager' pour voir si vous l'avez\ndéja téléchargé"
+export LOC_953="Vous n'avez pas assez d'espace pour installer"
+export LOC_954="Echec"
+export LOC_955="Dues aux contraintes de la RAM \nvous n'avez pas assez d'espace pour pouvoir installer"
+export LOC_956="Attendez... \n  Sfs volimineux, le téléchargement peut être long"
+export LOC_960="Cliquez sur Quitter si vous ne désirez pas télécharger"
+export LOC_961a="Cliquer sur le"
+export LOC_961b="Bouton pour télécharger directement le Pilote."
+export LOC_962="En cliquant les téléchargements"
+export LOC_970a="Si vous avez besoin de traduire cette page, vous devriez installer un Navigateur offrant cette possibilité."
+export LOC_970b="Possibilité de traduire cette page si le Navigateur en a la capacité."
+#NEW stuff AS OF 6 DECEMBER 2010
+export LOC_971a="la Mise à Jour est installée et semble opérationelle. Cliquer"
+export LOC_971b="la Mise à Jour est installée et semble opérationelle. Contrôle possible en lançant  \"glxgears\" en Console. Cliquer"
+export LOC_972=" est installé mais le pilote ne fonctionne pas. Clicquer le"
+
+#END
+

@@ -1,0 +1,204 @@
+Content-type: text/html
+
+<HTML><HEAD><TITLE>Manpage of USB_MODESWITCH</TITLE>
+</HEAD><BODY>
+<H1>USB_MODESWITCH</H1>
+Section: Misc. Reference Manual Pages (1)<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+usb_modeswitch - switch mode of &quot;multi-state&quot; USB devices
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<P>
+
+<B>usb_modeswitch</B> [<B>-hvpVPmM23rdHn</B>]  [<B>-c </B><I>filename</I>]
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<P>
+
+Several new USB devices have their proprietary Windows drivers onboard,
+most of them WAN dongles. When plugged in for the first time, they act
+like a flash storage and start installing the Windows driver from there.
+If the driver is already installed, it makes the storage device disappear
+and a new device, mainly composite with modem ports, shows up.
+<P>
+
+On Linux, in most cases the drivers are available as kernel modules,
+such as &quot;usbserial&quot; or &quot;option&quot;. However, the device shows up as
+&quot;usb-storage&quot; by default. <B>usb_modeswitch</B> can send a provided bulk
+message (most likely a mass storage command) to the device which is known
+to initiate the mode switching.
+<P>
+
+In some cases, USB control commands are used for switching. These cases are
+handled by custom functions, and no bulk message needs to be provided.
+<P>
+
+Usually, the program is distributed with a set of configurations for many
+known devices, which in combination with a wrapper script launched from the
+udev daemon allows a fully automatic handling of a device upon insertion.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<P>
+
+This program follows the usual GNU command line syntax,
+with long options starting with two dashes ('--').  A summary of
+options is included below.
+<DL COMPACT>
+<DT><B>-h</B> <B>--help</B>         <DD>
+Show summary of options.
+<DT><B>-e</B> <B>--version</B>         <DD>
+Print version information and exit
+<DT><B>-v</B> <B>--default-vendor NUM</B>         <DD>
+Vendor ID to look for (mandatory), usually given as hex number (example: 0x12d1).
+Each USB device is identified by a number
+officialy assigned to the vendor by the USB association and a number for the
+respective model (product ID) chosen by the vendor
+<DT><B>-p</B> <B>--default-product NUM</B>         <DD>
+Product ID to look for (mandatory)
+<DT><B>-V</B> <B>--target-vendor NUM</B>         <DD>
+Target vendor ID. When given will be searched for and detected initially
+for information purposes. If success checking (option -s) is active,
+providing target IDs (vendor/product) or target class is recommended
+<DT><B>-P</B> <B>--target-product NUM</B>         <DD>
+Target product ID
+<DT><B>-b</B> <B>--busnum NUM</B>         <DD>
+<DT><B>-g</B> <B>--devnum NUM</B>         <DD>
+If bus and device number are provided, the handling of a specific device on
+a specific USB port is guaranteed, in contrast to using only the USB ID. This
+is important if there are multiple similar devices on a system
+<DT><B>-C</B> <B>--target-class NUM</B>         <DD>
+Target Device Class according to the USB specification. Some devices keep
+their original vendor/product ID after successful switching. To prevent
+them from being treated again, the device class can be checked.
+For unswitched devices it is always 8 (storage class), for switched
+modems it is often 0xff (vendor specific). In composite modes,
+the class of the first interface is watched
+<DT><B>-m</B> <B>--message-endpoint NUM</B>         <DD>
+A specific endpoint to use for data transfers. Only for testing purposes; usually
+endpoints are determined from the device attributes
+<DT><B>-M</B> <B>--message-content STRING</B>         <DD>
+A bulk message to send as a switching command. Provided as a hexadecimal string
+<DT><B>-2, -3</B>  <B>--message-content2, --message-content3 STRING</B>         <DD>
+Additional bulk messages to send as switching commands. Provided as hexadecimal strings.
+When used with mass storage commands, setting <B>--need-response</B> is
+strongly advised to comply with specifications and to avoid likely errors
+<DT><B>-w</B> <B>--release-delay NUM</B>         <DD>
+After issuing all bulk messages, wait for NUM milliseconds before releasing the interface.
+Required for some modems on older systems (especially after an EJECT message)
+<DT><B>-n</B> <B>--need-response</B>         <DD>
+Read the response (command status wrapper) to a mass storage command
+transfer.
+Some devices have trouble switching if the response is not read; most
+are disappearing right away. When sending multiple mass storage commands
+with <B>-2</B> and <B>-3</B>, this may need to be set to avoid transfer errors
+<DT><B>-r</B> <B>--response-endpoint NUM</B>         <DD>
+Try to read the response to a storage command from there
+if option -n is active. Only for testing purposes; usually
+endpoints are determined from the device attributes
+<DT><B>-d</B> <B>--detach-only</B>         <DD>
+Just detach the current driver. This is sufficient for some early
+devices to switch successfully. Otherwise this feature can
+be used as a 'scalpel' for special cases, like separating the
+driver from individual interfaces
+<DT><B>-H</B> <B>--huawei-mode</B>         <DD>
+Send a special control message used by older Huawei devices
+<DT><B>-S</B> <B>--sierra-mode</B>         <DD>
+Send a special control message used by Sierra devices
+<DT><B>-G</B> <B>--gct-mode</B>         <DD>
+Send a special control message used by GCT chipsets
+<DT><B>-T</B> <B>--kobil-mode</B>         <DD>
+Send a special control message used by Kobil devices
+<DT><B>-T</B> <B>--sequans-mode</B>         <DD>
+Send a special control message used by Sequans chipset
+<DT><B>-T</B> <B>--mobileaction-mode</B>         <DD>
+Send a special control message used by the MobileAction device
+<DT><B>-B</B> <B>--qisda-mode</B>         <DD>
+Send a special control message used by Qisda devices
+<DT><B>-O</B> <B>--sony-mode</B>         <DD>
+Apply a special sequence used by Sony Ericsson devices. Implies option --success
+<DT><B>-L</B> <B>--cisco-mode</B>         <DD>
+Send a sequence of bulk messages used by Cisco devices
+<DT><B>-R</B> <B>--reset-usb</B>         <DD>
+Send a USB reset command to the device. Can be combined with any switching
+method or stand alone. It is always done as the last step of all device
+interactions.
+Few devices need it to complete the switching; apart from that it may be
+useful during testing
+<DT><B>-c</B> <B>--config FILENAME</B>         <DD>
+Use a specific config file. If any ID or switching options are given as
+command line parameters, this option is ignored.
+In that case all mandatory parameters have to be provided on
+the command line
+<DT><B>-f</B> <B>--long-config STRING</B>         <DD>
+Provide device details in config file syntax as a multiline string
+on the command line
+<DT><B>-t</B> <B>--stdinput</B>         <DD>
+Read the device details in config file syntax from standard input, e.g. redirected from
+a command pipe (multiline text)
+<DT><B>-Q</B> <B>--quiet</B>         <DD>
+Don't show progress or error messages 
+<DT><B>-W</B> <B>--verbose</B>         <DD>
+Print all settings before running and show libusb debug messages 
+<DT><B>-D</B> <B>--sysmode</B>         <DD>
+Changes the behaviour of the program slightly. A success message including the
+effective target device ID is put out and a syslog notice is issued. Mainly for
+integration with a wrapper script
+<DT><B>-s</B> <B>--success NUM</B>         <DD>
+After switching, keep checking for the result up to max. NUM seconds. If target IDs
+or target class were provided, their appearance indicates certain success. Otherwise
+the disconnection of the original device is rated as likely proof
+<DT><B>-I</B> <B>--no-inquire</B>         <DD>
+do not obtain SCSI attributes from device (default is on). For proper identification
+of differing devices the attributes of the storage part provide valuable information.
+This is not needed for devices that are known and supported
+<DT><B>-i</B> <B>--interface NUM</B>         <DD>
+Select initial USB interface (default: 0). Only for testing purposes
+<DT><B>-u</B> <B>--configuration NUM</B>         <DD>
+Select USB configuration (applied after any other possible switching actions)
+<DT><B>-a</B> <B>--altsetting NUM</B>         <DD>
+Select alternative USB interface setting (applied after switching). Mainly
+for testing
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<P>
+
+This manual page was originally written by Didier Raboud (<A HREF="mailto:didier@raboud.com">didier@raboud.com</A>) for
+the <B>Debian</B> system. Additions made by Josua Dietze. Permission is
+granted to copy, distribute and/or modify this document under
+the terms of the GNU General Public License, Version 2 or any
+later version published by the Free Software Foundation.
+<P>
+<P>
+
+The complete text of the current GNU General Public
+License can be found in <A HREF="http://www.gnu.org/licenses/gpl.txt">http://www.gnu.org/licenses/gpl.txt</A>
+<P>
+
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNOPSIS</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">AUTHOR</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 09:56:04 GMT, January 08, 2012
+</BODY>
+</HTML>

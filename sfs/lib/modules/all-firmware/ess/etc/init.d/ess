@@ -1,0 +1,73 @@
+#!/bin/sh
+#Barry Kauler, LGPL 2007
+#called from rc.local0. note, rc.local0 calls rc.modem beforehand which
+#sets /dev/modem if a serial modem found.
+
+#if a modem found, quit... v406 if a different modem found, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem`" != "ttyS_ESS0" ] && exit   #v3.98
+
+[ ! $1 ] && exit
+[ "$1" != "start" ] && exit
+
+#Wait for driver to load.
+/sbin/pup_event_backend_modprobe_protect --modcheck=esscom || exit #v432
+
+ln -snf ttyS_ESS0 /dev/modem
+
+#handling country is a problem. the module gets loaded on first boot of puppy
+#before /etc/countryinfo is created (rc.country, called from rc.local0), but
+#can create a hayes command...
+COUNTRIES='0 USA
+1 JAPAN
+2 GERMANY
+3 UK
+4 FRANCE
+5 AUSTRIA
+6 ITALY
+7 AUSTRALIA
+8 SWEDEN
+9 DENMARK
+10 NEW_ZEALAND
+11 KOREA
+12 CHINA
+13 SINGAPORE
+14 MALAYSIA
+15 SOUTHAFRICA
+16 POLAND
+17 CZECH_REPUBLIC
+18 HUNGARY
+19 HONG_KONG
+20 TURKEY
+21 SPAIN
+22 UAE
+23 BELGIUM
+24 FINLAND
+25 GREECE
+26 ICELAND
+27 NETHERLANDS
+28 LUXEMBOURG
+29 NORWAY
+30 CTR21EUROPE
+31 PORTUGAL
+32 SLOVENIA
+33 SWITZERLAND
+34 THAILAND
+35 PERU'
+if [ -f /etc/countryinfo ];then
+ . /etc/countryinfo
+ CPATTERN=" ${COUNTRY_NAME}"'$'
+ MODEM_COUNTRY_CODE="`echo "$COUNTRIES" | grep "$CPATTERN" | cut -f 1 -d ' '`"
+ if [ "$MODEM_COUNTRY_CODE" != "" ];then
+  SPATTERN="s/^MODEM_COUNTRY_STRING.*/MODEM_COUNTRY_STRING='AT\\*NC=${MODEM_COUNTRY_CODE}'/"
+  cat /etc/countryinfo | sed -e "$SPATTERN" > /tmp/countryinfo
+ else
+  SPATTERN="s/^MODEM_COUNTRY_STRING.*/MODEM_COUNTRY_STRING=''/"
+  cat /etc/countryinfo | sed -e "$SPATTERN" > /tmp/countryinfo
+ fi
+ sync
+ mv -f /tmp/countryinfo /etc/countryinfo
+fi
+#.../usr/sbin/gen_modem_init_string reads this variable (called from second
+#entry to /etc/rc.d/rc.modem, in rc.local0).
+
+###END###

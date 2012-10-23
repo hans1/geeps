@@ -1,0 +1,12 @@
+/lib
+ libgcrypt.so.11
+ libgcrypt.so.11.6.0
+/usr
+/usr/bin
+ dumpsexp
+ hmac256
+/usr/lib
+ libgcrypt.so
+ libgcrypt.so.11
+ libgcrypt.so.11.6.0
+/usr/sbin

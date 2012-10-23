@@ -1,0 +1,12 @@
+/etc
+/etc/ppp
+ vpn_servers
+ vpn_userids
+/usr
+/usr/sbin
+ gpptp
+/usr/share
+/usr/share/applications
+ Gpptp.desktop
+/usr/share/doc
+ gpptp.txt

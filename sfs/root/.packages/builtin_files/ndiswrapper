@@ -1,0 +1,6 @@
+/sbin
+ loadndisdriver
+/usr
+/usr/sbin
+ ndiswrapper
+ ndiswrapper-buginfo

@@ -1,0 +1,19 @@
+/root
+/root/File-Sharing
+ .DirIcon
+/root/File-Sharing/Setup-Sharing
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/root/File-Sharing/Setup-Sharing/icon
+ .DirIcon
+/root/File-Sharing/Setup-Sharing/scripts
+ part1
+ part2
+/usr
+/usr/sbin
+ curlftpfs
+ mpscan
+/usr/share
+/usr/share/applications
+ file_sharing.desktop

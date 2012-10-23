@@ -1,0 +1,19 @@
+#!/bin/sh
+which sfs_load &>/dev/null || exit
+if [ "$1" = "stop" ] ; then
+  exec sfs_load --cli stop
+fi
+[ "$1" = "start" ] || exit
+BOOTCONFIG=/etc/rc.d/BOOTCONFIG
+[ -f "$BOOTCONFIG" ] || exit
+. "$BOOTCONFIG"
+. /etc/rc.d/PUPSTATE
+if [ "$PUPMODE" = "5" -a -s "$BOOTCONFIG.save" ] && grep -q '^[^#]*EXTRASFSLIST=..' "$BOOTCONFIG.save"; then
+  # /etc/rc.d/BOOTCONFIG.save keeps EXTRASFSLIST on a remastered puppy
+  . "$BOOTCONFIG.save"
+  echo "EXTRASFSLIST='$EXTRASFSLIST'" > "$BOOTCONFIG"
+  echo "PREVUNIONRECORD='$PREVUNIONRECORD'" >> "$BOOTCONFIG"
+  echo "LASTUNIONRECORD='$LASTUNIONRECORD'" >> "$BOOTCONFIG"
+fi
+[ "$EXTRASFSLIST" ] || exit
+exec sfs_load --cli start

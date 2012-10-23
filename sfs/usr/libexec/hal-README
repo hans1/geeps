@@ -1,0 +1,5 @@
+BK jan 2009
+this dir has a lot more hal executables. removed as i'm trying to
+emasculate hal.
+i left in 'hald-runner' and 'hald-generate-fdi-cache' as that is needed to stop
+the 'hald' daemon from aborting as soon as it starts.

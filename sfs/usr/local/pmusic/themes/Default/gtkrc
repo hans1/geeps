@@ -1,0 +1,23 @@
+
+style "status_bar"
+{
+font_name="bold"
+}
+widget_class "*.GtkStatusbar*" style "status_bar"
+
+
+style "icon-style"
+{
+  stock["gtk-media-play"]		= {{ "icon_play.png", *, *, *}}
+  stock["gtk-missing-image"]	= {{ "blank.png", *, *, *}}
+}
+class "GtkWidget" style "icon-style"
+
+
+style "Lyrics"
+{
+  font_name="bold 14"
+  base[NORMAL]="black"
+  text[NORMAL]="yellow"
+}
+widget "*lyrics" style "Lyrics"

@@ -1,0 +1,36 @@
+#Packager: George Vlahavas (vlahavas~at~gmail~dot~com)
+
+pkgname=lame
+pkgver=3.98.4
+pkgrel=1gv
+arch=i486
+source=(http://downloads.sourceforge.net/project/lame/lame/3.98.4/lame-3.98.4.tar.gz)
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo" "maintainers" "acm" "api" "defines" "hacking" "install.configure" "styleguide" "usage")
+url=http://lame.sourceforge.net/
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"lame (MPEG Audio Layer III (MP3) encoder)"
+"LAME is considered to be the best mp3 encoder. Some of its features"
+"are:"
+"    * Highly optimised presets"
+"    * Fast encoding"
+"    * CBR, ABR and quality-optimized VBR encoding methods"
+"    * Gapless playback with LAME-header compliant decoders"
+"    * Supported by all major CD rippers"
+"    * Highly tunable"
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var --sysconfdir=/etc --mandir=/usr/man --enable-nasm
+	make || return 1
+	make install DESTDIR=$startdir/pkg
+	mkdir -p $startdir/pkg/usr/doc/$pkgname-$pkgver
+	mv $startdir/pkg/usr/share/doc/* $startdir/pkg/usr/doc/$pkgname-$pkgver
+	rm -rf $startdir/pkg/usr/share
+
+	rm $startdir/pkg/usr/lib${LIBDIRSUFFIX}/libmp3lame.a
+} 

@@ -1,0 +1,64 @@
+#!/bin/sh
+case $1 in
+-yesno)
+	[ -z "$FRAME" ] && FRAME="$LOC_INFO"
+	[ -z "$IMG" ] && IMG="dialog-question"
+	BUTTONS="<button no></button><button yes></button>"
+	;;
+-input) #rename / new dir in burnlist
+	BUTTONS="<button cancel></button>
+			<button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+			 <input file stock=\"gtk-apply\"></input>
+			 <label>$LOC_APPLY</label>
+			 <action>EXIT:Apply</action>
+			</button>"
+	EXTENDED_GTKDIALOG="<entry activates-default=\"true\"><variable>INPUT</variable><input>cat $WORKDIR/input</input></entry>"
+	;;
+-quest_blank) #option to blank not-empty-disc before burning  
+	FRAME="$LOC400"
+ 	IMG="dialog-question"
+	TXT1="$LOC307"
+	BUTTONS="<button><label>$LOC126</label><input file>$APPDIR/pburn20.png</input><action>EXIT:blank</action></button>
+			<button><input file stock=\"gtk-cdrom\"></input><label>$LOC339</label></button>
+			<text><label>\"    \"</label></text>
+			<button><input file stock=\"gtk-info\"></input><label>$LOC136</label><action>. $APPDIR/func -disc_info</action></button>
+			<button cancel></button>"
+	;;
+-quest_iso) #option to unpack iso-file or burn as is
+	FRAME="$LOC_ISO"
+ 	IMG="dialog-question"
+	TXT1="$LOC322"
+	BUTTONS="<button><label>$LOC337</label><input file>$APPDIR/pburn20.png</input><action>EXIT:iso</action></button>
+			<button><input file>$APPDIR/pburn20.png</input><label>$LOC338</label></button>
+			<text><label>\"    \"</label></text>
+			<button cancel></button>"
+	;;
+*) #ok box
+	[ -z "$IMG" ] && IMG="dialog-error"
+	[ -z "$FRAME" ] && FRAME="$LOC_ERROR"
+	BUTTONS="<button ok></button>"
+	;;
+esac
+
+export pburn_box="
+<window title=\"Pburn\" icon-name=\"gtk-cdrom\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\" wrap=\"true\" width-chars=\"50\"><label>\"$TXT1\"</label></text>
+   <text use-markup=\"true\" wrap=\"true\" width-chars=\"50\"><label>\"$TXT2\"</label></text>
+   $EXTENDED_GTKDIALOG
+  </frame>
+  <hbox>
+   $BUTTONS
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $($GTKDIALOG -p pburn_box --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+
+export EXIT=$EXIT
+TXT1=""; TXT2=""; IMG=""; FRAME=""; DEFAULT=""; EXTENDED_GTKDIALOG=""; echo -n > $WORKDIR/input #reset to avoid alien values in next box

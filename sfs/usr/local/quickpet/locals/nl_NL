@@ -1,0 +1,237 @@
+#!/bin/bash
+##Slickpet nl_NL-401
+#language=Dutch (Nederlands)
+#translator= Bert 12 December 2010
+
+
+
+
+
+
+
+
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="Annuleren"
+export LOC_ERROR="Fout"
+export LOC_WARNING="Waarschuwing"
+export LOC_YES="Ja"
+export LOC_NO="Nee"
+export LOC_QUIT="Afsluiten"
+export LOC_HELP="Help"
+export LOC_INFO="Info"
+export LOC_FILE="Bestand"
+export LOC_BRS=" is nu uw standaard browser \nHet is aanbevolen om een volwaardige \nbrowser ye installeren, vooral als u \nbestanden wil downloaden"
+export LOC_CANTINSTALL="U heeft onvoldoende ruimte om te installeren"
+export LOC_WARNINGINSTALL="pakket laat minder dan 45 MB ruimte in \n pupsave of partitie na installatie
+ \nDoorgaan?"
+
+#browser installer
+export LOC_001="Welkom in de"
+export LOC_002="Maak a.u.b een Internet-verbinding en kies dan een browser."
+export LOC_003="Let op"
+export LOC_004="Bij minder dan 256 MB RAM, is het beter eerst een opslag-bestand te maken en dan een.browser te kiezen"
+export LOC_005="Basis browser - geïnstalleerd"
+export LOC_006="Klik om Firefox te installeren"
+export LOC_007="Klik om Seamonkey te installeren"
+export LOC_008="Klik om Chromium te installeren"
+export LOC_009="Klik om Opera te installeren"
+export LOC_010="Klik om van de Basis Browser de standaard browser te maken, het staat al op uw systeem"
+
+#yaf messages
+export LOC_101="FOUT: Kan niet downloaden. Maak Internet-verbinding a.u.b."
+export LOC_102="Even geduld ..."
+export LOC_103="FOUT: De update-site reageert niet. Controleer uw verbinding of probeer later opnieuw"
+export LOC_104="U heeft de recentste update voor Puppy"
+export LOC_105="Er zijn momenteel geen updates voor Puppy"
+export LOC_106a="Even wachten op uw"
+export LOC_106b="download. U zal gevraagd worden de installatie te bevestigen"
+export LOC_107="Verbinding time-out. Probeer a.u.b later opnieuw of wijzig de time-out in Voorkeuren"
+export LOC_108="FOUT. Download mislukt. Probeer later opnieuw. Als de download startte, zal hij hervat worden."
+export LOC_109="FOUT: Installeren van pakket mislukt, probeer opnieuw"
+export LOC_110a="Installatie is geslaagd"
+export LOC 110b="."
+export LOC_111="browser is nu de standaard"
+export LOC_112="Slickpet is al actief. Even geduld.."
+export LOC_113="Even geduld a.u.b., uw pakket wordt gezocht..."
+export LOC_114="U kunt geen driver downloaden als er een andere download bezig is" #NEW 1 December
+export LOC_115="Probeer geen andere zaken te downloaden, terwijl u een driver download"
+export LOC_116="Sorry, uw pakket werd niet gevonden"
+export LOC_117="U heeft momenteel het maximum aantal sfs's geladen. Verwijder een paar sfs's in 'Bootmanager' om meer sfs's te downloaden"
+
+#xmessages
+export LOC_202="Welkom, dit is Puppy's Slickpet
+	Er zijn drie hoofd-tabs voor Pets, Puppy's software formaat. 'Pets'
+zijn heel eenvoudig. Als u uw keuze heeft gemaakt en klikt op het icoon, wordt
+het 'pet' pakket gedownload vanaf een Puppy repository. Dit kan even duren bij 
+trage verbindingen, dus even geduld a.u.b..Als het eenmaal is opgehaald, opent de
+PPM (Puppy Package Manager) en stelt enkele simpele vragen. Als u hier tekens OK kiest, 
+zal uw pakket geinstalleerd worden, klaar voor gebruik. U zal een succes- 
+bericht zien verschijnen bovenaan het scherm.
+	Er is een voorkeuren-functie, die u toelaat om de Puppy 
+repository te kiezen die het best voor u werkt. Als één niet of te langzaam
+werkt, kunt u een andere kiezen.
+	Er is een 'Drivers' tab, waarmee u de juiste video driver 
+voor uw specifieke hardware kunt installeren. Voor Nvidia zijn er andere drivers in de 
+Puppy Pakket Manager in het hoofdmenu. Voor Radeon en Intel wordt het 
+Xorg High Pakket aangeraden.
+        Er is ook een extra tab 'Nieuws'. Deze is voor nieuws over Puppy
+en brengt herstellingen en nieuwe functies.
+	Bij problemen is er een hulp-bestand in het menu 'Ondersteuning'.
+	Vergeet niet dat u pakketten kan installeren met de hoofd Puppy Package 
+Manager in het Puppy hoofd-menu. 
+	Veel plezier met Puppy"
+export LOC_203="Let er op dat de volgende links verwijzen naar
+toepassingen die door Puppy Linux enthousiastelingen werden gecompileerd.
+Er kan geen garantie geboden worden. De meeste programma's 
+vallen onder de Gnu GPL licentie en diens varianten. De meeste van
+deze programma's worden regelmatig bijgewerkt en zijn dus
+daardoor niet geschikt voor hosting in een
+repository. Meestal zal u de nieuwste, meest stabiele
+versie krijgen om uw besturingssysteem 
+actueel te houden.
+U dient een browser te hebben om deze functie te
+gebruiken. Klik het 'browse' icoon op het bureaublad
+om een browser te installeren."
+export LOC_204="Alle pakketten in de Puppy Pakket Manager zijn beschikbaar via het \"Install\" bureaublad ikoon.
+U kan klikken op 'Slickpet op het Net' en een web pagina opent zich waar u de pakketten d.m.v. 
+weblinks kan downloaden. Er zijn links naar andere programma's die in Puppy werken in 
+de 'Meer Pets'tab.
+	U kan uw download repository aanpassen in het Bestand menu en onder 'Voorkeuren' een locatie kiezen
+dichter bij u of een spiegel-server die beter werkt. Uw keuze wordt onthouden. U kan ook de standaard
+instelling voor pakketten in /root.quickpet/Downloads wijzigen van 'Verwijderen' naar 'Opslaan'.
+	Gedownloade paketten worden opgeslagen in uw pupsave/installatie. U kan de inhoud zien door 
+te klikken op het Download Map menu. U kan deze pakketten desgewenst ook verplaatsen. U kan uw
+ Download Map ook leegmaken met de 'Verwijder gedownloade pakketten' menu-functie. Dit alleen als u pakketten opslaat.
+	Er is ook een nieuwe tab voor SFS-bestanden. Dit zijn speciale pakketten meestal gemaakt van vrij grote 
+programma's die geinstalleerd kunnen worden zonder plaats in te nemen in uw pupsave. Voor meer informatie, klik op 
+de SFS Ondersteuning menu-functie.
+Veel plezier met Puppy!
+Het Puppy Team."
+
+#gtkdialog
+#prefs
+export LOC_299="Deselecteer om uw gedownloade paketten te behouden"             
+export LOC_302="Pakketten worden verwijderd uit /tmp na herstarten"
+export LOC_300="Puppy Pakket Manager"
+export LOC_301="Keuze-opties voor Slickpet"
+#export LOC_302="Veranderingen worden doorgevoerd, als u op OK klikt"
+export LOC_303="Kies een repository"
+#main gui
+export LOC_304="Voorkeuren"
+export LOC_305="op het Net"
+export LOC_306="Legaal"
+export LOC_307="Ondersteuning"
+export LOC_308="Leesmij"
+export LOC_309="Welkom in"
+export LOC_310="Dit is een snel alternatief voor Puppy's Pakket Manager. Klik op het icoon van uw keuze en uw selectie wordt gedownload en geinstalleerd"
+export LOC_311="Populair"
+export LOC_312="Internet"
+export LOC_313="Nuttig"
+export LOC_314="Drivers"
+export LOC_315="Nieuws"
+export LOC_316="Kies een te installeren pakket"
+export LOC_317="Kies een te installeren browser of email-programma"
+export LOC_318="Kies een Pet pakket"
+export LOC_319="Kies een Driver"
+export LOC_350="Meer Pets"
+export LOC_351="Download Map"
+export LOC_352="Verwijder gedownloade pakketten"
+export LOC_355="Over"
+export LOC_356="Video rapport"
+
+#Tooltips
+export LOC_353="Hier klikken laat de gedownloade pakketten zien, als u deze opslaat. U kan deze verslepen naar een andere locatie als u ze wil opslaan en de download folder leegmaken. Dit geeft wat meer ruimte in uw pupsave."
+export LOC_354="Hier klikken verwijdert alle gedownloade pakketten"
+export LOC_357="om te downloaden, gebruiker=puppy, wachtwoord=linux"
+export LOC_360="U kan dependencies nodig hebben voor" 
+#pets
+export LOC_320="Gimp, een krachtige beeld-editor 23MB" 
+export LOC_321="Pwidgets, kleine desktop toepassingen 283KB"
+export LOC_322="Audacity, een krachtige muziek-editor 6.7MB"
+export LOC_323="Songbird, veelzijdige muziek-manager 17MB"
+export LOC_324="Wine, gebruik Windows programma's 17MB"
+export LOC_325="Clan Bomber, spannend spel 5.3MB"
+export LOC_326="Google Earth  Heeft High Graphics nodig 44MB"
+#internet
+export LOC_501="Firefox, populaire Mozilla browser 15MB"
+export LOC_502="Seamonkey, volledige internet bundel 15MB"
+export LOC_503="Chromium, Ubuntu Chrome browser 23MB"
+export LOC_504="Opera, snelle browser bundel 16MB"
+export LOC_505="Thunderbird, Mozilla Mail client 12MB"
+export LOC_506="Kompozer, website manager 9.2MB"
+export LOC_507="Iron, op Chrome gebaseerde Browser 27MB"
+export LOC_508="Pidgin, uitgebreid Chat programma 3MB"
+
+#more pets
+export LOC_601="Vlc, veelzijdige Media Player 28MB"
+export LOC_602="Dia, diagram editor 4.3MB"
+export LOC_603="Cinelerra, video editor 15MB"
+export LOC_604="JRE Java Runtime Environment 36MB"
+export LOC_605="Pdfedit  PDF editor 5.2MB"
+export LOC_606="Inkscape, vector-teken editor 23MB"
+
+#Drivers
+export LOC_390="Sommige systemen zullen deze extra drivers nodig hebben om beter gebruik te maken van de systeem-functies"
+#export LOC_391="RadeonHD Voor recente ATI Video kaarten 372KB"
+export LOC_392B="Selecteer uw aanbevolen driver"
+export LOC_392C="Het is aan te raden de nieuwste driver voor uw kaart te gebruiken"
+#export LOC_392Att="Dit is voor oudere nVidia kaarten"
+#export LOC_392Btt="Dit is voor middel-oude en sommige nieuwe nVidia kaarten"
+#export LOC_392Ctt="Dit is voor meer recente nVidia kaarten"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.36 14MB"
+export LOC_392x="Xorg High -GLX Voor Radeon en Intel kaarten"
+export LOC_392m="Mesa -GLX voor Radeon en Intel kaarten"
+export LOC_392h="Klik hier voor installatie-hulp"
+#export LOC_392j="Nvidia-glx 256.36 Voor recente Nvidia Video kaarten 14MB" deprecated
+export LOC_392a="Nvidia-glx Voor recente Nvidia Video kaarten"
+export LOC_392tt="Door hier te klikken, kan u een driver kiezen. Als u niet weet welke te kiezen, klik dan de knop hierboven"
+export LOC_392ttr="Controleer of uw ATI-AMDcard ondersteund wordt in de video test"
+export LOC_392vid="Klik hier om uw grafische kaart te testen"
+export LOC_392ttvid="Hier wordt uw grafische kaart getest, om te bepalen welke driver u nodig heeft"
+export LOC_701="\n Gebruik de Xorg_High pet in Slickpet"
+export LOC_704="Grafische kaart"
+export LOC_705="klik deze knop om uw browser te openen en bovenstaande tekst te vertalen" 
+export LOC_706="U heeft hiervoor een Nederlandstalige browser nodig"
+#News
+#Update IS now "News"
+export LOC_500="Deze grote knop brengt u naar de Slacko Puppy Nieuws pagina, waar af en toe updates zullen worden aangeboden voor Slacko Puppy."  
+export LOC_500B="Deze grote knop brengt u naar de Puppy Wiki web pagina met het laatste nieuws over "
+
+#Clear Downloads
+export LOC_801="Downloads verwijderen"
+export LOC_802="U heeft gekozen om de gedownloade pets te verwijderen. \nWeet u het zeker?" 
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" dan zal u gevraagd worden er een Pet van te maken"
+export LOC_902=". u zal dan gevraagd worden te hertstarten om de installatie te vervolledigen"
+export LOC_903="Geen SFS geladen"
+export LOC_910="Klik uw gewenste"
+export LOC_910tt="klik om de geladen SFS te zien"
+export LOC_911="en het zal gedownload worden"
+export LOC_920="Beschikbare SFS"
+export LOC_920="Omschrijving"
+export LOC_950="Vergeet niet te herstarten alvorens \n meer sfs-bestanden te installeren"
+export LOC_951="U heeft reeds gedownload"
+export LOC_952="Controleer de Bootmanager om te zien of u het \nreeds geladen heeft"
+export LOC_953="U heeft niet voldoende ruimte om te installeren"
+export LOC_954="Beëindigen"
+export LOC_955="Door RAM beperkingen in uw systeem \nheeft u onvoldoende ruimte om te installeren"
+export LOC_956="Even wachten a.u.b... \n Het downloaden van grote SFS-bestanden kan lang duren"
+
+export LOC_960="Klik 'Afsluiten', als u niet zeker bent over het downloaden"
+export LOC_961a="Hier klikken"
+export LOC_961b="zal de driver direct downloaden"
+export LOC_962="Downloads aanklikken"
+export LOC_970a="U dient een browser te installeren die kan vertalen, als u deze pagina wil vertalen."
+export LOC_970b="U kan deze pagina vertalen, als uw browser vertaling ondersteunt."
+
+export LOC_971a="upgrade is geinstalleerd en lijkt te werken. Klik"
+export LOC_971b="upgrade is geinstalleerd en lijkt te werken. U kan dit checken door\"glxgears\" in een terminal te draaien. Klik"
+export LOC_972="is geinstalleerd, maar de driver werkt niet. Klik de"
+
+#END
+

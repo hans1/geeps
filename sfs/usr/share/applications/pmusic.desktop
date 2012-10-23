@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pmusic -player -manager -grabber
+Icon=/usr/local/pmusic/pmusic20.png
+Comment=Pmusic -player -manager -grabber
+Exec=pmusic
+Terminal=false
+Type=Application
+Categories=Audio
+GenericName=Pmusic -player -manager -grabber

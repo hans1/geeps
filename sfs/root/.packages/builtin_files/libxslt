@@ -1,0 +1,12 @@
+/usr
+/usr/bin
+ xsltproc
+/usr/lib
+ libexslt.so
+ libexslt.so.0
+ libexslt.so.0.8.15
+/usr/lib/libxslt-plugins
+/usr/lib/python2.6
+/usr/lib/python2.6/site-packages
+ libxsltmod.so
+ libxslt.py

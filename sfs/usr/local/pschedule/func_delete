@@ -1,0 +1,32 @@
+#! /bin/bash
+export delete_box="
+<window title=\"Pschedule\" allow-grow=\"false\">
+ <vbox>
+  <frame $Delete>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-clear\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"<b>${Delete_selected_task}?</b>\"</label></text>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-no\"></input>
+    <label>No</label>
+    <action type=\"exit\">no</action>
+   </button>
+   <button>
+    <input file icon=\"gtk-yes\"></input>
+    <label>Yes</label>
+    <action type=\"exit\">yes</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 -p delete_box --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+if [ "$EXIT" = "yes" ]; then
+	NUM=`echo $TREE | cut -d ":" -f 1` #jake_take
+	sed -i -e "${NUM},${NUM}d" /var/spool/cron/crontabs/$USER #jake_take
+	killall -q crond; crond #restart cron
+fi

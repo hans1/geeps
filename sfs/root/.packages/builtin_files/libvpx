@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ vpxdec
+ vpxenc
+/usr/lib
+ libvpx.so
+ libvpx.so.0
+ libvpx.so.0.9
+ libvpx.so.0.9.6

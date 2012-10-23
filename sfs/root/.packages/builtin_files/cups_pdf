@@ -1,0 +1,13 @@
+/etc
+/etc/cups
+/etc/cups/ppd
+ CUPS-PDF.ppd
+/usr
+/usr/lib
+/usr/lib/cups
+/usr/lib/cups/backend
+ pdf-writer
+/usr/share
+/usr/share/cups
+/usr/share/cups/model
+ ghostpdf.ppd

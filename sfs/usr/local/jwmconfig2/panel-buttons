@@ -1,0 +1,157 @@
+#!/bin/sh
+#set -x
+
+####################################
+#
+# A JWM panel button configuring tool
+# for jwmconfig
+# 2006-NOV-05
+# by plinej
+#
+#####################################
+# 2009-NOV-06 low and high position fixed by himajin, shinobar
+# 23aug2010 shinobar: skip comments from edit
+# 2012-03-19 full rewrite, 01micko, simplified
+
+if [ "`ls /root/.jwmrc-tray-bak`" = "" ]; then
+cp /root/.jwmrc-tray /root/.jwmrc-tray-bak  ### makes .jwmrc-tray-bak backup file unless it already exists
+fi
+[ ! -f /root/.jwmrc-tray.orig ] && cp /root/.jwmrc-tray /root/.jwmrc-tray.orig #make master backup
+cat /root/.jwmrc-tray | sed '/^$/d' > /tmp/.jwmrc-tray  ### remove all blank lines in .jwmrc-tray
+mv /tmp/.jwmrc-tray /root/
+
+#get current buttons
+CURRENTBTNCODE=$(grep "TrayButton" $HOME/.jwmrc-tray|grep -v "root:3")
+CURRENTBTNS=$(grep "TrayButton" $HOME/.jwmrc-tray|grep -v "root:3"|\
+	grep -v "Additional"|\
+	sed -e 's/.*<TrayButton //g' \
+		-e 's/>/ /g'  \
+		-e 's/<.*//g' \
+		-e 's/ icon/|icon/g' \
+		-e 's/xpm" /xpm"|/g' \
+		-e 's/png" /png"|/g')
+echo "$CURRENTBTNS" > /tmp/jwm_cur_btns
+echo "$CURRENTBTNCODE" > /tmp/jwm_cur_btn_code
+
+#delete from tray (tree)
+deletefunc()
+{
+	grep -v "$CHOICE" /root/.jwmrc-tray >/tmp/jwm_new_tray
+	mv -f /tmp/jwm_new_tray /root/.jwmrc-tray
+	jwm -restart
+	rm /tmp/jwm*
+}
+export -f deletefunc
+
+deletefuncsafe()
+{
+	PROG=$(echo $CHOICE|cut -d '=' -f2)
+	Xdialog --title "Delete" --yesno \
+	"Are you sure you want to delete \n${PROG} launcher?" 0 0 0
+	case $? in
+	0) deletefunc ;;
+	*) echo "you cancelled or selected no" ;;
+	esac
+}
+export -f deletefuncsafe
+
+#add to tray
+addfunc()
+{	
+	# 2009-NOV-06 low and high position fixed 
+	total=`wc -l /root/.jwmrc-tray | sed -e 's/ *//' | sed -e 's/ .*//g'` ### get total number of lines
+	low=`grep -n '^[[:blank:]]*<TrayButton' /root/.jwmrc-tray | head -n 1| cut -d':' -f1`  ### get line number of the first button(Menu)
+	high=`grep -n '^[[:blank:]]*<TrayButton' /root/.jwmrc-tray | tail -n 1| cut -d':' -f1` ### get line number of the last button
+	high=`echo "(("$high" + 1))" | bc -l`
+	last=`echo "(("$total" - "$high" + 1))" | bc -l`
+	begin=`echo "(("$low" + 1))" | bc -l` ### first line with panel buttons
+	
+	cat /root/.jwmrc-tray | head -n "$low" > /tmp/jwmrc-tray-1.txt
+	cat /root/.jwmrc-tray | tail -n "$last" > /tmp/jwmrc-tray-3.txt
+	cat /tmp/jwmrc-tray-1.txt /tmp/jwm_cur_btn_code > /tmp/jwmrc-tray-2.txt
+	EXECUTABLE="exec:"$EXEC""
+	[ "$EXEC" = "showdesktop" ] && EXECUTABLE="showdesktop"
+	echo "		<TrayButton popup=\""$POPUP"\" icon=\""$ICON"\">"$EXECUTABLE"</TrayButton>" >> /tmp/jwmrc-tray-2.txt
+	cat /tmp/jwmrc-tray-2.txt /tmp/jwmrc-tray-3.txt > /tmp/jwmrc-tray
+	mv -f /tmp/jwmrc-tray /root/.jwmrc-tray 
+	jwm -restart
+	rm /tmp/jwm*
+}
+export -f addfunc
+
+#gui
+export GUI='<window title="JWM Panel Button">
+ <vbox>
+  <frame Current>
+   <text use-markup="true"><label>"<b><big>Current Panel Buttons</big></b>"</label></text>
+   <text use-markup="true"><label>"<b>Selecting</b> an item in the list <b>deletes</b> that item"</label></text>
+   <tree tooltip-text="Be sure you want to delete the item when selecting">
+    <variable>CHOICE</variable>
+    <label>Popup|Icon|Exec</label>
+    <input>cat /tmp/jwm_cur_btns</input>
+    <action signal="button-release-event">deletefuncsafe</action>
+    <action signal="button-release-event">rm /tmp/jwm*</action>
+    <action signal="button-release-event">exit:deleted</action>
+   </tree>
+  </frame>
+  <frame New>
+   <text use-markup="true"><label>"<b><big>Add New Panel Button</big></b>"</label></text>
+   <hbox>
+    <text><label>Popup  </label></text>
+    <entry tooltip-text="Write your Popup text here">
+     <default>Popup text</default>
+     <variable>POPUP</variable>
+    </entry>
+   </hbox>
+   <hbox>
+    <text><label>Icon     </label></text>
+    <entry fs-action="file" fs-folder="/usr/local/lib/X11/mini-icons" 
+    tooltip-text="Drag or type the path of an icon here or use the file select button">
+     <default>Path to Icon</default>
+     <variable>ICON</variable>
+    </entry>
+    <button>
+     <input file stock="gtk-directory"></input>
+     <action>fileselect:ICON</action>
+    </button>
+   </hbox>
+   <hbox>
+    <text><label>Exec    </label></text>
+    <entry tooltip-text="Type the program executable here">
+     <default>Name of Executable</default>
+     <variable>EXEC</variable>
+    </entry>
+   </hbox>
+  </frame>
+  <frame Restore>
+   <text use-markup="true"><label>"<b><big>Restore Backup</big></b>"</label></text>
+   <hbox>
+    <text><label>Restore Previous Backup</label></text>
+    <button tooltip-text="Restores your previous tray buttons">
+     <input file stock="gtk-refresh"></input>
+     <action>cp -f /root/.jwmrc-tray-bak /root/.jwmrc-tray</action>
+     <action>jwm -restart</action> 
+     <action>exit:backup</action>
+    </button>
+   </hbox>
+   <hbox>
+    <text><label>Restore Master Backup</label></text>
+    <button tooltip-text="Restores the original tray buttons">
+     <input file stock="gtk-refresh"></input>
+     <action>cp -f /root/.jwmrc-tray.orig /root/.jwmrc-tray</action>
+     <action>jwm -restart</action>
+     <action>exit:orig</action>
+    </button>
+   </hbox>
+  </frame>
+  <hbox homogeneous="true">
+   <button use-stock="true" label="gtk-apply">
+    <action>addfunc</action>
+    <action>exit:apply</action>
+   </button>
+   <button cancel></button>
+  </hbox>
+ </vbox>
+</window>'
+
+gtkdialog -p GUI

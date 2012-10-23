@@ -1,0 +1,513 @@
+#!/bin/sh
+#Pmusic
+#Copyright, Sigmund Berglund
+
+#missing array values that won't export - Reload
+grep -F PLAYLIST_NAME $CONFIG > $WORKDIR/tmp_exec
+chmod 722 $WORKDIR/tmp_exec
+. $WORKDIR/tmp_exec
+#---
+
+$APPDIR/func -reset_gtk
+export THEMES=`ls "$APPDIR"/themes | awk '{print "<item>"$1"</item>"}'` #make theme list
+export LANGUAGES=`ls "$APPDIR"/locals | awk '{print "<item>"$1"</item>"}'`
+export PMUSIC_PRESETS=`ls -1 "$APPDIR"/presets | awk '{print "<item>"$1"</item>"}' | grep -vF '.pre</item>'`
+export SOUND_DEVICES="<item>auto</item>`aplay -l | grep -F 'card ' | awk '{print "<item>"$1" "$2" "$3" "$4" "$5" "$6" "$7" "$8" "$9" "$10"</item>"}'`"
+export SPEAKERS=`amixer controls | grep 'Playback Volume' | cut -d "'" -f 2 | sed -e "s/ Playback Volume//g" | tr -s ' ' '_' | awk '{print "<item>"$1"</item>"}' | tr -s '_' ' '`
+export CD_DEVICES="<item>/dev/`ls -1 /sys/block 2> $STDERR | grep -E '^scd|^sr' | tr '\n' ' '`</item>"
+
+write_config (){
+	#running Pmusic with the -j switch should NOT save PMUSIC_PRESET/geometry settings
+	if [ "$DONT_SAVE_PMUSIC_PRESET" ]; then #keep original values
+		PMUSIC_PRESET="`grep -F 'PMUSIC_PRESET=' $CONFIG | cut -d= -f2`"
+		HEIGHT="`grep -F -m1 'HEIGHT=' $CONFIG | cut -d= -f2 | tr -d '"'`" #'
+		WIDTH="`grep -F -m1 'WIDTH=' $CONFIG | cut -d= -f2 | tr -d '"'`" #'
+		X="`grep -F -m1 'X=' $CONFIG | cut -d= -f2 | tr -d '"'`" #'
+		Y="`grep -F -m1 'Y=' $CONFIG | cut -d= -f2 | tr -d '"'`" #'
+		CLASSIC_SOURCE_WINDOW"`grep -F 'CLASSIC_SOURCE_WINDOW=' $CONFIG | cut -d= -f2`"
+	else #save geometry
+		XWININFO=`xwininfo -stats -name Pmusic`
+		HEIGHT=`echo "$XWININFO" | grep 'Height:' | awk '{print $2}'`
+		WIDTH=`echo "$XWININFO" | grep 'Width:' | awk '{print $2}'`
+		X1=`echo "$XWININFO" | grep 'Absolute upper-left X' | awk '{print $4}'`
+		Y1=`echo "$XWININFO" | grep 'Absolute upper-left Y' | awk '{print $4}'`
+		X2=`echo "$XWININFO" | grep 'Relative upper-left X' | awk '{print $4}'`
+		Y2=`echo "$XWININFO" | grep 'Relative upper-left Y' | awk '{print $4}'`
+		X=$(($X1-$X2))
+		Y=$(($Y1-$Y2))
+	fi
+	#---
+	echo "#Pmusic config"											 > $CONFIG
+	echo "export VERSION=$VERSION"									>> $CONFIG
+	echo "export TOOLTIPS=$TOOLTIPS"								>> $CONFIG
+	echo "export TRAYAPP=$TRAYAPP"									>> $CONFIG
+	echo "export THEME=\"$THEME\""									>> $CONFIG
+	echo "export LANGUAGE=$LANGUAGE"								>> $CONFIG
+	echo "export PMUSIC_PRESET=$PMUSIC_PRESET"						>> $CONFIG
+	echo "export AUDIO_EDITOR=$AUDIO_EDITOR"						>> $CONFIG
+	echo "export BROWSER=$BROWSER"									>> $CONFIG
+	echo "export SOUND_DEVICE=\"$SOUND_DEVICE\""					>> $CONFIG
+	echo "export SPEAKER=$SPEAKER"									>> $CONFIG
+	echo "export HIGH_CPU=$HIGH_CPU"								>> $CONFIG
+	echo "export GAP=$GAP"											>> $CONFIG
+	echo "export CD_DEVICE=$CD_DEVICE"								>> $CONFIG
+	for I in $(seq 1 9); do
+		echo "PLAYLIST_NAME[$I]=\"${PLAYLIST_NAME[$I]}\""			>> $CONFIG
+	done
+	echo "export ID3_BROWSER=$ID3_BROWSER"							>> $CONFIG
+	echo "export ID3_BROWSER_MAX=$ID3_BROWSER_MAX"					>> $CONFIG
+	echo "export ID3_PLAYLIST=$ID3_PLAYLIST"						>> $CONFIG
+	echo "export M3U_META_PLAYLIST=$M3U_META_PLAYLIST"				>> $CONFIG
+	echo "export METAINFO_RADIO=$METAINFO_RADIO"					>> $CONFIG
+	echo "export TRACKINFO_REFRESH=$TRACKINFO_REFRESH"				>> $CONFIG
+	echo "export LYRICS_LOCAL=$LYRICS_LOCAL"						>> $CONFIG
+	echo "export LYRICS_LOCAL_DIR=\"$LYRICS_LOCAL_DIR\""			>> $CONFIG
+	echo "export ALBUMART_LOCAL=$ALBUMART_LOCAL"					>> $CONFIG
+	echo "export ALBUMART_LOCAL_DIR=\"$ALBUMART_LOCAL_DIR\""		>> $CONFIG
+	echo "export CONVERT_20=$CONVERT_20"							>> $CONFIG
+	echo "export CONVERT_UNDERSCORE=$CONVERT_UNDERSCORE"			>> $CONFIG
+
+	echo "export SEARCH_WHILE_TYPING=$SEARCH_WHILE_TYPING"			>> $CONFIG
+	echo "export SEARCH_MYMUSIC=$SEARCH_MYMUSIC"					>> $CONFIG
+	echo "export SEARCH_COLLECTIONS=$SEARCH_COLLECTIONS"			>> $CONFIG
+	echo "export SEARCH_WEBMUSIC=$SEARCH_WEBMUSIC"					>> $CONFIG
+	echo "export SEARCH_RADIOHITS=$SEARCH_RADIOHITS"				>> $CONFIG
+	echo "export SEARCH_RADIO=$SEARCH_RADIO"						>> $CONFIG
+	echo "export SEARCH_FILES=$SEARCH_FILES"						>> $CONFIG
+	echo "export SEARCHPATH=\"$SEARCHPATH\""						>> $CONFIG
+	echo "export BROWSERDIR=\"$BROWSERDIR\""						>> $CONFIG
+	echo "export PODCAST_MAX_DL=$PODCAST_MAX_DL"					>> $CONFIG
+	echo "export PODCAST_DIR=\"$PODCAST_DIR\""						>> $CONFIG
+
+	echo -e "\n\n#The following are not present in preferences gui\n"	>> $CONFIG
+	echo 'export FIRST_RUN=false'									>> $CONFIG #not in use
+	echo 'export UPDATE_INTERVAL=1000'								>> $CONFIG
+
+	echo -e "\n#Geometry"											>> $CONFIG
+	echo "export HEIGHT=\"$HEIGHT\""								>> $CONFIG
+	echo "export WIDTH=\"$WIDTH\""									>> $CONFIG
+	echo "export X=\"$X\""											>> $CONFIG
+	echo "export Y=\"$Y\""											>> $CONFIG
+	
+	#Classic PMUSIC_PRESET
+	echo "#Pmusic C L A S S I C config"								>> $CONFIG
+	XWININFO="`xwininfo -stats -name Pmusic_sources`"
+	if [ "$OVERRIDE_PMUSIC_PRESET" ]; then
+		echo "export CLASSIC_SOURCE_WINDOW=$CLASSIC_SOURCE_WINDOW"	>> $CONFIG
+	elif [ "$XWININFO" ]; then #window is running
+		echo "export CLASSIC_SOURCE_WINDOW=true"					>> $CONFIG
+		CLASSIC_HEIGHT=`echo "$XWININFO" | grep 'Height:' | awk '{print $2}'`
+		CLASSIC_WIDTH=`echo "$XWININFO" | grep 'Width:' | awk '{print $2}'`
+		X1=`echo "$XWININFO" | grep 'Absolute upper-left X' | awk '{print $4}'`
+		Y1=`echo "$XWININFO" | grep 'Absolute upper-left Y' | awk '{print $4}'`
+		X2=`echo "$XWININFO" | grep 'Relative upper-left X' | awk '{print $4}'`
+		Y2=`echo "$XWININFO" | grep 'Relative upper-left Y' | awk '{print $4}'`
+		CLASSIC_X=$(($X1-$X2))
+		CLASSIC_Y=$(($Y1-$Y2))
+	else
+		echo "export CLASSIC_SOURCE_WINDOW=false"					>> $CONFIG
+	fi
+	echo "export CLASSIC_HEIGHT=\"$CLASSIC_HEIGHT\""				>> $CONFIG
+	echo "export CLASSIC_WIDTH=\"$CLASSIC_WIDTH\""					>> $CONFIG
+	echo "export CLASSIC_X=\"$CLASSIC_X\""							>> $CONFIG
+	echo "export CLASSIC_Y=\"$CLASSIC_Y\""							>> $CONFIG
+}
+
+#build tab playback. This is used alone in the .CD preset
+S='
+<frame '$LOC273'>
+ <text height-request="5"><label>""</label></text>
+ <hbox tooltip-text="'$LOC513'">
+  <text><label>'$LOC272'</label></text>
+  <comboboxtext width-request="150">
+   <variable>SPEAKER</variable>
+   <item>'$SPEAKER'</item>
+   '$SPEAKERS'
+  </comboboxtext>
+ </hbox>
+ <hbox tooltip-markup="'$LOC802'">
+  <text><label>'$LOC801'</label></text>
+  <comboboxtext width-request="150">
+   <variable>SOUND_DEVICE</variable>
+   <item>'$SOUND_DEVICE'</item>
+   '$SOUND_DEVICES'
+  </comboboxtext>
+ </hbox>
+ <hbox>
+  <text><label>'$LOC800'</label></text>
+  <comboboxtext width-request="150">
+   <variable>CD_DEVICE</variable>'
+   [ "$CD_DEV" = false ] && S=$S'<visible>disabled</visible>'
+   S=$S'<item>'$CD_DEVICE'</item>
+   '$CD_DEVICES'
+  </comboboxtext>
+ </hbox>
+ <text height-request="15"><label>""</label></text>
+ <checkbox>
+  <label>'$LOC264'</label>
+  <variable>HIGH_CPU</variable>
+  <default>'$HIGH_CPU'</default>
+ </checkbox>
+ <text height-request="5"><label>""</label></text>
+ <hbox>
+  <text><label>'$LOC271'</label></text>
+  <hbox>
+   <entry width-request="30">
+    <variable>GAP</variable>
+    <default>"'$GAP'"</default>
+   </entry>
+  </hbox>
+ </hbox>
+</frame>'
+TAB_PLAYBACK="$S"
+
+
+
+
+case "$1" in
+-playback)
+	export Pmusic_preferences='
+	<window title="Pmusic - '$LOC103'" icon-name="pmusic">
+	 <vbox>
+	  '$TAB_PLAYBACK'
+	  <hbox>
+	   <button cancel></button>
+	   <button ok></button>
+	  </hbox>
+	 </vbox>
+	</window>'
+	[ $TOOLTIPS = false ] && Pmusic_preferences="`echo "$Pmusic_preferences" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -p Pmusic_preferences); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	[ "$EXIT" = "OK" ] && $APPDIR/func_config -write_config
+	;;
+-preferences)
+	case $2 in
+		-playback)		PAGE_NR=1;;
+		-lyrics)		PAGE_NR=2; PAGE2_NR=1;;
+		-playlist)		PAGE_NR=3;;
+		-source)		PAGE_NR=4;;
+		-search)		PAGE_NR=4; PAGE2_NR=1;;
+		-podcast)		PAGE_NR=4; PAGE2_NR=2;;
+		*)				PAGE_NR=0;;
+	esac
+	S="
+<window title=\"Pmusic - $LOC103\" icon-name=\"pmusic\">
+<vbox>
+ <notebook tab-pos=\"0\" page=\"$PAGE_NR\" labels=\"Pmusic|$LOC273|$LOC141|$LOC261|$LOC170\">
+
+
+
+  <vbox>
+   <notebook tab-pos=\"2\" page=\"$PAGE2_NR\" labels=\"$LOC260|$LOC263\" space-expand=\"true\" space-fill=\"true\">
+    <frame>
+     <text width-chars=\"1\" height-request=\"5\"><label>\"\"</label></text>
+     <hbox>
+      <text><label>$LOC270</label></text>
+      <comboboxtext width-request=\"150\">
+       <variable>LANGUAGE</variable>
+       <item>$LANGUAGE</item>
+       <item>auto</item>
+       $LANGUAGES
+      </comboboxtext>
+      <button width-request=\"45\">
+       <label>www</label>
+       <action>$BROWSER http://www.murga-linux.com/puppy/viewtopic.php?p=259090 &</action>
+      </button>
+     </hbox>
+     <hbox>
+      <text><label>$LOC262</label></text>
+      <comboboxtext width-request=\"150\">
+       <variable>THEME</variable>
+       <item>$THEME</item>
+       $THEMES
+      </comboboxtext>
+      <button width-request=\"45\">
+       <label>www</label>
+       <action>$BROWSER http://www.murga-linux.com/puppy/viewtopic.php?t=47639 &</action>
+      </button>
+     </hbox>
+     <hbox>
+      <text><label>$LOC267</label></text>
+      <comboboxtext width-request=\"150\">
+       <variable>PMUSIC_PRESET</variable>
+       <item>$PMUSIC_PRESET</item>
+       $PMUSIC_PRESETS
+      </comboboxtext>
+      <button width-request=\"45\">
+       <label>www</label>
+       <action>$BROWSER http://www.murga-linux.com/puppy/viewtopic.php?p=313250#313250 &</action>
+      </button>
+     </hbox>
+     <text height-request=\"20\"><label>\"\"</label></text>
+     <checkbox><label>$LOC275</label><variable>TOOLTIPS</variable><default>$TOOLTIPS</default></checkbox>
+     <checkbox><label>$LOC279</label><variable>TRAYAPP</variable><default>$TRAYAPP</default></checkbox>
+     <checkbox><label>$LOC265</label><variable>CONVERT_UNDERSCORE</variable><default>$CONVERT_UNDERSCORE</default></checkbox>
+     <checkbox><label>$LOC266</label><variable>CONVERT_20</variable><default>$CONVERT_20</default></checkbox>
+    </frame>
+   
+    <frame>
+     <hbox>
+      <text><label>$LOC_WEBBROWSER</label></text>
+      <entry><variable>BROWSER</variable><default>\"$BROWSER\"</default></entry>
+     </hbox>
+     <hbox>
+      <text><label>$LOC_AUDIOEDITOR</label></text>
+      <entry><variable>AUDIO_EDITOR</variable><default>\"$AUDIO_EDITOR\"</default></entry>
+     </hbox>
+    </frame>
+   </notebook>
+  </vbox>
+
+
+
+  $TAB_PLAYBACK
+
+
+
+
+  <vbox>
+   <notebook tab-pos=\"2\" page=\"$PAGE2_NR\" labels=\"$LOC840|$LOC850\" space-expand=\"true\" space-fill=\"true\">
+<vbox>
+
+  <frame $LOC840>
+   <checkbox>
+    <label>$LOC841</label>
+    <variable>ID3_PLAYLIST</variable>
+    <default>$ID3_PLAYLIST</default>
+   </checkbox>
+   <checkbox>
+    <label>$LOC842</label>
+    <variable>M3U_META_PLAYLIST</variable>
+    <default>$M3U_META_PLAYLIST</default>
+   </checkbox>
+  </frame>
+  <frame $LOC849>
+   <checkbox>
+    <label>$LOC843</label>
+    <variable>TRACKINFO_REFRESH</variable>
+    <default>$TRACKINFO_REFRESH</default>
+   </checkbox>"'
+   <checkbox>
+    <label>'$LOC846'</label>
+    <variable>METAINFO_RADIO</variable>
+    <default>'$METAINFO_RADIO'</default>
+   </checkbox>
+   <text><label>""</label></text>
+   <checkbox>
+    <label>'$LOC844'</label>
+    <variable>ID3_BROWSER</variable>
+    <default>'$ID3_BROWSER'</default>
+    <action>if true enable:TXT845</action>
+    <action>if true enable:ID3_BROWSER_MAX</action>
+    <action>if false disable:TXT845</action>
+    <action>if false disable:ID3_BROWSER_MAX</action>
+   </checkbox>
+   <hbox>
+    <text>
+     <variable>TXT845</variable>
+     <label>'$LOC845'</label>'
+     [ $ID3_BROWSER = false ] && S=$S'<sensitive>false</sensitive>'
+    S=$S'</text>
+    <spinbutton range-min="0" range-max="10000" range-step="50" range-value="'$ID3_BROWSER_MAX'">
+     <variable>ID3_BROWSER_MAX</variable>'
+     [ $ID3_BROWSER = false ] && S=$S'<sensitive>false</sensitive>'
+    S=$S'</spinbutton>
+   </hbox>
+  </frame>
+ </vbox>
+ <vbox>
+  <text><label>""</label></text>
+  <text><label>"'$LOC851'"</label></text>
+  <text height-request="30"><label>""</label></text>
+  <hbox>
+   <checkbox>
+    <variable>LYRICS_LOCAL</variable>
+    <default>'$LYRICS_LOCAL'</default>
+    <label>'$LOC_LYRICS'</label>
+    <action>if true enable:LYRICS_LOCAL_DIR</action>
+    <action>if true enable:BUTTON_LYRICS_LOCAL_DIR</action>
+    <action>if false disable:LYRICS_LOCAL_DIR</action>
+    <action>if false disable:BUTTON_LYRICS_LOCAL_DIR</action>
+    <action>rm -f '$WORKDIR'/xml_Pmusic*</action>
+   </checkbox>
+   <entry accept="directory" width-request="300" fs-title="Pmusic - '$LOC_LYRICS'">
+    <variable>LYRICS_LOCAL_DIR</variable>
+    <default>"'$LYRICS_LOCAL_DIR'"</default>'
+    [ $LYRICS_LOCAL = false ] && S=$S'<sensitive>false</sensitive>'
+   S=$S'</entry>
+   <button>
+    <variable>BUTTON_LYRICS_LOCAL_DIR</variable>
+    <input file stock="gtk-open"></input>
+    <action type="fileselect">LYRICS_LOCAL_DIR</action>'
+    [ $LYRICS_LOCAL = false ] && S=$S'<sensitive>false</sensitive>'
+   S=$S'</button>
+  </hbox>
+
+
+  <hbox>
+  <checkbox>
+   <variable>ALBUMART_LOCAL</variable>
+   <default>'$ALBUMART_LOCAL'</default>
+   <label>'$LOC_ALBUMART'</label>
+    <action>if true enable:ALBUMART_LOCAL_DIR</action>
+    <action>if true enable:BUTTON_ALBUMART_LOCAL_DIR</action>
+    <action>if false disable:ALBUMART_LOCAL_DIR</action>
+    <action>if false disable:BUTTON_ALBUMART_LOCAL_DIR</action>
+   <action>rm -f '$WORKDIR'/xml_Pmusic*</action>
+  </checkbox>
+   <entry accept="directory" width-request="300" fs-title="Pmusic - '$670'">
+    <variable>ALBUMART_LOCAL_DIR</variable>
+    <default>"'$ALBUMART_LOCAL_DIR'"</default>'
+    [ $ALBUMART_LOCAL = false ] && S=$S'<sensitive>false</sensitive>'
+   S=$S'</entry>
+   <button>
+    <variable>BUTTON_ALBUMART_LOCAL_DIR</variable>
+    <input file stock="gtk-open"></input>
+    <action type="fileselect">ALBUMART_LOCAL_DIR</action>
+    <action>rm -f '$WORKDIR'/xml_Pmusic*</action>'
+    [ $ALBUMART_LOCAL = false ] && S=$S'<sensitive>false</sensitive>'
+   S=$S'</button>
+  </hbox>
+ </vbox>
+</notebook>
+  </vbox>
+
+  <frame '$LOC261'>
+   <text><label>'$LOC268'</label></text>'
+for I in $(seq 1 9); do
+   S=$S'<entry activates-default="true"><variable>PLAYLIST_NAME['$I']</variable><input>echo "'${PLAYLIST_NAME[$I]}'"</input></entry>'
+done
+  S=$S'</frame>
+
+   <vbox>
+   <notebook tab-pos="2" page="'$PAGE2_NR'" labels="'$LOC260'|'$LOC_SEARCH'|'$LOC600'" space-expand="true" space-fill="true">
+
+  <frame>
+   <hbox>
+    <text><label>'$LOC808'</label></text>
+    <entry accept="directory">
+     <variable>BROWSERDIR</variable>
+     <input>echo $BROWSERDIR</input>
+    </entry>
+    <button>
+     <input file stock="gtk-open"></input>
+     <action type="fileselect">BROWSERDIR</action>
+    </button>
+   </hbox>
+   <hbox>
+    <button tooltip-text="'$LOC807'">
+     <label>"'$LOC226'"</label>
+     <input file stock="gtk-edit"></input>
+     <action>defaulttexteditor $HOME/.pmusic/index_rating &</action>
+    </button>
+    <button tooltip-text="'$LOC807'">
+     <label>"'$LOC225'"</label>
+     <input file stock="gtk-edit"></input>
+     <action>defaulttexteditor $HOME/.pmusic/index_recent &</action>
+    </button>
+   </hbox>
+  </frame>
+
+  <vbox>
+  <frame>
+    <checkbox label="'$LOC810'">
+     <variable>SEARCH_WHILE_TYPING</variable>
+     <default>'$SEARCH_WHILE_TYPING'</default>
+    </checkbox>
+  </frame>
+  <frame '$LOC811'>
+   <vbox>
+    <checkbox label="'$LOC228'">
+     <variable>SEARCH_MYMUSIC</variable>
+     <default>'$SEARCH_MYMUSIC'</default>
+    </checkbox>
+    <checkbox label="'$LOC224'">
+     <variable>SEARCH_COLLECTIONS</variable>
+     <default>'$SEARCH_COLLECTIONS'</default>
+    </checkbox>
+    <checkbox label="'$LOC229'">
+     <variable>SEARCH_RADIOHITS</variable>
+     <default>'$SEARCH_RADIOHITS'</default>
+    </checkbox>
+    <checkbox label="'$LOC222'">
+     <variable>SEARCH_RADIO</variable>
+     <default>'$SEARCH_RADIO'</default>
+    </checkbox>
+    <checkbox label="'$LOC221'">
+     <variable>SEARCH_WEBMUSIC</variable>
+     <default>'$SEARCH_WEBMUSIC'</default>
+    </checkbox>
+   </vbox>
+   <hseparator></hseparator>
+   <checkbox label="'$LOC812'">'
+    [ ! `which pfilesearch` ] && S=$S'<sensitive>false</sensitive>'
+    S=$S'<variable>SEARCH_FILES</variable>
+    <default>'$SEARCH_FILES'</default>
+   </checkbox>
+   <hbox>
+    <entry accept="directory">'
+     [ ! `which pfilesearch` ] && S=$S'<sensitive>false</sensitive>'
+     S=$S'<variable>SEARCHPATH</variable>
+     <input>echo $SEARCHPATH</input>
+    </entry>
+    <button>'
+     [ ! `which pfilesearch` ] && S=$S'<sensitive>false</sensitive>'
+     S=$S'<input file stock="gtk-open"></input>
+     <action type="fileselect">SEARCHPATH</action>
+    </button>
+   </hbox>
+  </frame>
+  </vbox>
+
+  <frame>
+   <hbox>
+    <text><label>'$LOC831'</label></text>
+    <entry accept="directory" ><variable>PODCAST_DIR</variable><default>"'$PODCAST_DIR'"</default></entry>
+    <button width-request="30">
+     <input file stock="gtk-open"></input>
+     <action type="fileselect">PODCAST_DIR</action>
+     <action>refresh:PODCAST_DIR</action>
+	</button>
+   </hbox>
+   <hbox>
+    <text><label>'$LOC830'</label></text>
+    <hbox width-request="30">
+     <entry width-request="30"><variable>PODCAST_MAX_DL</variable><default>'$PODCAST_MAX_DL'</default></entry>
+    </hbox>
+   </hbox>
+  </frame>
+  </notebook>
+  </vbox>
+
+ </notebook>
+ <hbox>
+  <button cancel></button>
+  <button ok></button>
+ </hbox>
+</vbox>
+</window>'
+	[ $TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	echo "$S" | sed 's/##.*//' > $WORKDIR/xml_Pmusic_preferences #I use double hash (##) for comments. --> as #FF0000
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -f $WORKDIR/xml_Pmusic_preferences); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	if [ "$EXIT" = "OK" ]; then
+		write_config
+		$APPDIR/func -update_playlist
+		killall pmusic_tray
+		rm -f $WORKDIR/xml_Pmusic* #remove xml-files to force fresh load of all guis (langauge change) 
+		pmusic #new start to load changed settings
+		exit 0
+	fi
+	;;
+
+-write_config) 
+	write_config
+	;;
+esac

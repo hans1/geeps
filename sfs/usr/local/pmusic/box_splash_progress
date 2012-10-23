@@ -1,0 +1,20 @@
+#! /bin/bash
+$APPDIR/func -reset_gtk
+
+echo 0 > $WORKDIR/splash
+echo 'Please wait ...' > $WORKDIR/progresstext
+export pmusic_splash='
+<window title="Pmusic" icon-name="pmusic" allow-grow="false" skip_taskbar_hint="true">
+<vbox>
+ <frame>
+   <text><label>""</label></text>
+  '"<text use-markup=\"true\"><label>\"<b><span color='"'gray30'"' size='"'x-large'"'>Pmusic  </span><span color='"'gray30'"' size='"'large'"'>$VERSION</span></b>\"</label></text>
+  <text><input file>$WORKDIR/splashtext</input></text>
+ </frame>
+ <progressbar>
+  <input>"'while [ "$I" != "100" ]; do I=`cat '$WORKDIR'/splash`; J=`cat '$WORKDIR'/progresstext`; echo $I; echo "$J (${I}%)"; usleep 500000; done</input>
+  <action type="exit">Ready</action>
+ </progressbar>
+</vbox></window>'
+$GTKDIALOG -p pmusic_splash --center
+

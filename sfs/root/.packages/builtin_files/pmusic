@@ -1,0 +1,88 @@
+/tmp
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/Pmusic_add
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/usr/local/bin
+ pmusic
+ pmusic_CD
+/usr/local/pmusic
+ blank.png
+ box_chooser
+ box_input
+ box_ok
+ box_progress
+ box_splash
+ box_splash_progress
+ box_yesno
+ func
+ func_add
+ func_bookmarks
+ func_cd
+ func_config
+ func_export
+ func_id3io
+ func_id3tagger
+ func_index
+ func_kill
+ func_mixer
+ func_player
+ func_podcast
+ func_progressbar
+ func_radio
+ func_radiohits
+ func_store_playlist
+ func_trackinfo
+ func_webmusic
+ gui_about
+ gui_add
+ gui_menu
+ gui_misc
+ gui_mixer
+ gui_navigation
+ gui_playlist
+ gui_toolbar
+ gui_trackinfo
+/usr/local/pmusic/locals
+ en_US:english
+/usr/local/pmusic/presets
+ .CD
+ LowPowered
+ LowPowered.pre
+ Manager
+ .NowPlaying
+ .Radio
+ .Radio.pre
+ Wings
+ Wings.pre
+/usr/local/pmusic/themes
+/usr/local/pmusic/themes/Default
+ album_art.png
+ album_art_radio.png
+ balance.png
+ blank.png
+ gtkrc
+ icon_addmode_playing.png
+ icon_addmode_tail.png
+ icon_pause.png
+ icon_playmode_loop.png
+ icon_playmode_noloop.png
+ icon_playmode_shuffle.png
+ icon_play.png
+ icon_source_local.png
+ icon_source_manual.png
+ icon_source_web.png
+ progressbar.png
+ themerc
+ trough-progressbar.png
+ volume.png
+/usr/local/pmusic/themes/.NowPlaying
+ gtkrc
+ themerc
+/usr/share
+/usr/share/applications
+ pmusic_CD.desktop
+ pmusic.desktop

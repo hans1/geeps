@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PeasyPDF Help
+Icon=mini-pdf.xpm
+Comment=Build multi-page PDF documents
+Exec=defaultbrowser /usr/share/doc/PeasyPDF.html
+Terminal=false
+Type=Application
+Categories=X-DocumentUtility
+GenericName=PeasyPDF Help

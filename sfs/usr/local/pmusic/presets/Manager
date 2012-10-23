@@ -1,0 +1,72 @@
+#!/bin/bash
+
+. $APPDIR/gui_menu
+. $APPDIR/gui_misc
+. $APPDIR/gui_add
+. $APPDIR/gui_toolbar
+. $APPDIR/gui_playlist
+. $APPDIR/gui_navigation
+. $APPDIR/gui_mixer
+
+GUI='
+ <vbox>
+  '$GUI_MENUS'
+  '$GUI_PROGRESS'
+
+   <hbox scrollable="true" height="200" width-request="10"> ##width-request to avoid scrollbars
+    <vbox space-expand="true" space-fill="true">
+     <vbox space-expand="false" space-fill="false">
+      <text height-request="2"><label>""</label></text>
+      '$GUI_ADD_SEARCH'
+     </vbox>
+     <hbox space-expand="true" space-fill="true">
+      '$GUI_ADD_FIELD'
+     </hbox>
+    </vbox>
+    <vbox width-request="350">
+    '$GUI_PLAYLIST_FIELD'
+    </vbox>
+   </hbox>
+
+  <hbox height-request="90" spacing="0">
+   <hbox spacing="0" space-expand="false" space-fill="false">
+    <button relief="2" tooltip-text="'$LOC131'">
+     <variable>ARTWORK</variable>
+     <input file>'$HOME'/.pmusic/nowplaying_albumart.jpg</input>
+     <height>80</height>
+     <action>'$APPDIR'/func_trackinfo &</action>
+    </button>
+   </hbox>
+
+   <vbox space-expand="true" space-fill="true">
+    <hbox>
+     <hbox space-expand="false" space-fill="false">
+      '$GUI_MIXER'
+     </hbox>
+     <hbox space-expand="true" space-fill="true">
+      <text><label>""</label></text>
+     </hbox>
+     '$GUI_BUTTON_NEW'
+     '$GUI_BUTTON_PLAYLIST_HISTORY_BACK'
+     '$GUI_BUTTON_PLAYLIST_HISTORY_FORWARD'
+     '$GUI_NAVIGATION'
+     '$GUI_BUTTON_PLAYMODE'
+     '$GUI_BUTTON_ADDMODE'
+    </hbox>
+    <text><label>""</label></text>
+    '$GUI_PROGRESSBAR'
+    '$GUI_STATUSBAR'
+   </vbox>
+   </hbox>
+
+
+ </vbox>
+ <action signal="show">'$APPDIR'/func_mixer -get_levels</action>
+ <action signal="show">refresh:VOLUME</action>
+ <action signal="show">refresh:BALANCE</action>
+ <action signal="show">echo > '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">rm -f '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">'$APPDIR'/func_config -write_config</action>
+ <action signal="delete-event">'$APPDIR'/func -quit</action>
+ <action signal="delete-event">exit:Exit</action>
+</window>'

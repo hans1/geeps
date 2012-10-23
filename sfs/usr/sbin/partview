@@ -1,0 +1,18 @@
+#!/bin/sh
+#2010-05-08 ecube
+
+#added stuff 01micko 2010-12-02
+. /etc/DISTRO_SPECS
+KERNEL=`uname -r`
+PUPVER=${DISTRO_FILE_PREFIX}-${DISTRO_VERSION}
+gtkdialog-splash -bg black -fg white -timeout 10 -fontsize large -placement top -icon gtk-info -close box -text "Puppy version $PUPVER Kernel $KERNEL" &
+#end added stuff
+
+`/usr/local/Partview/pdff.pl ` 
+J=`gtkdialog3 --glade-xml=/tmp/partview.glade  --program=dialog1`
+if [ "${J:0:3}" = "all" ]; then
+yaf-splash -font "8x16" -outline 0 -margin 4 -bg orange -placement center -text "Please wait, processing..." &
+XPID=$!
+`/usr/local/Partview/pdff.pl -all   $XPID  > /dev/null` 
+`gtkdialog3 --glade-xml=/tmp/partview.glade  --program=dialog1`
+fi

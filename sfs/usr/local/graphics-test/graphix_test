@@ -1,0 +1,90 @@
+#!/bin/bash
+#simple script to determine what graphics package to use
+set -x
+#revision 2 20101201 (complete rewrite)
+#revision 3 20110523 for spup
+#revision 4 20110927 nouveau rant 
+#revision 5 20120129 new kernels
+#revision 6 20120225 more new kernels -unionfs
+#revision 7 20121317 back to aufs
+
+rm -f /tmp/luci_recomend 2>/dev/null
+rm -f /tmp/card_brand 2>/dev/null
+#define working directorys
+APPDIR="/usr/local/graphics-test"
+KERNVER="`uname -r`"
+CURDRIVER="`grep -E -i " connected|card detect|primary dev" /var/log/Xorg.0.log|cut -d ':' -f1|rev|cut -d ' ' -f1|rev|cut -d '(' -f1|tr '[:upper:]' '[:lower:]'|head -n1`"
+
+MODEL=`lspci|grep -iw vga|cut -d ':' -f3`
+BRAND=`echo $MODEL|awk '{print $1}'`
+DRIVER="mesa-"
+VIDEODETAILS="`lspci -nn -m | grep 'VGA compatible controller'`"
+MANUFACTURER="`cat /etc/X11/xorg.conf | tr '\n' ' ' | tr '\t' ' ' | tr -s ' ' | grep -o '#card0driver .*' | grep -o 'VendorName "[^"]*' | cut -f 2 -d '"'`" #'geany
+#DEVICEID="`echo -n "$VIDEODETAILS" |  cut -f 6 -d '"' | rev | cut -f 2 -d ']' | cut -f 1 -d '[' | rev`" #'geany
+DEVICEID="`lspci -nn|grep -iE vga|tr '[' '\n'|tr ']' '\n'|grep ^[0-9]|grep -v '\.'|grep '\:'|cut -d ':' -f2`"
+
+if [ "$BRAND" != "Intel" ];then #20110329 RandSec issue
+ ATI=`grep -i $DEVICEID $APPDIR/ati`
+ NVID_285=`grep -i $DEVICEID $APPDIR/285nvid`
+ #NVID_275=`grep -i $DEVICEID $APPDIR/275nvid`
+ NVID_173=`grep -i $DEVICEID $APPDIR/173nvid`
+ NVID_96=`grep -i $DEVICEID $APPDIR/96nvid`
+ if [[ "$ATI" != "" ]];then MODEL=`echo $ATI|cut -d '|' -f1`
+  #DRIVER="ATI_fglrx-10.10 Catalyst driver"
+  #DRIVER="ati_fglrx-11.7 Catalyst driver"
+  case $KERNVER in
+  2.6.37.6)DRIVER="ati_fglrx-11.8 Catalyst driver";;
+  2.6.39.4)DRIVER="ati_fglrx-11.9 Catalyst driver";;
+  3.1.10-slacko_4gA)DRIVER="amd_fglrx-12.4 Catalyst driver";; #amd_fglrx-12.1-3.1.10-slacko_4gA-s.pet
+  3.1.10-slacko_paeA)DRIVER="amd_fglrx-12.4 Catalyst driver";; #amd_fglrx-12.1-3.1.10-slacko_paeA-s.pet
+  esac
+  
+  
+ fi
+ if [[ "$NVID_285" != "" ]];then #MODEL=`echo $NVID_280|cut -d '|' -f1` #upgraded to 285 111023 #290 120129
+  case $KERNVER in
+  2.6.37.6)MODEL=`echo $NVID_285|cut -d '|' -f1` ; DRIVER="nvidia-285.05.09 driver";;
+  2.6.39.4)MODEL=`echo $NVID_285|cut -d '|' -f1` ; DRIVER="nvidia-285.05.09 driver";;
+  3.1.10-slacko_4gA)MODEL=`echo $NVID_285|cut -d '|' -f1` ; DRIVER="nvidia-295.20 driver";;
+  3.1.10-slacko_paeA)MODEL=`echo $NVID_285|cut -d '|' -f1` ; DRIVER="nvidia-295.20 driver";;
+  esac
+ fi
+ #if [[ "$NVID_275" != "" ]];then MODEL=`echo $NVID_275|cut -d '|' -f1` #upgraded to 275 stable 111002
+  #DRIVER="nvidia-275.28 driver"
+ #fi
+ if [[ "$NVID_173" != "" ]];then MODEL=`echo $NVID_173|cut -d '|' -f1`
+  case $KERNVER in
+  2.6.37.6)DRIVER="nvidia-173.14.31 driver";;
+  2.6.39.4)DRIVER="nvidia-173.14.31 driver";;
+  3.1.10-slacko_4gA)DRIVER="nvidia-173.14.31 driver";;
+  3.1.10-slacko_paeA)DRIVER="nvidia-173.14.31 driver";;
+  esac
+ fi
+ if [[ "$NVID_96" != "" ]];then MODEL=`echo $NVID_96|cut -d '|' -f1`
+  case $KERNVER in
+  2.6.37.6)DRIVER="nvidia-96.43.16 driver";;
+  3.1.10-slacko_4gU)DRIVER="nvidia-96.43.20 driver";;
+  3.1.10-slacko_4gA)DRIVER="mesa-"
+  esac
+ fi
+fi
+if [[ "$DRIVER" = "nvidia-173.14.31 driver" || "$DRIVER" = "nvidia-285.05.09 driver" || "$DRIVER" = "nvidia-96.43.16 driver" || "$DRIVER" = "nvidia-295.20 driver" || "$DRIVER" = "nvidia-96.43.20 driver" ]];then
+ EXTRANVIDIA="Alternatively you could use the 'nouveau video' open source driver, which is much smaller and usually works. Then you can add the 'mesa' package from PPM too for acceleration."
+ elif [ "$CURDRIVER" = "nouveau" ];then EXTRANVIDIA=""
+fi
+RECO1="For your $BRAND video card, $MODEL we think the best add on driver is ${DRIVER}. It would be required for some programs and games with high graphical content and your desktop might seem a bit more snappy. ${EXTRANVIDIA}"
+#
+RECOMEND=$RECO1
+DRIVERSEL=`echo "$DRIVER"|grep -v pet$|awk '{print $1}'`
+[ ! "$DRIVERSEL" ] && DRIVERSEL="$DRIVER"
+echo "$RECOMEND" > /tmp/luci_recomend
+echo "$RECOMEND"
+echo $NVID_285
+echo $MODEL
+echo $BRAND
+echo $DEVICEID
+echo $DRIVERSEL > /tmp/graphic_driver_selection
+echo $DRIVERSEL
+echo "$CURDRIVER"
+echo "$CURDRIVER"> /tmp/graphic_driver_current
+###END

@@ -1,0 +1,13 @@
+/usr
+/usr/sbin
+ firewall_installREADME.txt
+ firewall_install.sh
+ firewallinstallshell
+/usr/share
+/usr/share/applications
+ Linux-Firewall.desktop
+ Linux-Firewall-Wizard.desktop
+/usr/share/doc
+/usr/share/doc/rc.firewall
+ index.html
+ rc.firewall.htm

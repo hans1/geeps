@@ -1,0 +1,60 @@
+#!/bin/bash
+
+[ ! "$PLAYLIST_HEIGHT" ] && PLAYLIST_HEIGHT=150
+GUI_PLAYLIST_FIELD="
+<tree headers_visible=\"false\" exported_column=\"2\" hover-selection=\"true\"> ## rules-hint=\"true\">
+ <label>A|B|C|D</label>
+ <height>$PLAYLIST_HEIGHT</height><width>150</width>
+ <input stock-column=\"0\">cat $WORKDIR/playlist</input>
+ <variable>PLAYLIST</variable>
+ <action signal=\"button-press-event\">echo \"\$PLAYLIST\" > $WORKDIR/PLAYLIST_PRESS_EVENT</action>
+ <action signal=\"button-press-event\">. $APPDIR/func -playlist_menu</action>
+ <action signal=\"button-release-event\">. $APPDIR/func -playlist_select</action>
+ <action signal=\"button-release-event\">refresh:PLAYLIST</action>
+ <action signal=\"button-release-event\">refresh:ID3_INFO</action>
+</tree>"
+
+GUI_BUTTON_PLAYMODE='
+<button tooltip-text="'$LOC413'">
+ <input file>'$WORKDIR'/icon_playmode.png</input>
+ <variable>PLAYMODE</variable>
+ <action>'$APPDIR'/func -playmode</action>
+ <action>refresh:PLAYMODE</action>
+</button>'
+
+GUI_BUTTON_ADDMODE='
+<button tooltip-text="'$LOC414'">
+ <input file>'$WORKDIR'/icon_addmode.png</input>
+ <variable>ADDMODE</variable>
+ <action>'$APPDIR'/func -addmode</action>
+ <action>refresh:ADDMODE</action>
+</button>'
+
+GUI_BUTTON_PLAYLIST_HISTORY_BACK="
+<button tooltip-text=\" $LOC400 \">
+ <input file stock=\"gtk-undo\"></input>
+ <action>. $APPDIR/func -undo</action>
+ <action>Refresh:PLAYLIST</action>
+</button>"
+
+GUI_BUTTON_PLAYLIST_HISTORY_FORWARD="
+<button tooltip-text=\" $LOC401 \">
+ <input file stock=\"gtk-redo\"></input>
+ <action>. $APPDIR/func -redo</action>
+ <action>Refresh:PLAYLIST</action>
+</button>"
+
+GUI_BUTTON_ADD="
+<button tooltip-text=\" $LOC409 \" has-focus=\"true\">
+ <input file stock=\"gtk-add\"></input>
+ <action>. $APPDIR/func -show_add_window -auto</action>
+</button>"
+
+GUI_BUTTON_NEW="
+<button tooltip-text=\" $LOC111 \">
+ <input file stock=\"gtk-clear\"></input>
+ <action>$APPDIR/func_store_playlist</action>
+ <action>$APPDIR/func -new</action>
+ <action>Refresh:PLAYLIST</action>
+</button>"
+

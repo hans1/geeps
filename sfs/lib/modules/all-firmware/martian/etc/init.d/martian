@@ -1,0 +1,98 @@
+#!/bin/bash
+#
+# Init file for martian_modem
+#
+# chkconfig: 2345 45 60
+# description: martian_modem
+#
+# processname: martian_modem
+#
+### BEGIN INIT INFO
+# Provides: martian_modem
+# Default-Start: 2 3 4 5
+# Short-Description: martian_modem
+# Description: martian_modem
+# Author: Stefan Puch
+# Adjustments for 2006/11 release A. Chentsov
+### END INIT INFO
+
+#BK July 2008 modified for Puppy Linux.
+
+#BK v405 if a different modem selected, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem`" != "ttySM0" ] && exit
+
+#Wait for driver to load.
+/sbin/pup_event_backend_modprobe_protect --modcheck=martian_dev || exit #v432
+
+#VPNCLIENT="/opt/cisco-vpnclient/bin/vpnclient"
+NAME="martian_modem"
+MARTIANMOD="martian_dev"
+USER_DRIVER="/usr/sbin/martian_modem"
+
+# edit to set other name
+DEVICE="/dev/ttySM0"
+
+if [ `lsmod | grep -c ${MARTIANMOD}` -lt "1" ]; then
+	echo "kernel module is not loaded!"
+	exit 0
+fi
+
+
+
+# See how we were called.
+case "$1" in
+  start)
+  
+   #BK...
+   if [ "`lsmod | grep '^martian_dev'`" != "" ];then
+    ln -snf ttySM0 /dev/modem
+   fi
+
+	echo -n "Starting ${NAME}: "
+	if [ `ps -A | grep -c ${NAME}` -gt "0" ]; then
+		echo "${NAME} is already running. Use restart instead."
+		exit 1
+	fi
+
+	if [ ${DEVICE} != "/dev/ttySM0" ]; then
+		ARGDEV=${DEVICE}
+	else
+		ARGDEV=
+	fi
+	/usr/sbin/martian_modem --daemon ${ARGDEV}
+	echo "Done"
+	;;
+  stop)
+	echo -n "Shutting down ${NAME}: "
+	if [ `ps -A | grep -c "martian_modem"` -lt "1" ]; then
+		echo "${NAME} is not running."
+		exit 1
+	fi
+	PID=`/sbin/pidof ${NAME}`
+
+	# cease now
+	/bin/kill ${PID}
+
+	if [ -L ${DEVICE} ]; then
+		rm -f ${DEVICE}
+	fi
+	echo "Done"
+	;;
+  status)
+	PID=`/sbin/pidof ${NAME}`
+	if [ -n "${PID}" ] ; then
+		echo ${NAME} "(PID ${PID}) is running..."
+	else 
+		echo ${NAME} "is stopped"
+	fi
+	;;
+  restart|reload)
+	$0 stop
+	$0 start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|restart|reload|status}"
+	exit 1
+esac
+
+exit 0

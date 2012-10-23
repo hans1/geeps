@@ -1,0 +1,15 @@
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/Xlock
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/usr/local/apps/Xlock/locale
+ english.po
+ french.po
+ russian.po
+/usr/share
+/usr/share/applications
+ Xlock-lock-screen.desktop
+ Xlock-setup.desktop

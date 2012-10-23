@@ -1,0 +1,16 @@
+/usr
+/usr/local
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/pixmaps
+ info.xpm
+/usr/sbin
+ wcpufreq
+/usr/share
+/usr/share/applications
+ wcpufreq.desktop
+/usr/share/icons
+/usr/share/icons/devices
+ cpu.png
+/usr/share/pixmaps
+ wcpufreq.png

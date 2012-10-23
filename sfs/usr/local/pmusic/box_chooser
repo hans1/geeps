@@ -1,0 +1,41 @@
+#!/bin/bash
+$APPDIR/func -reset_gtk
+if [ ! "$TITLE" ]; then TITLE=""; fi
+
+export chooser="
+<window title=\"Pmusic $TITLE\" icon-name=\"pmusic\">
+ <vbox>
+  <chooser>
+   <height>500</height><width>600</width>
+   <variable>CHOOSER</variable>
+  </chooser>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-cancel\"></input>
+    <label>$LOC_CANCEL</label>
+   </button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-apply\"></input>
+    <label>$LOC_OK</label>
+    <action type=\"exit\">OK</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $($GTKDIALOG --program=chooser --center); do
+eval $STATEMENTS
+done
+IFS=$I
+if [ $EXIT = "OK" ]; then
+	#check if hit is directory
+	if [ "$GET_OUTDIR" = "true" ]; then
+		if [ ! -d "$CHOOSER" ]; then 
+			TXT1="<b>$LOC509</b>"
+			. $APPDIR/box_ok
+			exit
+		fi
+		echo "$CHOOSER" > $WORKDIR/pburn-OUTDIR
+	fi
+fi
+	

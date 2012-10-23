@@ -1,0 +1,78 @@
+/usr
+/usr/bin
+ hardinfo
+/usr/lib
+/usr/lib/hardinfo
+/usr/lib/hardinfo/modules
+ benchmark.so
+ computer.so
+ devices.so
+ network.so
+/usr/share
+/usr/share/applications
+ hardinfo.desktop
+/usr/share/hardinfo
+ benchmark.conf
+ benchmark.data
+/usr/share/hardinfo/pixmaps
+ about-modules.png
+ audio.png
+ battery.png
+ benchmark.png
+ blowfish.png
+ bluetooth.png
+ boot.png
+ cdrom.png
+ close.png
+ compress.png
+ computer.png
+ cryptohash.png
+ devices.png
+ dev_removable.png
+ dialog-error.png
+ dialog-information.png
+ dialog-warning.png
+ dns.png
+ environment.png
+ face-grin.png
+ fft.png
+ hdd.png
+ inputdevices.png
+ internet.png
+ joystick.png
+ keyboard.png
+ language.png
+ logo.png
+ logo.xcf
+ memory.png
+ modem.png
+ module.png
+ monitor.png
+ mouse.png
+ nautilus.png
+ network-connections.png
+ network-interface.png
+ network.png
+ network-statistics.png
+ nqueens.png
+ os.png
+ pcmcia.png
+ printer.png
+ processor.png
+ raytrace.png
+ report-large.png
+ report.png
+ resources.png
+ shares.png
+ status-curr.png
+ status-done.png
+ summary.png
+ syncmanager.png
+ syncmanager-small.png
+ therm.png
+ usbfldisk.png
+ usb.png
+ users.png
+ wireless.png
+/usr/share/pixmaps
+ hardinfo.png

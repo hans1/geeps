@@ -1,0 +1,12 @@
+/root
+/root/Startup
+ freememapplet_tray
+/usr
+/usr/local
+/usr/local/Partview
+ pdff.pl
+/usr/sbin
+ partview
+/usr/share
+/usr/share/applications
+ Partview.desktop

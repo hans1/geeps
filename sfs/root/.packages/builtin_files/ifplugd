@@ -1,0 +1,4 @@
+/sbin
+ ifplugd
+ ifplugstatus-0.25
+ ifplugstatus-0.28

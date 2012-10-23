@@ -1,0 +1,6 @@
+/usr
+/usr/lib
+ libexif-gtk.so
+ libexif-gtk.so.5
+ libexif-gtk.so.5.0.0
+/var

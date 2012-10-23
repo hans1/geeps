@@ -1,0 +1,22 @@
+#!/bin/bash
+cd "/usr/local/pbackup"
+"/usr/local/pbackup/pbackup" "$@" &
+
+#Start loop to kill PID when window closes.
+#This is a workaround for a bug in gtkdialog. Works only in Xorg.
+[ "`echo "$*" | grep "\-q "`" ] && exit
+sleep 10
+while [ A != B ] && [ "`which xwininfo`" ]; do
+	TMP="`xwininfo -stats -name Pbackup`"
+	if [ ! "$TMP" ]; then
+		#run second test to ensure that window wasn't just rerendering during the first check
+		sleep 2
+		TMP="`xwininfo -stats -name Pbackup`"
+		if [ ! "$TMP" ]; then
+			for I in `ps | grep pbackup | grep gtkdialog | awk '{print $1}'`; do kill -9 $I 2> /dev/null; done
+			for I in `ps | grep -i pbackup | awk '{print $1}'`; do kill -9 $I 2> /dev/null; done
+			exit 0
+		fi
+	fi
+	sleep 3
+done

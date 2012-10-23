@@ -1,0 +1,89 @@
+/usr
+/usr/bin
+ gphoto2
+/usr/share
+/usr/share/doc
+/usr/share/doc/gphoto2
+ test-hook.sh
+/usr/share/locale
+/usr/share/locale/az
+/usr/share/locale/az/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/cs
+/usr/share/locale/cs/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/da
+/usr/share/locale/da/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/en_GB
+/usr/share/locale/en_GB/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/eu
+/usr/share/locale/eu/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/fi
+/usr/share/locale/fi/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/hu
+/usr/share/locale/hu/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/id
+/usr/share/locale/id/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/it
+/usr/share/locale/it/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/nl
+/usr/share/locale/nl/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/pa
+/usr/share/locale/pa/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/pl
+/usr/share/locale/pl/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/pt_BR
+/usr/share/locale/pt_BR/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/ro
+/usr/share/locale/ro/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/ru
+/usr/share/locale/ru/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/rw
+/usr/share/locale/rw/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/sk
+/usr/share/locale/sk/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/sr
+/usr/share/locale/sr/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/sv
+/usr/share/locale/sv/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/uk
+/usr/share/locale/uk/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/vi
+/usr/share/locale/vi/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/zh_CN
+/usr/share/locale/zh_CN/LC_MESSAGES
+ gphoto2.mo
+/usr/share/locale/zh_TW
+/usr/share/locale/zh_TW/LC_MESSAGES
+ gphoto2.mo

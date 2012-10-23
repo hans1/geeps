@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export inputbox="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <entry activates-default=\"true\">
+    <variable>ENTRY</variable>
+    <input>echo \"$DEFAULT\"</input>
+   </entry>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-cancel\">
+    </input><label>$LOC_CANCEL</label>
+    <action type=\"exit\">98</action>
+   </button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-apply\"></input>
+    <label>$LOC_OK</label>
+    <action type=\"exit\">99</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=inputbox --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+TXT1=""; DEFAULT=""; FRAME=""; IMG="" #reset to avoid alien text in next box

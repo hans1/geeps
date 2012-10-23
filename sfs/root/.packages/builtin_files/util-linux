@@ -1,0 +1,42 @@
+/bin
+ dnsdomainname
+ domainname
+ getopt
+ mount-FULL
+ nisdomainname
+ rev
+ umount-FULL
+ ypdomainname
+/lib
+ libblkid.so.1
+ libblkid.so.1.1.0
+ libmount.so.1
+ libmount.so.1.1.0
+ libuuid.so.1
+ libuuid.so.1.3.0
+/sbin
+ cfdisk
+ clock
+ fdisk
+ fsck
+ hwclock
+ losetup-FULL
+ mkfs
+ mkfs.cramfs
+ mkfs.minix
+ mkswap
+ mount
+ swapoff
+ swapon
+ umount
+/usr
+/usr/bin
+ flock
+ getopt
+ more
+ rename
+ rev
+ setsid
+/var
+/var/lock
+/var/lock/subsys

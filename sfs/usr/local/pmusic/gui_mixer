@@ -1,0 +1,51 @@
+#!/bin/bash
+
+GUI_VOLUME='
+<hscale height-request="12" draw-value="false" update-policy="1" scale-step="1" scale-min="0" scale-max="100" tooltip-text="'$LOC_VOLUME'
+'$LOC272': '$SPEAKER'">
+ <variable>VOLUME</variable>
+ <input file>'$WORKDIR'/VOLUME</input>
+ <action>. '$APPDIR'/func_mixer -set_volume</action>
+## <item>"0|2|"</item>
+## <item>"100|2|"</item>
+</hscale>'
+
+GUI_VOLUME_IMG='
+<pixmap>
+ <height>12</height>
+ <input file>'$APPDIR'/themes/'$THEME'/volume.png</input>
+</pixmap>
+'
+
+GUI_BALANCE='
+<hscale height-request="12" draw-value="false" update-policy="1" scale-step="1" scale-min="0" scale-max="200" tooltip-text="'$LOC_BALANCE'
+'$LOC272': '$SPEAKER'">
+ <variable>BALANCE</variable>
+ <input file>'$WORKDIR'/BALANCE</input>
+ <action>. '$APPDIR'/func_mixer -set_volume</action>
+## <item>"50|2|"</item>
+</hscale>
+'
+GUI_BALANCE_IMG='
+<pixmap>
+ <height>12</height>
+ <input file>'$APPDIR'/themes/'$THEME'/balance.png</input>
+</pixmap>
+'
+
+GUI_MIXER="
+<vbox spacing=\"0\">
+ <text height-request=\"5\"><label>\"\"</label></text>
+ <hbox spacing=\"5\">
+  <vbox width-request=\"100\" spacing=\"0\">
+   $GUI_VOLUME
+  </vbox>
+  $GUI_VOLUME_IMG
+ </hbox>
+ <hbox spacing=\"5\">
+  <vbox width-request=\"100\" spacing=\"0\">
+   $GUI_BALANCE
+  </vbox>
+  $GUI_BALANCE_IMG
+ </hbox>
+</vbox>"

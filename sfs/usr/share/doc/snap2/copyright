@@ -1,0 +1,25 @@
+Copyright:
+
+    Copyright (C) 2010 Lloyd G. Standish
+
+License:
+    You are free to distribute this software under the terms of
+    the GNU General Public License  either version 3 of the License,
+    or (at your option) any later version.
+    
+    This package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+     
+    You should have received a copy of the GNU General Public License
+    along with this package; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+    
+    On Puppy Linux, the license can be found at /usr/share/doc/legal/gpl-3.0.htm.
+    
+    If you downloaded the gzipped tar archive, the license is found at
+    /usr/share/doc/snap2/GPL-3.
+    
+    On Debian systems, the complete text of the GNU General
+    Public License version 3 can be found in `/usr/share/common-licenses/GPL-3'.

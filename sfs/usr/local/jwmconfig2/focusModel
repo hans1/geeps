@@ -1,0 +1,87 @@
+#!/bin/bash
+
+##----focus model configuration for JWM---->>
+
+#--------variables---------->>
+
+CLICK='<FocusModel>click</FocusModel>'
+SLOPPY='<FocusModel>sloppy</FocusModel>'
+CONFIG="/root/.jwm/jwmrc-personal"
+CONF="/root/.jwm/jwmrc-personal-temp"
+CONF2="/root/.jwm/jwmrc-personal-temp2"
+TMP="/tmp/inputbox.tmp.$$"
+
+CHOICE=click
+CLICK_ON=ON
+SLOPPY_ON=off
+VALUE="click"
+SET_CLICK=`grep -c "$CLICK" $CONFIG`
+
+
+if [ $SET_CLICK -eq 1 ]; then
+    CLICK_ON=ON
+    SLOPPY_ON=off
+else
+    CLICK_ON=off
+    SLOPPY_ON=ON
+    VALUE="sloppy"
+fi
+
+#----------dialogue-------->>
+
+#!/bin/sh
+
+Xdialog --title "Focus Model" \
+        --radiolist "Choose between the sloppy and click focus models:\n\n\
+First, a little note on what these focus models are:\n\n\
+SLOPPY FOCUS\n\
+The window that is under the mouse pointer is the\n\
+window that has the focus. The focus is changed\n\
+by pointing at another window, there is no need\n\
+to click in it as well.\n\n\
+CLICK TO FOCUS\n\
+The model used by Microsoft Windows.\n\
+The active window is selected by mouse click.\n\n" 0 0 2 \
+"click"  "click-to-focus" $CLICK_ON \
+"sloppy" "sloppy focus" $SLOPPY_ON 2> $TMP
+
+retval=$?
+
+#--------clean exit------->>
+case $retval in
+  1)
+    exit 0;;
+  255)
+    exit 0;;
+esac
+
+#--------preparation------>>
+
+CHOICE=`cat $TMP`
+rm -f $TMP
+
+if [ -z $CHOICE ]; then
+   CHOICE="click"
+fi
+	
+SEDFOCUS=s!Model\>${VALUE}!Model\>${CHOICE}!g
+
+
+#---------save changes----->>
+
+
+sed -e "$SEDFOCUS" $CONFIG > $CONF
+
+mv $CONF $CONFIG
+rm -f $CONF2
+
+#----notify of result----->>
+
+RES=`grep -c ">$CHOICE" $CONFIG`
+
+if [ $RES -eq 1 ]; then
+    Xdialog --title "Change_saved" --msgbox "Set to $CHOICE focus model" 0 0
+fi
+
+exit 0
+

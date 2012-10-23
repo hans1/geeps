@@ -1,0 +1,45 @@
+#!/bin/sh -a
+#set -x 
+. /tmp/JWMCONFIGVARS
+switchdesk(){
+NEWROWS="\"$NEWROWS\""
+NEWCOLUMNS="\"$NEWCOLUMNS\""
+OLDCOLUMNS=`grep "Desktops width" $HOME_DIR/jwmrc-personal|cut -d '=' -f2|cut -d ' ' -f1`
+OLDROWS=`grep "Desktops width" $HOME_DIR/jwmrc-personal|cut -d '=' -f3|cut -d '/' -f1`
+sed -i "s/$OLDROWS/"$NEWROWS"/" $HOME/.jwm/jwmrc-personal
+sed -i "s/$OLDCOLUMNS/"$NEWCOLUMNS"/" $HOME/.jwm/jwmrc-personal
+cp -f $HOME_DIR/jwmrc-personal $HOME_DIR/jwmrc-personal2
+sleep 0.5
+jwm -restart
+}
+virtualdesk="<window title=\"Virtual Desktops\" resizable=\"false\">
+ <vbox> 
+  <text use-markup=\"true\"><label>\"<b>Maximum of 10 desktops</b>\"</label></text>
+  <hbox>
+  <text><label>No of Rows</label></text>
+   <combobox width-request=\"60\">
+    <variable>NEWROWS</variable>
+     <item>1</item>
+     <item>2</item>
+   </combobox> 
+   <text><label>No of Columns</label></text>
+   <combobox width-request=\"60\">
+    <variable>NEWCOLUMNS</variable>
+     <item>1</item>
+     <item>2</item>
+     <item>3</item>
+     <item>4</item>
+     <item>5</item>
+   </combobox>  
+  </hbox>
+  <hbox homogeneous=\"true\">
+   <button ok>
+    <action>switchdesk &</action>
+    <action>exit:done</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+gtkdialog3 -p virtualdesk
+unset virtualdesk
+exit   

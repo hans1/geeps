@@ -1,0 +1,113 @@
+#!/bin/bash
+##########################
+#
+# gtk2jwm
+# this script integrates
+# the default jwm theme
+# with the current gtk
+# theme.
+#
+# author: thoughtjourney
+# date: 28/08/2005
+#
+# Hacked BK Feb 2006 for JWM 1.4
+# Abused by Dougal, Dec 2006
+#########################
+## Latest update: July 14th: add gradient support for JWM
+# BK jan 2008: integrated into jwmconfig2.
+#modified by Karl Godt 18 Nov 2010
+# 28 Dec 2010 shinobar: removed wrong save code
+
+ ##-------------variables---------------->>
+       
+
+ GTKTHEME=`fgrep 'include' /root/.gtkrc-2.0 | fgrep '/usr/share/themes/' | grep -v '^#' | fgrep -m1 'gtkrc' | tr -d "'" | tr -d '"' | sed 's/include //' | tr -d '\t' | tr -d ' '`
+ [ ! -e $GTKTHEME ] && exit 1
+ 
+ JWMTHEME=/root/.jwm/jwmrc-theme
+ 
+ FULL_COLOUR=255
+ 
+ ##------get relevant gtk colours-------->>
+ MENU_BG=`grep -v "^#" $GTKTHEME | grep -m1 '\Wbg\[NORMAL\]' | cut -d'"' -f2`
+ ACTIVE_BG=`grep -v "^#" $GTKTHEME | grep -m1 '\Wbg\[SELECTED\]' | cut -d'"' -f2`
+ FOREGROUND=`grep -v "^#" $GTKTHEME | grep -m1 '\Wfg\[NORMAL\]' | cut -d'"' -f2`
+ PAGER_BG=`grep -v "^#" $GTKTHEME | grep -m1 '\Wbg\[ACTIVE\]' | cut -d'"' -f2`
+ FG_SELECTED=`grep -v "^#" $GTKTHEME | grep -m1 '\Wfg\[SELECTED\]' | cut -d'"' -f2`
+if test -f /root/.jwm/jwm_colors.bak ; then
+. /root/.jwm/jwm_colors.bak
+fi
+ 
+ #save them...
+ echo '#This is written to by /usr/local/jwmconfig2/gtk2jwm script' > /root/.jwm/jwm_colors
+ echo "MENU_BG='${MENU_BG}'" >> /root/.jwm/jwm_colors
+ echo "ACTIVE_BG='${ACTIVE_BG}'" >> /root/.jwm/jwm_colors
+ echo "FOREGROUND='${FOREGROUND}'" >> /root/.jwm/jwm_colors
+ echo "PAGER_BG='${PAGER_BG}'" >> /root/.jwm/jwm_colors
+ echo "FG_SELECTED='${FG_SELECTED}'" >> /root/.jwm/jwm_colors
+ # 28 Dec 2010 shinobar: removed wrong save code
+ 
+
+if test -f /root/.tcl-gtk ; then
+ rm -f /root/.tcl-gtk
+fi
+ if [ -z "$MENU_BG" ]; then
+  echo > "$JWMTHEME"
+  pidof jwm >/dev/null && jwm -restart
+  exit 2
+ else
+  DEFAULT="
+  <JWM>
+  <WindowStyle>
+    <Active>
+       <Text>$FG_SELECTED</Text>
+       <Title>$ACT_GRAD</Title>
+       <!-- <Corner>white</Corner> -->
+           <Outline>black</Outline>
+    </Active>
+    <Inactive>
+       <Text>$FOREGROUND</Text>
+       <Title>$MEN_GRAD</Title>
+       <!-- <Corner>#aaaaaa</Corner> -->
+           <Outline>black</Outline>
+    </Inactive>
+ </WindowStyle>
+ </JWM>"
+ fi
+ TrayFileBak="/root/.jwmrc-tray.bak"
+ 
+BackgroundColor="$MENU_BG" #"#ffc100"
+echo $MENU_BG
+ 
+function GetLineIndex
+{
+   lineVal=`fgrep -in "$1" $TrayFile | awk -F":" '{print $1}'`
+   #return `expr $lineVal`
+   return $lineVal
+}
+
+ GetLineIndex "blinkydelayed"
+ linenumber=$?
+ echo $linenumber
+ 
+ GetLineIndex "xload -nolabel"
+ linenumber2=$?
+
+ echo $linenumber2
+ 
+ lineNumber=`expr $linenumber`
+ lineNumber2=`expr $linenumber2`
+ 
+ blinkyline="         blinkydelayed -bg \"$BackgroundColor\""
+ xloadline="         xload -nolabel -fg red -hl white -bg \"$BackgroundColor\""
+if test $lineNumber -gt 0 ; then
+sed -e "$lineNumber"i"$blinkyline" -e "$lineNumber"d $TrayFileBak > $TrayFile
+fi
+if test $lineNumber2 -gt 0 ; then
+sed -e "$lineNumber2"i"$xloadline" -e "$lineNumber2"d $TrayFileBak > $TrayFile
+fi
+ #end John Doe's code.
+ ########
+ 
+sync
+pidof jwm >/dev/null && jwm -restart

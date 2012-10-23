@@ -1,0 +1,16 @@
+/usr
+/usr/local
+/usr/local/bin
+ ptiming
+/usr/local/ptiming
+ box_ok
+ box_yesno
+ competitors
+/usr/local/ptiming/locals
+ en_US:english
+/usr/share
+/usr/share/applications
+ ptiming.desktop
+/usr/share/audio
+ beep_high.wav
+ beep_low.wav

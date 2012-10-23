@@ -1,0 +1,12 @@
+/usr
+/usr/bin
+ dvdauthor
+ dvddirdel
+ dvdunauthor
+ mpeg2desc
+ spumux
+ spuunmux
+/usr/share
+/usr/share/dvdauthor
+ dvdauthor.xsd
+ spumux.xsd

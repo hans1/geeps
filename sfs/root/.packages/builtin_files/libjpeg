@@ -1,0 +1,11 @@
+/usr
+/usr/bin
+ cjpeg
+ djpeg
+ jpegtran
+ rdjpgcom
+ wrjpgcom
+/usr/lib
+ libjpeg.so
+ libjpeg.so.8
+ libjpeg.so.8.0.1

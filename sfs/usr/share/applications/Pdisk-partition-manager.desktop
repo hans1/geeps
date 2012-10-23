@@ -1,0 +1,16 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pdisk partition manager
+Name[ru]=Pdisk менеджер разделов
+Name[de]=Pdisk Partitionsmanager
+Name[es]=Pdisk-Administrador de Particiones
+Name[hu_HU]=Pdisk partíció kezelés
+Name[ja]=Pdisk パーティションの管理
+Name[zh_CN]=Pdisk 分区管理器
+Icon=Pdisk.xpm
+Comment=Pdisk partition manager
+Exec=Pdisk
+Terminal=false
+Type=Application
+Categories=X-SystemMemory
+GenericName=Pdisk partition manager

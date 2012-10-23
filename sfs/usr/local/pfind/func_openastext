@@ -1,0 +1,15 @@
+#!/bin/bash
+
+FILE=`echo "$*" | cut -b 2-`
+if [ -z "$FILE" ]; then
+	TXT1="<b>$LOC710</b>"
+	. "$PROGPATH"box_ok
+	exit 0
+fi
+EXTENSION=`echo "$FILE" | sed -e 's/^.*\.//g'`
+PROGRAM=`grep "$EXTENSION=" "$HOME/.pfind/pfindMIMErc" | sed -e s/^.*\=//g`
+echo > /tmp/pfind-error$PROGPID
+exec $TEXTEDITOR "$FILE" 2> /tmp/pfind-error$PROGPID
+TXT1=`cat /tmp/pfind-error$PROGPID`
+if [ -n "$TXT1" ]; then . "$PROGPATH"box_ok; fi #error
+

@@ -1,0 +1,7 @@
+/usr
+/usr/lib
+ libdrm_intel.so.1.0.0
+ libdrm_nouveau.so.1.0.0
+ libdrm_radeon.so.1.0.0
+ libdrm.so.2.4.0
+ libkms.so.1.0.0

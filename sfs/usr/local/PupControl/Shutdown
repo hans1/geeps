@@ -1,0 +1,174 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Shutdown Manager
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
+
+WORKDIR="/usr/local/PupControl"
+CPANEL_ICONS_DIR="$WORKDIR/icons"
+CURRDPI=`cat $HOME/.Xresources | grep "^Xft\\.dpi:" | tr '\t' ' ' | tr -s ' ' | cut -f 2 -d ' '` ##get current global screen dpi
+CURRFONTNAME=`cat $HOME/.gtkrc-2.0 | grep font_name | cut -d "=" -f2 | cut -d " " -f2 | sed 's/\"//g'` ##get current user-font
+DISTRO_NAME=`cat /etc/DISTRO_SPECS | grep DISTRO_NAME | cut -d "=" -f2 | sed s/\'//g` ##get current distro name
+if [ "`pidof xfwm4`" ]; then
+ XFWM4="$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
+ XFDPI=`cat $XFWM4 | grep '"DPI' | awk '{print $4}' | cut -d "=" -f2 | sed -e 's/\"//g' -e 's/\/>//g'`
+ [ "$XFDPI" = "" -o "$XFDPI" = "-1" ] && XFDPI="96"
+fi
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#define current window manager
+if [ -f "$HOME/Choices/windowmanager" ]; then CURRWM=`cat "$HOME/Choices/windowmanager"` #TazOC LHP
+else CURRWM=`cat /etc/windowmanager`
+fi
+
+#define text width-request for the Liberation/Luxi Sans font in Puppy derivatives (LHP)
+if [ "$CURRFONTNAME" = "Liberation" -o "$CURRFONTNAME" = "Luxi" ]; then
+	if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"125"
+	elif [ $CURRDPI = "144" ]; then TEXT_WIDTH=$"205"
+	elif [ $CURRDPI = "138" ]; then TEXT_WIDTH=$"195"
+	elif [ $CURRDPI = "132" ]; then TEXT_WIDTH=$"185"
+	elif [ $CURRDPI = "126" ]; then TEXT_WIDTH=$"175"
+	elif [ $CURRDPI = "120" ]; then TEXT_WIDTH=$"170"
+	elif [ $CURRDPI = "114" ]; then TEXT_WIDTH=$"155"
+	elif [ $CURRDPI = "108" ]; then TEXT_WIDTH=$"145"
+	elif [ $CURRDPI = "102" ]; then TEXT_WIDTH=$"135"
+	elif [ $CURRDPI = "96" ]; then TEXT_WIDTH=$"120"
+	elif [ $CURRDPI = "90" ]; then TEXT_WIDTH=$"113"
+	elif [ $CURRDPI = "84" ]; then TEXT_WIDTH=$"100"
+	elif [ $CURRDPI = "78" ]; then TEXT_WIDTH=$"103"
+	elif [ $CURRDPI = "72" ]; then TEXT_WIDTH=$"93"
+	elif [ $CURRDPI = "66" ]; then TEXT_WIDTH=$"87"
+	fi
+
+#define text width-request for Sans or DejaVu Sans font in Saluki implementation of xfwm4
+elif [ "$DISTRO_NAME" = "Saluki" ] && [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then
+	if [[ $XFDPI -ge 117 ]] && [[ $XFDPI -lt 123 ]]; then TEXT_WIDTH=$"180"
+	elif [[ $XFDPI -ge 111 ]] && [[ $XFDPI -lt 117 ]]; then TEXT_WIDTH=$"170"
+	elif [[ $XFDPI -ge 105 ]] && [[ $XFDPI -lt 111 ]]; then TEXT_WIDTH=$"160"
+	elif [[ $XFDPI -ge 99 ]] && [[ $XFDPI -lt 105 ]]; then TEXT_WIDTH=$"150"
+	elif [[ $XFDPI -ge 93 ]] && [[ $XFDPI -lt 99 ]]; then TEXT_WIDTH=$"142"
+	elif [[ $XFDPI -ge 87 ]] && [[ $XFDPI -lt 93 ]]; then TEXT_WIDTH=$"134"
+	elif [[ $XFDPI -ge 81 ]] && [[ $XFDPI -lt 87 ]]; then TEXT_WIDTH=$"120"
+	elif [[ $XFDPI -ge 75 ]] && [[ $XFDPI -lt 81 ]]; then TEXT_WIDTH=$"105"
+	elif [[ $XFDPI -ge 69 ]] && [[ $XFDPI -lt 75 ]]; then TEXT_WIDTH=$"103"
+	fi
+
+#define text width-request for default Sans or DejaVu Sans font in standard derivatives of Puppy
+elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"140"
+	elif [ $CURRDPI = "108" ]; then TEXT_WIDTH=$"165"
+	elif [ $CURRDPI = "102" ]; then TEXT_WIDTH=$"155"
+	elif [ $CURRDPI = "96" ]; then TEXT_WIDTH=$"140"
+	elif [ $CURRDPI = "90" ]; then TEXT_WIDTH=$"133"
+	elif [ $CURRDPI = "84" ]; then TEXT_WIDTH=$"120"
+	elif [ $CURRDPI = "78" ]; then TEXT_WIDTH=$"105"
+	elif [ $CURRDPI = "72" ]; then TEXT_WIDTH=$"103"
+	elif [ $CURRDPI = "66" ]; then TEXT_WIDTH=$"98"
+fi
+
+#show Suspend option in Shutdown Manager, only if acpitool is available
+if [ "`which acpitool`" ]; then
+	 SUSPEND="
+    <hbox>    
+     <button tooltip-text=\" Suspend Notebook to RAM \">
+      <input file>$CPANEL_ICONS_DIR/suspend-ram20.png</input>
+      <action>$WORKDIR/func -suspend_standby &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Standby \"</label></text>
+    </hbox>"
+else SUSPEND=""
+fi
+
+#show WM-Change option in Shutdown Manager, only if program is available
+if [ "`which wmswitcher`" -o "`which changewm.sh`" -o "`which change-wm`" ]; then
+	 WM_CHANGE="
+    <hbox>    
+     <button tooltip-text=\" Select alternate window manager \">
+      <input file>$CPANEL_ICONS_DIR/add-remove20.png</input>
+      <action>$WORKDIR/func -wmchanger &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Switch WM \"</label></text>
+    </hbox>"
+else WM_CHANGE=""
+fi
+
+export SHUTDOWN_DIALOG="<window title=\"SDM\" icon-name=\"gtk-stop\" resizable=\"false\">
+  <vbox>
+   <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Pup</span><span size='"'large'"' color='"'#3272C0'"'>Control</span></b>\"</label></text>
+  <notebook labels=\"  Shutdown Manager  \">
+   <vbox>
+    $SUSPEND
+
+    <hbox>    
+     <button tooltip-text=\" Turn off PC \">
+      <input file>$CPANEL_ICONS_DIR/shutdown20.png</input>
+      <action>$WORKDIR/func -poweroff &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Power-Off \"</label></text>
+    </hbox>
+
+    <hbox>    
+     <button tooltip-text=\" Restart PC \">
+      <input file>$CPANEL_ICONS_DIR/reboot20.png</input>
+      <action>$WORKDIR/func -reboot &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Reboot \"</label></text>
+    </hbox>
+
+    <hbox>    
+     <button tooltip-text=\" Exit to command prompt \">
+      <input file>$CPANEL_ICONS_DIR/console20.png</input>
+      <action>$WORKDIR/func -logout &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Log-Out \"</label></text>
+    </hbox>
+
+    <hbox>    
+     <button tooltip-text=\" Restart X-server \">
+      <input file>$CPANEL_ICONS_DIR/x20.png</input>
+      <action>$WORKDIR/func -restartX &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Restart X \"</label></text>
+    </hbox>
+
+    <hbox>    
+     <button tooltip-text=\" Restart $CURRWM \">
+      <input file>$CPANEL_ICONS_DIR/wm20.png</input>
+      <action>$WORKDIR/func -restartWM &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"  Restart WM \"</label></text>
+    </hbox>
+
+    $WM_CHANGE
+   </vbox>
+  </notebook>
+
+    <hbox homogeneous=\"true\">    
+     <button width-request=\"60\" tooltip-text=\" Return to control panel \">
+      <label>Exit</label>
+      <action>$WORKDIR/PupControl &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+    </hbox>
+ </vbox>
+</window>"
+
+$GTKDIALOG --center --program=SHUTDOWN_DIALOG
+
+unset SHUTDOWN_DIALOG
+
+exit 0

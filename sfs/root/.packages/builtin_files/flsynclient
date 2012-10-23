@@ -1,0 +1,11 @@
+/root
+/root/Startup
+ load-touchpad-settings
+/usr
+/usr/bin
+ flsynclient
+/usr/share
+/usr/share/applications
+ flsynclient.desktop
+/usr/share/pixmaps
+ flsynclient.png

@@ -1,0 +1,32 @@
+/usr
+/usr/bin
+ rapper
+ rdfproc
+ redland-db-upgrade
+ roqet
+/usr/doc
+/usr/doc/raptor-1.4.21
+/usr/doc/rasqal-0.9.21
+/usr/doc/redland-1.0.12
+/usr/lib
+ libmpfr.so
+ libmpfr.so.4
+ libmpfr.so.4.0.1
+ libraptor.so
+ libraptor.so.1
+ libraptor.so.1.2.0
+ librasqal.so
+ librasqal.so.2
+ librasqal.so.2.0.0
+ librdf.so
+ librdf.so.0
+ librdf.so.0.0.0
+/usr/lib/redland
+ librdf_storage_mysql.so
+ librdf_storage_sqlite.so
+ librdf_storage_virtuoso.so
+/usr/share
+/usr/share/redland
+ mysql-v1.ttl
+ mysql-v2.ttl
+ Redland.i

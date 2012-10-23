@@ -1,0 +1,22 @@
+/etc
+ esd.conf
+ .wh.esd.conf.new
+/usr
+/usr/bin
+ esd
+ esdcat
+ esdctl
+ esddsp
+ esdfilt
+ esdloop
+ esdmon
+ esdplay
+ esdrec
+ esdsample
+/usr/lib
+ libesddsp.so
+ libesddsp.so.0
+ libesddsp.so.0.2.39
+ libesd.so
+ libesd.so.0
+ libesd.so.0.2.39

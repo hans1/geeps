@@ -1,0 +1,11 @@
+/sbin
+ dosfsck
+ dosfslabel
+ fsck.msdos
+ fsck.vfat
+ mkdosfs
+ mkfs.msdos
+ mkfs.vfat
+/usr
+/usr/man
+/usr/man/man8

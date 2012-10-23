@@ -1,0 +1,117 @@
+#!/bin/sh
+# rcrsn51 2010-10-28
+# v1.7 2011-09-25
+
+STARTHELP () {
+  defaultbrowser http://www.murga-linux.com/puppy/viewtopic.php?t=61046
+}
+export -f STARTHELP
+
+export PEASYPATH="/usr/local/peasyscan"
+
+URI=""
+SOURCE=""
+MODE=""
+RESOLUTION=""
+
+CONFIGFILELIST=`ls $PEASYPATH/config/* 2> /dev/null | cut -d "/" -f 6 `
+if [ -n "$CONFIGFILELIST" ]; then
+  Xdialog --title " " --combobox "Select a scanner configuration file (or Cancel)" 0 0  $CONFIGFILELIST 2> /tmp/configout
+  if [ $? -eq 0 ]; then
+    CONFIGFILE=$PEASYPATH"/config/"`cat /tmp/configout`
+    URI=`grep -i "uri" $CONFIGFILE | cut -d ">" -f 2 | cut -d "<" -f 1`
+    SOURCE=`grep -i "source" $CONFIGFILE | cut -d ">" -f 2 | cut -d "<" -f 1`
+    MODE=`grep -i "mode" $CONFIGFILE | cut -d ">" -f 2 | cut -d "<" -f 1`
+    RESOLUTION=`grep -i "resolution" $CONFIGFILE | cut -d ">" -f 2 | cut -d "<" -f 1`
+  fi
+fi 
+
+if [ -z "$URI" ]; then
+  SCANNERLIST=$(scanimage -L | grep "device" | cut -d "\`" -f 2 | cut -d "'" -f 1)
+  SCANNERCOUNT=`echo $SCANNERLIST | wc -w`
+  if [ "$SCANNERCOUNT" -eq 1 ]; then
+    URI=$SCANNERLIST
+  elif [ "$SCANNERCOUNT" -gt 1 ]; then
+    Xdialog --title " " --combobox "You have several scanners. Pick the URI." 0 0 $SCANNERLIST 2> /tmp/scannerlistout
+    if [ $? -eq 0 ]; then
+      URI=`cat /tmp/scannerlistout`
+    fi
+  fi
+fi
+
+if [ -z "$URI" ]; then
+  Xdialog --title " " --msgbox "No scanner detected!" 0 0
+  exit
+fi
+
+export URI
+export SOURCE
+export MODE
+export RESOLUTION
+
+export DIALOG="
+<window title=\"Peasyscan v1.7\">
+<vbox>
+  <frame Select the image format>
+    <radiobutton> 
+      <variable>F1</variable>
+      <label>PNG</label>
+    </radiobutton>
+    <radiobutton> 
+      <variable>F2</variable>
+      <label>JPG</label>
+    </radiobutton>
+    <radiobutton> 
+      <variable>F3</variable>
+      <label>PDF</label>
+    </radiobutton>
+    <radiobutton> 
+      <variable>F4</variable>
+      <label>TXT - OCR Mode</label>
+    </radiobutton>
+    <radiobutton> 
+      <variable>F5</variable>
+      <label>PS   - Copier Mode</label>
+    </radiobutton>
+  </frame>
+  <frame Save the scanned image as>
+    <hbox>
+      <entry accept=\"savefilename\">
+        <label>Select a Filename</label>
+        <variable>SAVEFILENAME</variable>
+      </entry>
+      <button>
+        <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">SAVEFILENAME</action>
+      </button>
+    </hbox>
+  </frame> 
+  <hbox>
+   <button>
+     <label>Help</label>
+     <action>STARTHELP &</action>
+   </button>
+   <button>
+     <label>ADF</label>
+     <action>$PEASYPATH/ADF &</action>
+   </button>
+   <button>
+     <label>Reset</label>
+     <action>$PEASYPATH/reset</action>
+   </button>
+   <button>
+     <label>Start</label>
+     <action>$PEASYPATH/scan &</action>
+   </button>
+   <button>
+     <label>Save</label>
+     <action>$PEASYPATH/save</action>
+     </button>
+   <button><label>Quit</label></button>
+  </hbox>
+</vbox>
+</window>
+"
+
+gtkdialog3 --program DIALOG > /dev/null
+rm -f /tmp/out.pnm /tmp/out.png

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+FILE=`Xdialog --title "Please select your file" --fselect /usr/local/lib/X11/mini-icons/ 28 48 2>&1`
+
+case $? in
+	0)
+		echo "\"$FILE\" chosen";;
+	1)
+		echo "Cancel pressed.";;
+	255)
+		echo "Box closed.";;
+esac
+if [ "$FILE" = "" ]; then
+exit
+fi
+echo "$FILE" > /tmp/tmp-icon.txt

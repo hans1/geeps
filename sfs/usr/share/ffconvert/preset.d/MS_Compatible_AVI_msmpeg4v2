@@ -1,0 +1,1 @@
+-f avi -vcodec msmpeg4v2  -b 1000k     -acodec libmp3lame -ab 192k -ar 44100  

@@ -1,0 +1,103 @@
+#!/bin/bash
+#
+# Code updated for Puppy 1.0.9, JWM 1.7
+# by Kwiller on 5-May-2006
+#
+# 27aug2010 shinobar: remove warnings at parsing new config
+
+##-----DesktopCount Config----->>
+
+MINTOPS=1
+MAXTOPS=8
+DC="<Desktops count=\"[0-9][0-9]*\"/>"
+CONFIG="/root/.jwm/jwmrc-personal"
+CONFIG2="/root/.jwm/jwmrc-personal-bak"
+CONF="/root/.jwm/jwmrc-personal-temp"
+TMP="/tmp/inputbox.tmp.$$"
+
+#-----Backup current settings----->>
+cp $CONFIG $CONFIG2
+
+#----Check for current settings---->>
+SET_ON=`grep -c "$DC" $CONFIG`
+
+#----Set choice outside of range----->>
+CHOICE=0
+
+#----------dialogue-------->>
+
+#--- loop until choice is in range 1 to 8 ---->>
+while [ "$CHOICE" -lt "$MINTOPS" -o "$CHOICE" -gt "$MAXTOPS" ]
+do
+  Xdialog --title "Virtual Desktops" \
+          --inputbox "Specify your desired number of virtual desktops (1 - 8)" 0 0 2> $TMP
+
+  retval=$?
+
+#--------cancel pressed------->>
+  case $retval in
+    1 | 255)  exit 0;;
+  esac
+
+#-------preparation----------->>
+
+  CHOICE=`cat $TMP`
+
+  if [ -z $CHOICE ]; then
+     CHOICE=1
+  fi
+done
+
+if [ "$SET_ON" -eq "1" ]
+then
+#-----If there are current settings change them----->>
+
+  SEDCOUNT=s!count=\"[0-9][0-9]*\"!count=\"${CHOICE}\"!g
+
+  sed -e "$SEDCOUNT" $CONFIG > $CONF
+
+else
+#-----If there are no current settings add the new one---->>
+
+  echo "  " > $TMP
+  echo '<!-- Number of virtual desktops -->' >> $TMP
+  echo "<Desktops count=\"${CHOICE}\"/>" >> $TMP
+
+  sed -e "/<JWM>/r $TMP" $CONFIG > $CONF
+
+fi
+
+#---------save changes----->>
+
+  mv $CONF $CONFIG
+
+#------check new configuration----->>
+jwm -p 2>&1 | grep -v 'warning' > $TMP
+
+CHECKCONF=`cat $TMP`
+
+RES=`grep -c "Desktops count=\"$CHOICE\"/>" $CONFIG`
+
+#----notify of result----->>
+
+if [ "$RES" -eq "1" ]; then
+  if [ -z $CHECKCONF ]; then 
+    RESTOP="Change Saved"
+    RESMSG="Now set for $CHOICE virtual desktops"
+    rm -f $CONFIG2
+  else
+    RESTOP="Change Reversed"
+    RESMSG="New config corrupt. Keeping original"
+    mv $CONFIG2 $CONFIG
+  fi
+else
+  RESTOP="Change Failed"
+  RESMSG="Configuration has not been altered"
+  mv $CONFIG2 $CONFIG
+fi
+
+Xdialog --title "$RESTOP" --msgbox "$RESMSG" 0 0
+
+#--------clean exit------->>
+rm -f $TMP
+exit 0

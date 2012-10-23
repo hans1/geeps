@@ -1,0 +1,21 @@
+/root
+/root/Startup
+ retrovol_tray
+/usr
+/usr/bin
+ retrovol
+/usr/share
+/usr/share/locale
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+ retrovol.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+ retrovol.mo
+/usr/share/retrovol
+ dot.retrovolrc
+/usr/share/retrovol/images
+ audio-volume-high.png
+ audio-volume-low.png
+ audio-volume-medium.png
+ audio-volume-muted.png

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+if [ -z "$IMG" ]; then IMG="dialog-question"; fi
+export yesnobox="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+ <vbox>
+  <frame>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <text use-markup=\"true\"><label>\"$TXT2\"</label></text>
+   <text use-markup=\"true\"><label>\"$TXT3\"</label></text>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-no\">
+    </input><label>$LOC_NO</label>
+    <action type=\"exit\">98</action>
+   </button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-yes\"></input>
+    <label>$LOC_YES</label>
+    <action type=\"exit\">99</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=yesnobox --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+TXT1=""; TXT2=""; TXT3=""; IMG="" #reset to avoid alien text in next box

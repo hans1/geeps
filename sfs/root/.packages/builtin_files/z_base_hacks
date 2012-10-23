@@ -1,0 +1,83 @@
+/bin
+ mount
+/etc
+/etc/init.d
+ 10alsa
+/etc/rc.d
+ rc.update
+/etc/X11
+/etc/X11/xkb
+/etc/X11/xkb/rules
+ evdev
+/etc/X11/xkb/symbols
+/etc/X11/xkb/symbols/pc
+ fr
+/root
+/root/Startup
+ firstrun
+/usr
+/usr/bin
+ gtkdialog-splash
+ gv
+ xterm
+/usr/lib
+/usr/lib/sane
+ libsane-epson2.so
+ libsane-epson2.so.1
+ libsane-epson2.so.1.0.20
+/usr/local
+/usr/local/apps
+/usr/local/apps/ROX-Filer
+/usr/local/apps/ROX-Filer/ROX
+/usr/local/apps/ROX-Filer/ROX/MIME
+ application-x-ext2-image.png
+ application-x-ext3-image.png
+ application-x-ext4-image.png
+/usr/local/bin
+ rox
+/usr/local/jwmconfig2
+ panel-buttons
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ glade-3.png
+/usr/local/lib/X11/themes
+/usr/local/lib/X11/themes/FlatOrange
+ qp-icon.svg
+/usr/local/lib/X11/themes/Stardust
+ qp-icon48.png
+/usr/sbin
+ connectwizard
+ connectwizard_2nd
+ cups_shell
+ delayedrun
+ ipinfo
+ pmount
+ remasterpup2
+ report-video
+ report-video-glx
+ resizepfile.sh
+ welcome1stboot.sh
+ zdump
+/usr/share
+/usr/share/applications
+ Urxvt-terminal-emulator.desktop
+/usr/share/backgrounds
+ big_blue_sky.jpg
+ Space_Sunset.jpg
+/usr/share/doc
+/usr/share/doc/nls
+/usr/share/doc/nls/welcome1stboot.sh
+ es.po
+ ru.po
+ welcome1stboot.sh.pot
+/usr/share/icons
+ display.png
+ report-video.png
+/usr/share/locale
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+ welcome1stboot.sh.mo
+/usr/share/locale/ru
+/usr/share/locale/ru/LC_MESSAGES
+ welcome1stboot.sh.mo

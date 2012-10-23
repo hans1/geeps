@@ -1,0 +1,5 @@
+/usr
+/usr/lib
+ libgdbm.so
+ libgdbm.so.3
+ libgdbm.so.3.0.0

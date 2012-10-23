@@ -1,0 +1,4 @@
+/etc
+/etc/udev
+/etc/udev/rules.d
+ 00-i915_modeset0.rules

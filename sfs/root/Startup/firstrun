@@ -1,0 +1,151 @@
+#!/bin/sh
+# first setup dialogs, distributers are welcome to modify this script
+# You may also need to modify the script /usr/sbin/delayedrun.
+# See /usr/sbin/delayedrun-example
+#
+# 24dec2010 shinobar
+# 28dec2010 pupsaveconfig, wait video-wizard done
+# 31dec2010 avoid multiple run
+# 19Jan2011 extralang
+#  4feb2011 extralang -f
+#  9feb2011 welcome info
+# 17feb2011 pman
+# 17oct2011 /etc/firstrun instead of changing permission (thanks to rerwin)
+# 29nov2011 firstrun only once, not launch pman
+# 11mar2012: remove DISTRO_XORG_AUTO from DISTRO_SPECS for recent woof
+# 11mar2012: bark after personalize settings, quickcountry, test internet, extralang, getflash
+# 17mar2012: fix was not bark
+# 20mar2012: offering getflash commented out
+# 28mar2012: everytime comment out DISTRO_XORG_AUTO
+
+# can be called as 'firstrun quickcountry'
+PARAM1=$1
+
+#avoid multiple run
+PSRESULT=$(ps)
+N=$(echo "$PSRESULT"| grep -w "$0"| grep -w 'sh'| wc -l)
+if [ $N -gt 1 ] ; then
+  echo "$0 seems already running."
+  exit
+fi
+
+#28mar2012: everytime comment out DISTRO_XORG_AUTO because it revives every boot.
+# Need not this block if it is implemented in the delayedrun. See /usr/sbin/delayedrun-example.
+if [ -s /etc/DISTRO_SPECS ]  && grep -q '^[[:space:]]*DISTRO_XORG_AUTO=.*yes' /etc/DISTRO_SPECS; then
+  rm -f /tmp/DISTRO_SPECS
+  grep -v 'DISTRO_XORG_AUTO=' /etc/DISTRO_SPECS > /tmp/DISTRO_SPECS
+  echo "#DISTRO_XORG_AUTO='yes'" >> /tmp/DISTRO_SPECS
+  [ -s /tmp/DISTRO_SPECS ]  &&  mv -f /tmp/DISTRO_SPECS /etc/DISTRO_SPECS
+fi
+
+# already done?
+RUNSTATUS=/etc/firstrun
+[ -f "$RUNSTATUS" ] && exit
+
+
+run_gui() {
+  P=$(which "$1")
+  [ "$P" ] || return
+  killall yaf-splash 2>/dev/null
+  killall welcome1stboot 2>/dev/null
+  $P
+}
+
+# suppress delayedrun offers to download flashplayer
+GETFLASH=""; GETFLASHINMENU=""
+for P in getflash flash_install; do
+    which $P &>/dev/null && GETFLASH="$P" && break
+done
+[ "$GETFLASH" ] && grep -q "Exec=.*$GETFLASH"  /usr/share/applications/*.desktop && GETFLASHINMENU="y"
+# need not offer to download flashplayer if it can be done from the menu
+[ "$GETFLASHINMENU" ] && touch /var/local/internetsuccess	# delayedrun sees this
+
+# wait until fc-cache done
+for I in $(seq 10);do
+  [ "$(pidof fc-cache)" ] || break
+  sleep 1
+done
+
+# wait video-wizard done
+while true; do
+  PSRESULT=$(ps)
+  echo "$PSRESULT" | grep -qw 'sh[ ].*video-wizard' || break
+  sleep 1
+done
+
+# personalize settings
+# can be called as 'firstrun quickcountry'
+QUICKSETUP=firstrun
+case "$PARAM1" in
+*country*) QUICKSETUP=countrywizard
+esac
+[ ! -s /tmp/firstrun ] && run_gui $QUICKSETUP
+
+# pupsaveconfig
+[ -s /etc/rc.d/PUPSTATE ] && source /etc/rc.d/PUPSTATE
+[ "$PUPMODE" = "5" -a ! -f /etc/rc.d/pupsave.conf ] && run_gui pupsaveconfig
+
+# bark
+#SOUND=/usr/share/audio/2barks.au
+#if [ ! -f /tmp/firstrun-bark -a -s "$SOUND"  ];then
+    #grep -q '^[#]*play /usr/share/audio/2barks' /usr/sbin/delayedrun || aplay "$SOUND" &
+    #[ $? -eq 0 ] && touch /tmp/firstrun-bark
+#fi
+
+# Test internet ready
+if [ ! -f /tmp/internetsuccess ]; then
+  echo -n "Test if connected to internet..."
+  [ "$GETFLASHINMENU" ] && rm -f /var/local/internetsuccess	# delayedrun sees this
+  NETREADY=""
+  # wait max. 10 sec.
+  for I in $(seq 5); do
+    LANG=C route | grep -q 'default[ ].*[ ]0\.0\.0\.0[ ]' && grep -wq 'nameserver' /etc/resolv.conf && NETREADY="y" && break
+    echo -n "."
+    sleep 2
+  done
+  #[ "$NETREADY" ] && ping -c1 google.com &>/dev/null || NETREADY=""
+  if [ "$NETREADY" ] ;then
+    echo "Network is ready."
+    touch /tmp/internetsuccess	# leave flag
+    # need not offer to download flashplayer if it can be done from the menu
+    [ "$GETFLASHINMENU" ] && touch /var/local/internetsuccess	# delayedrun sees this
+    #[ ! -s /usr/lib/mozilla/plugins/libflashplayer.so ] && [ "$GETFLASH" ] && $GETFLASH	# uncomment this to offer download flashplayer here
+  else
+    echo "Timeout."
+    NEXTSCRIPT=/root/Startup/test_if_connected
+    # script may not be excutable
+    if [ -s "$NEXTSCRIPT" ]; then
+      sh "$NEXTSCRIPT"
+      rm -f "$NEXTSCRIPT"
+    #else run_gui connectwizard	# uncomment this to offer connect wizard
+    fi
+  fi
+fi
+
+# find extra sfs
+#[ ! -s /tmp/extrastate ] && which extrasfsfind &>/dev/null && extrasfsfind #commented 120505 01micko, bug where pops up with no extra sfs, also faster
+
+# call extralang again
+[ "$PUPMODE" = "5" ] && which pupsaveconfig &>/dev/null && which extralang &>/dev/null && extralang more
+
+# welcome info
+INFO=""
+for P in welcome1stboot.sh welcome1stboot; do
+  which $P &>/dev/null && INFO="$P" && break
+done
+if [ "$INFO" = "" ]; then
+  WELCOME=/usr/share/doc/welcome1stboot
+  [ -f "$WELCOME" -a ! -x "$WELCOME" ] && chmod +x "$WELCOME" && INFO="$WELCOME"
+fi
+grep -q 'welcome1stboot' /usr/bin/pman && INFO=""  # click the 'Help' desktop icon to look up welcome1stboot
+grep -q '^[^#]*welcome1stboot' /usr/sbin/delayedrun && INFO=""
+if [ "$INFO" ]; then
+  PSRESULT=$(ps)
+  echo "$PSRESULT" | grep -qw  "$INFO" || "$INFO" &
+fi
+
+# all done
+echo -n "done" > "$RUNSTATUS"
+exit 0
+
+ 

@@ -1,0 +1,11 @@
+#!/bin/sh
+SRC=/root/my-applications/share/ffconvert/preset-source
+(
+  while read ALINE;do
+    TITLE=$(echo $ALINE|cut -d '"' -f2)
+    OPT=$(echo $ALINE|cut -d '"' -f4)
+    FMT=$(echo $ALINE|cut -d '"' -f6)
+    echo "$OPT"| grep -q '\-f ' || OPT="-f $FMT $OPT"
+    echo "$TITLE, $OPT"
+  done
+ ) < $SRC

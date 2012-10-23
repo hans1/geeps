@@ -1,0 +1,5 @@
+/usr
+/usr/lib
+ libexif.so
+ libexif.so.12
+ libexif.so.12.3.2

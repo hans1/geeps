@@ -1,0 +1,225 @@
+#!/bin/bash
+##Slickpet en_US
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=english
+#translator=rodin.s ##TRANSLATORS please name your version 1.4 so I know ..Thankyou
+#        ****************LATEST 25 September 2011 ************************
+
+##################                    PLEASE NOTE                               ###############
+#if you are unfamiliar with coding then you may notice "\n" in some lines                     #
+#this means "new line" and it is important. I realise grammar is different in each language   #
+#do place this "\n" every 6 to 10 words or 40 to 50 characters  
+#Also there may be references to "Slacko" or "Lupu", change to "Slacko"                              #
+##################                  THANK  YOU                                  ###############
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="Отмена"
+export LOC_ERROR="Ошибка"
+export LOC_WARNING="Предупреждение"
+export LOC_YES="Да"
+export LOC_NO="Нет"
+export LOC_QUIT="Выход"
+export LOC_HELP="Справка"
+export LOC_INFO="Инфо"
+export LOC_FILE="Файл"
+#export LOC_BRS=" is currently your default browser \nIt is recommended to get a full \nfeatured browser especially if you want to \ndownload files"
+export LOC_CANTINSTALL="У вас недостаточно места для установки"
+export LOC_WARNINGINSTALL="после установки пакета у вас на разделе или\n в сейв-файле останется менее 45 Мб \n \nПродолжать?"
+
+#browser installer #NOT used in Slacko
+
+#yaf messages
+export LOC_101="ОШИБКА: Невозможно скачать. Подключитесь к Интернету"
+export LOC_102="Подождите..."
+export LOC_103="ОШИБКА: Сайт обновлений не отвечает. Пожалуйста проверьте соединение или попробуйте позже."
+export LOC_104="У вас установлено последнее обновление Puppy"
+export LOC_105="Сейчас нет обновлений для Puppy"
+export LOC_106a="Пожалуйста, подождите, пока"
+export LOC_106b="скачается. Затем вам будет предложено подтвердить установку"
+export LOC_107="Время ожидания истекло. Пожалуйста, повторите попытку позже или сбросьте настройки"
+export LOC_108="ОШИБКА: не удалось скачать. Попробуйте еще раз. Если загрузка уже началась, она возобновится."
+export LOC_109="ОШИБКА: Не удалось установить пакет, попробуйте снова"
+export LOC_110a="Успешно установлен"
+export LOC_110b="."
+export LOC_111=" установлен как браузер по умолчанию"
+export LOC_112="Slickpet уже запущен. Пожалуйста, подождите..."
+export LOC_113="Пожалуйста, подождите, идет поиск пакета..."
+#NEW yaf messages
+export LOC_114="Вы не можете загрузить драйвер, пока вы загружаете другие вещи" #NEW 1 December
+export LOC_115="Воздержитесь от других скачиваний, пока качается драйвер"
+export LOC_116="Извините, ваш пакет не найден"
+export LOC_117="Сейчас подключено максимальное колличество sfs. Отключите некоторые sfs файлы в 'Менеджере загрузки' чтобы загрузить больше"
+#xmessages
+#export LOC_201=deprecated
+export LOC_202="Добро пожаловать в Slickpet
+    Тут вы увидите вкладки для разных пакетов разного назначения. Все 
+очень просто. Когда Вы выберете пакет и нажмете на иконку рядом с ним, 
+этот пакет скачается из репозитория Puppy Linux. На медленном соединении 
+для этого может потребоваться время, наберитесь терпения. После загрузки 
+откроется PPM (Puppy Package Manager), отобразит несколько вопросов 
+и, если Вы везде выберете OK, выбранный пакет установится. Вы увидите 
+сообщение об успешной установке вверху экрана.
+    В настройках Вы можете выбрать один из нескольких репозиториев. Если 
+какой-то репозиторий не работает или работает медленно, Вы можете выбрать другой.
+    На вкладке «Драйверы» Вы сможете выбрать видео драйвер для Вашего 
+оборудования. Для видеокарт производства Nvidia в PPM (Puppy Package Manager) 
+присутствуют другие драйвера. Для карт Radeon и Intel рекомендуется 
+использовать пакет Xorg High.
+    На вкладке «Новости» вы сможете прочитать о последних исправлениях 
+и усовершенствованиях Puppy Linux.
+    Если у вас возникли проблемы, Вы найдете справку в меню.
+    Другие пакеты доступны из основного менеджера пакетов Puppy (PPM).
+    Наслаждайтесь пользованием Puppy" 
+export LOC_203="Учтите, что эти следующие приложения скомпилированы 
+и подготовлены энтузиастами Puppy. Никаких 
+гарантий не дается. Большинство из них 
+распространяется под лицензией Gnu GPL 
+и ее вариантами. Большинство из них постоянно
+обновляются и поэтому не могут храниться в главном
+репозитории. Чаще всего вы получаете наиболее стабильные
+последние версии чтобы держать вашу систему на переднем 
+крае. Для использования этих функций у Вас должен быть
+установлен браузер. Кликните значок браузера на 
+рабочем столе, чтобы загрузить и установить браузер." #No changes  :)
+export LOC_204="Все пакеты менеджера пакетов Puppy (PPM) доступны по нажатию иконки «Установить» Рабочего стола.
+Вы можете нажать «Slickpet в Сети», после чего откроется веб-страница и Вы сможете  
+скачать пакеты по ссылкам. На вкладке «Больше» вы найдете программы, которые должны 
+работать в Вашей системе.
+    Вы можете изменить текущий репозиторий из меню Файл -> Настройки на ближайший к вам или  
+на зеркало, которое работает лучше для Вас. Ваш выбор будет запомнен. Также Вы можете 
+отменить автоматическое удаление загруженых пакетов (по пути /root/.slickpet/Downloads).
+    Загруженые пакеты сохраняются в Вашем файле сохранения. Если Вы нажмете на меню 
+«Каталог загрузки», то сможете увидеть, что там находится и переместить нужный пакет. 
+Можно очистить эту папку, выбрав пункт меню «Удалить загруженные пакеты».
+    Также Вы увидите вкладку для SFS-модулей. Это специальные пакеты, которые создаются для больших 
+программ, чтобы они не занимали место в Вашем файле сохранения. Чтобы узнать больше 
+выберите пункт меню «SFS Помощь».
+Наслаждайтесь Puppy!
+Команда Puppy." 
+
+#gtkdialog Be careful with escape character "\" here.. 
+#prefs
+export LOC_299="Снимите флажок чтобы сохранить загруженные пакеты"             
+export LOC_302="Пакеты удаляются из /tmp после перезагрузки" 
+export LOC_300="Менеджер пакетов Puppy"
+export LOC_301="Выберите опции для Slickpet"
+#export LOC_302="Changes will take effect when you click OK"
+export LOC_303="Выберите репозиторий"
+#main gui
+export LOC_304="Настройки"
+export LOC_305="В сети"
+export LOC_306="О лицензии"
+export LOC_307="Поддержка"
+export LOC_308="Прочтите это"
+export LOC_309="Добро пожаловать в"
+export LOC_310="Это быстрая альтернатива главному Менеджеру пакетов Puppy. Нажатие на значок, который вы выберете автоматически загрузит и установит то, что вы выбрали"
+export LOC_311="Популярные пакеты"
+export LOC_312="Интернет пакеты"
+export LOC_313="Полезные пакеты"
+export LOC_314="Драйвера"
+export LOC_315="Новости"
+export LOC_316="Выберите пакет для установки"
+export LOC_317="Выберите браузер или почтовый клиент для установки"
+export LOC_318="Выберите pet-пакет"
+export LOC_319="Выберите драйвер"
+export LOC_350="Больше пакетов"
+export LOC_351="Каталог загрузки"
+export LOC_352="Удалить загруженные пакеты"
+export LOC_355="О программе"
+export LOC_356="Отчёт о видео" 
+
+#Tooltips
+export LOC_353="Нажатие сюда покажет ваши загруженные пакеты если вы их сохраняете. Вы можете переместить их в другое место если хотите их сохранить и очистить каталог загрузки. Это также освободит место в вашем сейв-файле" #small change
+export LOC_354="Нажатие сюда удалит все загруженные пакеты"
+export LOC_357="для скачивания: пользователь=puppy, пароль=linux"
+export LOC_360="Возможно, имеются зависимости у"
+#pets
+export LOC_320="Gimp   Мощный редактор изображений" 
+export LOC_321="Psip Puppyphone  Интернет телефон"
+#export LOC_321="Pwidgets  Tiny Desktop Apps"
+export LOC_322="Изменить браузер по умолчанию"
+export LOC_323="Облако ..Интернет-приложения"
+export LOC_324="Wine  запуск программ Windows"
+export LOC_327="Игры Gnome Lite много удовольствия"
+#internet
+export LOC_501="Firefox  популярный Mozilla браузер"
+export LOC_502="Dillo  маленький, лёгкий браузер"
+export LOC_503="Chromium  Ubuntu Chrome браузер"
+export LOC_504="Opera  быстрый браузер"
+export LOC_505="Transmission  битторрент клиент"
+export LOC_506="Kompozer  менеджер веб-сайтов"
+export LOC_507="Iron  браузер, основанный на Chrome"
+export LOC_508="Pidgin  многофункциональный чат-клиент"
+#This is an exztra, TOR browser may be an inclusion
+export LOC_TOR="TOR Browser безопасный браузер"
+
+#Drivers
+#export LOC_389="Please ensure you have at least 80MB of free space before installing a video driver" ##deprecated 2 Nov
+export LOC_390="Для некоторых систем потребуются дополнительные драйвера, чтобы использовать все возможности" 
+#export LOC_391="RadeonHD For later model ATI Video Cards 372KB" deprecated, no harm to leave it though
+export LOC_392B="Выберите рекомендуемый драйвер"
+export LOC_392C="Для вашей карты рекомендуется использовать последнюю версию драйвера"
+#export LOC_392Att="This is for older nVidia cards"
+#export LOC_392Btt="This is for middle aged and some newer nVidia cards"
+#export LOC_392Ctt="This is for newer nVidia cards"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.35 14MB"
+export LOC_392x="Mesa -GLX для Radeon и Intel карт" 
+export LOC_392m="Mesa -GLX для Radeon и Intel карт"
+export LOC_392h="Кликните сюда для справки по установке"
+#export LOC_392j="Nvidia-glx For later model Nvidia Video Cards" deprecated
+export LOC_392a="Nvidia-glx для новых моделей видеокарт Nvidia"
+export LOC_392tt="Нажав сюда, вы сможете выбрать драйвер. Если вы не знаете, какой вам нужен, нажмите на кнопку выше" 
+export LOC_392ttr="Убедитесь с помощью видеотеста, что ваша карта ATI-AMD поддерживается"
+export LOC_392vid="Нажмите сюда, чтобы проверить свою видеокарту"
+export LOC_392ttvid="Здесь ваша видеокарта будет определена и вы сможете понять, какой драйвер вам нужен" 
+export LOC_701="\n Используйте пакет Mesa из Slickpet"
+#export LOC_702="You have"
+#export LOC_703="You have"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language########### deprecated 1 November
+export LOC_704="Видеокарта"
+export LOC_705="Нажмите на кнопку, чтобы открыть браузер и перевести текст выше" 
+export LOC_706="У вас должен быть установлен браузер на вашем языке"
+#News
+#Update IS now "News"
+export LOC_500="Эта большая кнопка перенесёт вас на веб-страницу новостей Slacko Puppy, которая содержит последние новости о Slacko Puppy Linux. Время от времени на этом сайте будут предлагаться обновления для Slacko Puppy." 
+export LOC_500B="Эта большая кнопка перенесет вас на вики-страницу с последними новостями о проекте " 
+
+#Xdialog ###deprecated
+#export LOC_401="Slacko Puppy Driver Install"
+#export LOC_402="You have chosen to install"
+#export LOC_403="\nPlease note: There will be a message pop up when you install \n your nVidia driver, write the information down. \nWould you like to continue?"
+#Clear Downloads
+export LOC_801="Очистить загрузки"
+export LOC_802="Вы выбрали удалить загруженные пакеты. \nВы уверены?" 
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" затем вам будет предложено переделать его в Pet"
+export LOC_902=". Вам будет предложено перезагрузить компьютер для завершения установки"
+export LOC_903="SFS-модули не загружены"
+export LOC_910="Просто нажмите на желаемый"
+export LOC_910tt="посмотреть загруженные SFS"
+export LOC_911="и он будет загружен"
+export LOC_920="Доступные SFS"
+export LOC_921="Описание"
+export LOC_950="Не забудьте перезагрузиться \n перед установкой других SFS"
+export LOC_951="Вы уже скачали"
+export LOC_952="Проверить Bootmanager на наличие \nмодуля"
+export LOC_953="Недостаточно места для установки"
+export LOC_954="Прерываю"
+export LOC_955="Из-за того, что в вашей системе недостаточно ОЗУ \nу вас нет достаточно места для установки"
+export LOC_956="Пожалуйста подождите... \n Большой Sfs может долго загружаться"
+#NEW stuff AS OF 1 DECEMBER 2010
+export LOC_960="Нажмите «Выход», если вы не уверены, чтобы выйти без скачивания"
+export LOC_961a="После нажатия на кнопку"
+export LOC_961b="скачает драйвер напрямую"
+export LOC_962="Нажатие загрузит"
+export LOC_970a="Вам следует установить браузер, с возможностью перевода, если вам нужно перевести эту страницу."
+export LOC_970b="Вы можете перевести эту страницу если ваш браузер поддерживает перевод"
+#NEW stuff AS OF 6 DECEMBER 2010
+export LOC_971a="установлен и должен работать. Нажмите"
+export LOC_971b="установлен и должен работать. Вы можете это проверить запустив \"glxgears\" в терминале. Нажмите"
+export LOC_972="установлен, но драйвер не работает. Нажмите"
+
+#END

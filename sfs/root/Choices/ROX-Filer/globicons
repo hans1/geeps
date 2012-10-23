@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<special-files>
+<rule match="/usr/sbin/cloud">
+<icon>/usr/share/pixmaps/cloud_48x48.png</icon>
+</rule>
+<rule match="/usr/bin/gnumeric">
+<icon>/usr/local/lib/X11/pixmaps/spread48.png</icon>
+</rule>
+<rule match="/usr/sbin/savesession-dvd">
+<icon>/usr/local/lib/X11/pixmaps/save48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda1">
+<icon>/usr/local/lib/X11/pixmaps/drive_mntd48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda5">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda6">
+<icon>/usr/local/lib/X11/pixmaps/drive_mntd_boot48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda7">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda8">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda9">
+<icon>/usr/local/lib/X11/pixmaps/drive_mntd48.png</icon>
+</rule>
+<rule match="/usr/local/bin/mozstart">
+<icon>/usr/local/lib/X11/pixmaps/www48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultcontact">
+<icon>/usr/local/lib/X11/pixmaps/contact48.png</icon>
+</rule>
+<rule match="/usr/sbin/dotpup">
+<icon>/usr/local/lib/X11/pixmaps/pet48.png</icon>
+</rule>
+<rule match="/usr/sbin/pmount">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda10">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultmediaplayer">
+<icon>/usr/local/lib/X11/pixmaps/multimedia48.png</icon>
+</rule>
+<rule match="/usr/sbin/wizardwizard">
+<icon>/usr/local/lib/X11/pixmaps/configuration48.png</icon>
+</rule>
+<rule match="/usr/local/bin/rox">
+<icon>/usr/local/lib/X11/pixmaps/home48.png</icon>
+</rule>
+<rule match="/usr/sbin/save2flash">
+<icon>/usr/local/lib/X11/pixmaps/save48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultpaint">
+<icon>/usr/local/lib/X11/pixmaps/paint48.png</icon>
+</rule>
+<rule match="/usr/sbin/puppyhelp">
+<icon>/usr/local/lib/X11/pixmaps/help48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultdraw">
+<icon>/usr/local/lib/X11/pixmaps/draw48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultwordprocessor">
+<icon>/usr/local/lib/X11/pixmaps/word48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb1">
+<icon>/usr/local/lib/X11/pixmaps/drive_mntd48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaulttexteditor">
+<icon>/usr/local/lib/X11/pixmaps/edit48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb2">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/sbin/petget">
+<icon>/usr/local/lib/X11/pixmaps/pet48.png</icon>
+</rule>
+<rule match="/usr/bin/rxvt">
+<icon>/usr/local/lib/X11/pixmaps/console48.png</icon>
+</rule>
+<rule match="/usr/bin/urxvt">
+<icon>/usr/local/lib/X11/pixmaps/console48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaulthtmleditor">
+<icon>/usr/local/lib/X11/pixmaps/webedit48.png</icon>
+</rule>
+<rule match="/usr/sbin/quickpet">
+<icon>/usr/local/lib/X11/pixmaps/qp-icon48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultcalendar">
+<icon>/usr/local/lib/X11/pixmaps/date48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb7">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/sbin/mut">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb6">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultbrowser">
+<icon>/usr/local/lib/X11/pixmaps/www48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultspreadsheet">
+<icon>/usr/local/lib/X11/pixmaps/spread48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultemail">
+<icon>/usr/local/lib/X11/pixmaps/email48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultchat">
+<icon>/usr/local/lib/X11/pixmaps/chat48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb3">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/local/bin/defaultconnect">
+<icon>/usr/local/lib/X11/pixmaps/connect48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb5">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/usr/local/bin/mozmail">
+<icon>/usr/local/lib/X11/pixmaps/email48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sdb8">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/pupzip">
+<icon>/usr/local/lib/X11/mini-icons/gz.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/SendTo/abiword">
+<icon>/usr/local/lib/X11/mini-icons/abiword_16.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/abiword">
+<icon>/usr/local/lib/X11/mini-icons/abiword_16.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/composer">
+<icon>/usr/local/lib/X11/mini-icons/xterm16.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/libreoffice">
+<icon>/usr/local/lib/X11/mini-icons/mini-doc.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/gview">
+<icon>/usr/local/lib/X11/mini-icons/mini-cave.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/mtpaint">
+<icon>/usr/local/lib/X11/mini-icons/mini-palette.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/pmusic">
+<icon>/usr/local/lib/X11/mini-icons/mini.audiovol.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/gnumeric">
+<icon>/usr/local/lib/X11/mini-icons/gnumeric.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/inkscapelite">
+<icon>/usr/local/lib/X11/mini-icons/inkscape.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/mozilla">
+<icon>/usr/local/lib/X11/mini-icons/seamonkey16.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/epdfview">
+<icon>/usr/local/lib/X11/mini-icons/mini-pdf.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/geany">
+<icon>/usr/local/lib/X11/mini-icons/mini-edit.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/bcrypt">
+<icon>/usr/local/lib/X11/mini-icons/mini-hex.xpm</icon>
+</rule>
+<rule match="/root/.config/rox.sourceforge.net/OpenWith/ffconvert">
+<icon>/usr/local/lib/X11/mini-icons/mini-turn.xpm</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sr0">
+<icon>/usr/local/lib/X11/pixmaps/optical48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda11">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+<rule match="/root/.pup_event/drive_sda13">
+<icon>/usr/local/lib/X11/pixmaps/drive48.png</icon>
+</rule>
+</special-files>

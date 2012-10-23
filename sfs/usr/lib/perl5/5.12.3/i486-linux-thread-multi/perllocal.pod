@@ -1,0 +1,110 @@
+=head2 Wed Jan 26 14:44:32 2011: C<Module> L<DBI|DBI>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.616>
+
+=item *
+
+C<EXE_FILES: dbiproxy dbiprof dbilogstrip>
+
+=back
+
+=head2 Wed Jan 26 14:44:45 2011: C<Module> L<DBD::mysql|DBD::mysql>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 4.018>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Jan 26 14:44:51 2011: C<Module> L<XML::Parser|XML::Parser>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.40>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Jan 26 14:45:03 2011: C<Module> L<XML::Simple|XML::Simple>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 2.18>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Wed Jan 26 14:45:05 2011: C<Module> L<URI|URI>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 1.58>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

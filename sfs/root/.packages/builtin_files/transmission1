@@ -1,0 +1,18 @@
+/etc
+ mailcap
+/root
+/root/Choices
+/root/Choices/MIME-types
+ application_x-bittorrent
+/usr
+/usr/bin
+ transmission
+ transmission-gtk
+/usr/share
+/usr/share/applications
+ transmission-gtk.desktop
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/24x24
+/usr/share/icons/hicolor/24x24/apps
+ transmission.png

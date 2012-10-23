@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ sudo
+ sudoreplay
+/usr/libexec
+ sudoers.so
+ sudo_noexec.so

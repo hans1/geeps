@@ -1,0 +1,228 @@
+#!/bin/bash
+##Slickpet ja_JP 
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#translator=native ##TRANSLATORS please name your version 400 so I know ..Thankyou
+#        ****************LATEST 2 November 2010************************
+
+##################                    PLEASE NOTE                               ###############
+#if you are unfamiliar with coding then you may notice "\n" in some lines                     #
+#this means "new line" and it is important. I realise grammar is different in each language   #
+#do place this "\n" every 6 to 10 words or 40 to 50 characters                                #
+##################                  THANK  YOU                                  ###############
+#language=japanese
+#translator=YoN, 2010-07-04.
+#       himajin, 2010-11-15~17
+
+#Buttons and warnings
+export LOC_OK="OK"
+export LOC_CANCEL="キャンセル"
+export LOC_ERROR="エラー"
+export LOC_WARNING="警告"
+export LOC_YES="はい"
+export LOC_NO="いいえ"
+export LOC_QUIT="終了"
+export LOC_HELP="ヘルプ"
+export LOC_INFO="情報"
+export LOC_FILE="ファイル"
+export LOC_BRS=" 現在の規定のブラウザ \nファイルをダウンロードする場合は \nフル機能のブラウザをお勧めします"
+export LOC_CANTINSTALL="インストールに十分なスペースがありません"
+export LOC_WARNINGINSTALL="パッケージをインストールした後　\n45 MB 以下のpupsave 又は partition しか残りません。\n続けますか?"
+
+#browser installer
+export LOC_001="ようこそ"
+export LOC_002="インターネットに接続してからブラウザを選択してください。"
+export LOC_003="注意"
+export LOC_004="RAMが256MB以下の時はブラウザをインストールする前に保存ファイルを作ることを推奨します。"
+export LOC_005="汎用ブラウザ - インストール済み" 
+export LOC_006="クリックして Firefox をインストール"
+export LOC_007="クリックして Seamonkey をインストール"
+export LOC_008="クリックして Chromium をインストール"
+export LOC_009="クリックして Opera をインストール"
+export LOC_010="クリックして すでにシステムに導入済みの 汎用ブラウザ をデフォルトブラウザにします。"
+
+#yaf messages
+export LOC_101="エラー: ダウンロードできません。インターネットに接続してください。"
+export LOC_102="お待ちください ..."
+export LOC_103="エラー: 更新サイトの応答がありません。接続を確認するか、後で再試行してください。"
+export LOC_104="Slacko Puppy の更新は最新です。"
+export LOC_105="Slacko Puppy の更新はありません。"
+export LOC_106a="ダウンロードが始まるまでお待ちください。"
+export LOC_106b="のインストールの確認を聞かれます"
+export LOC_107="接続はタイムアウトしました。あとで再試行してください。"
+export LOC_108="エラー: ダウンロードに失敗。再試行してください。ダウンロードが始まると再開します。"
+export LOC_109="エラー: パッケージのインストールに失敗。再試行してください。"
+export LOC_110a="インストールは成功しました"
+export LOC_110b="."
+export LOC_111="ブラウザがデフォルトに設定されています"
+export LOC_112="Slickpet はすでに実行されています。お待ちください..."
+export LOC_113="お待ち下さい, パッケージを探しています..."
+
+#xmessages
+#export LOC_201=deprecated
+export LOC_202="Slacko PuppyのSlickpetへようこそ
+	Puppyのパッケージフォーマット,PETのためのタブがあります。PET
+は非常に簡単です。選択してアイコンをクリックするとすぐに、PETパッケージが
+Puppyリポジトリからダウンロードされます。これは遅い接続ではかなりの時間が
+かかるかも知れません。辛抱してください。一旦それが到着すると、PPM（Puppy
+ Package Manager）はパッケージを開き、いくつかの簡単な質問をします。そこで 
+「OK」を選択したときに限り、パッケージをインストールして使う準備ができます。 
+そしてスクリーンの最上部に成功メッセージが現れます。
+	あなたに最良に動くPuppyリポジトリを選べる設定機能があります。
+もし1つが動かないか、非常に遅いならば、別のリポジトリに変えることができます。
+	特定のハードウェア用のビデオドライバをインストールできるように、
+ドライバ・タブがあります。メイン・メニューの Puppy Package Manager には、
+Nvidia用の他のドライバがあります。RadeonとIntelには、Xorg High Packageが
+推奨されます。一部のRadeonユーザは、Radeon HDドライバが必要かも知れません。
+ニュース と呼ばれる余分なタブもあります。これは、子犬についてのニュースです
+修正と機能を備えています
+	トラブルに会ったら、「サポート」メニューにヘルプファイルがあります。
+Puppyのメインメニューにある Puppy Package Manager からもパッケージを
+	インストールできる事をお忘れなく。Slacko Lynx deb もインストールできます。
+	Slacko Puppy を使って楽しんでください"            ##2 November, some small changes
+export LOC_203="以下のエントリは Puppy Linux狂がコンパイル、作成した
+アプリケーションへのリンクである点に注意してください。
+保証は受けられません。ほとんどはGnu GPL licence とその変形に該当し
+ます。これらのプログラムのほとんどは定期的にメンテナンスされています。
+従って、リポジトリにホスティングすることはふさわしくありません。 
+ほとんどの場合、お使いのオペレーティングシステムを最先端に保つために、
+最新の安定バージョンを入手できます。
+この機能を使うためにはブラウザをインストールしておかなければなりません。 
+ブラウザをダウンロードして、インストールするには、デスクトップ画面の
+「ブラウザ」アイコンをクリックしてください。"
+export LOC_204="Slickpet が失敗しても絶望する必要はありません。
+ウェブ上で Slickpet をクリックすることができます。そしてリンクから
+パッケージをダウンロードできるウェブページを開きます。 更新への
+アクセスもそのページにあります。もっと多くのプログラムタブには Slacko
+ Puppy で動くことが報告された他のプログラムのリンクがあります。
+ファイル >> 設定 でダウンロードリポジトリを変更できます。もっと近い
+場所やもっとよく動くミラーサイトに変更することができます。選択は記憶されます。
+ ダウンロードされたパッケージは、pupsave/installation の中に格納されます。
+お望みなら、ファイル >> ダウンロードディレクトリ をクリックして、
+何がそこにあるか見たり、これらのパッケージを移動することができます。
+ また、ファイル >> ダウンロードしたパッケージのクリア で、
+ダウンロードディレクトリを消去することもできます。
+ SFSファイルのためのメニューもあります（ウェブ上）。
+ これらは通常、お使いの pupsave の容量を使わずにインストールできる
+非常に大きなプログラムのスペシャルパッケージです。
+ 詳細は、SFS >> SFS サポート をクリックしてください。
+ Slacko Puppy を使って楽しんでください！
+ The Puppy Team." 
+ #2 November #changed sfs wording slightly because there is an sfs tab now
+
+#gtkdialog
+#prefs
+export LOC_298="ダウンロードしたパッケージを保持するにはチェックを外して下さい。"             
+export LOC_299="パッケージは再起動後 /tmpから削除されます。" #2 November, changed wording, not teribly important
+export LOC_300="Puppyパッケージマネージャ"
+export LOC_301="Slickpet のオプションの選択"
+export LOC_302="変更は OK をクリックすると反映されます。"
+export LOC_303="リポジトリを選択してください"
+#main gui
+export LOC_304="設定"
+export LOC_305="オンザウェブ(英文)"
+export LOC_306="ライセンス(GPL)"
+export LOC_307="サポート"
+export LOC_308="お読みください"
+export LOC_309="ようこそ！"
+export LOC_310="これはPuppyパッケージマネージャの代わりになるクイックアプリです。アイコンを選択してクリックすると自動的にダウンロードしてインストールします"
+export LOC_311="人気のPET"
+export LOC_312="インターネットPET"
+export LOC_313="役に立つPET"
+export LOC_314="ドライバ"
+export LOC_315="News"
+export LOC_316="インストールするパッケージを選択してください"
+export LOC_317="インストールするブラウザやメールソフトを選択してください"
+export LOC_318="PETパッケージを選択してください"
+export LOC_319="ドライバを選択してください"
+export LOC_350="もっと多くのPET"
+export LOC_351="ダウンロードディレクトリ"
+export LOC_352="ダウンロードしたパッケージのクリア" 
+export LOC_355="情報"     
+export LOC_356="ビデオ（ハード＆ソフト）" 
+
+#Tooltips 
+export LOC_353="ここをクリックするとダウンロードしたパッケージを表示します（保存していたならば）。ダウンロードしたパッケージを別の場所に保存して
+ダウンロードフォルダをきれいにしたいなら、ドラッグ＆ドロップすることができます。これは pupsave に若干のスペースを取ります"
+export LOC_354="ここをクリックするとダウンロードしたパッケージすべてを削除します"
+export LOC_357="ダウンロードするには, user=puppy, password=linux"
+export LOC_360="以下の依存ファイルが要るようです" #New November 2
+#pets
+export LOC_320="Gimp - 強力な画像エディタ 23MB" 
+export LOC_321="Pwidgets - ごく小さなデスクトップアプリ 283KB"
+export LOC_322="Audacity - 強力な音楽エディタ 6.7MB"
+export LOC_323="Songbird - 豊富な特徴の音楽マネージャ 17MB"
+export LOC_324="Wine - Windowsプログラムを実行 17MB"
+export LOC_325="Clan Bomber - エキサイティングゲーム 5.3MB"
+export LOC_326="Google Earth  高速なグラフィック性能が要求されます 44MB" ###ADDED July 13
+#internet
+export LOC_501="Firefox - 人気の Mozilla ブラウザ 15MB"
+export LOC_502="Seamonkey - 完全なインターネット・パッケージ 15MB"
+export LOC_503="Chromium - Ubuntu Chrome ブラウザ 19MB"
+export LOC_504="Opera - 高速ブラウザ・パッケージ 16MB"
+export LOC_505="Thunderbird - Mozilla メールクライアント 11MB"
+export LOC_506="Kompozer - ウェブサイト・マネージャ 9.2MB"
+#more pets
+export LOC_601="Vlc - 万能メディアプレーヤ 28MB" #####changed to Vlc
+export LOC_602="Dia - ダイアグラム・エディタ 4.3MB"
+export LOC_603="Cinelerra - ビデオ編集  15MB"
+export LOC_604="JRE - Java 実行環境 36MB"
+export LOC_605="Pdfedit - PDF エディタ 5.2MB"     ####changed from foxit to pdfedit
+export LOC_606="Inkscape - ベクター ドローエディタ 23MB"
+
+#Drivers
+#export LOC_389="Please ensure you have at least 80MB of free space before installing a video driver" ##deprecated 2 Nov
+export LOC_390="いくつかのシステムではこれらの別製ドライバは、システムの機能をより活用するために必要になります" ##ALL NEW
+#export LOC_391="RadeonHD - ATI ビデオカードの最近モデル用 372KB" deprecated, no harm to leave it though
+#export LOC_392="Nvidia　Drivers - 新旧のカードの為の選択"
+export LOC_392B="推奨ドライバー選択"
+export LOC_392C="あなたのカード用の最新ドライバの使用を推奨"
+#export LOC_392Att="This is for older nVidia cards"
+#export LOC_392Btt="This is for middle aged and some newer nVidia cards"
+#export LOC_392Ctt="This is for newer nVidia cards"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.35 14MB"
+export LOC_392x="Xorg High - Radeon と Intel カード用 GLX" #Changed for generic, 2 November
+export LOC_392m="Mesa -GLX For Radeon and Intel カード用" #as above
+export LOC_392h="インストールヘルプ"
+#export LOC_392j="Nvidia-glx 256.35 Nvidia ビデオカードの最近モデル用" deprecated
+export LOC_392a="Nvidia-glx Nvidia ビデオカードの最近モデル用"
+export LOC_392tt="ここをクリックでドライバの選択へ。どれがわからない場合は上のボタンをクリックする必要があります" ##New for generic, late October
+export LOC_392vid="クリックであなたのビデオカードをテスト"
+export LOC_392ttvid="あなたのグラフィックカードを検証しますので、あなたに必要なドライバを決められるでしょう。" 
+export LOC_701="\n Use the Xorg_High pet in Slickpet"
+#export LOC_702="You have"
+#export LOC_703="You have"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language########### deprecated 1 November
+export LOC_704="グラフィックカード"
+export LOC_705="ボタンをクリックしてブラウザを開き上記の文章を翻訳します。" 
+export LOC_706="あなたの言語でインストールされているブラウザが必要です"
+#News
+#Update
+export LOC_500="この大きなボタンは、あなたをSlackoPuppyリナックスに関する最新のニュースがある、SlackoPuppyニュースのWebページ(英語)へお連れします。このサイトには随時 Slacko Puppy のアップデートが提供されます。"  #New late October 2010 for generic version
+export LOC_500B="  この大きなボタンで、Puppy wiki のWebページへお連れします。以下のPuppyに関する最新情報があります。→" 
+#New, as above
+
+#Xdialog
+#export LOC_401="Slacko Puppy ドライバ インストール"
+#export LOC_402="選択したインストールするドライバは "
+export LOC_801="ダウンロードをクリア"
+export LOC_802="ダウンロード済みのpetのクリアを選択しました. \n本気?" ##NEW! suggested by YoN.. good idea! Remember though, default is now delete but now there is a choice in Preferences
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" その後、petにそれをするためにプロンプトが表示されます。"
+export LOC_902="次に、インストールを完了するために再起動を促すメッセージが表示されます。"
+export LOC_903="読込み済みの SFS はありません"
+export LOC_910="あなたの希望の"
+export LOC_910tt="読込み済みのsfsを表示"
+export LOC_911="をクリックするとダウンロードします。"
+export LOC_920="利用可能な SFS"
+export LOC_920="説明"
+export LOC_950="sfsファイルをこれ以上インストールする前に \n再起動をお忘れ無く。"
+export LOC_951="既にダウンロード済みです"
+export LOC_952="ブートマネージャをクリックして既に読込み済みか確認して下さい"
+export LOC_953="インストールの為の十分なスペースがありません"
+export LOC_954="中断"
+export LOC_955="お使いのシステムのRAM上の制約のために\nインストールするのに十分なスペースがありません"
+export LOC_956="お待ち下さい... \n 大きな Sfs はダウンロードに時間がかかります"
+#END
+

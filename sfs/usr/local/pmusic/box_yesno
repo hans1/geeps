@@ -1,0 +1,32 @@
+#!/bin/bash
+$APPDIR/func -reset_gtk
+
+if [ -z "$FRAME" ]; then FRAME="Info"; fi
+export yesno_box="
+<window title=\"Pmusic\" icon-name=\"pmusic\" window_position=\"2\" allow-grow=\"false\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <text use-markup=\"true\"><label>\"$TXT2\"</label></text>
+  </frame>
+  <hbox>
+   <button>
+    <input file icon=\"gtk-no\"></input>
+    <label>$LOC_NO</label>
+    <action type=\"exit\">no</action>
+   </button>
+   <button>
+    <input file icon=\"gtk-yes\"></input>
+    <label>$LOC_YES</label>
+    <action type=\"exit\">yes</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $($GTKDIALOG -p yesno_box --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+TXT1=""; TXT2=""; IMG=""; FRAME="" #reset to avoid alien values in next box

@@ -1,0 +1,173 @@
+#!/bin/bash
+#PupControl 1.8.8
+#JWM configuration
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+WORKDIR="/usr/local/PupControl"
+CPANEL_ICONS_DIR="$WORKDIR/icons"
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#JWM variables based on jwmConfigMgr
+SCRIPT_DIR="/usr/local/jwmconfig2"
+MINI_ICONS_DIR="/usr/local/lib/X11/mini-icons"
+HOME_DIR="/root/.jwm"
+echo "SCRIPT_DIR='${SCRIPT_DIR}'" > /tmp/JWMCONFIGVARS
+echo "MINI_ICONS_DIR='${MINI_ICONS_DIR}'" >> /tmp/JWMCONFIGVARS
+echo "HOME_DIR='${HOME_DIR}'" >> /tmp/JWMCONFIGVARS
+
+#define current global screen dpi
+CURRDPI=`cat $HOME/.Xresources | grep "^Xft\\.dpi:" | tr '\t' ' ' | tr -s ' ' | cut -f 2 -d ' '`
+
+#define current user-font
+CURRFONTNAME=`cat $HOME/.gtkrc-2.0 | grep font_name | cut -d "=" -f2 | cut -d " " -f2 | sed 's/\"//g'`
+
+#define current window manager
+if [ -f "$HOME/Choices/windowmanager" ]; then CURRWM=`cat "$HOME/Choices/windowmanager"` #TazOC LHP
+else CURRWM=`cat /etc/windowmanager`
+fi
+
+#define text width-request for Liberation Sans font in Puppy derivatives (LHP)
+if [ "$CURRFONTNAME" = "Liberation" ]; then
+	if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"410"
+	elif [ $CURRDPI = "144" ]; then TEXT_WIDTH=$"715"
+	elif [ $CURRDPI = "138" ]; then TEXT_WIDTH=$"640"
+	elif [ $CURRDPI = "132" ]; then TEXT_WIDTH=$"610"
+	elif [ $CURRDPI = "126" ]; then TEXT_WIDTH=$"610"
+	elif [ $CURRDPI = "120" ]; then TEXT_WIDTH=$"605"
+	elif [ $CURRDPI = "114" ]; then TEXT_WIDTH=$"525"
+	elif [ $CURRDPI = "108" ]; then TEXT_WIDTH=$"515"
+	elif [ $CURRDPI = "102" ]; then TEXT_WIDTH=$"505"
+	elif [ $CURRDPI = "96" ]; then TEXT_WIDTH=$"430"
+	elif [ $CURRDPI = "90" ]; then TEXT_WIDTH=$"410"
+	elif [ $CURRDPI = "84" ]; then TEXT_WIDTH=$"405"
+	elif [ $CURRDPI = "78" ]; then TEXT_WIDTH=$"395"
+	elif [ $CURRDPI = "72" ]; then TEXT_WIDTH=$"323"
+	elif [ $CURRDPI = "66" ]; then TEXT_WIDTH=$"315"
+	fi
+
+#define text width-request for default Sans or DejaVu Sans font in standard derivatives of Puppy
+elif [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" ]; then TEXT_WIDTH=$"555"
+	elif [ $CURRDPI = "108" ]; then TEXT_WIDTH=$"605"
+	elif [ $CURRDPI = "102" ]; then TEXT_WIDTH=$"530"
+	elif [ $CURRDPI = "96" ]; then TEXT_WIDTH=$"510"
+	elif [ $CURRDPI = "90" ]; then TEXT_WIDTH=$"495"
+	elif [ $CURRDPI = "84" ]; then TEXT_WIDTH=$"430"
+	elif [ $CURRDPI = "78" ]; then TEXT_WIDTH=$"405"
+	elif [ $CURRDPI = "72" ]; then TEXT_WIDTH=$"400"
+	elif [ $CURRDPI = "66" ]; then TEXT_WIDTH=$"395"
+fi
+
+#show jwmthememaker, only if installed
+if [ "`which jwmthememaker`" != "" ]; then #jwmthememaker-1.5
+JWM_THEMEMAKER="
+    <hbox>
+     <button tooltip-text=\" jwmthememaker \">
+      <input file>$CPANEL_ICONS_DIR/thememaker20.png</input>
+      <action>jwmthememaker &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  JWM Theme Maker </b>- Make your own JWM theme\"</label></text>
+    </hbox>"
+elif [ -f /usr/local/jwmthememaker/jwmthememaker ]; then #prior to jwmthememaker-1.5
+JWM_THEMEMAKER="
+    <hbox>
+     <button tooltip-text=\" jwmthememaker \">
+      <input file>$CPANEL_ICONS_DIR/thememaker20.png</input>
+      <action>/usr/local/jwmthememaker/jwmthememaker &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  JWM Theme Maker </b>- Make your own JWM theme\"</label></text>
+    </hbox>"
+else JWM_THEMEMAKER=""
+fi
+
+export JWMCONFIG="<window title=\"JWM\" icon-name=\"gtk-preferences\" resizable=\"false\">
+  <vbox>
+   <text use-markup=\"true\"><label>\"<b><span size='"'x-large'"'>JWM</span><span size='"'x-large'"' color='"'#3272C0'"'>Configuration</span></b>\"</label></text>
+  <notebook labels=\" Options \">
+   <vbox>
+    <text height-request=\"30\"><label>\"                                                                                                                          \"</label></text>
+    
+    <hbox>
+     <button tooltip-text=\" JWM workspaces \">
+      <input file>$CPANEL_ICONS_DIR/remaster20.png</input>
+      <action>$WORKDIR/desktops &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Desktops </b>- Set number of JWM virtual desktops\"</label></text>
+    </hbox>
+    
+    <hbox>
+     <button tooltip-text=\" theme_switcher \">
+      <input file>$CPANEL_ICONS_DIR/themes20.png</input>
+      <action>$SCRIPT_DIR/theme_switcher &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  JWM Theme </b>- Theme for menu/tray/window-border\"</label></text>
+    </hbox>
+    
+    $JWM_THEMEMAKER
+    
+    <hbox>
+     <button tooltip-text=\" jwmConfigMgr \">
+      <input file>$CPANEL_ICONS_DIR/keyboard20.png</input>
+      <action>$SCRIPT_DIR/keyboard &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Keyboard Shortcuts </b>- Set JWM hotkey for programs\"</label></text>
+    </hbox>
+    
+    <hbox>
+     <button tooltip-text=\" jwm -restart \">
+      <input file>$CPANEL_ICONS_DIR/reboot20.png</input>
+      <action>$WORKDIR/func -restartWM &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Restart JWM </b>- Restart Joe's Window Manager\"</label></text>
+    </hbox>
+    
+    <hbox>
+     <button tooltip-text=\" jwmConfigMgr - or ptray if installed \">
+      <input file>$CPANEL_ICONS_DIR/button20.png</input>
+      <action>$WORKDIR/func -traybuttons</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Tray Buttons </b>- Add/Delete JWM tray launch buttons\"</label></text>
+    </hbox>
+    
+    <hbox>
+     <button tooltip-text=\" jwmConfigMgr - or ptray if installed \">
+      <input file>$CPANEL_ICONS_DIR/tray20.png</input>
+      <action>$WORKDIR/func -taskbar</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Tray Management </b>- Manage/Edit JWM tray options\"</label></text>
+    </hbox>
+    
+    <hbox>
+     <button tooltip-text=\" jwmConfigMgr \">
+      <input file>$CPANEL_ICONS_DIR/window20.png</input>
+      <action>$SCRIPT_DIR/focusModel &</action>
+     </button>
+      <text width-request=\""$TEXT_WIDTH"\" use-markup=\"true\"><label>\"<b>  Window Focus </b>- Select sloppy or click focus models\"</label></text>
+    </hbox>
+    <text height-request=\"30\"><label>\"\"</label></text>
+   </vbox>
+  </notebook>
+
+    <hbox>
+     <button height-request=\"32\">
+      <label>Exit </label>
+      <input file stock=\"gtk-quit\"></input>
+      <action type=\"exit\">quit_now</action>
+     </button>
+    </hbox>
+  </vbox>
+ </window>"
+
+$GTKDIALOG --center --program=JWMCONFIG
+
+unset JWMCONFIG
+
+exit 0

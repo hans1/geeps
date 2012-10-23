@@ -1,0 +1,19 @@
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/XkbConfigurationManager
+ Help
+/usr/local/apps/XkbConfigurationManager/images
+ bindings16.png
+ euro16.png
+ infoBlue.gif
+ key_bindings.png
+ keyboard.png
+ keys01.gif
+ khotkeys.png
+ layout16.png
+ layout.png
+ stock_euro.png
+ xfce4-keys.png
+/usr/local/bin
+ xkbconfigmanager

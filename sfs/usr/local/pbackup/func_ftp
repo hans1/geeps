@@ -1,0 +1,53 @@
+#!/bin/bash
+
+export ftpdialog="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+<vbox>
+ <pixmap icon_size=\"6\"><input file stock=\"gtk-network\"></input></pixmap>
+ <frame FTP>
+  <hbox>
+   <text><label>$LOC524</label></text>
+   <entry><variable>FTPSERVER</variable><default>\"$FTPSERVER\"</default></entry>
+  </hbox>
+  <hbox>
+   <text><label>$LOC525</label></text>
+   <entry><variable>FTPSERVERDIR</variable><default>\"$FTPSERVERDIR\"</default></entry>
+  </hbox>
+  <text><label>\"\"</label></text>
+  <hbox>
+   <text><label>$LOC526</label></text>
+   <entry><variable>FTPUSERNAME</variable><default>\"$FTPUSERNAME\"</default></entry>
+  </hbox>
+  <hbox>
+   <text><label>$LOC527</label></text>
+   <entry invisible_char=\"x\" visibility=\"false\">
+    <variable>FTPPASSWORD</variable>
+    <default>\"$FTPPASSWORD\"</default>
+   </entry>
+  </hbox>
+ </frame>
+ <hbox>
+  <button><input file icon=\"gtk-cancel\"></input><label>$LOC_CANCEL</label></button>
+  <button>
+   <input file icon=\"gtk-apply\"></input>
+   <label>$LOC_OK</label>
+   <action type=\"exit\">99</action>
+  </button>
+ </hbox>
+</vbox></window>"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 --program=ftpdialog --center); do
+	eval $STATEMENTS > /dev/null 2>&1
+done
+IFS=$I
+if [ "$EXIT" = "99" ]; then 
+	FTPSERVERDIR=`echo "$FTPSERVERDIR""/" | sed -e "s/\/\//\//g"` #Be sure it ends with /
+	#gui entry must save in files to render inside gtkdialog
+	echo $TMPSAVEMODE 	> $WORKDIR/pbackup-SAVEMODE
+	echo "$FTPSERVER""$FTPSERVERDIR" > $WORKDIR/pbackup-BCKDEV
+	echo $FTPSERVER		> $WORKDIR/pbackup-FTPSERVER
+	echo $FTPSERVERDIR	> $WORKDIR/pbackup-FTPSERVERDIR
+	echo $FTPUSERNAME	> $WORKDIR/pbackup-FTPUSERNAME
+	echo $FTPPASSWORD	> $WORKDIR/pbackup-FTPPASSWORD
+	echo "$TMPSAVEMODE - $FTPSERVER""$FTPSERVERDIR" > $WORKDIR/pbackup-ENTRY_SAVE_TO
+fi

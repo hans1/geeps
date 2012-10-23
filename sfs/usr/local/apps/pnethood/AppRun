@@ -1,0 +1,22 @@
+#!/bin/sh
+## Make an appdir out of Pnethood, so it's portable
+## This script exists just for the sake of running the app + enabling a menu
+## Made by Dougal, November 26th, 2007
+
+# find where we're at
+APPDIR="`dirname $0`"
+[ "$APPDIR" = "." ] && APPDIR="`pwd`"
+
+
+if [ "$1" ] ; then # if run with an argument
+  case "$1" in
+   --help) 
+     rox /usr/share/doc/pnethood.html
+     ;; 
+   *) # else -- no others yet, so just run it
+     $APPDIR/pnethood "$@"
+     ;;
+  esac
+else # just run it
+  $APPDIR/pnethood
+fi

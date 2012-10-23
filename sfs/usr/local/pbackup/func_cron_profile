@@ -1,0 +1,107 @@
+#!/bin/bash
+
+echo > $WORKDIR/pbackup-cron
+VIS_FREE="disabled" #disable entry with crontab by default
+export crondialog="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+<vbox>
+ <frame $LOC637:   $PROFILE>
+   <text><label>\"\"</label></text>
+   <radiobutton>
+   <label>$LOC580</label>
+   <variable>RADIO_MANUALLY</variable>
+   <action>if true disable:CRON</action>
+   <action>echo '' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+   </radiobutton>
+  <text><label>\"\"</label></text>
+  <radiobutton>
+   <label>$LOC581</label>
+   <variable>RADIO_HOURLY</variable>
+   <action>if true disable:CRONCOMMAND</action>
+   <action>echo '1 * * * * /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+  </radiobutton>
+  <radiobutton>
+   <label>$LOC582</label>
+   <variable>RADIO_DAILY</variable>
+   <action>if true disable:CRONCOMMAND</action>
+   <action>echo '15 9 * * * /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+  </radiobutton>
+  <radiobutton>
+   <label>$LOC583 9:31</label>
+   <variable>RADIO_WEEKLY</variable>
+   <action>if true disable:CRONCOMMAND</action>
+   <action>echo '31 9 * * 1 /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+  </radiobutton>
+  <radiobutton>
+   <label>$LOC584</label>
+   <variable>RADIO_MONTHLY</variable>
+   <action>if true disable:CRONCOMMAND</action>
+   <action>echo '45 9 1 * * /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+  </radiobutton>
+  <radiobutton>
+   <label>$LOC585</label>
+   <variable>RADIO_REALTIME</variable>
+   <action>if true disable:CRONCOMMAND</action>
+   <action>echo '*/2 * * * * /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+  </radiobutton>
+  <text><label>\"\"</label></text>
+  <radiobutton>
+   <label>$LOC586</label>
+   <variable>RADIO_FREE</variable>
+   <action>echo '* * * * * /usr/local/bin/pbackup -q \"'\"$PROFILE\"'\"' > $WORKDIR/pbackup-cron</action>
+   <action>refresh:CRONCOMMAND</action>
+   <action>if true enable:CRONCOMMAND</action>
+  </radiobutton>
+  <entry>
+   <variable>CRONCOMMAND</variable>
+   <input>cat $WORKDIR/pbackup-cron</input>
+   <visible>$VIS_FREE</visible>
+  </entry>
+ </frame>
+ <hbox>
+  <button>
+   <input file icon=\"gtk-execute\"></input>
+   <label>$LOC173...</label>
+   <action>$CRON_EDITOR &</action>
+   <action type=\"exit\">*</action>
+  </button>
+  <text><label>\"                          \"</label></text>
+  <button><input file icon=\"gtk-cancel\"></input><label>$LOC_CANCEL</label></button>
+  <button>
+   <input file icon=\"gtk-apply\"></input>
+   <label>$LOC_OK</label>
+   <action type=\"exit\">99</action>
+  </button>
+ </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 --program=crondialog --center); do
+	eval $STATEMENTS > /dev/null 2>&1
+done
+IFS=$I
+if [ "$EXIT" = "99" ]; then
+	mkdir -p /var/spool/cron/crontabs/ > /dev/null 2>&1 #if not existing
+	#remove from crontab
+	sed -i -e "s/*/{ð®STARđþ}/g" /var/spool/cron/crontabs/$USER #*			
+	TMP=`grep "\"$PROFILE\"" /var/spool/cron/crontabs/"$USER"`
+	if [ -z "$TMP" ]; then TMP="{ð®TMPđþ}"; fi #to avoid freak out in next sed
+	sed -i -e "s%$TMP%%g" /var/spool/cron/crontabs/$USER > /dev/null 2>&1
+	sed -i -e "s/{ð®STARđþ}/*/g" /var/spool/cron/crontabs/$USER
+	#remove empty lines in file
+	grep -v "^$" /var/spool/cron/crontabs/$USER > $WORKDIR/pbackup-tmp
+	mv -f $WORKDIR/pbackup-tmp /var/spool/cron/crontabs/$USER
+	#set new crontab
+	echo "$CRONCOMMAND" | sed -e "s/$PROFILE/\"$PROFILE\"/g" >> /var/spool/cron/crontabs/$USER
+	if [ "$RADIO_MANUALLY" = "false" ]; then
+		cron_check
+	fi
+fi
+CONF="$HOME/.pbackup/profiles/$PROFILE"
+. "$PROG_PATH"func_write_config

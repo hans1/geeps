@@ -1,0 +1,17 @@
+/usr
+/usr/bin
+ sndfile-cmp
+ sndfile-concat
+ sndfile-convert
+ sndfile-deinterleave
+ sndfile-info
+ sndfile-interleave
+ sndfile-metadata-get
+ sndfile-metadata-set
+ sndfile-play
+ sndfile-regtest
+ sndfile-salvage
+/usr/lib
+ libsndfile.so
+ libsndfile.so.1
+ libsndfile.so.1.0.24

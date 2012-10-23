@@ -1,0 +1,8 @@
+/usr
+/usr/sbin
+ gparted
+ gpartedbin
+ gparted_shell
+/usr/share
+/usr/share/applications
+ GParted-partition-manager.desktop

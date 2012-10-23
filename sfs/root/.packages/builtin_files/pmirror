@@ -1,0 +1,9 @@
+/usr
+/usr/local
+/usr/local/bin
+ pmirror
+/usr/local/pmirror
+ pmirror
+/usr/share
+/usr/share/applications
+ pmirror.desktop

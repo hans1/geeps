@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=PupScan interface information
+Name[ru]=PupScan информация об интерфейсах
+Name[de]=PupScan Interface Informationen
+Name[es]=PupScan-Información de Interface
+Name[hu_HU]=PupScan eszközinformációk
+Name[ja]=PupScan インターフェース情報
+Name[zh_CN]=PupScan 界面信息
+Name[zh_TW]=PupScan 界面資訊
+Icon=Card.xpm
+Comment=PupScan interface information
+Exec=pupscan
+Terminal=false
+Type=Application
+Categories=System
+GenericName=PupScan interface information

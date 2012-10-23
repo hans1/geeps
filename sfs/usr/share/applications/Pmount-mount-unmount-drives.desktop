@@ -1,0 +1,18 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pmount mount/unmount drives
+Name[ru]=Pmount монтирование дисков
+Name[de]=Pmount Laufwerke einhaengen
+Name[es]=Pmount-Monta/Desmonta Unidades
+Name[fr]=Outil de montage
+Name[hu_HU]=Pmount meghajtók csatolása
+Name[ja]=Pmount ドライブマウンタ
+Name[zh_CN]=Pmount 驱动器挂载/卸载
+Name[zh_TW]=Pmount 裝置掛載工具
+Icon=mini-diskette.xpm
+Comment=Pmount mount/unmount drives
+Exec=pmount
+Terminal=false
+Type=Application
+Categories=X-FilesystemMount
+GenericName=Pmount mount/unmount drives

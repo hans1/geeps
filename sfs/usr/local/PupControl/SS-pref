@@ -1,0 +1,77 @@
+#!/bin/bash
+#PupControl 1.8.8
+#ScreenSaver Control 1.2
+#Preferences
+#Copyright 2012 GPL3
+
+VERSION="1.2"
+WORKDIR="/usr/local/PupControl"
+DELAY=`cat $WORKDIR/ss-control.rc | grep -a DELAY | cut -d "=" -f 2 | sed 's/\"//g'`
+
+#if no SS-Control configuration file, then build config file
+[ ! -s $WORKDIR/ss-control.rc ] && echo -e -n 'DELAY="10"\n' > $WORKDIR/ss-control.rc
+. $WORKDIR/ss-control.rc
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#define $DELAY for delay combobox
+DELAY_ITEMS="<item>$DELAY</item>"
+for I in 5 10 15 20 30 45 60 90 120 150 180 210 240; do DELAY_ITEMS=`echo "$DELAY_ITEMS<item>$I</item>"`; done
+
+#ScreenSaver Delay dlg...
+export DELAY_DIALOG="
+<window title=\"Preferences\" icon-name=\"gtk-preferences\" resizable=\"false\">
+  <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>SS-</span><span size='"'large'"' color='"'#3272C0'"'>Control</span> $VERSION</b>\"</label></text>
+  <frame  ScreenSaver and DPMS Activation Delay >
+  <text height-request=\"10\"><label>\"\"</label></text>
+  <text use-markup=\"true\"><label>\"     SS-Control blanks the screen, and     
+     enables DPMS (Power Save Mode)    
+     for Energy-Star displays and video     
+     cards. The activation delays below     
+     are for screen blanking and DPMS.    \"</label></text>
+  <text height-request=\"10\"><label>\"\"</label></text>
+   <hbox homogeneous=\"true\">
+    <text><label>Delay (minutes)</label></text>
+   </hbox>
+   <hbox homogeneous=\"true\">
+    <combobox width-request=\"125\" tooltip-text=\" Use shorter delays for optimal 
+ power management, and long 
+ delays for viewing entertaining 
+ videos without screen blanking. \">
+     <variable>DELAY</variable>
+     $DELAY_ITEMS
+    </combobox>
+   </hbox>
+  <text height-request=\"10\"><label>\"\"</label></text>
+  </frame>
+   <hbox homogeneous=\"true\">
+     <button tooltip-text=\" Save changes, enable 
+ screensaver, and exit \">
+      <label>Save  </label>
+       <input file stock=\"gtk-ok\"></input>
+        <action>$WORKDIR/func -ScreenSaveON &</action>
+        <action type=\"exit\">quit_now</action>
+     </button>
+     <button tooltip-text=\" Exit without saving \">
+      <label>\" Exit   \"</label>
+       <input file stock=\"gtk-close\"></input>
+        <action>cp -f $WORKDIR/ss-control2.rc $WORKDIR/ss-control.rc && sleep 0.3 && $WORKDIR/SS-control &</action>
+        <action type=\"exit\">quit_now</action>
+    </button>
+   </hbox>
+  </vbox>
+</window>"
+
+$GTKDIALOG --center -p DELAY_DIALOG > $WORKDIR/ss-control.rc
+
+unset DELAY_DIALOG
+
+exit 0

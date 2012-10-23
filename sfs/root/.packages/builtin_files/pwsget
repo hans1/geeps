@@ -1,0 +1,8 @@
+/usr
+/usr/sbin
+ pwsget
+/usr/share
+/usr/share/applications
+ Pwsget.desktop
+/usr/share/pixmaps
+ pwget.png

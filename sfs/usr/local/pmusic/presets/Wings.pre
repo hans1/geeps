@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo true > $WORKDIR/TRACKINFO_REFRESH #for func_progressbar

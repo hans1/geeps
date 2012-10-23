@@ -1,0 +1,5 @@
+/sbin
+/usr
+/usr/bin
+ dpkg-deb
+ undeb

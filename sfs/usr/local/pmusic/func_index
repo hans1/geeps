@@ -1,0 +1,340 @@
+#!/bin/bash
+#Pmusic
+#Copyright 2008,2009,2010,2011
+#Sigmund Berglund
+IFS=$'\n'
+$APPDIR/func -reset_gtk
+
+case "$1" in
+-update_index)
+	. $APPDIR/func -reset_gtk
+	if [ "`cat $WORKDIR/USE_TAGS 2> $STDERR`" = "true" ]; then
+		USE_TAGS=true
+		VISIBLE_SOURCE_CHANGES=enabled
+	else
+		USE_TAGS=false
+		VISIBLE_SOURCE_CHANGES=disabled
+	fi
+	echo 0 > $WORKDIR/index_splash #reset progress bar
+	echo ' ' > $WORKDIR/splashtext
+	export Pmusic_index="	
+<window title=\"Pmusic - $LOC228 $LOC_SETUP\" icon-name=\"pmusic\">
+<vbox>
+<text use-markup=\"true\"><label>\"<b>$LOC301</b>\"</label></text>
+<notebook labels=\" $LOC314 | $LOC317 | $LOC315 \">
+ <vbox>
+  <frame $LOC302>
+    <hbox>
+     <button>
+      <input file stock=\"gtk-add\"></input>
+      <action>. $APPDIR/func_index -add_to_indexlist</action>
+      <action>refresh:SOURCE_SOURCE</action>
+     </button>
+     <button>
+      <variable>BUTTON_REMOVE</variable>
+      <visible>disabled</visible>
+      <input file stock=\"gtk-remove\"></input>
+      <action>. $APPDIR/func_index -remove_from_indexlist</action>
+      <action>refresh:SOURCE_SOURCE</action>
+     </button>
+   </hbox>
+    <tree headers_visible=\"false\">
+     <label>a</label>
+     <variable>SOURCE_SOURCE</variable>
+     <input>cat $HOME/.pmusic/index_directories</input>
+     <width>250</width><height>150</height>
+     <action signal=\"button-release-event\">enable:BUTTON_REMOVE</action>
+    </tree>
+  </frame>
+  </vbox>
+ <vbox>
+  <frame $LOC317>
+   <checkbox><label>$LOC265</label><variable>CONV_UNDERSCORE</variable><default>true</default></checkbox>
+   <checkbox><label>$LOC266</label><variable>CONV_20</variable><default>true</default></checkbox>
+  </frame>
+  <frame $LOC303>
+   <checkbox>
+    <label>$LOC304</label>
+    <variable>USE_TAGS</variable>
+    <default>$USE_TAGS</default>
+    <action>if true enable:SOURCE_CHANGES</action>
+    <action>if false disable:SOURCE_CHANGES</action>
+   </checkbox>
+   <checkbox>
+    <visible>$VISIBLE_SOURCE_CHANGES</visible>
+    <label>$LOC307</label>
+    <variable>SOURCE_CHANGES</variable>
+   </checkbox>
+   <text><label>\"\"</label></text>
+   <text><label>$LOC310</label></text>
+   <comboboxtext>
+    <variable>SOURCE_DIR</variable>
+    <item>$LOC306</item>
+    <item>../$LOC_ARTIST - $LOC_ALBUM/$LOC223</item>
+    <item>../$LOC_ARTIST/$LOC_ALBUM/$LOC223</item>
+    <item>../$LOC_ARTIST/$LOC223</item>
+   </comboboxtext>
+  </frame>
+ </vbox>
+ <vbox>
+  <text><label>\"\"</label></text>
+  <hbox height-request=\"20\">
+   <text use-markup=\"true\"><label>\"<b>$LOC316 : </b>\"</label></text>
+   <text width-request=\"200\"><input>find $HOME/.pmusic/index_alphabetic -printf \"%Td.%Tb %TY   (%TH:%TM)\n\"</input></text>
+  </hbox>
+  <text><label>\"\"</label></text>
+  <hbox height-request=\"20\">
+   <text use-markup=\"true\"><label>\"<b>$LOC223 : </b>\"</label></text>
+   <text width-request=\"200\"><input>\"grep -c ^ $HOME/.pmusic/index_alphabetic\"</input></text>
+  </hbox>
+  <hbox height-request=\"20\">
+   <text use-markup=\"true\"><label>\"<b>$LOC224 : </b>\"</label></text>
+   <text width-request=\"200\"><input>\"grep -c ^ $HOME/.pmusic/index_playlists\"</input></text>
+  </hbox>
+ </vbox>
+</notebook>
+ <progressbar>
+  <input>"'while [ "$I" != "100" ]; do I=`cat $WORKDIR/index_splash`; echo $I; cat $WORKDIR/splashtext;  sleep 1; done'"</input>
+  <action type=\"exit\">cancel</action>
+ </progressbar>
+ <hbox>
+  <button>
+   <input file stock=\"gtk-cancel\"></input>
+   <label>$LOC_CANCEL</label>
+   <action>echo cancel > $WORKDIR/update_index_cancel</action>
+   <action type=\"exit\">cancel</action>
+  </button>
+  <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+   <input file stock=\"gtk-apply\"></input>
+   <label>$LOC308</label>
+   <action>$APPDIR/func_index -build_index &</action>
+  </button>
+ </hbox>
+</vbox>
+</window>"
+	I=$IFS; IFS=""
+	for STATEMENTS in  $($GTKDIALOG -p Pmusic_index --center); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	echo 100 > $WORKDIR/index_splash #end loop
+	if [ "$EXIT" = "cancel" ]; then
+		for I in `ps | grep update_index | awk '{print $1}'`; do kill -9 $I; done
+		for I in `ps | grep func_index | awk '{print $1}'`; do kill -9 $I; done
+	fi
+	;;
+-add_to_indexlist)
+	GET_OUTDIR="true"; TITLE="- $LOC309"; . $APPDIR/box_chooser
+	if [ "$EXIT" = "OK" ]; then
+		if [ ! -d "$CHOOSER" ]; then #dir not found
+			TXT1="<b>$CHOOSER $LOC507</b>"
+			. $APPDIR/box_ok
+		else
+			echo "$CHOOSER" >> $HOME/.pmusic/index_directories
+		fi
+	fi
+	;;
+-remove_from_indexlist)
+	grep -vx "$SOURCE_SOURCE" $HOME/.pmusic/index_directories > $WORKDIR/tmp
+	mv -f $WORKDIR/tmp $HOME/.pmusic/index_directories
+	;;
+-build_index)
+	rm $WORKDIR/update_index_cancel
+	if [ $USE_TAGS = true ]; then #change name from filename to metatag artist - title
+		echo "$LOC311" > $WORKDIR/splashtext
+		echo true > $WORKDIR/USE_TAGS #defines <table> header
+		if [ $SOURCE_CHANGES = true ]; then #update only new files
+			if [ -s $WORKDIR/LAST_SOURCE ]; then
+				LAST_SOURCE="`cat $WORKDIR/LAST_SOURCE`"
+				TMP="`date +%s`"
+				SOURCE_TIME=`expr $TMP / 60` #minutes since 1970. For -cmin.
+				CMIN=`expr $LAST_SOURCE - $SOURCE_TIME`
+			else
+				SOURCE_TIME=20000000 #minutes since 1970. For -cmin
+			fi
+			echo $SOURCE_TIME > $WORKDIR/LAST_SOURCE
+		else #reset
+			rm -f $WORKDIR/generated_playlists/*
+		fi
+		[ ! "$CMIN" ] && CMIN='-20000000'
+		#find both changed files and new added files
+		echo -n > $WORKDIR/index_new
+		while read I; do
+			find -L "$I" -cmin $CMIN -printf "  %p|%f\n" | grep -iE "$AUDIO_FORMATS|\.m3u|\.pls" >> $WORKDIR/index_new
+		done < $HOME/.pmusic/index_directories
+		#check meta tag. file by file
+		COUNT=0
+		TOTAL=`cat $WORKDIR/index_new | wc -l`
+		echo -n > $WORKDIR/index_tmp
+		echo -n > $WORKDIR/index_albums
+		while read I; do
+			FILE="`echo "$I" | cut -d '|' -f 1 | awk -F"  " '{print $2}'`"
+			. $APPDIR/func_id3io "$FILE" -read 
+			if [ "$ID3_TITLE" ] && [ ! "$(grep -iE "^ $|unknown" <<<"$ID3_TITLE")" ]; then #use meta-tags only if 'title' exists
+				echo "  $FILE|$ID3_TITLE|$ID3_ARTIST|$ID3_BITRATE|$ID3_ALBUM|$ID3_TRACK|$ID3_YEAR|$ID3_GENRE" >> $WORKDIR/index_tmp
+				[ "$ID3_ALBUM" ] && echo "$ID3_ALBUM" >> $WORKDIR/index_albums #later generate playlists out of this 
+			else #audio track with no metatags and other stuff like dirs --> for browsing only
+				echo "$I||$ID3_BITRATE" >> $WORKDIR/index_tmp
+			fi
+
+			#update progress bar
+			PERCENT=$((($COUNT*100/$TOTAL)+1))
+			echo $PERCENT > $WORKDIR/index_splash #update progressbar
+			COUNT=$(($COUNT+1))
+			[ "$(<$WORKDIR/update_index_cancel)" = "cancel" ] && exit
+		done < $WORKDIR/index_new
+		#convert genre number
+		cut -d'|' -f8 $WORKDIR/index_tmp | sort -u | grep -v "^$" > $WORKDIR/index_tmp2
+		while read I; do 
+			TMP="`echo "$I" | sed -e 's/^00//' -e 's/^0//'`"
+			ID3_GENRE="`grep -m1 "(${TMP})" $APPDIR/txt_id3genre | cut -d'(' -f1`"
+			[ "$ID3_GENRE" ] && sed -i "s%$I$%$ID3_GENRE%g" $WORKDIR/index_tmp
+		done < $WORKDIR/index_tmp2
+
+		#generate playlists based on ALBUM metatags
+		echo "$LOC312" > $WORKDIR/splashtext
+		sort -u --output=$WORKDIR/index_tmp2 $WORKDIR/index_albums
+		mv -f $WORKDIR/index_tmp2 $WORKDIR/index_albums
+		COUNT=0
+		TOTAL=`cat $WORKDIR/index_albums | wc -l`
+		while read I; do
+			ARTIST=`echo "$I" | cut -d '|' -f 1`
+			ALBUM=`echo "$I" | cut -d '|' -f 2`
+			if [ "$ALBUM" ] && [ "$ALBUM" != " " ]; then
+				cat $WORKDIR/index_tmp | grep "$ALBUM" | cut -b 3- | awk -F "|" '{print $5"|"$1}' > $WORKDIR/generated_playlists/"$ARTIST - $ALBUM".album
+				sort --output=$WORKDIR/index_tmp2 $WORKDIR/generated_playlists/"$ARTIST - $ALBUM".album
+				cut -d '|' -f 2 $WORKDIR/index_tmp2 > $WORKDIR/generated_playlists/"$ARTIST - $ALBUM".album
+			fi
+			#update progress bar
+			PERCENT=$((($COUNT*100/$TOTAL)+1))
+			echo $PERCENT > $WORKDIR/index_splash #update progressbar
+			COUNT=$(($COUNT+1))
+			[ "$(<$WORKDIR/update_index_cancel)" = "cancel" ] && exit
+		done < $WORKDIR/index_albums
+		#---
+		if [ $SOURCE_CHANGES = false ]; then
+			mv -f $WORKDIR/index_tmp $HOME/.pmusic/index_all
+		else
+			cat $WORKDIR/index_tmp >> $HOME/.pmusic/index_all
+		fi
+	else #only use filenames in add-list
+		echo false > $WORKDIR/USE_TAGS #defines <table> header
+		rm -f $WORKDIR/generated_playlists/*
+		echo -n > $HOME/.pmusic/index_all
+		while read I; do
+			find -L "$I" -printf "  %p|%f\n" | grep -iE "$AUDIO_FORMATS|\.m3u|\.pls" >> $HOME/.pmusic/index_all
+		done < $HOME/.pmusic/index_directories
+	fi
+
+	#generate playlists based on directory structure
+	if [ "$SOURCE_DIR" != "$LOC306" ]; then
+		echo "$LOC313" > $WORKDIR/splashtext
+		COUNT=0
+		TOTAL=`cat $WORKDIR/index_new | wc -l`
+		while read I; do
+			case "$SOURCE_DIR" in
+			"../$LOC_ARTIST - $LOC_ALBUM/$LOC223")
+				TMP="`echo "$I" | cut -d '|' -f 1`"
+				DIR_ARTIST_ALBUM="`dirname "$TMP"`"
+				ARTIST_ALBUM="`basename "$DIR_ARTIST_ALBUM"`"
+				find "$DIR_ARTIST_ALBUM" -type f | grep -iE "$AUDIO_FORMATS" > $WORKDIR/generated_playlists/"$ARTIST_ALBUM".dir
+				;;
+			"../$LOC_ARTIST/$LOC_ALBUM/$LOC223")
+				TMP="`echo "$I" | cut -d '|' -f 1`"
+				DIR_ALBUM="`dirname "$TMP"`" #level 1
+				DIR_ARTIST="`dirname "$DIR_ALBUM"`" #level 2
+				ALBUM="`basename "$DIR_ALBUM"`"
+				ARTIST="`basename "$DIR_ARTIST"`"
+				find "$DIR_ALBUM" -type f | grep -iE "$AUDIO_FORMATS" > $WORKDIR/generated_playlists/"$ARTIST - $ALBUM".dir
+				find "$DIR_ARTIST" -type f | grep -iE "$AUDIO_FORMATS" > $WORKDIR/generated_playlists/"$ARTIST".dir
+				;;
+			"../$LOC_ARTIST/$LOC223")
+				TMP="`echo "$I" | cut -d '|' -f 1`"
+				DIR_ARTIST="`dirname "$TMP"`" #level 1
+				ARTIST="`basename "$DIR_ARTIST"`"
+				find "$DIR_ARTIST" -type f | grep -iE "$AUDIO_FORMATS" > $WORKDIR/generated_playlists/"$ARTIST".dir
+				;;
+			esac
+			rm $WORKDIR/generated_playlists/.dir
+			rm $WORKDIR/generated_playlists/..dir
+			#update progress bar
+			PERCENT=$((($COUNT*100/$TOTAL)+1))
+			echo $PERCENT > $WORKDIR/index_splash #update progressbar
+			COUNT=$(($COUNT+1))
+			[ "`cat $WORKDIR/update_index_cancel`" = "cancel" ] && exit
+		done < $WORKDIR/index_new
+	fi
+
+	###################### generate playlists based on the youtube index file
+	##### NOT IN USE #####
+	if [ $SOURCE_YOUTUBE_COLLECTIONS = true ]; then
+		grep -F '|' $HOME/.pmusic/index_youtube | cut -d'|' -f5 | sort -u > $WORKDIR/index_tmp
+		while read I; do
+			ARTIST="`grep -Fm1 "|${I}|" $HOME/.pmusic/index_youtube | cut -d'|' -f3`"
+			ALBUM="`grep -Fm1 "|${I}|" $HOME/.pmusic/index_youtube | cut -d'|' -f5`"
+			YEAR="`grep -Fm1 "|${I}|" $HOME/.pmusic/index_youtube | cut -d'|' -f7`"
+			echo '#EXTM3U' > $WORKDIR/generated_playlists/"$ARTIST - $ALBUM (${YEAR}) youtube".m3u
+			#track info
+			grep -F "|${I}|" $HOME/.pmusic/index_youtube > $WORKDIR/index_tmp1
+			while read J; do
+				ADR="`grep -F "${J}" $HOME/.pmusic/index_youtube | cut -d'|' -f1`"
+				TITLE="`grep -F "${J}" $HOME/.pmusic/index_youtube | cut -d'|' -f2`"
+				MIN="`grep -F "${J}" $HOME/.pmusic/index_youtube | cut -d'|' -f9 | cut -d: -f1`"
+				SEC="`grep -F "${J}" $HOME/.pmusic/index_youtube | cut -d'|' -f9 | cut -d: -f2`"
+				LENGTH="`echo "( $MIN * 60 ) + $SEC" | bc`"
+				echo -e "#EXTINFO:${LENGTH},$ARTIST - $TITLE\n$ADR" >> $WORKDIR/generated_playlists/"$ARTIST - $ALBUM (${YEAR}) youtube".m3u
+			done < $WORKDIR/index_tmp1
+		done < $WORKDIR/index_tmp
+	fi
+	######################
+
+	#spread index to subindexes
+	echo -n > $HOME/.pmusic/index_alphabetic
+	echo -n > $HOME/.pmusic/index_playlists
+	find $WORKDIR/generated_playlists -printf "  %p|%f\n" >> $HOME/.pmusic/index_all #generated directories
+	TMP="`echo "$AUDIO_FORMATS" | sed 's/\\$/\\\\|/g'`"
+	grep -iE "$TMP" $HOME/.pmusic/index_all >> $HOME/.pmusic/index_alphabetic
+	grep -iE "\.m3u|\.pls|\.dir|\.album" $HOME/.pmusic/index_all >> $HOME/.pmusic/index_playlists
+
+	#sort index. Similar to sort by artist from menu
+	cat $HOME/.pmusic/index_alphabetic | sort -st'|' -k2,2 | sort -nst'|' -k6,6 | sort -st'|' -k5,5 | sort -nst'|' -k7,7 | sort -st'|' -k3,3 --output=$WORKDIR/index_tmp
+	mv -f $WORKDIR/index_tmp $HOME/.pmusic/index_alphabetic
+	sort -u --output=$WORKDIR/index_tmp $HOME/.pmusic/index_playlists
+	mv -f $WORKDIR/index_tmp $HOME/.pmusic/index_playlists
+
+	#convert underscores and %20
+	if [ $CONV_UNDERSCORE = true ]; then
+		cut -d'|' -f1 $HOME/.pmusic/index_alphabetic > $WORKDIR/index_tmp
+		cut -d'|' -f2- $HOME/.pmusic/index_alphabetic > $WORKDIR/index_tmp1
+		cat $WORKDIR/index_tmp1 | tr '_' ' ' > $WORKDIR/index_tmp2
+		paste -d'|' $WORKDIR/index_tmp $WORKDIR/index_tmp2 > $HOME/.pmusic/index_alphabetic
+		#---
+		cut -d'|' -f1 $HOME/.pmusic/index_playlists > $WORKDIR/index_tmp
+		cut -d'|' -f2- $HOME/.pmusic/index_playlists > $WORKDIR/index_tmp1
+		cat $WORKDIR/index_tmp1 | tr '_' ' ' > $WORKDIR/index_tmp2
+		paste -d'|' $WORKDIR/index_tmp $WORKDIR/index_tmp2 > $HOME/.pmusic/index_playlists
+	fi
+	if [ $CONV_20 = true ]; then
+		cut -d'|' -f1 $HOME/.pmusic/index_alphabetic > $WORKDIR/index_tmp
+		cut -d'|' -f2- $HOME/.pmusic/index_alphabetic > $WORKDIR/index_tmp1
+		sed -i 's/%20/ /g' $WORKDIR/index_tmp1
+		paste -d'|' $WORKDIR/index_tmp $WORKDIR/index_tmp1 > $HOME/.pmusic/index_alphabetic
+		#---
+		cut -d'|' -f1 $HOME/.pmusic/index_playlists > $WORKDIR/index_tmp
+		cut -d'|' -f2- $HOME/.pmusic/index_playlists > $WORKDIR/index_tmp1
+		sed -i 's/%20/ /g' $WORKDIR/index_tmp1
+		paste -d'|' $WORKDIR/index_tmp $WORKDIR/index_tmp1 > $HOME/.pmusic/index_playlists
+	fi
+
+	#index_all is the search source, and should only contain playable files
+	cp -f $HOME/.pmusic/index_alphabetic $HOME/.pmusic/index_all
+	cat $HOME/.pmusic/index_playlists >> $HOME/.pmusic/index_all
+
+	#reset
+	echo 100 > $WORKDIR/index_splash
+	$APPDIR/func -index_songs
+	#update search options
+	echo true > $WORKDIR/SEARCH_MYMUSIC
+	echo true > $WORKDIR/SEARCH_COLLECTIONS
+	;;
+esac

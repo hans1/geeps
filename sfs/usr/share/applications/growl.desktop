@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name= Growl Security Enhancements
+Icon=tin-hat.png
+Comment= Growl Security Enhancements
+Exec=growl
+Terminal=false
+Type=Application
+Categories=RemoteAccess
+GenericName= Growl Security Enhancements

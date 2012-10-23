@@ -1,0 +1,64 @@
+/usr
+/usr/bin
+ gtklp
+ gtklpq
+/usr/share
+/usr/share/locale
+/usr/share/locale/ca
+/usr/share/locale/ca_ES
+/usr/share/locale/ca_ES/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/ca/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/chs
+/usr/share/locale/chs/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/cht
+/usr/share/locale/cht/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/cz
+/usr/share/locale/cz/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/en
+/usr/share/locale/en/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/hu
+/usr/share/locale/hu/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/it
+/usr/share/locale/it/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/nl
+/usr/share/locale/nl/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/pl
+/usr/share/locale/pl/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/pt_BR
+/usr/share/locale/pt_BR/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/ru
+/usr/share/locale/ru/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/uk_UA
+/usr/share/locale/uk_UA/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/zh_CN
+/usr/share/locale/zh_CN/LC_MESSAGES
+ gtklp.mo
+/usr/share/locale/zh_TW
+/usr/share/locale/zh_TW/LC_MESSAGES
+ gtklp.mo
+/var

@@ -1,0 +1,97 @@
+#!/bin/sh
+#Barry Kauler www.puppylinux.com
+#LGPL 2007 Puppy Linux www.puppylinux.com
+#17 june 2007
+#v3.93 10 dec 2007 BK: updated for 2.6.24 kernel, no /dev/hd*
+#v3.97 handle /dev/hd also for retro kernels.
+#v3.97 25feb2008 BK: guess_fstype does not work when testing 'makebootfat', use fdisk.
+#v4.01 19may2008 BK: bugfix for 2.6.25.4, ram entries in /proc/partitions.
+#100912 no longer supporting /proc/ide.
+#101127 debug output.
+#110125,110126 brought back /proc/ide /dev/hd* support.
+#111109 replace guess_fstype with blkid (note, blkid very slow, not preferred).
+
+#***this one runs in initrd, very slightly different from the main one.***
+
+SUNITS="$1" #allowed params are '-k' or '-m'.
+OUTPUT=""
+
+##devices that have partitions... 
+#([^k] is to eliminate mmcblk0 device -- allow mmcblk0p1 etc) v4.01 bugfix eliminate ram... 110126
+PARTITIONS="`grep -E '^ .*[^k][0-9]$' /proc/partitions | tr -s ' ' | cut -f 4-5 -d ' ' | grep -vE ' loop| ram' | tr ' ' '|'`"
+echo "PARTITIONS=$PARTITIONS" > /tmp/probepart.log #101127
+
+#101127 for comparison, log this... 110125 restore hd...
+SYSBLOCKSUB="`ls -1 /sys/block/*/ | grep -E '^hd|^scd|^sd|^mmc|^sr' | tr '\n' ' '`"
+echo "SYSBLOCKSUB=$SYSBLOCKSUB" >> /tmp/probepart.log #101127
+
+#all disk devices...
+#ALLDEVS="`grep -E ' hd| scd| sd| mmc| sr' /proc/diskstats | tr -s ' ' | cut -f 4 -d ' ' | tr '\n' ' '`"
+#ALLDRVS="`ls -1 /sys/block | grep -E '^hd|^scd|^sd|^mmc|^sr' | tr '\n' ' '`"
+ALLDRVS="`ls -1 /sys/block | grep -E '^scd|^sd|^mmc|^sr' | tr '\n' ' '`"
+[ -e /proc/ide ] && ALLDRVS="${ALLDRVS} `ls -1 /proc/ide | grep '^hd' | tr '\n' ' '`" #110125
+echo "ALLDRVS=$ALLDRVS" >> /tmp/probepart.log #101127 for debugging.
+
+#all drives and partitions...
+ALLDEVS="`echo "$PARTITIONS" | cut -f 2 -d '|' | tr '\n' ' '`$ALLDRVS"
+
+for ONEDEV in $ALLDEVS
+do
+ FSTYPE="unknown"
+ DPATTERN='|'${ONEDEV}'$'
+ SIZE=`echo "$PARTITIONS" | grep "$DPATTERN" | cut -f 1 -d '|'`
+ DEVICE="`echo "$PARTITIONS" | grep "$DPATTERN" | cut -f 2 -d '|'`"
+ echo "ONEDEV=$ONEDEV SIZE=$SIZE DEVICE=$DEVICE" >> /tmp/probepart.log #101127 for debugging.
+ if [ ! $SIZE ];then
+  [ "`echo "$PARTITIONS" | grep "$ONEDEV"`" != "" ] && continue
+  #must be a device without partitions...
+  SIZE=0
+  DEVICE="$ONEDEV"
+  case $DEVICE in
+   hd*)
+    [ "`cat /proc/ide/$DEVICE/media`" = "cdrom" ] && FSTYPE="iso9660"
+   ;;
+   scd*|sr*) #usb,sata,scsi cd/dvd drive.
+    FSTYPE="iso9660"
+   ;;
+  esac
+  #for hd* or sd* superfloppy, determine size...
+  if [ "$FSTYPE" = "unknown" ];then
+   BSIZE=`disktype /dev/$DEVICE 2>/dev/null | grep '^Block device' | cut -f 2 -d '(' | cut -f 1 -d ' '`
+   [ $BSIZE ] && SIZE=$(($BSIZE/1024)) #KB
+  fi
+ fi
+ if [ "$FSTYPE" = "unknown" ];then
+  if [ -f /bin/guess_fstype ];then
+   FSTYPE="`guess_fstype /dev/$DEVICE 2>/dev/null`"
+  else
+   #111109 replace guess_fstype with blkid (note, blkid very slow, not preferred)...
+   FSTYPE="`blkid /dev/$DEVICE 2>/dev/null | grep -o ' TYPE=.*' | cut -f 2 -d '"'`" #'geany
+   [ `echo "$FSTYPE" | wc -l` -gt 1 ] && FSTYPE="unknown" #blkid may fallback to returning all partitions.
+   [ ! "$FSTYPE" ] && FSTYPE="unknown" #paranoid precaution.
+  fi
+ fi
+ echo "  SIZE=$SIZE FSTYPE=$FSTYPE" >> /tmp/probepart.log #101127 for debugging.
+  
+ #v3.97 guess_fstype fails sometimes...
+ #(using makebootfat to setup a USB-FLOPPY/-HDD/-ZIP combined bootable FAT drive).
+ xFSTYPE=''
+ if [ "$FSTYPE" = "unknown" ];then
+  fsPATTERN='^/dev/'"$DEVICE"' '
+  xDEVICE="`echo -n "$DEVICE" | sed -e 's/[0-9]*$//'`" #"${DEVICE/[0-9]/}" #remove partition number.
+  xFSTYPE="`fdisk -l /dev/$xDEVICE 2>/dev/null | grep "$fsPATTERN" | head -n 1 | grep -o -E 'FAT12$|FAT16$|FAT32$'`"
+  [ "$xFSTYPE" != "" ] && FSTYPE='vfat'
+ fi
+ 
+ #for compatibility with old probepart from antonio gallo...
+ [ "$FSTYPE" = "unknown" ] && FSTYPE="none"
+ 
+ [ "$SUNITS" = "" ] && SIZE=$(($SIZE*2)) #512 byte blocks.
+ [ "$SUNITS" = '-m' ] && SIZE=$(($SIZE/1024)) #MB
+
+ echo "/dev/$DEVICE|$FSTYPE|$SIZE"
+ echo "  /dev/$DEVICE|$FSTYPE|$SIZE" >> /tmp/probepart.log #101127
+done
+
+
+###END###

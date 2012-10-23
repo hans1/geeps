@@ -1,0 +1,49 @@
+#!/bin/sh
+#set -x
+
+switch ()
+{
+OLDVALUE="`grep '<TaskList' $HOME/.jwmrc-tray|cut -d ' ' -f2|cut -d '/' -f1`"
+if [ "$RAD1" = "true" ];then NEWVALUE="maxwidth=\"25\""
+ elif [ "$RAD2" = "true" ];then NEWVALUE="maxwidth=\"200\""
+ elif [ "$RAD3" = "true" ];then NEWVALUE="maxwidth=\"0\""
+fi
+sed -i "s%$OLDVALUE%$NEWVALUE%" $HOME/.jwmrc-tray
+sleep 2
+jwm -restart
+}
+export -f switch
+export GUI="<window title=\"Pager Style\">
+ <vbox>
+  <hbox>
+   <frame Choose your pager style>
+    <vbox>
+     <radiobutton>
+      <label>Iconify</label> 
+      <variable>RAD1</variable>
+     </radiobutton>
+     <radiobutton>
+      <label>Fixed Width</label> 
+      <variable>RAD2</variable>
+     </radiobutton> 
+     <radiobutton>
+      <label>Variable Width</label> 
+      <variable>RAD3</variable>
+     </radiobutton>
+    </vbox>
+   </frame>
+  </hbox>
+  <hbox>
+   <button cancel></button>
+   <button>
+    <input file stock=\"gtk-ok\"></input>
+    <label>Ok</label>
+    <action>switch &</action>
+    <action>exit:done</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+gtkdialog3 -p GUI
+
+unset GUI

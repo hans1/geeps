@@ -1,0 +1,6 @@
+/bin
+ ps-FULL
+/lib
+ libproc-3.2.8.so
+/sbin
+ sysctl

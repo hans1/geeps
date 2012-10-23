@@ -1,0 +1,151 @@
+#!/bin/bash
+#PupControl 1.8.8
+#ScreenSaver Control 1.2
+#Copyright 2012 GPL3
+
+[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
+
+WORKDIR="/usr/local/PupControl"
+DELAY=`cat $WORKDIR/ss-control.rc | grep -a DELAY | cut -d "=" -f 2 | sed 's/\"//g'` #define screensaver delay
+DISTRO_NAME=`cat /etc/DISTRO_SPECS | grep DISTRO_NAME | cut -d "=" -f2 | sed s/\'//g` #define current distro name
+EXIT_STATE=`cat $WORKDIR/ss-control.rc | grep -a EXIT | tail -n 1 | cut -d "=" -f 2 | sed 's/\"//g'` #define ss-control exit status
+
+if   [ "$EXIT_STATE" = "abort" -o "$EXIT_STATE" = "" ]; then
+ cp -f $WORKDIR/ss-control2.rc $WORKDIR/ss-control.rc &
+fi
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#define screensaver dialog
+if [ "$DISTRO_NAME" = "Lighthouse64" ] && [ "`which xscreensaver-demo-LHP`" != "" ]; then #TazOC LHP
+	SSDIALOG=\"
+export SS_DIALOG="<window title=\"SSC\" icon-name=\"gtk-fullscreen\" width-request=\"255\" resizable=\"false\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>EnergySaver</span></b>\"</label></text>
+  <pixmap>
+   <variable>IMAGE</variable>
+   <input file>$WORKDIR/icons/status.png</input>
+  </pixmap>
+  <text height-request=\"8\"><label>\"\"</label></text>
+  <frame DPMS Options>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" Enable power management and screen blanking \" xalign=\"0\">
+     <label>\"Enable            \"</label>
+       <input file stock=\"gtk-yes\"></input>
+      <action>$WORKDIR/func -ScreenSaveON</action>
+      <action type=\"refresh\">IMAGE</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" Disable power management and screen blanking \" xalign=\"0\">
+     <label>\"Disable           \"</label>
+       <input file stock=\"gtk-no\"></input>
+      <action>$WORKDIR/func -ScreenSaveOFF</action>
+      <action type=\"refresh\">IMAGE</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" Set power management delay 
+ (Currently $DELAY minutes) \" xalign=\"0\">
+     <label>\"Preferences   \"</label>
+       <input file stock=\"gtk-preferences\"></input>
+      <action>$WORKDIR/SS-pref &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <text height-request=\"8\"><label>\"\"</label></text>
+  </frame>
+  
+  <frame XScreensavers>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" Preview XScreensaver \" xalign=\"0\">
+     <label>\"Preview          \"</label>
+       <input file stock=\"gtk-media-play\"></input>
+      <action>xscreensaver-next-LHP &</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" XScreensaver Preferences \" xalign=\"0\">
+     <label>\"Preferences   \"</label>
+       <input file icon=\"xscreensaver\"></input>
+      <action>xscreensaver-demo-LHP &</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" XScreensaver Wizard \" xalign=\"0\">
+     <label>\"Setup Wizard \"</label>
+       <input file icon=\"wizard\"></input>
+      <action>XScreenSaverSetup -rox &</action>
+     </button>
+   </hbox>
+   <text height-request=\"8\"><label>\"\"</label></text>
+  </frame>
+  
+   <hbox homogeneous=\"true\">
+     <button width-request=\"155\" tooltip-text=\" Close SS-Control \" xalign=\"2\">
+     <label>\"Exit                 \"</label>
+       <input file stock=\"gtk-close\"></input>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+ </vbox>
+</window>"\"
+else
+	SSDIALOG=\"
+export SS_DIALOG="<window title=\"SSC\" icon-name=\"gtk-fullscreen\" resizable=\"false\">
+ <vbox>
+  <text use-markup=\"true\"><label>\"<b><span size='"'large'"'>ScreenSaver</span></b>\"</label></text>
+  <pixmap>
+   <variable>IMAGE</variable>
+   <input file>$WORKDIR/icons/status.png</input>
+  </pixmap>
+  <frame Options>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Enable screen blanking 
+ and power save mode \">
+     <label>\"Enable\"</label>
+      <action>$WORKDIR/func -ScreenSaveON</action>
+      <action type=\"refresh\">IMAGE</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Disable screen blanking 
+ and power save mode \">
+     <label>\"Disable\"</label>
+      <action>$WORKDIR/func -ScreenSaveOFF</action>
+      <action type=\"refresh\">IMAGE</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Set screensaver delay 
+ (Currently $DELAY minutes) \">
+     <label>\"Preferences\"</label>
+      <action>$WORKDIR/SS-pref &</action>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+   <hbox homogeneous=\"true\">
+     <button width-request=\"135\" tooltip-text=\" Close SS-Control \">
+     <label>\"Exit\"</label>
+      <action type=\"exit\">quit_now</action>
+     </button>
+   </hbox>
+  </frame>
+ </vbox>
+</window>"\"
+fi
+
+#ScreenSaver dlg...
+$SSDIALOG
+$GTKDIALOG --center --program=SS_DIALOG
+
+unset SS_DIALOG
+
+exit 0

@@ -1,0 +1,97 @@
+/etc
+/etc/X11
+/etc/X11/xorg.conf.d
+/usr
+/usr/bin
+ cvt
+ gtf
+ X
+ Xorg
+/usr/doc
+/usr/doc/xorg-server
+/usr/lib
+ libchromeXvMCPro.so
+ libchromeXvMCPro.so.1
+ libchromeXvMCPro.so.1.0.0
+ libchromeXvMC.so
+ libchromeXvMC.so.1
+ libchromeXvMC.so.1.0.0
+ libI810XvMC.so
+ libI810XvMC.so.1
+ libI810XvMC.so.1.0.0
+ libIntelXvMC.so
+ libIntelXvMC.so.1
+ libIntelXvMC.so.1.0.0
+/usr/lib/modules
+/usr/lib/xorg
+/usr/lib/xorg/modules
+/usr/lib/xorg/modules/drivers
+ apm_drv.so
+ ark_drv.so
+ ast_drv.so
+ ati_drv.so
+ chips_drv.so
+ cirrus_alpine.so
+ cirrus_drv.so
+ cirrus_laguna.so
+ geode_drv.so
+ i128_drv.so
+ i740_drv.so
+ intel_drv.so
+ mach64_drv.so
+ mga_drv.so
+ neomagic_drv.so
+ nouveau_drv.so
+ openchrome_drv.so
+ r128_drv.so
+ radeon_drv.so
+ rendition_drv.so
+ s3_drv.so
+ s3virge_drv.so
+ savage_drv.so
+ siliconmotion_drv.so
+ sis_drv.so
+ sisusb_drv.so
+ tdfx_drv.so
+ trident_drv.so
+ tseng_drv.so
+ v4l_drv.so
+ vesa_drv.so
+ vmware_drv.so
+ vmwlegacy_drv.so
+ voodoo_drv.so
+ xgi_drv.so
+ ztv_drv.so
+/usr/lib/xorg/modules/extensions
+ libdbe.so
+ libdri2.so
+ libdri.so
+ libextmod.so
+ libglx.so
+ librecord.so
+/usr/lib/xorg/modules/input
+ evdev_drv.so
+ kbd_drv.so
+ mouse_drv.so
+/usr/lib/xorg/modules/multimedia
+ bt829_drv.so
+ fi1236_drv.so
+ msp3430_drv.so
+ tda8425_drv.so
+ tda9850_drv.so
+ tda9885_drv.so
+ theatre200_drv.so
+ theatre_detect_drv.so
+ theatre_drv.so
+ uda1380_drv.so
+/usr/man
+/usr/man/man4
+/usr/share
+/usr/share/X11
+/usr/share/X11/xorg.conf.d
+ 10-evdev.conf
+ 90-keyboard-layout.conf
+/var
+/var/lib
+/var/lib/xkb
+ README.compiled

@@ -1,0 +1,28 @@
+/usr
+/usr/local
+/usr/local/bin
+ pbackup
+/usr/local/pbackup
+ box_chooser
+ box_input
+ box_list
+ box_ok
+ box_splash
+ box_yesno
+ func
+ func_cron_profile
+ func_date_from
+ func_date_to
+ func_delete_task
+ func_ftp
+ func_save_to
+ func_select_cd-dvd
+ func_write_config
+/usr/local/pbackup/locals
+ english
+/usr/share
+/usr/share/applications
+ pbackup.desktop
+/usr/share/doc
+/usr/share/doc/pbackup
+ help-english.html

@@ -1,0 +1,59 @@
+#!/bin/bash
+
+[ "$1" = "-eq" ] && GUI_PEQUALIZER="`/usr/local/pequalizer/pequalizer -e 2> /dev/null`"
+
+GUI_PROGRESS='
+<timer visible="false" milliseconds="true" interval="'$UPDATE_INTERVAL'">
+ <action>nice -n 18 '$APPDIR'/func_progressbar &</action>
+ <action>refresh:PROGRESS</action>
+ <action>refresh:STATUSBAR</action>
+ <action>refresh:UPDATE_GUI</action>
+ <action>refresh:UPDATE_SOURCELIST</action>
+ <action>refresh:UPDATE_TRACKINFO</action>
+</timer>
+
+##here follows switches that updates parts of gui without user interaction (and update sourcelist when browsing+++) 
+<checkbox visible="false"> ##called from browse_id3
+ <label>a</label>
+ <variable>UPDATE_SOURCELIST</variable>
+ <input>cat '$WORKDIR'/UPDATE_SOURCELIST</input>
+ <action>if true clear:SOURCE</action>
+ <action>if true refresh:SOURCE</action>
+ <action>if true echo false > '$WORKDIR'/UPDATE_SOURCELIST</action>
+ <action>if true refresh:UPDATE_SOURCELIST</action>
+</checkbox>
+<checkbox visible="false"> ##this is NOT called from <timer>, but when browsing+++ in sourcelist 
+ <label>a</label>
+ <variable>UPDATE_SOURCELIST2</variable>
+ <input>cat '$WORKDIR'/UPDATE_SOURCELIST2</input>
+ <action>if true clear:SOURCE</action>
+ <action>if true refresh:SOURCE</action>
+ <action>if true refresh:SEARCH</action>
+ <action>if true echo false > '$WORKDIR'/UPDATE_SOURCELIST2</action>
+ <action>if true refresh:UPDATE_SOURCELIST2</action>
+</checkbox>
+<checkbox visible="false">
+ <label>a</label>
+ <variable>UPDATE_GUI</variable>
+ <input>cat '$WORKDIR'/UPDATE_GUI</input>
+ <action>if true refresh:PLAYLIST</action>
+ <action>if true refresh:ARTWORK</action>
+ <action>if true refresh:BUTTON_PLAY</action> ##play or pause icon
+ <action>if true echo false > '$WORKDIR'/UPDATE_GUI</action>
+ <action>if true refresh:UPDATE_GUI</action>
+</checkbox>
+'
+
+
+GUI_PROGRESSBAR='
+<hscale height-request="16" draw-value="false" block-function-signals="true" update-policy="1" scale-step="1" scale-min="0" scale-max="100"> ##update-policy: 0=constantly 1=button-activated 2=delayed
+ <variable>PROGRESS</variable>
+ <input file>'$WORKDIR'/PERCENT_BAR</input>
+ <action>. '$APPDIR'/func_player -jump_to_percent</action>
+</hscale>'
+
+GUI_STATUSBAR='
+<statusbar>
+ <variable>STATUSBAR</variable>
+ <input file>'$WORKDIR'/statusbar</input>
+</statusbar>'

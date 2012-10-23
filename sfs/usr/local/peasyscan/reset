@@ -1,0 +1,9 @@
+#!/bin/sh
+rm -rf /root/.sane/xscanimage
+rm -f /root/.sane/*.ppm
+mkdir -p /root/.sane/xscanimage
+cat << EOF >> /root/.sane/xscanimage/xscanimage.rc
+"filename"
+"/tmp/out.pnm"
+EOF
+Xdialog --title " " --infobox "Resetting Peasyscan ..." 0 0 2000

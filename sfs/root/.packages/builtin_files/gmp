@@ -1,0 +1,11 @@
+/usr
+/usr/lib
+ libgmp.so
+ libgmp.so.10
+ libgmp.so.10.0.1
+ libgmpxx.so
+ libgmpxx.so.4
+ libgmpxx.so.4.2.1
+ libmp.so
+ libmp.so.3
+ libmp.so.3.1.21

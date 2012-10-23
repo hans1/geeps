@@ -1,0 +1,11 @@
+/lib
+/usr
+/usr/lib
+ libhistory.so
+ libhistory.so.5
+ libhistory.so.5.2
+ libhistory.so.6
+ libreadline.so
+ libreadline.so.5
+ libreadline.so.5.2
+ libreadline.so.6

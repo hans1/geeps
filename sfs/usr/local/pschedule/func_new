@@ -1,0 +1,166 @@
+#! /bin/bash
+MODE="$1"
+
+edit () {
+	MINUTE=`echo "$TREE" | cut -d" " -f1`
+	HOUR=`echo "$TREE" | cut -d" " -f2`
+	DAY=`echo "$TREE" | cut -d" " -f3`
+	MONTH=`echo "$TREE" | cut -d" " -f4`
+	WEEKDAY=`echo "$TREE" | cut -d" " -f5`
+	TASK=`echo "$TREE" | cut -d" " -f6- | cut -d'#' -f1`
+	TASKNAME=`echo "$TREE" | cut -d" " -f6- | cut -d'#' -f2-`
+	OLD="$MINUTE $HOUR $DAY $MONTH $WEEKDAY $TASK""#$TASKNAME"
+
+	if [ "$MINUTE" = "*" ]; then MINUTE="$any"; fi
+	if [ `echo $MINUTE | wc -c` = 2 ]; then MINUTE=0"$MINUTE"; fi #place a zero in front when only 1 digit
+	if [ "$HOUR" = "*" ]; then HOUR="$any"; fi
+	if [ `echo $HOUR | wc -c` = 2 ]; then HOUR=0"$HOUR"; fi #place a zero in front when only 1 digit
+	if [ "$DAY" = "*" ]; then DAY="$any"; else DAY="$DAY."; fi
+	case $WEEKDAY in
+		1)		WEEKDAY="$Mondays";;
+		2)		WEEKDAY="$Tuesdays";;
+		3)		WEEKDAY="$Wednesdays";;
+		4)		WEEKDAY="$Thursdays";;
+		5)		WEEKDAY="$Fridays";;
+		6)		WEEKDAY="$Saturdays";;
+		0)		WEEKDAY="$Sundays";;
+		"*")	WEEKDAY="$any";;
+	esac
+	case "$MONTH" in
+		1)		MONTH="$January";;
+		2)		MONTH="$February";;
+		3)		MONTH="$March";;
+		4)		MONTH="$April";;
+		5)		MONTH="$May";;
+		6)		MONTH="$June";;
+		7)		MONTH="$July";;
+		8)		MONTH="$August";;
+		9)		MONTH="$September";;
+		10)		MONTH="$October";;
+		11)		MONTH="$November";;
+		12)		MONTH="$December";;
+		"*")	MONTH="$any";;
+	esac
+	ITEMS_HOUR="<item>$HOUR</item>$ITEMS_HOUR"
+	ITEMS_MINUTE="<item>$MINUTE</item>$ITEMS_MINUTE"
+	ITEMS_DAY="<item>$DAY</item>$ITEMS_DAY"	
+	ITEMS_MONTH="<item>$MONTH</item>$ITEMS_MONTH"	
+	ITEMS_WEEKDAY="<item>$WEEKDAY</item>$ITEMS_WEEKDAY"	
+}
+
+new () {
+	if [ "$MODE" != "-edit" ] && [ ! "$TASK" ]; then TASK='gxmessage "Happy Puppy"'; TASKNAME=''; fi
+	export new_task="
+	<window title=\"Pschedule - $Task_on_time\">
+	<vbox>
+	 <frame $Task>
+	  <hbox>
+	   <text><label>${Command}:</label></text>
+	   <entry><variable>TASK</variable><input>echo \"$TASK\"</input></entry>
+	  </hbox>
+	  <hbox>
+	   <text><label>$Task_name:</label></text>
+	   <entry><variable>TASKNAME</variable><input>echo \"$TASKNAME\"</input></entry>
+	  </hbox>
+	 </frame>
+	 <frame $Time>
+	  <hbox>
+	   <table>
+		<width>80</width><height>150</height>
+		<label>$Hour</label>
+		<variable>HOUR</variable>
+		$ITEMS_HOUR
+		<action>. $PROGPATH/func_human_to_cron -a</action>
+		<action>refresh:ENTRY_CRON</action>
+		<action>. $PROGPATH/func_cron_to_human -new -a</action>
+		<action>refresh:ENTRY_NEXT</action>
+	   </table>
+	   <table>
+		<width>80</width><height>100</height>
+		<label>$Minute</label>
+		<variable>MINUTE</variable>
+		$ITEMS_MINUTE
+		<action>. $PROGPATH/func_human_to_cron -a</action>
+		<action>refresh:ENTRY_CRON</action>
+		<action>. $PROGPATH/func_cron_to_human -new -a</action>
+		<action>refresh:ENTRY_NEXT</action>
+	   </table>
+	   <table>
+		<width>140</width><height>100</height>
+		<label>$Day</label>
+		<variable>WEEKDAY</variable>
+		$ITEMS_WEEKDAY
+		<action>. $PROGPATH/func_human_to_cron -a</action>
+		<action>refresh:ENTRY_CRON</action>
+		<action>. $PROGPATH/func_cron_to_human -new -a</action>
+		<action>refresh:ENTRY_NEXT</action>
+	   </table>
+	   <table>
+		<width>80</width><height>100</height>
+		<label>$Date</label>
+		<variable>DAY</variable>
+		$ITEMS_DAY
+		<action>. $PROGPATH/func_human_to_cron -a</action>
+		<action>refresh:ENTRY_CRON</action>
+		<action>. $PROGPATH/func_cron_to_human -new -a</action>
+		<action>refresh:ENTRY_NEXT</action>
+	   </table>
+	   <table>
+		<width>140</width><height>100</height>
+		<label>$Month</label>
+		<variable>MONTH</variable>
+		$ITEMS_MONTH
+		<action>. $PROGPATH/func_human_to_cron</action>
+		<action>refresh:ENTRY_CRON</action>
+		<action>. $PROGPATH/func_cron_to_human -new</action>
+		<action>refresh:ENTRY_NEXT</action>
+	   </table>
+	  </hbox>
+	  <hbox>
+	   <text><label>$Cron_time</label></text>
+	   <vbox>
+		<entry progress-fraction=\"1\" xalign=\"1\"><variable>ENTRY_CRON</variable><width>120</width><height>27</height><input>cat /tmp/pschedule-cron</input></entry>
+	   </vbox>
+	  </hbox>
+	  <hbox>
+	   <text><label>$Next_run</label></text>
+	   <entry cursor-visible=\"false\" editable=\"false\" progress-fraction=\"1\"><variable>ENTRY_NEXT</variable><input>cat /tmp/pschedule-next</input></entry>
+	  </hbox>
+	 </frame>
+	 <hbox>
+	  <button cancel></button>
+	  <button ok></button>
+	 </hbox>
+	</vbox>
+	<action signal=\"show\">rm -f /tmp/pschedule-loading</action>
+	</window>"
+	I=$IFS; IFS=""
+	for STATEMENTS in  $(gtkdialog3 -p new_task); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	TASK="`echo "$TASK #$TASKNAME" | sed 's%&%\\\&%g'`" #& corrupts tasklist in main window
+	case $EXIT in
+		OK) if [ "$MODE" = "-edit" ]; then
+				sed -i -e 's%*%{ð®STARđþ}%g' /var/spool/cron/crontabs/$USER
+				OLD=`echo "$OLD" | sed -e 's%*%{ð®STARđþ}%g'`
+				PATTERN="s%$OLD%$ENTRY_CRON $TASK%g"
+				sed -i -e "$PATTERN" /var/spool/cron/crontabs/$USER
+				sed -i -e 's%{ð®STARđþ}%*%g' /var/spool/cron/crontabs/$USER
+			else
+				echo "$ENTRY_CRON $TASK" >> /var/spool/cron/crontabs/$USER
+			fi
+			killall -q crond; crond #restart cron
+			;;
+		*)	exit;;
+	esac
+}
+
+if [ "$MODE" = "-edit" ]; then
+	TREE=`cat /tmp/pschedule-treeitems | grep "$TREE" | cut -d "|" -f 3 | cut -c 2-` #jake_take 
+	[ "$TREE" ] && edit #generate lists of cron command
+	[ ! "$TREE" ] && MODE='' #the -e switch will be overlooked. This is a new task
+fi
+
+echo true > /tmp/pschedule-loading #to avoid many calls to human_to_cron / cron_to_human during startup of editor window
+new

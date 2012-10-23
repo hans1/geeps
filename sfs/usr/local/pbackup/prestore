@@ -1,0 +1,104 @@
+#!/bin/bash
+#Prestore - Restore utility for Pbackup
+#Copyright 2006, 2007, 2008
+#Sigmund Berglund
+
+#------------------------------
+#Pbackup is released under the GNU General Public License (GPL). You have the right to use and modify this software in any way you like, so long as any derivative works remain under a GPL license.
+    
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
+#See the GNU General Public License homepage for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+main_window (){
+echo > $WORKDIR/pbackup-prestore_searchresult
+echo > $WORKDIR/pbackup-historyfiles
+export history_box="
+<window title=\"Pbackup - $LOC440\" icon-name=\"gtk-refresh\">
+<vbox>
+ <frame $LOC600>
+  <hbox>
+   <tree rules_hint=\"true\">
+    <width>350</width><height>200</height>
+    <label>$LOC601</label>
+    <variable>BACKUP_ID</variable>
+    <input>cat $HOME/.pbackup/history/history</input>
+    <action signal=\"button-release-event\">. $PROG_PATH/func -prestore_show_files \$BACKUP_ID</action>
+    <action signal=\"button-release-event\">refresh:FILE</action>
+   </tree>
+   <vbox>
+    <text><label>\"\"</label></text>
+    <button>
+     <input file icon=\"gtk-remove\"></input>
+     <action>. $PROG_PATH/func -prestore_del \$BACKUP_ID</action>
+     <action>refresh:BACKUP_ID</action>
+     <action>refresh:FILE</action>
+    </button>	  
+   </vbox>
+  </hbox>
+ </frame>
+ <hbox>
+  <vbox>
+   <frame $LOC602>
+    <hbox>
+     <entry  activates-default=\"true\"><variable>SEARCHSTRING</variable><default>$SEARCHSTRING</default></entry>
+     <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+      <input file icon=\"gtk-find\"></input>
+      <action>. $PROG_PATH/func -prestore_search</action>
+      <action>refresh:EDIT_SEARCHRESULT</action>
+    </button>
+    </hbox>
+    <edit>
+     <variable>EDIT_SEARCHRESULT</variable>
+     <input file>$WORKDIR/pbackup-prestore_searchresult</input>
+     <visible>disabled</visible>
+     <width>50</width><height>50</height>
+    </edit>
+   </frame>
+  </vbox>
+  <frame $LOC603 $BACKUP_ID>
+   <tree rules_hint=\"true\" headers_visible=\"false\">
+    <width>350</width><height>200</height>
+    <label>hidden_label</label>
+    <variable>FILE</variable>
+    <input>cat $WORKDIR/pbackup-historyfiles</input>
+    <action>. $PROG_PATH/func -box_restore_file</action>
+   </tree>
+  </frame>
+ </hbox>  
+ <hbox>
+  <button>
+   <input file icon=\"gtk-quit\"></input>
+   <label>\"$LOC_QUIT\"</label>
+   <action type=\"exit\">99</action>
+  </button>
+  <text><label>\"      \"</label></text>
+  <button>
+   <input file icon=\"gtk-clear\"></input>
+   <label>\"$LOC174\"</label>
+   <action>. $PROG_PATH/func -clear_history</action>
+   <action>refresh:BACKUP_ID</action>
+  </button>
+  <button>
+   <label>\"$LOC604\"</label>
+   <input file stock=\"gtk-revert-to-saved\"></input>
+   <action>. $PROG_PATH/func -box_restore_all</action>
+  </button>
+  <button>
+   <label>\"$LOC605\"</label>
+   <input file stock=\"gtk-revert-to-saved\"></input>
+   <action>. $PROG_PATH/func -box_restore_file</action>
+  </button>
+ </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 --program=history_box --center); do
+	eval $STATEMENTS > /dev/null 2>&1
+done
+IFS=$I
+exit
+}
+
+SEARCHSTRING="$LOC608"
+main_window

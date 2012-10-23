@@ -1,0 +1,37 @@
+/usr
+/usr/bin
+ ffmpeg
+ ffplay
+ ffprobe
+ ffserver
+/usr/lib
+ libavcodec.so.53
+ libavcodec.so.53.7.0
+ libavdevice.so.53
+ libavdevice.so.53.1.1
+ libavfilter.so.2
+ libavfilter.so.2.23.0
+ libavformat.so.53
+ libavformat.so.53.4.0
+ libavutil.so.51
+ libavutil.so.51.9.1
+ libpostproc.so.51
+ libpostproc.so.51.2.0
+ libswscale.so.2
+ libswscale.so.2.0.0
+/usr/share
+/usr/share/ffmpeg
+ libvpx-1080p50_60.ffpreset
+ libvpx-1080p.ffpreset
+ libvpx-360p.ffpreset
+ libvpx-720p50_60.ffpreset
+ libvpx-720p.ffpreset
+ libx264-baseline.ffpreset
+ libx264-ipod320.ffpreset
+ libx264-ipod640.ffpreset
+ libx264-lossless_fast.ffpreset
+ libx264-lossless_max.ffpreset
+ libx264-lossless_medium.ffpreset
+ libx264-lossless_slower.ffpreset
+ libx264-lossless_slow.ffpreset
+ libx264-lossless_ultrafast.ffpreset

@@ -1,0 +1,6 @@
+#!/bin/bash
+
+RESULT=`Xdialog --stdout --title "Pbackup" --screen-center --cancel-label "$LOC_CANCEL" --ok-label "$LOC_OK" --calendar "$LOC506" 350x270`
+if [ $? = 0 ]; then
+	echo $RESULT > $WORKDIR/pbackup-BCKDATE_TO
+fi

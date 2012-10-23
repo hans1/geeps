@@ -1,0 +1,11 @@
+# This is a based on sample ACPID configuration
+# Additional scripts catered specifically for Puppy Linux 4.1.x
+
+# event=button power.*
+# action=/usr/local/bin/power.sh "%e"
+
+#event=button.power.*
+#newer kernel syntax
+event=button/power*
+action=/etc/acpi/actions/acpi_poweroff.sh
+

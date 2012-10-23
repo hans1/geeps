@@ -1,0 +1,17 @@
+/usr
+/usr/bin
+ snap2
+ snap2engine
+ snap2shell
+/usr/share
+/usr/share/applications
+ snap2.desktop
+/usr/share/doc
+/usr/share/doc/snap2
+ copyright
+ readme.txt
+/usr/share/pixmaps
+ snap2.xpm
+/usr/share/snap2
+ readme.txt
+ remoteutils2.sh

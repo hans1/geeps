@@ -1,0 +1,47 @@
+# Packager: Phill Watkins <phill~dot~watkins~at~gmail~dot~com>
+
+pkgname=streamripper
+pkgver=1.64.6
+pkgrel=1pw
+#arch=noarch
+source=("http://downloads.sourceforge.net/sourceforge/streamripper/streamripper-$pkgver.tar.gz")
+sourcetemplate=http://people.salixos.org/pwatk/packages/ap/$pkgname/$pkgver
+docs=("CHANGES" "COPYING" "INSTALL" "README" "THANKS")
+url=http://streamripper.sourceforge.net/
+
+#doinst() {
+#
+#}
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"streamripper (Rip shoutcast radio streams to mp3 files)"
+"Streamripper records shoutcast and icecast compatible streams, in"
+"their native format. The following formats are supported: mp3, nsv,"
+"aac, and ogg. The meta data within the stream are interpreted to"
+"determine the beginning and end of each song, and stores the songs on"
+"your hard disk as individual files. In addition, streamripper includes"
+"a relay server for listening to the station while you are recording."
+)
+
+build() {
+    set -e
+
+    cd $startdir/src/$pkgname-$pkgver
+
+    ./configure \
+      --prefix=/usr \
+      --sysconfdir=/etc \
+      --localstatedir=/var \
+      --mandir=/usr/man \
+      --infodir=/usr/info \
+      --docdir=/usr/doc/$pkgname-$pkgver \
+      --build=$arch-slackware-linux
+
+    make --jobs=$(( $(getconf _NPROCESSORS_ONLN) + 1 ))
+    make install DESTDIR=$startdir/pkg
+      
+    set +e
+} 
+    

@@ -1,0 +1,11 @@
+/root
+ .mprc
+/usr
+/usr/bin
+ mp
+ mp_doccer
+/usr/share
+/usr/share/applications
+ MP-console-editor.desktop
+/usr/share/doc
+ mp.txt

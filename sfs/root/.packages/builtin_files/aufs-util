@@ -1,0 +1,16 @@
+/etc
+/etc/default
+ aufs
+/sbin
+ auibusy
+ auplink
+ mount.aufs
+ umount.aufs
+/usr
+/usr/bin
+ aubrsync
+ aubusy
+ auchk
+/usr/lib
+ libau.so.2.6
+/usr/share

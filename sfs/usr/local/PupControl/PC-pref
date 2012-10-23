@@ -1,0 +1,590 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Preferences
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+VERSION="1.8.8"
+WORKDIR="/usr/local/PupControl"
+APPS_DIR="$WORKDIR/defaultapps"
+
+. $WORKDIR/func -prxvt
+
+#define gtkdialog
+if [ "`which gtkdialog4`" ]; then
+ GTKDIALOG=gtkdialog4
+elif [ "`which gtkdialog3`" ]; then
+ GTKDIALOG=gtkdialog3
+else
+ GTKDIALOG=gtkdialog
+fi
+
+#define current window manager
+if [ -f "$HOME/Choices/windowmanager" ]; then
+	CURRWM=`cat "$HOME/Choices/windowmanager"` #TazOC LHP
+else
+	CURRWM=`cat /etc/windowmanager`
+fi
+
+#define current default apps
+WALLPAPER=`cat $APPS_DIR/wallpaper | tail -1`
+BACKUP=`cat $APPS_DIR/backup | tail -1`
+GRUB=`cat $APPS_DIR/grub | tail -1`
+SCANNER=`cat $APPS_DIR/scanner | tail -1`
+NOTEBOOK=`cat $APPS_DIR/notebook | tail -1`
+ORGANIZER=`cat $APPS_DIR/organizer | tail -1`
+TASK_MANAGER=`cat $APPS_DIR/taskmanager | tail -1 | sed 's/rxvt +sb -fn 9x15 -bg black -fg white -title htop -n htop -e htop/htop/'`
+TIME_MANAGER=`cat $APPS_DIR/timemanager | tail -1 | sed 's/sgtt/timetracker/'`
+WIRELESS=`cat $APPS_DIR/wireless | tail -1`
+NETWORK=`cat $APPS_DIR/network | tail -1`
+REMOTE_DESKTOP=`cat $APPS_DIR/remotedesktop | tail -1`
+SAMBA=`cat $APPS_DIR/samba | tail -1`
+VPN_CLIENT=`cat $APPS_DIR/vpnclient | tail -1`
+FILE_MANAGER=`cat $APPS_DIR/filemanager | tail -1 | sed 's/xterm -e mc/mc/' | sed 's/rox \//rox/' | sed 's/Thunar \//Thunar/'`
+FILE_FINDER=`cat $APPS_DIR/filefinder | tail -1`
+FILE_ARCHIVER=`cat $APPS_DIR/archiver | tail -1`
+CONSOLE=`cat $APPS_DIR/console | tail -1`
+PUP_RXVT=`cat $WORKDIR/pupcontrol2.rc | grep -a PUP_RXVT | cut -d "=" -f 2 | sed 's/\"//g'`
+SHUTDOWN_DIALOG=`cat $WORKDIR/pupcontrol2.rc | grep -a SHUTDOWN_DIALOG | cut -d "=" -f 2 | sed 's/\"//g'`
+
+## COMBOBOX DEFINITIONS ##
+
+# <----------BASIC APPS---------->
+
+#define $WALLPAPER_ITEMS for wallpaper combobox
+WALLPAPER_ARRAY=("fehbg" "Puppybackgroundmenu" "pwallpaper" "sws" "wallpaper")
+WALLPAPER_ITEMS="<item>$WALLPAPER</item>"
+for i in "${WALLPAPER_ARRAY[@]}"
+do
+   if [ "$i" != "$WALLPAPER" ]; then
+      if [  "`which $i`" != "" ]; then
+         WALLPAPER_ITEMS=`echo "$WALLPAPER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $BACKUP_ITEMS for file backup combobox
+BACKUP_ARRAY=("gadmin-rsync" "pbackup" "pmirror" "snap2")
+BACKUP_ITEMS="<item>$BACKUP</item>"
+for i in "${BACKUP_ARRAY[@]}"
+do
+   if [ "$i" != "$BACKUP" ]; then
+      if [  "`which $i`" != "" ]; then
+         BACKUP_ITEMS=`echo "$BACKUP_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $GRUB_ITEMS for grub combobox
+GRUB_ARRAY=("grub4dosconfig" "grubconfig")
+GRUB_ITEMS="<item>$GRUB</item>"
+for i in "${GRUB_ARRAY[@]}"
+do
+   if [ "$i" != "$GRUB" ]; then
+      if [  "`which $i`" != "" ]; then
+         GRUB_ITEMS=`echo "$GRUB_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $SCANNER_ITEMS for scanner combobox
+SCANNER_ARRAY=("peasyscan" "simple-scan" "xsaneshell")
+SCANNER_ITEMS="<item>$SCANNER</item>"
+for i in "${SCANNER_ARRAY[@]}"
+do
+   if [ "$i" != "$SCANNER" ]; then
+      if [  "`which $i`" != "" ]; then
+         SCANNER_ITEMS=`echo "$SCANNER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $NOTEBOOK_ITEMS for notebook combobox
+NOTEBOOK_ARRAY=("notecase" "xournal" "xpad" "znotes")
+NOTEBOOK_ITEMS="<item>$NOTEBOOK</item>"
+for i in "${NOTEBOOK_ARRAY[@]}"
+do
+   if [ "$i" != "$NOTEBOOK" ]; then
+      if [  "`which $i`" != "" ]; then
+         NOTEBOOK_ITEMS=`echo "$NOTEBOOK_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $ORGANIZER_ITEMS for organizer combobox
+ORGANIZER_ARRAY=("defaultcalendar" "gtodo" "osmo" "pschedule")
+ORGANIZER_ITEMS="<item>$ORGANIZER</item>"
+for i in "${ORGANIZER_ARRAY[@]}"
+do
+   if [ "$i" != "$ORGANIZER" ]; then
+      if [  "`which $i`" != "" ]; then
+         ORGANIZER_ITEMS=`echo "$ORGANIZER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $TASK_MANAGER_ITEMS for task manager combobox
+TASK_MANAGER_ARRAY=("htop" "lxtask" "pprocess" "xfce4-taskmanager")
+TASK_MANAGER_ITEMS="<item>$TASK_MANAGER</item>"
+for i in "${TASK_MANAGER_ARRAY[@]}"
+do
+   if [ "$i" != "$TASK_MANAGER" ]; then
+      if [  "`which $i`" != "" ]; then
+         TASK_MANAGER_ITEMS=`echo "$TASK_MANAGER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $TIME_MANAGER_ITEMS for time manager combobox
+TIME_MANAGER_ARRAY=("gstpw" "ktimer" "lsalarm" "pclock" "pstopwatch" "ptimer" "ptiming" "ptmtimer" "sgtt")
+TIME_MANAGER_ITEMS="<item>$TIME_MANAGER</item>"
+for i in "${TIME_MANAGER_ARRAY[@]}"
+do
+   if [ "$i" != "$TIME_MANAGER" ]; then
+      if [  "`which $i`" != "" ]; then
+         TIME_MANAGER_ITEMS=`echo "$TIME_MANAGER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+# <----------NETWORK APPS---------->
+
+#define $WIRELESS_ITEMS for wireless combobox
+WIRELESS_ARRAY=("Frisbee" "Pwireless" "Pwireless2")
+WIRELESS_ITEMS="<item>$WIRELESS</item>"
+for i in "${WIRELESS_ARRAY[@]}"
+do
+   if [ "$i" != "$WIRELESS" ]; then
+      if [  "`which $i`" != "" ]; then
+         WIRELESS_ITEMS=`echo "$WIRELESS_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $NETWORK_ITEMS for network combobox
+NETWORK_ARRAY=("connectwizard" "Frisbee" "net-setup.sh" "sns")
+NETWORK_ITEMS="<item>$NETWORK</item>"
+for i in "${NETWORK_ARRAY[@]}"
+do
+   if [ "$i" != "$NETWORK" ]; then
+      if [  "`which $i`" != "" ]; then
+         NETWORK_ITEMS=`echo "$NETWORK_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $REMOTE_DESKTOP_ITEMS for remote desktop combobox
+REMOTE_DESKTOP_ARRAY=("krdc" "rdesktop" "remmina" "tsclient")
+REMOTE_DESKTOP_ITEMS="<item>$REMOTE_DESKTOP</item>"
+for i in "${REMOTE_DESKTOP_ARRAY[@]}"
+do
+   if [ "$i" != "$REMOTE_DESKTOP" ]; then
+      if [  "`which $i`" != "" ]; then
+         REMOTE_DESKTOP_ITEMS=`echo "$REMOTE_DESKTOP_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $SAMBA_ITEMS for samba combobox
+SAMBA_ARRAY=("lameSMBqmount" "lameSMBxplorer" "pnethood")
+SAMBA_ITEMS="<item>$SAMBA</item>"
+for i in "${SAMBA_ARRAY[@]}"
+do
+   if [ "$i" != "$SAMBA" ]; then
+      if [  "`which $i`" != "" ]; then
+         SAMBA_ITEMS=`echo "$SAMBA_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $VPN_CLIENT_ITEMS for vpn client combobox
+VPN_CLIENT_ARRAY=("gadmin-openvpn-client" "gpptp")
+VPN_CLIENT_ITEMS="<item>$VPN_CLIENT</item>"
+for i in "${VPN_CLIENT_ARRAY[@]}"
+do
+   if [ "$i" != "$VPN_CLIENT" ]; then
+      if [  "`which $i`" != "" ]; then
+         VPN_CLIENT_ITEMS=`echo "$VPN_CLIENT_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+# <----------TRAY APPS---------->
+
+#define $FILE_MANAGER for file manager combobox
+FILE_MANAGER_ARRAY=("dolphin" "emelfm" "emelfm2" "krusader" "mc" "pcmanfm" "pcmanfm2" "rox" "Thunar" "tuxcmd" "xfe")
+FILE_MANAGER_ITEMS="<item>$FILE_MANAGER</item>"
+for i in "${FILE_MANAGER_ARRAY[@]}"
+do
+   if [ "$i" != "$FILE_MANAGER" ]; then
+      if [  "`which $i`" != "" ]; then
+         FILE_MANAGER_ITEMS=`echo "$FILE_MANAGER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $FILE_FINDER for file finder combobox
+FILE_FINDER_ARRAY=("findwild" "pfilesearch" "pfind" "searchmonkey" "turma2" "zfind")
+FILE_FINDER_ITEMS="<item>$FILE_FINDER</item>"
+for i in "${FILE_FINDER_ARRAY[@]}"
+do
+   if [ "$i" != "$FILE_FINDER" ]; then
+      if [  "`which $i`" != "" ]; then
+         FILE_FINDER_ITEMS=`echo "$FILE_FINDER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $FILE_ARCHIVER for file archiver combobox
+FILE_ARCHIVER_ARRAY=("ark" "file-roller" "peazip" "xarchive" "xarchiver")
+FILE_ARCHIVER_ITEMS="<item>$FILE_ARCHIVER</item>"
+for i in "${FILE_ARCHIVER_ARRAY[@]}"
+do
+   if [ "$i" != "$FILE_ARCHIVER" ]; then
+      if [  "`which $i`" != "" ]; then
+         FILE_ARCHIVER_ITEMS=`echo "$FILE_ARCHIVER_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $CONSOLE for console combobox
+DISTRO=`cat /etc/DISTRO_SPECS | grep DISTRO_NAME | cut -d "=" -f2 | cut -d " " -f1 | sed s/\'//g`
+if [ "`which urxvt`" = "" -o "`pidof enlightenment`" != "" -o "$DISTRO" = "Dpup" ]; then
+	PCONSOLE=""
+else
+	PCONSOLE="Prxvt"
+fi
+CONSOLE_ARRAY=("$PCONSOLE" "rxvt" "urxvt" "mrxvt" "aterm" "xterm" "Console-LHP" "konsole" "roxterm" "sakura" "defaultterminal" "terminal" "termit" "lxterminal")
+CONSOLE_ITEMS="<item>$CONSOLE</item>"
+for i in "${CONSOLE_ARRAY[@]}"
+do
+   if [ "$i" != "$CONSOLE" ]; then
+      if [  "`which $i`" != "" ]; then
+         CONSOLE_ITEMS=`echo "$CONSOLE_ITEMS<item>$i</item>"`
+      fi
+   fi
+done
+
+#define $PUP_RXVT for Prxvt combobox
+PUP_RXVT_ITEMS="<item>$PUP_RXVT</item>"
+for I in on off; do PUP_RXVT_ITEMS=`echo "$PUP_RXVT_ITEMS<item>$I</item>"`; done
+
+#show 'Transparent Prxvt' combobox, only if functional urxvt is available
+if [ "`which urxvt`" != "" ] && [ "`pidof enlightenment`" = "" ] && [ "$DISTRO" != "Dpup" ]; then
+	PRXVT="
+    <hbox>
+    <text><label>Transparent Prxvt:</label></text>
+    <combobox>
+     <variable>PUP_RXVT</variable>
+     $PUP_RXVT_ITEMS
+    </combobox>
+   </hbox>"
+else
+	PRXVT=""
+fi
+
+#define hotkey compatibility
+if [ "$CURRWM" = "startxfce4" -o "$CURRWM" = "xfce4-session" -o "$CURRWM" = "xfwm4" -o "$CURRWM" = "startkde" -o "`pidof enlightenment`" ]; then
+	HOTKEY=""
+else
+	HOTKEY="
+    <button height-request=\"35\" tooltip-text=\" Restore Ctrl+Shift+C hotkey \">
+      <label>\"H-key\"</label>
+       <input file>$WORKDIR/icons/keyboard20.png</input>
+        <action>$WORKDIR/hkey_func -pupcontrol_hotkey &</action>
+     </button>"
+fi
+
+#define $SHUTDOWN_DIALOG for shutdown-dialog combobox
+SHUTDOWN_DIALOG_ITEMS="<item>$SHUTDOWN_DIALOG</item>"
+for I in yes no; do SHUTDOWN_DIALOG_ITEMS=`echo "$SHUTDOWN_DIALOG_ITEMS<item>$I</item>"`; done
+
+#Preferences dlg...
+export PREFERENCES="
+<window title=\"Preferences\" icon-name=\"gtk-preferences\" resizable=\"false\">
+  <vbox>
+<text use-markup=\"true\"><label>\"<b><span size='"'large'"'>Pup</span><span size='"'large'"' color='"'#3272C0'"'>Control</span> $VERSION</b>\"</label></text>
+   <notebook page=\"1\" labels=\" Basic Apps | MyControl | Net Apps | Tray Apps \">
+  <vbox>
+   <hbox>
+    <text><label>Wallpaper:</label></text>
+    <combobox>
+     <variable>WALLPAPER</variable>
+     $WALLPAPER_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>File Backup:</label></text>
+    <combobox>
+     <variable>BACKUP</variable>
+     $BACKUP_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Grub:</label></text>
+    <combobox>
+     <variable>GRUB</variable>
+     $GRUB_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Scanner:</label></text>
+    <combobox>
+     <variable>SCANNER</variable>
+     $SCANNER_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Notes Mgr:</label></text>
+    <combobox>
+     <variable>NOTEBOOK</variable>
+     $NOTEBOOK_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Schedule Mgr:</label></text>
+    <combobox>
+     <variable>ORGANIZER</variable>
+     $ORGANIZER_ITEMS
+    </combobox>
+   </hbox>
+
+    <hbox>
+    <text><label>Task Manager:</label></text>
+    <combobox>
+     <variable>TASK_MANAGER</variable>
+     $TASK_MANAGER_ITEMS
+    </combobox>
+   </hbox>
+
+    <hbox>
+    <text><label>Time Manager:</label></text>
+    <combobox>
+     <variable>TIME_MANAGER</variable>
+     $TIME_MANAGER_ITEMS
+    </combobox>
+   </hbox>
+  </vbox>
+
+  <vbox>
+   <hbox>
+    <text><label>1:</label></text>
+    <entry accept=\"fileselect\" tooltip-text=\" Enter executable name or full path \">
+     <variable>MYCONTROL1</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL1 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 1 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL1</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>2:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL2</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL2 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 2 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL2</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>3:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL3</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL3 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 3 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL3</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>4:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL4</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL4 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 4 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL4</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>5:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL5</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL5 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 5 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL5</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>6:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL6</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL6 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 6 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL6</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>7:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL7</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL7 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 7 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL7</action>
+    </button> 
+   </hbox>
+
+   <hbox>
+    <text><label>8:</label></text>
+    <entry accept=\"fileselect\">
+     <variable>MYCONTROL8</variable>
+     <input>cat $WORKDIR/pupcontrol2.rc | grep -a MYCONTROL8 | cut -d "=" -f 2 | sed 's/\"//g'</input>
+    </entry>
+    <button tooltip-text=\" Select App 8 \">
+     <input file stock=\"gtk-open\"></input>
+        <action type=\"fileselect\">MYCONTROL8</action>
+    </button> 
+   </hbox>
+  </vbox>
+
+  <vbox>
+   <hbox>
+    <text><label>Wireless Internet:</label></text>
+    <combobox>
+     <variable>WIRELESS</variable>
+     $WIRELESS_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Network Setup:</label></text>
+    <combobox>
+     <variable>NETWORK</variable>
+     $NETWORK_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Remote Desktop:</label></text>
+    <combobox>
+     <variable>REMOTE_DESKTOP</variable>
+     $REMOTE_DESKTOP_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Samba Shares:</label></text>
+    <combobox>
+     <variable>SAMBA</variable>
+     $SAMBA_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>VPN Client:</label></text>
+    <combobox>
+     <variable>VPN_CLIENT</variable>
+     $VPN_CLIENT_ITEMS
+    </combobox>
+   </hbox>
+  </vbox>
+
+  <vbox>
+   <hbox>
+    <text><label>File Manager:</label></text>
+    <combobox>
+     <variable>FILE_MANAGER</variable>
+     $FILE_MANAGER_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>File Finder:</label></text>
+    <combobox>
+     <variable>FILE_FINDER</variable>
+     $FILE_FINDER_ITEMS
+    </combobox>
+   </hbox>
+ 
+   <hbox>
+    <text><label>File Archiver:</label></text>
+    <combobox>
+     <variable>FILE_ARCHIVER</variable>
+     $FILE_ARCHIVER_ITEMS
+    </combobox>
+   </hbox>
+
+   <hbox>
+    <text><label>Console/Terminal:</label></text>
+    <combobox>
+     <variable>CONSOLE</variable>
+     $CONSOLE_ITEMS
+    </combobox>
+   </hbox>
+
+	$PRXVT
+
+   <hbox>
+    <text><label>Shutdown Dialog:</label></text>
+    <combobox tooltip-text=\" Show the 'Remove-CD' dialog at shutdown \">
+     <variable>SHUTDOWN_DIALOG</variable>
+     $SHUTDOWN_DIALOG_ITEMS
+    </combobox>
+   </hbox>
+    <pixmap><input file>/usr/local/PupControl/icons/control-panel_48.png</input></pixmap>
+  </vbox>
+  </notebook>
+
+   <hbox homogeneous=\"true\">
+     <button height-request=\"35\" tooltip-text=\" PupControl Help \">
+      <label>\" Help  \"</label>
+       <input file>$WORKDIR/icons/help20.png</input>
+        <action>/tmp/PCONTROL-help &</action>
+     </button>
+
+	$HOTKEY
+
+     <button height-request=\"35\" tooltip-text=\" Save changes and exit \">
+      <label>Save  </label>
+       <input file stock=\"gtk-ok\"></input>
+        <action>$WORKDIR/func -preferences_save &</action>
+        <action type=\"exit\">quit_now</action>
+     </button>
+
+     <button height-request=\"35\" tooltip-text=\" Exit without saving \">
+      <label>\" Exit   \"</label>
+       <input file stock=\"gtk-close\"></input>
+        <action>$WORKDIR/func -preferences_nochange &</action>
+        <action type=\"exit\">quit_now</action>
+    </button>
+   </hbox>
+  </vbox>
+</window>"
+
+$GTKDIALOG --center -p PREFERENCES > /usr/local/PupControl/pupcontrol.rc
+
+unset PREFERENCES
+
+exit 0

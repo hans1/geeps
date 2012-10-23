@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ a52dec
+ extract_a52
+/usr/lib
+ liba52.so
+ liba52.so.0
+ liba52.so.0.0.0

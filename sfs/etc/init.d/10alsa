@@ -1,0 +1,143 @@
+#!/bin/sh
+#Barry Kauler april 2009, puppylinux.com
+#called from /etc/rc.d/rc.services at bootup, with 'start' param.
+#called from /etc/rc.d/rc.shutdown at shutdown, with 'stop' param.
+#called from /usr/sbin/alsaconf for alsawizard, with 'restart' param.
+#101102 renamed script from 'alsa' to '10alsa' so will start before agrsm (and any other that potentially can delay sound availability).
+#101113 backend snd_ module loading taking longer than it used to, may have to wait.
+#101122 rerwin: improved code to wait for snd_* modules to load.
+#110111 shinobar: for reliable sound detection on HP Compac nc4010.
+#110113 tweak delay. 110216 tweak delay.
+#110506 /usr/sbin/alsaconf has 'restart' option, might need to reprobe modules. for now, just 'start|restart'.
+# 7dec2011 shinobar: wait loading modules, conditional saving asound.state (merged form the Quickset Wary, wary-511-01q)
+#111107 Skip module-loaded checks for restart.
+#111126 Simplify module-loaded check.
+#111229 add test file /etc/asound.state exists; save initial configuration.
+#111210 shinobar: refresh asound.state at restart
+#120103 karl godt: fix unloading modules. refer: http://www.murga-linux.com/puppy/viewtopic.php?t=71767&start=390
+#120105 Save current default driver for reboots.
+#120222 revert 111229. 120223 shinobar: better fix.
+#120226 01micko: added 'Master Front' entries. 120318 bumped it up, 75% to 100%.
+
+case "$1" in
+ start|restart) #110506
+  if [ "$1" = "start" ];then #111107
+   # shinobar: wait sound drivers loaded
+   GOOD=""
+   for I in $(seq 8); do
+    [ "`lsmod | grep '^snd_'`" != "" ] && GOOD="yes" && break
+    sleep 1
+   done
+   #[ "$GOOD" != "" ] || exit
+   #111126 Wait for audio sound modules to load...
+   NONSNDLIST="`grep -s '^options .* index=-2' /etc/modprobe.d/alsa-base.conf | tr -s ' ' | cut -f 2 -d ' ' | tr - _`"
+   SNDMODLIST="`ls /tmp/alsa_load-* 2> /dev/null | cut -f 2 -d - | grep -F -v "$NONSNDLIST" | tr '\n' ' '`"
+   if [ "$SNDMODLIST" ];then	#shinobar
+    for ONESNDMOD in $SNDMODLIST;do
+     pup_event_backend_modprobe_protect --modcheck=$ONESNDMOD
+    done
+   fi
+   rm -f /tmp/alsa_load-* #111126 end
+   #120105 Ensure default retained across reboots...
+   DFLTSNDMOD="`grep -s '^ 0 ' /proc/asound/modules | sed -e 's/ 0 //' | tr '_' '-'`"
+   if [ "$DFLTSNDMOD" ];then
+    grep -E -s -q '^alias  *snd-card-0 |^options  *snd .*slots=[^,]' /etc/modprobe.d/alsa*.conf \
+     || echo -e "alias snd-card-0 \nalias sound-slot-0 " >> /etc/modprobe.d/alsa.conf
+    if ! grep -s -q "^alias  *snd-card-0  *$DFLTSNDMOD" /etc/modprobe.d/alsa.conf;then
+     SEDSCRIPT1="s/^\(alias snd-card-0 \).*/\1$DFLTSNDMOD/"
+     SEDSCRIPT2="s/^\(alias sound-slot-0 \).*/\1$DFLTSNDMOD/"
+     sed -i -e "$SEDSCRIPT1" -e "$SEDSCRIPT2" /etc/modprobe.d/alsa.conf
+    fi
+   fi #120105 end
+  else #restart 120223
+   rm -f /etc/asound.state	#111210 shinobar: refresh asound.state at restart
+   sleep 1 #120223 precaution in lieu of ineffectual 'lsmod' test for sound modules
+  fi
+  rm -f /var/lock/subsys/alsasound 2> /dev/null #or alsa will not start.
+  #sometimes these don't all load...
+  modprobe snd-mixer-oss
+  modprobe snd-seq-oss
+  modprobe snd-pcm-oss
+  for I in $(seq 8); do #110111 shinobar: for reliable sound detection on HP Compac nc4010.
+   [ -c /dev/mixer ] && break #note, /dev/mixer is deleted in /etc/rc.d/rc.sysinit.
+   sleep 0.5 #110113 reduce 1 to 0.5. 110216 move up.
+  done 
+  [ -c /dev/mixer ] || exit
+  touch /tmp/rc_d_rc_services_alsa_ok # shinobar: delayedrun may use it (precaution/compatibility)
+  if [ ! -f /etc/asound.state ];then
+   #try and set all levels workable...
+   #set_mixers #in functions4puppy4
+   #101015 BK had to add ,0 after Front...
+   #110823 pemasu: add this set Speaker 75% unmute
+   #120226 01micko: added 'Master Front' entries...
+   amixer -s -q <<EOF
+set Master 75% unmute
+set Master -12dB
+set 'Master Mono' 75% unmute
+set 'Master Mono' -12dB
+set 'Master Front' 100% unmute
+set 'Master Front' 0dB
+set Front,0 75% unmute
+set Front,0 -12dB
+set PCM 90% unmute
+set PCM 0dB
+set Synth 90% unmute
+set Synth 0dB
+set CD 90% unmute
+set CD 0dB
+set Mic 0% mute
+set PCM,1 90% unmute
+set PCM,1 0dB
+set Wave 100% unmute
+set Music 100% unmute
+set AC97 100% unmute
+set 'Master Digital' 75% unmute
+set DAC 90% unmute
+set DAC -12dB
+set DAC,0 90% unmute
+set DAC,0 -12dB
+set DAC,1 90% unmute
+set DAC,1 -12dB
+set Headphone 75% unmute
+set Headphone -12dB
+set Playback 100% unmute
+set "SB Live Analog/Digital Output Jack" off
+set "Audigy Analog/Digital Output Jack" off
+set Speaker 75% unmute
+EOF
+   [ $? -eq 0 ] && alsactl -f /etc/asound.state store #111229
+  else
+   alsactl -f /etc/asound.state restore #from /etc/asound.state.
+  fi
+ ;;
+ stop)
+  [ -f /etc/asound.state ] && alsactl -f /etc/asound.state store #saves to /etc/asound.state. 111229 add test file exists.
+  # Kill processes holding open sound devices...
+  fuser -k /dev/admmidi? /dev/adsp? /dev/amidi? /dev/audio* /dev/dmfm* /dev/dmmidi? /dev/dsp* /dev/dspW* /dev/midi0? /dev/mixer? /dev/music /dev/patmgr? /dev/sequencer* /dev/sndstat >/dev/null 2>&1
+  [ -d /proc/asound/dev ] && fuser -k /proc/asound/dev/* >/dev/null 2>&1
+  [ -d /dev/snd ] && fuser -k /dev/snd/* >/dev/null 2>&1
+  # remove all sequencer connections if any
+  [ -f /proc/asound/seq/clients -a -x aconnect ] && aconnect --removeall
+  # mute master to avoid clicks at unload
+  amixer set Master mute >/dev/null 2>&1
+  # remove all sound modules... 120103...
+  #lsmod | grep "^snd" | grep -Ev "(snd-page-alloc|snd_page_alloc)" |
+  c=0
+  while [ "`lsmod | grep 'snd_'`" ];do
+   lsmod | grep "^snd" | grep '0 $' | grep -Ev "(snd-page-alloc|snd_page_alloc)" |
+   while read line
+   do
+    #rmmod `echo $line | cut -d ' ' -f 1`
+    modprobe -rv `echo $line | cut -d ' ' -f 1`
+   done
+   c=$((c+1));[ "$c" = '6' ] && break #precaution if neverending loop
+  done
+  # remove the 2.2 soundcore module (if possible)
+  rmmod soundcore 2> /dev/null
+  rmmod gameport 2> /dev/null
+  # remove lockfile if lockdir exists
+  [ -d /var/lock/subsys ] && rm -f /var/lock/subsys/alsasound
+ ;;
+esac
+
+###END###

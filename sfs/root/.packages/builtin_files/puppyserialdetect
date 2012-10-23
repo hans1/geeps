@@ -1,0 +1,6 @@
+/sbin
+ puppyserialdetect
+/usr
+/usr/share
+/usr/share/doc
+ puppyserialdetect.txt

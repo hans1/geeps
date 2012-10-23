@@ -1,0 +1,20 @@
+/bin
+ bunzip2
+ bzcat
+ bzip2
+ bzip2recover
+/lib
+ libbz2.so.1
+ libbz2.so.1.0
+ libbz2.so.1.0.6
+/usr
+/usr/bin
+ bunzip2
+ bzcat
+ bzdiff
+ bzgrep
+ bzip2
+ bzless
+ bzmore
+/usr/lib
+ libbz2.so

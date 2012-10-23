@@ -1,0 +1,27 @@
+#Maintainer: Dimitris Tzemos <djemos@slackel.gr>
+
+pkgname=libdaemon
+pkgver=0.13
+pkgrel=1dj
+source=("http://0pointer.de/lennart/projects/libdaemon/libdaemon-0.13.tar.gz")
+docs=("README")
+url=http://0pointer.de/lennart/projects/libdaemon/libdaemon-0.13.tar.gz
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"libdaemon (Unix daemonizing library)"
+"libdaemon is a lightweight C library that eases the"
+"writing of Unix daemons."
+""
+"Homepage: http://0pointer.de/lennart/projects/libdaemon/"
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr  --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var --sysconfdir=/etc --disable-static
+	make -j $numjobs || return 1
+	make install DESTDIR=$startdir/pkg
+	chown -R root:root $startdir/pkg
+} 

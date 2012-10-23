@@ -1,0 +1,16 @@
+cartoon-fighter-1.1-sfs4|cartoon|fighter-1.1-sfs4||Fun|60000K||cartoon-fighter-1.1-sfs4.sfs||Cartoon game by sc0ttman REQUIRES OPENGL mesa, ati, or nvidia, see drivers tab||||
+compiz-slacko-0.8.8|compiz-slacko|0.8.8||Desktop|20000K||compiz-slacko-0.8.8.sfs||wobbly stuff REQUIRES compiz_helepr(see PPM), OPENGL mesa, ati, or nvidia, see drivers tab||||
+gogglesmm-0.12.6-i686|gogglesmm|0.12.6-i686||Multimedia|10996K||gogglesmm-0.12.6-i686.sfs||Goggles Music Manager app REQUIRES MESA||||
+Google_Earth-5.1-spup|Google_Earth|5.1-spup||Fun|32000K||Google_Earth-5.1-spup.sfs||Google Earth Locations app REQUIRES QT_ALL SFS or PET and VIDEO DRIVERS||||
+jre-1.6.31-slacko|jre|1.6.31-slacko||Desktop|110492K||jre-1.6.31-slacko.sfs||Java Runtime Environment||||
+kernel_sources-3.1.10-patched_s_4gA|kernel_sources|3.1.10-patched_s_4gA||System|99204K||kernel_sources-3.1.10-patched_s_4gA.sfs||kernel sources k3.1.10-slacko_4gx3||||
+LibreOffice-3.5.3_en-US|LibreOffice|3.5.3_en-US||Document|160000K||LibreOffice-3.5.3_en-US.sfs||LibreOffice 3.5.3 Suite, with ROX integration, may require Java for some functions, Language packs from http://www.libreoffice.org/download||||
+math-slacko|math-slacko|||Document|72000K||math-slacko.sfs||Mathematics program suite||||
+openshot-1.4.0|openshot|1.4.0||Multimedia|75888||openshot-1.4.0.sfs||Openshot video editor||||
+qt_all-4.7.3|qt_all|4.7.3||System|40000K||qt_all-4.7.3.sfs||QT Nokia libraries including development and locales REQUIRES REBOOT||||
+samba_krb-3.6.4|samba_krb|3.6.4||Network|105400K||samba_krb-3.6.4.sfs||Samba with full kerberos support||||
+skype_static-2.1.0.81|skype_static|2.1.0.81||Internet|27376K||skype_static-2.1.0.81.sfs||Skype Internet Telephony||||
+torcs-1.3.1-2|torcs|1.3.1-2||Fun|150000K||torcs-1.3.1-2.sfs||Racing car Game REQUIRES OPENGL mesa, ati, or nvidia, see drivers tab||||
+trinity-3.5.13|trinity|3.5.13||Desktop|73356||trinity-3.5.13.sfs||KDE 3 desktop fork|||| 
+virtualbox-4.1.10-slacko|virtualbox|4.1.10-slacko||System|73356||virtualbox-4.1.10-slacko.sfs||Virtualisation to use any OS within Slacko||||
+zeroballistics-2.0|zeroballistics|2.0||Fun|60000K||zeroballistics-2.0.sfs||Tank shoot-em-up Game REQUIRES OPENGL mesa, ati, or nvidia, see drivers tab||||

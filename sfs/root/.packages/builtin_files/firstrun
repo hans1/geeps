@@ -1,0 +1,65 @@
+/root
+/root/Startup
+ firstrun
+/usr
+/usr/bin
+ first-run.sh
+/usr/local
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ greypuplogo24.png
+/usr/sbin
+ chooselocale
+ countrywizard
+ countrywizard.qs
+ delayedrun-example
+ extralang
+ firstrun
+ keymap-set
+ quickcountry
+ quicksetup
+ timezone-set
+ xrandrshell
+/usr/share
+/usr/share/applications
+ PersonalizeSettings.desktop
+/usr/share/doc
+/usr/share/doc/nls
+/usr/share/doc/nls/countrywizard
+ countrywizard.pot
+ README.txt
+/usr/share/i18n
+ countrycodes.txt
+ dialog_table
+ keymaps
+ languagelist
+ languagelist.data
+ layouts
+ mainlangs
+ shortlists
+ timezones
+/usr/share/locale
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/hu
+/usr/share/locale/hu/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/nl
+/usr/share/locale/nl/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/pl
+/usr/share/locale/pl/LC_MESSAGES
+ countrywizard.mo
+/usr/share/locale/ru
+/usr/share/locale/ru/LC_MESSAGES
+ countrywizard.mo
+/usr/share/pixmaps
+ nvidia24.png

@@ -1,0 +1,7 @@
+/usr
+/usr/lib
+ libparted.so.0
+ libparted.so.0.0.1
+/usr/sbin
+ parted
+ partprobe

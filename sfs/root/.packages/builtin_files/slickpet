@@ -1,0 +1,102 @@
+/etc
+/etc/quickpet
+ guirc
+ prefs.conf
+ qpet.conf
+ repos.conf
+ sfs_grab
+ Sfs-puppy-spup-official-2.6.37.6
+ Sfs-puppy-spup-official-2.6.39.4
+ Sfs-puppy-spup-official-3.1.10-slacko_4gA
+ Sfs-puppy-spup-official-3.1.10-slacko_paeA
+ sleeprc
+/usr
+/usr/local
+/usr/local/graphics-test
+ 173nvid
+ 285nvid
+ 96nvid
+ ati
+ graphix_test
+/usr/local/quickpet
+ driverhelp.htm
+/usr/local/quickpet/icons
+ ati.png
+ browser-def.png
+ chromium-browser.png
+ cloud.png
+ dillo.png
+ display.png
+ Firefox.png
+ flash.png
+ GCC_icon.png
+ Gimp.png
+ gnotravex.xpm
+ nvidia.png
+ Opera.png
+ phone.png
+ pidgin24.png
+ pupsave.png
+ Pwidgets.png
+ Seamonkey2.png
+ sfs.png
+ tor.png
+ transmission.png
+ wine_logo.png
+ xorg.png
+/usr/local/quickpet/locals
+ de_AT
+ de_BE
+ de_CH
+ de_DE:deutsch
+ de_LI
+ de_LU
+ en_US:english
+ es_AR
+ es_BO
+ es_CL
+ es_CO
+ es_CR
+ es_DO
+ es_EC
+ es_ES
+ es_ES:spanish
+ es_GT
+ es_HN
+ es_MX
+ es_NI
+ es_PA
+ es_PE
+ es_PR
+ es_PY
+ es_SV
+ es_US
+ es_UY
+ es_VE
+ fr_BE
+ fr_CA
+ fr_CH
+ fr_FR
+ fr_LU
+ it_IT
+ ja_JP:japanese
+ nl_BE
+ nl_NL
+ pl_PL
+ pt_BR
+ pt_PT
+ ru_RU
+ ru_UA
+ sv_SE
+ sv_SE:svenska
+ zh_CN:chinese
+ zh_HK
+ zh_SG
+ zh_TW
+/usr/sbin
+ quickpet
+ sfs_grabber
+ sfs_installation.sh
+/usr/share
+/usr/share/applications
+ quickpet.desktop

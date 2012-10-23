@@ -1,0 +1,192 @@
+#!/bin/sh
+# getflash 0.5 original code by technosaurus and by Barry K. http://bkhome.org/blog/?viewDetailed=01897
+# 13 Nov 2011 01micko http://www.murga-linux.com/puppy/viewtopic.php?t=72805&start=201
+# v0.6 - 21 Dec 2011 shinobar: puppy version independent (may work 4.0 and later), flashblock checkbox, registration, i18n
+# v0.8 - 11 Jan 2012 shinobar: flashplayer version info (stu90), fix was not able to uninstall
+# v0.9 - 25 Mar 2012 shinobar: fix was the ownership under /usr messing up
+
+export TEXTDOMAIN=getflash
+export TEXTDOMAINDIR=/usr/share/locale
+export OUTPUT_CHARSET=UTF-8
+LANG_USER=$LANG
+
+T_title="GetFlashPlayer"
+WAIT_PLS=$(gettext "Please wait...")
+
+GTKDIALOG=gtkdialog3
+which gtkdialog4 &>/dev/null && GTKDIALOG=gtkdialog4
+for P in $BROWSER defaultbrowser seamonkey firefox $DEFAULTBROWSER; do
+  which $P &>/dev/null && MYBROWSER=$P && break
+done
+RXVT=urxvt
+which $RXVT &>/dev/null || RXVT=rxvt
+export X1PID=""
+mysplash() {
+	[ "$X1PID" ] && kill $X1PID
+	killall yaf-splash &>/dev/null
+	X1PID=""
+	BGCOLOR="orange"
+	MYICON="gtk-info"
+	TIMEOUT=50
+  while [ "$1" ]; do
+	case "$1" in
+	-*stop) return;;
+	-*bg) shift; BGCOLOR=$1; shift;;
+	-*timeout) shift; TIMEOUT=$1; shift;;
+	-*icon) shift; MYICON=$1; shift;;
+	-*text) shift;;
+	-*) shift; shift;;
+	*) break;;
+	esac
+  done
+	if which gtkdialog-splash &>/dev/null ; then
+	  LANG=$LANG_USER gtkdialog-splash -fontsize "large" -icon $MYICON --placement center -bg $BGCOLOR -timeout $TIMEOUT -close never -text "$@" &
+	else
+	  LANG=$LANG_USER gxmessage -center -wrap -bg $BGCOLOR -title "$T_title" -buttons ''  -timeout $TIMEOUT -nofocus "$@" &
+	fi
+	X1PID=$!
+}
+internet_status() {
+  LANG=C route | grep -q 'default[ ].*[ ]0\.0\.0\.0[ ]' && grep -wq 'nameserver' /etc/resolv.conf #&& ping -c1 google.com &>/dev/null
+}
+
+   #mysplash -bg yellow "$WAIT_PLS"
+    if ! internet_status; then
+      mysplash -bg hotpink -timeout 5 -icon gtk-dialog-error $(gettext "Please check your internet connection")
+      exit 1
+    fi
+     mysplash -bg yellow "$WAIT_PLS"
+
+     #111113 changed url, scrapped ping
+     DOWNLOADURL="`curl -s 'http://get.adobe.com/flashplayer/completion/?installer=Flash_Player_11_for_other_Linux_(.tar.gz)_32-bit'|tr ' ' '\n'|grep fpdownload|tr -d ';'`"
+     if [ ! "$DOWNLOADURL" ];then 
+      mysplash -bg hotpink -timeout 5 -icon gtk-dialog-error "Unable to contact the server, please check your internet connection"
+      exit 1
+     fi
+    echo "$DOWNLOADURL" >&2
+     NEWVERSION=$(dirname "$DOWNLOADURL")
+     NEWVERSION=$(basename "$NEWVERSION")
+     echo "NEWVERSION=$NEWVERSION"
+
+DOWNTEXT=$(gettext "Click the 'Yes' button to download and install FlashPlayer-%s (6MB).")
+DOWNTEXT=$(printf "$DOWNTEXT" "$NEWVERSION")
+if [ ! -f /usr/lib/mozilla/plugins/libflashplayer.so ];then
+  FLASHVERSION="0"
+  TEXT=$(gettext "The Adobe Flash Player for the web browser is not installed.")
+else
+  FLASHVERSION=$(strings -n13 /usr/lib/mozilla/plugins/libflashplayer.so  | grep 'FlashPlayer_' | cut -d '_' -f2-5| tr '_' '.')
+  echo "INSTALLED=$FLASHVERSION" >&2
+  TEXT=$(gettext "The Adobe FlashPlayer-%s for the web browser is already installed.")
+  TEXT=$(printf "$TEXT" "$FLASHVERSION")
+  if [ "$FLASHVERSION" = "$NEWVERSION" ]; then
+    TEXT="$TEXT $(gettext "It seems the latest version. But you can download again and re-install it.")"
+  fi
+fi
+TEXT="$TEXT\\n$DOWNTEXT"
+export TEXT
+     
+      #LANG=C Xdialog --center --title "Adobe Flash Player" --icon "/usr/share/doc/flashlogo.gif" --yesno "$TEXT" 0 0
+      export FDLG='<window title="'$T_title'">
+      <vbox>
+      <hbox>
+      <pixmap><width>32</width><input file>/usr/share/doc/flashlogo.gif</input></pixmap>
+      <text><input>echo -en "$TEXT"</input></text>
+      </hbox>
+      <hbox><button yes></button><button no></button></hbox>
+      </vbox></window>'
+      echo "$FDKG" >&2
+      mysplash --stop
+      REPLY=$($GTKDIALOG -p FDLG -c |grep '^EXIT=') || echo "$FDKG" >&2
+      eval "$REPLY"
+      if [ "$EXIT" = "Yes" ];then
+       cd /usr/lib/mozilla/plugins
+       #echo -e "#!/bin/sh\nwget -O - http://fpdownload.macromedia.com/get/flashplayer/current/install_flash_player_11_linux.i386.tar.gz | tar -xz" > /tmp/delayedrun_flashdl
+       # v0.9: fix the ownership
+       echo -e "#!/bin/sh\nwget -O - $DOWNLOADURL | tar --no-same-owner -xz" > /tmp/delayedrun_flashdl
+       chmod 777 /tmp/delayedrun_flashdl
+       $RXVT -bg orange -geometry 80x4 -title "$T_title" -e /tmp/delayedrun_flashdl
+       mysplash -bg yellow "$WAIT_PLS"
+       ldd /usr/lib/mozilla/plugins/libflashplayer.so > /dev/null 2>&1
+       [ $? -ne 0 ] && rm -f /usr/lib/mozilla/plugins/libflashplayer.so 2>/dev/null
+       if [ -f /usr/lib/mozilla/plugins/libflashplayer.so ];then
+        FLASHSIZE=$(du /usr/lib/mozilla/plugins/libflashplayer.so| cut -f1)
+        echo /usr/lib/mozilla/plugins/libflashplayer.so > /tmp/flashplayer.files #register
+        if [ -d /usr/lib/mozilla/plugins/usr ];then cp -rf /usr/lib/mozilla/plugins/usr / # v0.9: fix the ownership
+         if [ $? -eq 0 ];then
+          #LINE1="`ls -R /usr/lib/mozilla/plugins/usr|head -n1`"
+          #cd /usr/lib/mozilla/plugins
+          #ls -R usr|grep -v "$LINE1" >> /tmp/flashplayer.files  #register
+          find /usr/lib/mozilla/plugins/usr -type d -printf '/usr/%P/\n'  >> /tmp/flashplayer.files
+          find /usr/lib/mozilla/plugins/usr -type l -printf '/usr/%P\n'  >> /tmp/flashplayer.files
+          find /usr/lib/mozilla/plugins/usr -type f -printf '/usr/%P\n'  >> /tmp/flashplayer.files
+          cd $HOME
+          rm -rf /usr/lib/mozilla/plugins/usr
+          grep -vw '^flashplayer' $HOME/.packages/user-installed-packages > /tmp/user-installed-packages
+          NEWENTRY="flashplayer-11|flashplayer|11||Internet|${FLASHSIZE}K||flashplayer-11.pet||Adobe flashplayer plugin||||"
+          echo "$NEWENTRY" >> /tmp/user-installed-packages
+          mv -f /tmp/flashplayer.files /tmp/flashplayer-11.files	# name with version
+          cp -f /tmp/flashplayer-11.files /tmp/user-installed-packages $HOME/.packages/
+         fi
+         if [ -f /usr/share/applications/flash-player-properties.desktop ];then #fix .desktop for menu
+          OLDCATEGORY="`grep "^Categories" /usr/share/applications/flash-player-properties.desktop`"
+          NEWCATEGORY="Categories=X-Internet;"
+          OLDICON="`grep "^Icon" /usr/share/applications/flash-player-properties.desktop`"
+          NEWICON="Icon=/usr/share/icons/flash-player-properties.png"
+          sed -i -e "s%$OLDCATEGORY%$NEWCATEGORY%" \
+			  -e "s%$OLDICON%$NEWICON%" /usr/share/applications/flash-player-properties.desktop
+         fi
+         fixmenus
+         [ "`pidof jwm`" != "" ] && jwm -restart
+        fi
+        #http://flashblock.mozdev.org/
+        #LANG=C Xdialog --center --title "Adobe Flash Player" --icon "/usr/share/doc/flashlogo.gif" --msgbox "The Adobe Flash Player has been downloaded to:\\n /usr/lib/mozilla/plugins/libflashplayer.so\\nYou will need to exit from your web browser and restart it for the player to load" 0 0
+        NOFB="`grep -i -E "flashblock" $HOME/.packages/woof-installed-packages`"
+        if [ "$NOFB" = "" ];then
+         FLASHBLOCK='<hbox>
+            <pixmap><input file>/usr/share/icons/flashblock.png</input></pixmap>
+         <checkbox>
+           <label>'$(gettext "Open your browser at the mozilla Flashblock page")'</label>
+           <variable>OPENFB</variable>
+           <default>true</default>
+          </checkbox></hbox>'
+          else FLASHBLOCK='';
+        fi 
+        TEXT=$(gettext "The Adobe Flash Player has been downloaded to\n/usr/lib/mozilla/plugins/libflashplayer\nYou will need to exit from your web browser and restart it for the player to load")
+        export FDLG='<window title="'$T_title'">
+        <vbox>
+         <frame><hbox>
+          <pixmap><width>32</width><input file>/usr/share/doc/flashlogo.gif</input></pixmap>
+          <text usemarkup="true"><input>echo -en "'$TEXT'"</input></text>
+         </hbox></frame>
+         '"$FLASHBLOCK"'
+         <hbox>
+          <button ok></button>
+         </hbox>
+        </vbox>
+       </window>'
+       mysplash --stop
+       #I=$IFS; IFS="" 
+		STATEMENTS=$($GTKDIALOG -p FDLG -c) || echo "$FLDG" >&2 
+		STATEMENTS=$(echo "$STATEMENTS"|grep '^[A-Z][A-Z]*=')
+		eval "$STATEMENTS"
+		#IFS=$I
+		[ "$EXIT" = "OK" -a "$OPENFB" = "true" ] && \
+		exec $MYBROWSER http://flashblock.mozdev.org/
+		exit
+       else
+        #LANG=C Xdialog --center --title "Adobe Flash Player" --icon "/usr/share/doc/flashlogo.gif" --msgbox "Sorry, the Player did not download. Try the Puppy Package Manager." 0 0
+        TEXT=$(gettext "Sorry, the Player did not download. Try the Puppy Package Manager.")
+        export FDLG='<window title="'$T_title'">
+        <vbox>
+        <hbox>
+        <pixmap><width>32</width><input file>/usr/share/doc/flashlogo.gif</input></pixmap>
+        <text><input>echo -en "'$TEXT'"</input></text>
+        </hbox>
+        <hbox><button ok></button></hbox>
+        </vbox></window>'
+         mysplash --stop
+         $GTKDIALOG -p FDLG -c
+       fi
+      fi
+
+

@@ -1,0 +1,279 @@
+#!/bin/bash
+#Clock Set Gui 
+#Robert Lane 2009 2010 2011(tasmod)
+
+AFRICA="africa.pool.ntp.org"
+ASIA="asia.pool.ntp.org" 
+EUROPE="europe.pool.ntp.org" 
+NORTHAMERICA="north-america.pool.ntp.org " 
+SOUTHAMERICA="south-america.pool.ntp.org " 
+OCEANIA="oceania.pool.ntp.org" 
+UK="uk.pool.ntp.org" 
+
+HTIME=`cat /etc/clock | grep '^HWCLOCKTIME' | cut -d "=" -f 2 `
+L="localtime"
+U="utc"
+
+BLURB="# Psync autorun server location - Rob Lane (tasmod) 2011"
+
+case "$1" in
+AFRICA)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+           ntpdate  $AFRICA > /tmp/settertime
+        if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc 
+		fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "AFRICAREP" >> /usr/local/psync/setcountry
+;;
+ASIA)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+          ntpdate $ASIA > /tmp/settertime
+	      if [ $HTIME = $L ]
+		  then
+		  hwclock -w 
+		  fi
+		  if [ $HTIME = $U ]
+          then
+		  hwclock --systohc --utc 
+          fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "ASIAREP" >> /usr/local/psync/setcountry
+;;
+EUROPE)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+         ntpdate $EUROPE > /tmp/settertime
+        if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc 
+		fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "EUROPEREP" >> /usr/local/psync/setcountry
+;;
+NORTHAMERICA)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+         ntpdate  $NORTHAMERICA > /tmp/settertime
+        if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc 
+		fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "NORTHAMERICAREP" >> /usr/local/psync/setcountry
+;;
+SOUTHAMERICA)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+         ntpdate  $SOUTHAMERICA > /tmp/settertime
+	    if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc 
+		fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "SOUTHAMERICAREP" >> /usr/local/psync/setcountry
+;;
+OCEANIA)
+
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+        ntpdate $OCEANIA > /tmp/settertime
+		if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc
+		fi
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "OCEANIAREP" >> /usr/local/psync/setcountry
+;;
+UK)
+Xdialog --infobox "Setting Time ........Please wait" 12 40 &
+         ntpdate  $UK > /tmp/settertime
+		if [ $HTIME = $L ]
+		then
+		hwclock -w 
+		fi
+		if [ $HTIME = $U ]
+		then
+		hwclock --systohc --utc 
+		fi 
+NEWCURRENT_TIME=`date +%c`
+secs=`cat /tmp/settertime |grep 'offset'`
+offset=${secs#*offset}
+echo -e $BLURB  > /usr/local/psync/setcountry
+echo -e "UKREP" >> /usr/local/psync/setcountry
+;;
+
+################################################################
+#Autostart case select to run server pool country with no report
+#Exit command prevents GUI running
+################################################################
+
+AFRICAREP)
+           ntpdate  $AFRICA > /tmp/settertime
+           if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+ASIAREP)
+          ntpdate $ASIA > /tmp/settertime
+	      if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+EUROPEREP)
+         ntpdate $EUROPE > /tmp/settertime
+         if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+NORTHAMERICAREP)
+         ntpdate  $NORTHAMERICA > /tmp/settertime
+         if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+SOUTHAMERICAREP)
+         ntpdate  $SOUTHAMERICA > /tmp/settertime
+	    if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+OCEANIAREP)
+        ntpdate $OCEANIA > /tmp/settertime
+    	if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc 
+fi
+exit
+;;
+
+UKREP)
+         ntpdate  $UK > /tmp/settertime
+		 if [ $HTIME = $L ]
+then
+hwclock -w 
+fi
+if [ $HTIME = $U ]
+then
+hwclock --systohc --utc
+fi   
+exit
+;;
+esac
+
+
+   	
+cd $HOME
+export timeis="
+<window title=\"Synchronised System Time\">
+    <vbox>
+    <frame Updated Time>
+   	<text use-markup=\"true\"><label>\"<b>$NEWCURRENT_TIME</b>\"</label></text>
+	<text><label>\"       \"</label></text>
+	<text use-markup=\"true\"><label>\" <b>  Offset was $offset      </b>\"</label></text>
+	</frame>
+    <frame>
+    <text><label> To synchronise your clock at each startup. </label></text>
+    <text><label>Press the button for auto run at each startup.</label></text>
+    <text><label>\"       \"</label></text>
+    <hbox>
+	<button>
+    <input file icon=\"gtk-execute\"></input>
+    <label>Autostart</label>
+    <action>cp /usr/local/psync/timesync.sh  /root/Startup/timesync.sh</action>
+    <action> exit: gtkdialogue </action>
+    </button>
+    <button>
+    <input file icon=\"gtk-execute\"></input>
+    <label>Remove Autostart</label>
+    <action>rm /root/Startup/timesync.sh</action>
+    <action> exit: gtkdialogue </action>
+    </button>
+    <button>
+    <input file icon=\"gtk-close\"></input>
+    <label>Close</label>
+    </button>
+    </hbox>
+    </frame>
+    </vbox>
+</window>"
+
+#execute gtkdialog
+gtkdialog3 -c -p  timeis 
+
+
+

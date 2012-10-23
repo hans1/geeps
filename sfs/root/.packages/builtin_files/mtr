@@ -1,0 +1,17 @@
+/usr
+/usr/doc
+/usr/doc/mtr-0.80
+ AUTHORS
+ ChangeLog
+ COPYING
+ FORMATS
+ INSTALL
+ NEWS
+ README
+ SECURITY
+ TODO
+/usr/man
+/usr/man/man8
+ mtr.8.gz
+/usr/sbin
+ mtr

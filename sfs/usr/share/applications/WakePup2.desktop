@@ -1,0 +1,15 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=WakePup create boot floppy
+Name[ru]=Создание загрузочной дискеты
+Name[es]=WakePup-Crea Disco de Arranque
+Name[hu_HU]=WakePup boot floppy készítés
+Name[ja]=WakePup ブートフロッピーの作成
+Name[zh_CN]=WakePup 创建启动软盘
+Icon=mini-ray.xpm
+Comment=WakePup create boot floppy
+Exec=wakepup2
+Terminal=false
+Type=Application
+Categories=X-SetupUtility
+GenericName=WakePup create boot floppy

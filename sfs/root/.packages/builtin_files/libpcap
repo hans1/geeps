@@ -1,0 +1,8 @@
+/usr
+/usr/lib
+ libpcap.so
+ libpcap.so.0
+ libpcap.so.1
+ libpcap.so.1.1.1
+/usr/man
+/usr/man/man3

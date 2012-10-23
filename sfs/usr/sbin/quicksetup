@@ -1,0 +1,4 @@
+#!/bin/sh
+# quicksetup for compatibility with woof
+STARTUPSCRIPT=/root/Startup/firstrun
+[ -x "$STARTUPSCRIPT" ] && sh "$STARTUPSCRIPT" "$@"

@@ -1,0 +1,102 @@
+#!/bin/bash
+#
+# Code adapted for Puppy 1.0.9, JWM 1.7
+# by Kwiller on 6-May-2006
+#
+###################
+# 23aug2010 shinobar: remove warnings at parsing new config
+
+##-----taskbarPlace----->>
+
+TMP="/tmp/checklist.tmp.$$"
+ISSET="true"
+ISOFF="false"
+CONFIG="/root/.jwmrc-tray"
+CONFIG2="/root/.jwmrc-tray-bak"
+CONF="/root/.jwmrc-tray-temp"
+
+#----Set defaults---->>
+AUTO_OFF=ON
+AUTO_SET=off
+
+#----Are current settings non-default---->>
+SET_AHD=`grep -c "autohide=\"$ISSET\"" $CONFIG`
+
+if [ "$SET_AHD" -eq "1" ]; then
+    AUTO_OFF=off
+    AUTO_SET=ON
+fi
+
+#-----Backup current settings----->>
+cp $CONFIG $CONFIG2
+
+SEDSET=s!autohide=\"$ISOFF\"!autohide=\"$ISSET\"!g
+SEDOFF=s!autohide=\"$ISSET\"!autohide=\"$ISOFF\"!g
+
+
+#-------------gui----------->>
+
+Xdialog --backtitle "JWM Taskbar Configuration" \
+	--title "Taskbar" \
+        --radiolist "Choose a tray autohide option" 13 46 2 \
+"OFF"  "Tray Autohide off." $AUTO_OFF \
+"ON"    "Tray Autohide on" $AUTO_SET 2>$TMP
+
+retval=$?
+
+#--------cancel pressed----->>
+case $retval in
+  1 | 255) exit 0;;
+esac
+
+#---------save changes----->>
+
+OPTN=`cat $TMP`
+
+#-----If there new settings chosen then make the changes----->>
+if [ "$OPTN" = "ON" ]; then
+  if [ "$SET_AHD" -eq "0" ]; then
+    sed -e "$SEDSET" $CONFIG > $CONF
+    mv $CONF $CONFIG
+  fi
+else
+  if [ "$SET_AHD" -eq "1" ]; then
+    sed -e "$SEDOFF" $CONFIG > $CONF
+    mv $CONF $CONFIG
+  fi
+fi
+
+#------check new configuration----->>
+jwm -p 2>&1 | grep -v 'warning' > $TMP
+
+CHECKCONF=`cat $TMP`
+
+if [ "$OPTN" = "ON" ]; then
+  RES=`grep -c "autohide=\"$ISSET\"" $CONFIG`
+else
+  RES=`grep -c "autohide=\"$ISOFF\"" $CONFIG`
+fi
+
+#----notify of result----->>
+
+if [ "$RES" -eq "1" ]; then
+  if [ -z $CHECKCONF ]; then 
+    RESTOP="Change Saved"
+    RESMSG="The tray autohide option is now $OPTN"
+    rm -f $CONFIG2
+  else
+    RESTOP="Change Reversed"
+    RESMSG="New config corrupt. Keeping original"
+    mv $CONFIG2 $CONFIG
+  fi
+else
+  RESTOP="Change Failed"
+  RESMSG="Configuration has not been altered"
+  mv $CONFIG2 $CONFIG
+fi
+
+Xdialog --title "$RESTOP" --msgbox "$RESMSG" 0 0
+
+#--------clean exit------->>
+rm -f $TMP
+exit 0

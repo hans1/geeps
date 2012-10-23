@@ -1,0 +1,10 @@
+/usr
+/usr/local
+/usr/local/bin
+ 7z
+/usr/local/lib
+/usr/local/lib/p7zip
+ 7z
+ 7z.so
+/usr/local/lib/p7zip/Codecs
+ Rar29.so

@@ -1,0 +1,64 @@
+/usr
+/usr/bin
+ homebank
+/usr/share
+/usr/share/applications
+ homebank.desktop
+/usr/share/homebank
+/usr/share/homebank/datas
+ example.xhb
+ hb-categories-de.csv
+ hb-categories-en.csv
+ hb-categories-es.csv
+ hb-categories-fr.csv
+ hb-categories-it.csv
+ hb-categories-pt.csv
+ hb-categories-ro.csv
+ hb-categories-ru.csv
+/usr/share/homebank/icons
+/usr/share/homebank/icons/hicolor
+/usr/share/homebank/icons/hicolor/16x16
+/usr/share/homebank/icons/hicolor/16x16/actions
+ hb-account.png
+ hb-archive.png
+ hb-assign.png
+ hb-assign-run.png
+ hb-budget.png
+ hb-category.png
+ hb-file-export.png
+ hb-file-import.png
+ hb-filter.png
+ hb-ope-add.png
+ hb-ope-auto.png
+ hb-ope-delete.png
+ hb-ope-edit.png
+ hb-ope-herit.png
+ hb-ope-remind.png
+ hb-ope-show.png
+ hb-ope-valid.png
+ hb-payee.png
+ hb-rep-balance.png
+ hb-rep-budget.png
+ hb-rep-stats.png
+ hb-rep-time.png
+ hb-rep-vehicle.png
+ lpi-help.png
+/usr/share/homebank/icons/hicolor/16x16/status
+ pm-cash.png
+ pm-ccard.png
+ pm-check.png
+ pm-dcard.png
+ pm-deposit.png
+ pm-epayment.png
+ pm-fifee.png
+ pm-intransfer.png
+ pm-none.png
+ pm-standingorder.png
+ pm-transfer.png
+/usr/share/homebank/images
+ splash.png
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/16x16
+/usr/share/icons/hicolor/16x16/apps
+ homebank.png

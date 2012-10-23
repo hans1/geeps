@@ -1,0 +1,27 @@
+/etc
+/etc/hiawatha
+ cgi-wrapper.conf
+ hiawatha.conf
+ httpd.confORIG
+ mimetype.conf
+ php-fcgi.conf
+/root
+/root/Web-Server
+ hiawatha.htm
+ index.html
+/usr
+/usr/bin
+ ssi-cgi
+/usr/sbin
+ cgi-wrapper
+ hiawatha
+ hiawatha.run
+ newroot
+ php-fcgi
+ wigwam
+/usr/share
+/usr/share/doc
+ hiawatha.htm
+/var
+/var/log
+/var/log/hiawatha

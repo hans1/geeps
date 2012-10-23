@@ -1,0 +1,265 @@
+#!/bin/ash
+# pmirc: wanted to make a irc client with some initial user choices and working with busybox applets only...still some fine tuning of the formating could be done...
+# main irc function from
+# http://lists.canonical.org/pipermail/kragen-hacks/2008-February/000480.html
+# other bits from
+# http://www.murga-linux.com/puppy/viewtopic.php?p=486385#486385
+# https://github.com/pabloPXL/irc.sh
+# https://github.com/halhen/shic
+# works with telnet and nc - change 1 line down in script
+
+VER=0.2
+
+[ ! $DISPLAY ] && clear
+
+#parameters #01micko
+while [ $# != 0 ]; do
+	I=1
+	while [ $I -lt `echo $# | wc -c` ]; do
+		case $1 in
+			-v)echo "pmirc $VER" && exit;;
+			-h|--help)
+				echo 'pmirc
+  -v    Show version number and exit
+  -h    Show this help message
+  Run "pmirc"
+  Follow the prompts and make appropriate choices.
+  Puppy help is available on the Freenode server.
+  When you get logged into IRC type
+  "/join #puppylinux"
+  to get help for Puppy Linux
+  going-nuts, puppylinux forum'
+  [ $DISPLAY ] && sleep 20 #if invoked indirectly
+				exit;;
+		esac
+		shift
+		I=$(($I+1))
+	done
+done
+
+# Don't exit at Ctrl-C - from shic
+trap "echo" SIGINT
+
+# Clean up children at exit - from shic
+trap "kill 0" EXIT
+
+# version info
+version="pmimirc 0.1 ;-)"
+
+# where we are running from
+pmdir="$(pwd)"
+
+
+# colors
+CRE="$(echo -e '\r\033[K')"
+RED="$(echo -e '\033[1;31m')"
+GREEN="$(echo -e '\033[1;32m')"
+YELLOW="$(echo -e '\033[1;33m')"
+BLUE="$(echo -e '\033[1;34m')"
+MAGENTA="$(echo -e '\033[1;35m')"
+CYAN="$(echo -e '\033[1;36m')"
+WHITE="$(echo -e '\033[1;37m')"
+NORMAL="$(echo -e '\033[0;39m')"
+GRAY="$(echo -e '\e[1;30m')"
+
+ircserver="$1"
+nickname="$2"
+
+# handle input etc.
+debuglog () {
+while read line; do 
+  echo "$line"
+done
+}
+
+menu_fc() {
+echo -n > /tmp/selectlist
+clear
+COUNTER=0
+echo "#!/bin/ash
+echo \"\"
+echo \"\"
+echo \"\"
+echo \"${TITLE}\"
+echo \"${TEXT}\"
+echo \"\""> /tmp/dlg
+while read CHOICE; do
+  echo "echo \"$COUNTER. $CHOICE\"" >> /tmp/dlg
+  #create /tmp/selectlist
+  echo "$COUNTER) $CHOICE" >> /tmp/selectlist
+  let COUNTER=COUNTER+1
+done </tmp/choices
+let COUNTER=COUNTER-1
+echo "while :; do
+echo
+read REPLY
+if [ \$REPLY -ge 0 ]; then
+if [ \$REPLY -le $COUNTER ]; then
+echo \$REPLY >/tmp/reply; break;
+else
+echo \"??\"
+fi
+fi
+done" >> /tmp/dlg
+
+#run /tmp/dlg
+chmod 777 /tmp/dlg
+/tmp/dlg
+#check response
+[ "$(cat /tmp/reply)" = "" ] && echo "Cancel pressed or an error has occured - program will exit" && exit
+REPLY_NUM=$(cat /tmp/reply)
+while read line; do
+if [ ! "${line}" = "" ]; then
+  TEMP1=$(echo "$line" | wc -w)
+  if [ $TEMP1 -eq 1 ]; then
+    REPLY_NUM=$(echo "$line")
+  fi
+fi
+done < /tmp/reply
+REPLY_CHAR=$(cat /tmp/selectlist | grep ^$REPLY_NUM\) | cut -d " " -f2-100)
+}
+
+yesno_fc () {
+echo "Yes
+No" > /tmp/choices
+menu_fc
+}
+
+input_fc () {	#to be changed after rewrite of all scripts...
+clear
+echo "$TITLE"
+echo "$TEXT - write 'cancel' to exit."		
+while :; do
+  read TEXTINPUT
+  if [ "${TEXTINPUT}" = "cancel" ]; then
+    REPLY_NUM=cancel
+    REPLY_CHAR=cancel
+    sync
+    break
+  fi
+  if [ ! "${TEXTINPUT}" = "" ]; then
+    REPLY_NUM=$TEXTINPUT
+    REPLY_CHAR=$TEXTINPUT
+    break
+  else
+    echo "Please enter a value - try again or write cancel to exit/continue."
+  fi
+done
+}
+
+# choose server if not set by command line input
+if [ -z $ircserver ]; then
+TEXT="Please select irc server below:"
+echo "Cancel
+irc.freenode.net
+irc.galaxynet.org
+irc.fef.net
+irc.ircnet.com" > /tmp/choices
+menu_fc
+[ $REPLY_NUM -eq 0 ] && exit
+ircserver=$REPLY_CHAR
+fi 
+
+# choose nickname if not set by commandline
+if [ -z $nickname ]; then
+TEXT="Do you want to set your nickname? Otherwise
+a random name will be chosen."
+  yesno_fc
+  if [ $REPLY_NUM -eq 0 ]; then
+TEXT="Please enter the nickname you want to connect with"
+    input_fc
+    [ "${REPLY_CHAR}" = "cancel" ] && exit
+    nickname="$REPLY_CHAR"
+  else
+    nickname=pupngo_user_$RANDOM
+  fi
+fi
+
+# use formating or not
+TEXT="Do you want to use formated output
+(easier to read - less information)?"
+yesno_fc
+if [ $REPLY_NUM -eq 0 ]; then
+  BEAUTIFY="yes"
+fi
+
+# make a log
+[ ! -d $HOME/.pmirc ] && mkdir /root/.pmirc
+irclog=$HOME/.pmirc/$(busybox date +"%H_%M_%S")_pmirc.log
+echo -n "" > $irclog
+
+tmpdir=".tmp.pmirc.$$"
+mkdir "$tmpdir"
+cd "$tmpdir"
+
+# run it!
+(echo user pmirc hostname "$ircserver" :pmirc user
+echo nick "$nickname"
+> pmirc-responses
+tail -f pmirc-responses &
+while read command; do
+  case "$command" in
+	/JOIN*|/join*) echo "joining" >/dev/tty
+	    set $command; currentchan="$2"
+		echo "$command" > .pmtmp
+		dd bs=1 skip=1 < .pmtmp 2>/dev/null;;
+	/PART*|/part*) echo "leaving channel $currentchan" >/dev/tty
+	    echo "/part $currentchan" > .pmtmp
+		dd bs=1 skip=1 < .pmtmp 2>/dev/null;;
+	/QUIT*|/quit*) echo "quiting server $ircserver" >/dev/tty
+	    echo "/QUIT :I'm out - bye." > .pmtmp
+	    dd bs=1 skip=1 < .pmtmp 2>/dev/null
+	    sleep 2
+	    echo 	#need this to quit clean?
+	    cd $pmdir
+	    rm -rf "$tmpdir"
+	    exit;;
+	/*) echo "$command" > .pmtmp
+		dd bs=1 skip=1 < .pmtmp 2>/dev/null;;
+	*)  echo "PRIVMSG $currentchan :$command";;
+  esac
+#done) | debuglog | nc "$ircserver" 6667 | while read response
+done) | debuglog | telnet "$ircserver" 6667 | while read response
+   do echo "$response" >> $irclog
+   
+	case "$response" in
+	"PING "*) echo "responding to ping" >> $irclog
+		set $response
+		shift
+		echo "PONG $*" >> pmirc-responses;;
+	*"VERSION"*)
+	    echo "responding to version" >> $irclog
+	    echo "NOTICE "$nickname" : VERSION "$version >> pmirc-responses;;
+	*"JOIN"*|*"PART"*|*"QUIT"*)
+	    if [ "${BEAUTIFY}" = "yes" ]; then
+	      echo "${MAGENTA}$response${NORMAL}"
+	    else
+	      echo "$response"
+	    fi
+        ;;
+    *"ERROR"*)
+        if [ "${BEAUTIFY}" = "yes" ]; then
+          response=$(echo "$response" | sed 's/ERROR ://g')
+	      echo "${RED}$response${NORMAL}"
+	    else
+	      echo "$response"
+	    fi
+	    ;;
+    *"PRIVMSG"*)
+	    if [ "${BEAUTIFY}" = "yes" ]; then
+	      response=$(echo "$response" | tr -s ' ' | sed -e 's/\!~.* PRIVMSG.*:/: /g')
+          echo "${GREEN}$response${NORMAL}" 
+        else
+          echo "$response"
+        fi
+        ;;
+    *)  if [ "${BEAUTIFY}" = "yes" ]; then
+          response=$(echo "$response" | tr -s ' ' | sed -e 's/\:.*:-/-/g' -e 's/^:.*:/- /g')
+          echo "${GREY}$response${NORMAL}" 
+        else
+          echo "$response"
+        fi
+        ;;
+	esac
+done
+

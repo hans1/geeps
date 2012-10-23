@@ -1,0 +1,264 @@
+/etc
+/etc/cups
+ cupsd.conf
+ cupsd.conf.default
+ cupsd.confOLD1
+/etc/cups/interfaces
+/etc/cups/ppd
+/etc/cups/ssl
+/etc/dbus-1
+/etc/dbus-1/system.d
+ cups.conf
+/etc/init.d
+ cups
+/etc/pam.d
+/usr
+/usr/bin
+ cancel
+ cancel-cups
+ cups-config
+ cupstestdsc
+ cupstestppd
+ lp
+ lp-cups
+ lpoptions
+ lppasswd
+ lpq
+ lpq-cups
+ lpr
+ lpr-cups
+ lprm
+ lprm-cups
+ lpstat
+ lpstat-cups
+ ppdc
+ ppdhtml
+ ppdi
+ ppdmerge
+ ppdpo
+/usr/doc
+/usr/doc/cups
+/usr/doc/cups-1.4.6
+ CHANGES.txt
+ cups.css
+ cups-printable.css
+/usr/doc/cups-1.4.6/help
+/usr/doc/cups-1.4.6/images
+ color-wheel.png
+ cups-block-diagram.png
+ cups-command-chain.png
+ cups-icon.png
+ cups.png
+ cups-postscript-chain.png
+ cups-raster-chain.png
+ generic.png
+ left.gif
+ raster.png
+ right.gif
+ sel.gif
+ smiley.jpg
+ unsel.gif
+ wait.gif
+/usr/lib
+/usr/lib/cups
+/usr/lib/cups/backend
+ http
+ ipp
+ lpd
+ parallel
+ scsi
+ serial
+ snmp
+ socket
+ usb
+/usr/lib/cups/cgi-bin
+ admin.cgi
+ classes.cgi
+ help.cgi
+ jobs.cgi
+ printers.cgi
+/usr/lib/cups/daemon
+ cups-deviced
+ cups-driverd
+ cups-lpd
+ cups-polld
+/usr/lib/cups/driver
+/usr/lib/cups/filter
+ bannertops
+ commandtoescpx
+ commandtopclx
+ commandtops
+ gziptoany
+ hpgltops
+ imagetops
+ imagetoraster
+ pdftops
+ pstops
+ rastertodymo
+ rastertoepson
+ rastertoescpx
+ rastertohp
+ rastertolabel
+ rastertopclx
+ texttops
+/usr/lib/cups/monitor
+ bcp
+ tbcp
+/usr/lib/cups/notifier
+ dbus
+ mailto
+ rss
+/usr/sbin
+ accept
+ cupsaccept
+ cupsaddsmb
+ cupsctl
+ cupsd
+ cupsdisable
+ cupsenable
+ cupsfilter
+ cupsreject
+ lpadmin
+ lpc
+ lpc-cups
+ lpinfo
+ lpmove
+ reject
+/usr/share
+/usr/share/cups
+/usr/share/cups/banners
+ classified
+ confidential
+ secret
+ standard
+ topsecret
+ unclassified
+/usr/share/cups/charmaps
+ iso-8859-15.txt
+ iso-8859-16.txt
+ iso-8859-1.txt
+ iso-8859-2.txt
+ koi8-r.txt
+ koi8-u.txt
+ mac-roman.txt
+/usr/share/cups/charsets
+ iso-8859-1
+ iso-8859-15
+ iso-8859-2
+ koi8-r
+ koi8-u
+ utf-8
+/usr/share/cups/data
+ HPGLprolog
+ psglyphs
+ testprint
+/usr/share/cups/doc-root
+/usr/share/cups/doc-root/help
+/usr/share/cups/doc-root/images
+/usr/share/cups/drivers
+/usr/share/cups/fonts
+/usr/share/cups/mime
+ mime.convs
+ mime.types
+/usr/share/cups/ppdc
+ epson.h
+ escp.h
+ font.defs
+ hp.h
+ label.h
+ media.defs
+ pcl.h
+ raster.defs
+/usr/share/cups/templates
+ add-class.tmpl
+ add-printer.tmpl
+ add-rss-subscription.tmpl
+ admin.tmpl
+ choose-device.tmpl
+ choose-make.tmpl
+ choose-model.tmpl
+ choose-serial.tmpl
+ choose-uri.tmpl
+ class-added.tmpl
+ class-confirm.tmpl
+ class-deleted.tmpl
+ classes-header.tmpl
+ classes.tmpl
+ class-jobs-header.tmpl
+ class-modified.tmpl
+ class.tmpl
+ command.tmpl
+ edit-config.tmpl
+ error-op.tmpl
+ error.tmpl
+ header.tmpl
+ help-header.tmpl
+ help-printable.tmpl
+ help-trailer.tmpl
+ job-cancel.tmpl
+ job-hold.tmpl
+ job-moved.tmpl
+ job-move.tmpl
+ job-release.tmpl
+ job-restart.tmpl
+ jobs-header.tmpl
+ jobs.tmpl
+ list-available-printers.tmpl
+ modify-class.tmpl
+ modify-printer.tmpl
+ norestart.tmpl
+ option-boolean.tmpl
+ option-conflict.tmpl
+ option-header.tmpl
+ option-pickmany.tmpl
+ option-pickone.tmpl
+ option-trailer.tmpl
+ pager.tmpl
+ printer-accept.tmpl
+ printer-added.tmpl
+ printer-configured.tmpl
+ printer-confirm.tmpl
+ printer-default.tmpl
+ printer-deleted.tmpl
+ printer-jobs-header.tmpl
+ printer-modified.tmpl
+ printer-purge.tmpl
+ printer-reject.tmpl
+ printers-header.tmpl
+ printer-start.tmpl
+ printers.tmpl
+ printer-stop.tmpl
+ printer.tmpl
+ restart.tmpl
+ samba-exported.tmpl
+ samba-export.tmpl
+ search.tmpl
+ set-printer-options-header.tmpl
+ set-printer-options-trailer.tmpl
+ subscription-added.tmpl
+ subscription-canceled.tmpl
+ test-page.tmpl
+ trailer.tmpl
+ users.tmpl
+/usr/share/doc
+/usr/share/doc/cups
+/usr/share/doc/cups-1.4.6
+/usr/share/ppd
+ Brother-HL-2040-hl1250.ppd
+/var
+/var/cache
+/var/cache/cups
+/var/cache/cups/ppd
+/var/cache/cups/rss
+/var/cups
+/var/cups/log
+/var/cups/ppd
+/var/cups/rss
+/var/log
+/var/log/cups
+/var/run
+/var/run/cups
+/var/run/cups/certs
+/var/spool
+/var/spool/cups
+/var/spool/cups/tmp

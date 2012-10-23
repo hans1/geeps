@@ -1,0 +1,4 @@
+if [ "$( cat /tmp/curlftpfs.error | grep Error)" != "" ] ; then
+Xdialog --title "Setup File Sharing" --stdout --ok-label "OK" --infobox "Can not connect to server." 0 0 90000
+exit
+fi

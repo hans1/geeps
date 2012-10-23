@@ -1,0 +1,5 @@
+/usr
+/usr/lib
+ libmng.so
+ libmng.so.1
+ libmng.so.1.0.0

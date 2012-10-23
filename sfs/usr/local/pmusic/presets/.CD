@@ -1,0 +1,63 @@
+#!/bin/sh
+set -a
+
+. $APPDIR/gui_misc
+. $APPDIR/gui_playlist
+. $APPDIR/gui_navigation
+. $APPDIR/gui_mixer
+
+GUI='
+<window title="Pmusic" icon-name="gtk-media-stop" default_height="450" default_width="300">
+ <vbox>
+  <hbox height-request="70" spacing="0">
+   <hbox spacing="0">
+    <button relief="2" tooltip-text="'$LOC131'">
+     <variable>ARTWORK</variable>
+     <input file>'$HOME'/.pmusic/nowplaying_albumart.jpg</input>
+     <width>60</width>
+     <action>'$APPDIR'/func_trackinfo -showtab_albumart &</action>
+    </button>
+   </hbox>
+   <vbox scrollable="true" spacing="0" width="250" width-request="10"> ##width-request to avoid scrollbars
+    <text height-request="5"><label>""</label></text>
+    <hbox spacing="0">
+     '$GUI_MIXER'
+     '$GUI_NAVIGATION'
+     '$GUI_BUTTON_PLAYMODE'
+     <text width-request="3"><label>""</label></text>
+    </hbox>
+    <text height-request="15"><label>""</label></text>
+    '$GUI_PROGRESSBAR'
+    '$GUI_PROGRESS'
+   </vbox>
+  </hbox>
+  
+  <hbox homogeneous="true"><hbox>
+   <button tooltip-text="'$LOC701'"><label>" '$LOC700' "</label><action>'$APPDIR'/func_export</action></button>
+   <button tooltip-text="'$LOC703'">
+    <label>" '$LOC702' "</label>
+    <action>'$APPDIR'/func_player -stop</action>
+    <action>[ -f '$APPDIR'/themes/'$THEME'/icon_pause.png ] && cp -f '$APPDIR'/themes/'$THEME'/icon_play.png '$WORKDIR'/icon_playpause.png</action>
+    <action>echo > '$WORKDIR'/UPDATE_GUI</action>
+    <action>pburn -m copy-audio &</action>
+   </button>
+   <button tooltip-text="'$LOC705'"><label>" '$LOC704' "</label><action>'$APPDIR'/func_player -stop</action><action>'$APPDIR'/func_cd -play_cd</action></button>
+   <button>
+    <label>" '$LOC108' "</label>
+    <action>'$APPDIR'/func_player -stop</action>
+    <action>[ -f '$APPDIR'/themes/'$THEME'/icon_pause.png ] && cp -f '$APPDIR'/themes/'$THEME'/icon_play.png '$WORKDIR'/icon_playpause.png</action>
+    <action>echo > '$WORKDIR'/UPDATE_GUI</action>
+    <action>eject</action>
+   </button>
+   <button><input file stock="gtk-preferences"></input><action>'$APPDIR'/func_config -playback</action></button>
+  </hbox>
+  </hbox>
+  '$GUI_PLAYLIST_FIELD'
+  '$GUI_STATUSBAR'
+ </vbox>
+ <action signal="show">echo > '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">rm -f '$WORKDIR'/gui_is_running</action>
+ <action signal="delete-event">'$APPDIR'/func -quit</action>
+ <action signal="delete-event">exit:Exit</action>
+</window>'
+

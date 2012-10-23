@@ -1,0 +1,10 @@
+/usr
+/usr/share
+/usr/share/themes
+/usr/share/themes/Gradient-grey
+/usr/share/themes/Gradient-grey/gtk-2.0
+ default.png
+ gtkrc
+ tab1.png
+ tab2.png
+ tab3.png

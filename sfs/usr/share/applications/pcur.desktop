@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Pcur cursor selector
+Name[ru]=Pcur выбор курсора
+Name[es]=Pcur-Selector de Cursor de Ratón
+Name[hu_HU]=Pcur kurzorválasztó
+Name[ja]=Pcur カーソルの変更
+Icon=default_left_ptr.png
+Comment=Mouse cursor selector
+Exec=pcur
+Terminal=false
+Type=Application
+Categories=X-Desktop
+GenericName=Pcur

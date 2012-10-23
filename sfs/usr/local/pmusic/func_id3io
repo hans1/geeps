@@ -1,0 +1,62 @@
+#!/bin/bash
+#this tool reads/writes meta-tags used by Pmusic.
+#Uses libid3 (optional), ffmpeg and a builtin id3V1 reader.
+
+#Genre is returning number and not the genre-name. This because of speed. This convert should be done in the funtion calling func_id3io.  
+
+FILE="$1"
+
+case "$2" in
+-read)
+#	ID3_TITLE=""
+#	ID3_ARTIST=""
+#	ID3_ALBUM=""
+#	ID3_YEAR=""
+#	#ID3_COMMENT=""
+#	ID3_TRACK=""
+#	ID3_GENRE=""
+	
+#	#libid3 -  handles also id3 version 2 - *.ape *.mp3 *.ogg *.wma ????????????
+#	if [ "$(which id3info 2> /dev/null)" ] && [ "`echo "$FILE" | grep -iE "\.ape|\.mp3|\.ogg|\.wma"`" ]; then
+#		ID3INFO="$(id3info "$FILE")"
+#		ID3_BITRATE="$(grep -F 'Bitrate' <<<"$ID3INFO" | cut -d: -f2 | cut -dK -f1)"
+#		ID3_TITLE="$(grep -Fm1 'Title' <<<"$ID3INFO" | cut -d: -f2- | cut -b 2-)"
+#		if [ "$ID3_TITLE" ] && [ ! "$(grep -iE "^ $|unknown" <<<"$ID3_TITLE")" ]; then #use meta-tags only if 'title' exists
+#			ID3_ARTIST="$(grep -Fm1 'Lead performer' <<<"$ID3INFO" | cut -d: -f2- | cut -b2-)"
+#			ID3_ALBUM="$(grep -Fm1 'Album' <<<"$ID3INFO" | cut -d: -f2- | cut -b2-)"
+#			ID3_TRACK="$(grep -Fm1 'Track' <<<"$ID3INFO" | cut -d: -f2 | cut -b2-)"
+#			[ "$ID3_TRACK" = "99" ] && ID3_TRACK=' ' #if set to 99 (cleared), show only a space.
+#			ID3_YEAR="$(grep -Fm1 'Year' <<<"$ID3INFO" | cut -d: -f2 | cut -b2-)"
+#			ID3_GENRE="$(grep -Fm1 '(Content' <<<"$ID3INFO" | cut -d'(' -f3 | cut -d')' -f1)"
+#		fi
+#	#ffmpeg - supports *.m4a *.mp3 *.wma *.rm
+#	else
+		ffmpeg -i "$FILE" > $WORKDIR/tmp_id3ffmpeg 2>&1
+		ID3_BITRATE="`grep -wm1 "Audio:" $WORKDIR/tmp_id3ffmpeg | cut -d, -f5 | cut -d' ' -f2`"
+		ID3_TITLE="`grep -wim1 "^    title" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		ID3_ARTIST="`grep -wim1 "^    artist" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		ID3_ALBUM="`grep -wim1 "^    album" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		ID3_YEAR="`grep -wim1 "^    year" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+#		[ ! "$ID3_YEAR" ] && ID3_YEAR="`grep -wim1 "^    date" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		#ID3_COMMENT="`grep -wim1 "^    comment" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		ID3_TRACK="`grep -wim1 "^    track" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+		ID3_GENRE="`grep -wim1 "^    genre" $WORKDIR/tmp_id3ffmpeg | cut -d: -f2- | cut -d' ' -f2-`"
+#	fi
+	;;
+-write)
+#	if [ "$(which id3tag 2> /dev/null)" ] && [ "`echo "$FILE" | grep -iE "\.ape|\.mp3|\.ogg|\.wma"`" ]; then
+#		id3tag -a "$ID3_ARTIST" -s "$ID3_TITLE" -A "$ID3_ALBUM" -y "$ID3_YEAR" -t$ID3_TRACK -g "$ID3_GENRE" "$FILE" #-c "$ID3_COMMENT"
+#	else
+#		NAME="`basename "$FILE" | sed -e 's/\.[^\.]*$//'`"
+		EXTENSION="`basename "$FILE" | sed -e "s/^.*\.//g"`"
+		ffmpeg -i "$FILE" -acodec copy -id3v2_version 3 -metadata title="$ID3_TITLE" -metadata artist="$ID3_ARTIST" -metadata album="$ID3_ALBUM" -metadata year="$ID3_YEAR" -metadata track="$ID3_TRACK" -metadata genre="$ID3_GENRE" -y $WORKDIR/tmp_ffmpeg_copy.$EXTENSION
+		mv -f $WORKDIR/tmp_ffmpeg_copy.$EXTENSION "$FILE"
+#	fi
+	;;
+-clear)
+	EXTENSION="`basename "$FILE" | sed -e "s/^.*\.//g"`"
+	ffmpeg -i "$FILE" -acodec copy -id3v2_version 3 -metadata title='' -metadata artist='' -metadata album='' -metadata year='' -metadata track='' -metadata genre='' -y $WORKDIR/tmp_ffmpeg_copy.$EXTENSION
+	mv -f $WORKDIR/tmp_ffmpeg_copy.$EXTENSION "$FILE"
+	;;
+esac
+

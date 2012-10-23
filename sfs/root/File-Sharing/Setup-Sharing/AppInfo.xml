@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<AppInfo>
+  <Summary>Puppy File Sharing</Summary>
+  <About>
+    <Purpose>Samba like file sharing with Curlftpfs</Purpose>
+    <Version>0.1</Version>
+    <PuppyHomepage>http://www.puppylinux.com/</PuppyHomepage>
+  </About>
+</AppInfo>

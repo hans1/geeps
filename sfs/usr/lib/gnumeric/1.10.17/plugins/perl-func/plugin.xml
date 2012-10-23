@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="Gnumeric_PerlFunc">
+	<information>
+		<name>Perl functions</name>
+		<name xml:lang="ast">Funciones Perl</name>
+		<name xml:lang="bg">Функции на Perl</name>
+		<name xml:lang="ca">Funcions del Perl</name>
+		<name xml:lang="ca@valencia">Funcions del Perl</name>
+		<name xml:lang="cs">Funkce jazyka Perl</name>
+		<name xml:lang="da">Perl funktioner</name>
+		<name xml:lang="de">Perl-Funktionen</name>
+		<name xml:lang="dz">པརཱལ་ལས་འགན་ཚུ་</name>
+		<name xml:lang="el">Συναρτήσεις Perl</name>
+		<name xml:lang="en_CA">Perl functions</name>
+		<name xml:lang="en_GB">Perl functions</name>
+		<name xml:lang="es">Funciones Perl</name>
+		<name xml:lang="et">Perli funktsioonid</name>
+		<name xml:lang="eu">Perl funtzioak</name>
+		<name xml:lang="fi">Perl-funktioita</name>
+		<name xml:lang="fr">Fonctions Perl</name>
+		<name xml:lang="gu">Perl વિધેયો</name>
+		<name xml:lang="he">פונקציות Perl</name>
+		<name xml:lang="hu">Perl függvények</name>
+		<name xml:lang="id">Fungsi-fungsi Perl</name>
+		<name xml:lang="it">Funzioni Perl</name>
+		<name xml:lang="ko">펄 함수</name>
+		<name xml:lang="lt">Perl funkcijos</name>
+		<name xml:lang="mk">Perl функции</name>
+		<name xml:lang="nb">Perl-fuksjoner</name>
+		<name xml:lang="ne">पर्ल प्रकार्य</name>
+		<name xml:lang="nl">Perl-functies</name>
+		<name xml:lang="nn">Perl-funksjonar</name>
+		<name xml:lang="pt_BR">Funções Perl</name>
+		<name xml:lang="ru">Функции Perl</name>
+		<name xml:lang="sl">Perl funkcije</name>
+		<name xml:lang="sv">Perlfunktioner</name>
+		<name xml:lang="vi">Hàm Perl</name>
+		<name xml:lang="zh_TW">Perl 函數</name>
+		<description>Sample Perl plugin providing some (useless) functions.</description>
+		<description xml:lang="ast">Complementu de muestra de Perl que proporciona dalgunes funciones (inútiles) d'exemplu.</description>
+		<description xml:lang="bg">Примерен модул на Perl, осигуряващ някои (безполезни) функции.</description>
+		<description xml:lang="ca">Connector Perl de mostra amb algunes funcions poc útils.</description>
+		<description xml:lang="ca@valencia">Connector Perl de mostra amb algunes funcions poc útils.</description>
+		<description xml:lang="cs">Ukázkový zásuvný modul v jazyce Perl poskytující pár (neužitečných) funkcí.</description>
+		<description xml:lang="de">Beispiel-Perl-Plugin mit ein paar (nutzlosen) Funktionen.</description>
+		<description xml:lang="dz">(ཕན་མེད་)ལས་འགན་ལ་ལུ་ཅིག་བྱིན་མི་ དཔེ་ཚད་པརཱལ་པ་ལག་ཨིན།</description>
+		<description xml:lang="el">Δείγμα πρόσθετης λειτουργίας Perl που παρέχει μερικές (άχρηστες) συναρτήσεις.</description>
+		<description xml:lang="en_CA">Sample Perl plugin providing some (useless) functions.</description>
+		<description xml:lang="en_GB">Sample Perl plugin providing some (useless) functions.</description>
+		<description xml:lang="es">Complemento de muestra de Perl que proporciona algunas funciones (inútiles) de ejemplo.</description>
+		<description xml:lang="et">Perli näidisplugin mõningate (kasutute) funktsioonidega.</description>
+		<description xml:lang="eu">Adibidezko Perl plugina, hainbat funtzio (baliogabe) biltzen dituena.</description>
+		<description xml:lang="fi">Esimerkki Perl-liitännäisestä, joka tarjoaa joitain (hyödyttömiä) funktioita.</description>
+		<description xml:lang="fr">Greffon d'exemple Perl, fournissant quelques fonctions (inutiles).</description>
+		<description xml:lang="hu">Minta Perl bővítmény, amely néhány (haszontalan) függvényt biztosít.</description>
+		<description xml:lang="id">Plugin Sample Perl menyediakan beberapa fungsi (tak-berguna).</description>
+		<description xml:lang="it">Plugin Perl d'esempio che fornisce alcune (inutili) funzioni.</description>
+		<description xml:lang="lt">Parodomasis Perl papildinys, suteikiantis keletą (nenaudingų) funkcijų.</description>
+		<description xml:lang="nb">Eksempel på Perl-tillegg som har noen (ubrukelige) funksjoner.</description>
+		<description xml:lang="ne">नमूना पर्ल प्लगइन केही (बेकार) प्रकार्यहरू प्रदान गर्दैछ।</description>
+		<description xml:lang="nl">Voorbeeld Perl plugin met enkele (zinloze) functies.</description>
+		<description xml:lang="pt_BR">Um exemplo de plugin Perl fornecendo algumas funções (inúteis).</description>
+		<description xml:lang="ru">Образец дополнения Perl предоставляющий несколько (бесполезных) функций.</description>
+		<description xml:lang="sv">Exempelinsticksmodul för Perl som tillhandahåller en del (onödiga) funktioner.</description>
+		<description xml:lang="vi">Bổ sung Perl mẫu, cung cấp một vài hàm (vô ích).</description>
+		<description xml:lang="zh_TW">Perl 增效模組範例，提供一些 (沒用的) 函數。</description>
+		<require_explicit_enabling/>
+	</information>
+	<loader type="Gnumeric_PerlLoader:perl">
+		<attribute value="perl_func" name="module_name"/>
+	</loader>
+	<services>
+		<service type="function_group" id="test">
+			<category>Perl</category>
+			<category xml:lang="am">Perl</category>
+			<category xml:lang="ar">Perl</category>
+			<category xml:lang="ast">Perl</category>
+			<category xml:lang="az">Perl</category>
+			<category xml:lang="bg">Perl</category>
+			<category xml:lang="ca">Perl</category>
+			<category xml:lang="ca@valencia">Perl</category>
+			<category xml:lang="cs">Perl</category>
+			<category xml:lang="da">Perl</category>
+			<category xml:lang="de">Perl</category>
+			<category xml:lang="dz">པརཱལ་</category>
+			<category xml:lang="el">Perl</category>
+			<category xml:lang="en_CA">Perl</category>
+			<category xml:lang="en_GB">Perl</category>
+			<category xml:lang="es">Perl</category>
+			<category xml:lang="et">Perl</category>
+			<category xml:lang="eu">Perl</category>
+			<category xml:lang="fi">Perl</category>
+			<category xml:lang="fr">Perl</category>
+			<category xml:lang="ga">Perl</category>
+			<category xml:lang="gl">Perl</category>
+			<category xml:lang="gu">Perl</category>
+			<category xml:lang="he">Perl</category>
+			<category xml:lang="hr">Perl</category>
+			<category xml:lang="hu">Perl</category>
+			<category xml:lang="id">Perl</category>
+			<category xml:lang="it">Perl</category>
+			<category xml:lang="ja">Perl</category>
+			<category xml:lang="ko">펄</category>
+			<category xml:lang="lt">Perl</category>
+			<category xml:lang="lv">Perl</category>
+			<category xml:lang="mk">Perl</category>
+			<category xml:lang="ml">പേള്</category>
+			<category xml:lang="mr">पर्ल</category>
+			<category xml:lang="ms">Perl</category>
+			<category xml:lang="nb">Perl</category>
+			<category xml:lang="ne">पर्ल</category>
+			<category xml:lang="nl">Perl</category>
+			<category xml:lang="nn">Perl</category>
+			<category xml:lang="oc">Perl</category>
+			<category xml:lang="pl">Perl</category>
+			<category xml:lang="pt">Perl</category>
+			<category xml:lang="pt_BR">Perl</category>
+			<category xml:lang="ro">Perl</category>
+			<category xml:lang="ru">Perl</category>
+			<category xml:lang="rw">Perl</category>
+			<category xml:lang="sk">Perl</category>
+			<category xml:lang="sl">Perl</category>
+			<category xml:lang="sr">Перл</category>
+			<category xml:lang="sr@latin">Perl</category>
+			<category xml:lang="sv">Perl</category>
+			<category xml:lang="tr">Perl</category>
+			<category xml:lang="uk">PERL</category>
+			<category xml:lang="vi">Perl</category>
+			<category xml:lang="zh_CN">Perl</category>
+			<category xml:lang="zh_TW">Perl</category>
+			<functions>
+				<function name="perl_adder"/>
+				<function name="perl_date"/>
+				<function name="perl_sed"/>
+			</functions>
+		</service>
+	</services>
+</plugin>

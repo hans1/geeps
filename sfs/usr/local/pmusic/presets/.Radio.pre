@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#remove xml-file to force fresh load of gui
+#this frontend require its own functions that needs to be loaded at every startup
+#the load-time is anyway very small
+rm -f $WORKDIR/xml_Pmusic

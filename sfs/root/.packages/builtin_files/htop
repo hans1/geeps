@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ htop
+/usr/share
+/usr/share/applications
+ htop.desktop
+/usr/share/pixmaps
+ htop.png

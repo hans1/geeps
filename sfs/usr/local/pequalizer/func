@@ -1,0 +1,128 @@
+#!/bin/bash
+#pEqualizer
+
+case "$1" in
+-gui)
+	COUNT=1
+	until [ $COUNT = 11 ]; do 
+		case $COUNT in #labels
+			1) FR="31Hz"; FREQ='01. 31 Hz';;
+			2) FR="63Hz"; FREQ='02. 63 Hz';;
+			3) FR="125Hz"; FREQ='03. 125 Hz';;
+			4) FR="250Hz"; FREQ='04. 250 Hz';;
+			5) FR="500Hz"; FREQ='05. 500 Hz';;
+			6) FR="1kHz"; FREQ='06. 1 kHz';;
+			7) FR="2kHz"; FREQ='07. 2 kHz';;
+			8) FR="4kHz"; FREQ='08. 4 kHz';;
+			9) FR="8kHz"; FREQ='09. 8 kHz';;
+			10) FR="16kHz"; FREQ='10. 16 kHz';;
+		esac
+		#<action>echo "'$VARIABLE' is now $'$VARIABLE'"</action> #this was for testing
+		SCALES=$SCALES'
+		<vbox width-request="28">
+		 <vscale width-request="15" height-request="150" scale-min="0" scale-max="100" scale-step="1" value-pos="2" digits="0" inverted="true">
+		   <input file>/tmp/eq/VAL'$COUNT'</input>
+		   <variable>SLIDER'$COUNT'</variable>
+		   <action>amixer -D equal sset '"'$FREQ'"' $SLIDER'$COUNT' >/dev/null 2>&1</action>         
+		   <item>"50  | 1"</item>
+		  </vscale>
+		 <text use-markup="true"><label>"<tt><small><small>'${FR}'</small></small></tt>"</label></text>
+		</vbox>'
+		COUNT=$(($COUNT+1))
+	done		
+	;;
+
+-preset)
+	cp -f $HOME/.pequalizer/preset/$PRESET /tmp/eq/valuesrc
+	. /tmp/eq/valuesrc 
+	eval /usr/local/pequalizer/func -links #update images
+	COUNT=1
+	for VAL in '01._31_Hz' '02._63_Hz' '03._125_Hz' '04._250_Hz' '05._500_Hz' '06._1_kHz' '07._2_kHz' '08._4_kHz' '09._8_kHz' '10._16_kHz'; do
+		ACTVAL="`echo "$VAL"|tr '_' ' '`"
+		case $COUNT in #values
+			1)SETVAL="$VAL1";;
+			2)SETVAL="$VAL2";;
+			3)SETVAL="$VAL3";;
+			4)SETVAL="$VAL4";;
+			5)SETVAL="$VAL5";;
+			6)SETVAL="$VAL6";;
+			7)SETVAL="$VAL7";;
+			8)SETVAL="$VAL8";;
+			9)SETVAL="$VAL9";;
+			10)SETVAL="$VAL10";;
+		esac
+		#echo "amixer -D equal sset "$ACTVAL" "$SETVAL"" >> /root/debug #debug remove
+		amixer -D equal sset "$ACTVAL" "$SETVAL" >/dev/null 2>&1 #set mixer, suppress stdout and stderr
+		echo $SETVAL > /tmp/eq/VAL$COUNT
+		COUNT=$(($COUNT+1))
+	done
+	/usr/local/pequalizer/func -writeconfig
+	;;
+
+-writeconfig)
+	echo "#pEqualizer config"				 > $HOME/.pequalizer/pequalizerrc
+	echo "export PRESET=$PRESET"			>> $HOME/.pequalizer/pequalizerrc
+	;;
+
+-getcurrent)
+	#get current values #could be a problem here if there is surround enabled
+	echo "#values" > /tmp/eq/valuesrc
+	CNT=1
+	for VAL in '01._31_Hz' '02._63_Hz' '03._125_Hz' '04._250_Hz' '05._500_Hz' '06._1_kHz' '07._2_kHz' '08._4_kHz' '09._8_kHz' '10._16_kHz'; do
+		ACTVAL="`echo "$VAL"|tr '_' ' '`"
+		PERCENT="`amixer -D equal sget "$ACTVAL" | grep -F "Left:" | cut -d ':' -f2 | cut -d' ' -f3`"
+		echo "VAL${CNT}=$PERCENT" >> /tmp/eq/valuesrc
+		echo "$PERCENT" > /tmp/eq/VAL${CNT}
+		CNT=$(($CNT+1))
+	done
+	#error check and fix
+	if [ ! -f $HOME/.alsaequal.bin ];then 
+		gtkdialog-splash -close box -bg hotpink -text "An error occurred. When you close this box a window will open to attempt to fix the problem"
+		/usr/local/pequalizer/firstrun -fix && exit 1
+	fi	
+	;;
+
+-save)
+	SAVEFILE="`echo $PRESET | tr ' ' '_'`" #ensure it is only one word
+	if [ -s $HOME/.pequalizer/preset/$PRESET ]; then #already exist
+		export yesno_box='
+		<window title="pEqualizer" window_position="2" allow-grow="false">
+		 <vbox>
+		  <frame>
+		   <pixmap icon_size="6"><input file stock="gtk-dialog-warning"></input></pixmap>
+		   <text use-markup="true"><label>"<b>Preset <u>'$PRESET'</u> already exist.</b>"</label></text>
+		   <text><label>Do you want to overwrite existing Preset?</label></text>
+		  </frame>
+		  <hbox><button no></button><button yes></button></hbox>
+		 </vbox>
+		</window>'
+		I=$IFS; IFS=""
+		for STATEMENTS in  $(gtkdialog4 -p yesno_box --center); do
+			eval $STATEMENTS
+		done
+		IFS=$I
+		[ $EXIT = No ] && exit
+	fi
+	/usr/local/pequalizer/func -getcurrent
+	cp /tmp/eq/valuesrc $HOME/.pequalizer/preset/$PRESET
+	;;
+	
+-delete)
+	export yesno_box='
+	<window title="pEqualizer" window_position="2" allow-grow="false">
+	 <vbox>
+	  <frame>
+	   <pixmap icon_size="6"><input file stock="gtk-dialog-warning"></input></pixmap>
+	   <text use-markup="true"><label>"<b>Do you really want to delete the preset <u>'$PRESET'</u>?</b>"</label></text>
+	  </frame>
+	<hbox><button no></button><button yes></button></hbox>
+	 </vbox>
+	</window>'
+	I=$IFS; IFS=""
+	for STATEMENTS in $(gtkdialog4 -p yesno_box --center); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	[ $EXIT = Yes ] && rm $HOME/.pequalizer/preset/$PRESET
+	;;
+esac

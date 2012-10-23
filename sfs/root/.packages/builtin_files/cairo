@@ -1,0 +1,13 @@
+/usr
+/usr/doc
+/usr/doc/cairo-1.10.2
+/usr/lib
+ libcairo-gobject.so
+ libcairo-gobject.so.2
+ libcairo-gobject.so.2.11000.2
+ libcairo-script-interpreter.so
+ libcairo-script-interpreter.so.2
+ libcairo-script-interpreter.so.2.11000.2
+ libcairo.so
+ libcairo.so.2
+ libcairo.so.2.11000.2

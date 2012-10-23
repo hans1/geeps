@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ metamail
+ mimencode
+/usr/lib
+ libmetamail.so
+ libmetamail.so.0
+ libmetamail.so.0.0.0

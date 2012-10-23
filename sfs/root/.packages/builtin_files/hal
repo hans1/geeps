@@ -1,0 +1,112 @@
+/etc
+/etc/dbus-1
+/etc/dbus-1/system.d
+ hal.conf
+/etc/hal
+/etc/hal/fdi
+/etc/hal/fdi/information
+/etc/hal/fdi/policy
+/etc/hal/fdi/preprobe
+/etc/init.d
+ x_hal
+/etc/udev
+/etc/udev/rules.d
+ 90-hal.rules
+/usr
+/usr/bin
+ hal-device
+ hal-disable-polling
+ hal-find-by-capability
+ hal-find-by-property
+ hal-get-property
+ hal-is-caller-locked-out
+ hal-lock
+ hal-set-property
+ lshal
+/usr/lib
+/usr/libexec
+ hald-generate-fdi-cache
+ hald-runner
+ hal-README
+/usr/lib/hal
+/usr/lib/hal/scripts
+ hal-dockstation-undock
+ hal-functions
+ hal-luks-remove
+ hal-luks-setup
+ hal-luks-teardown
+ hal-system-killswitch-get-power
+ hal-system-killswitch-set-power
+ hal-system-lcd-get-brightness
+ hal-system-lcd-set-brightness
+ hal-system-power-hibernate
+ hal-system-power-reboot
+ hal-system-power-set-power-save
+ hal-system-power-shutdown
+ hal-system-power-suspend
+ hal-system-power-suspend-hybrid
+ hal-system-wol-enable
+ hal-system-wol-enabled
+ hal-system-wol-supported
+/usr/lib/hal/scripts/linux
+ hal-dockstation-undock-linux
+ hal-luks-remove-linux
+ hal-luks-setup-linux
+ hal-luks-teardown-linux
+ hal-system-killswitch-get-power-linux
+ hal-system-killswitch-set-power-linux
+ hal-system-lcd-get-brightness-linux
+ hal-system-lcd-set-brightness-linux
+ hal-system-power-hibernate-linux
+ hal-system-power-reboot-linux
+ hal-system-power-set-power-save-linux
+ hal-system-power-shutdown-linux
+ hal-system-power-suspend-hybrid-linux
+ hal-system-power-suspend-linux
+ hal-system-wol-enabled-linux
+ hal-system-wol-enable-linux
+ hal-system-wol-linux
+ hal-system-wol-supported-linux
+/usr/sbin
+ hald
+/usr/share
+/usr/share/hal
+/usr/share/hal/fdi
+ fdi.dtd
+/usr/share/hal/fdi/information
+/usr/share/hal/fdi/information/10freedesktop
+ 10-camera-ptp.fdi
+ 10-cd-dvd-burner.fdi
+ 10-laptop-panel-hardware.fdi
+ 10-modem.fdi
+ 10-usb-card-readers.fdi
+ 10-usbcsr-mice.fdi
+ 10-usb-music-players.fdi
+ 10-usb-pda.fdi
+ 10-usb-zip-drives.fdi
+/usr/share/hal/fdi/policy
+/usr/share/hal/fdi/policy/10osvendor
+ 10-cpufreq.fdi
+ 10-dockstation.fdi
+ 10-input-policy.fdi
+ 10-laptop-panel-mgmt-policy.fdi
+ 10-macbookpro-utils.fdi
+ 10-power-mgmt-policy.fdi
+ 10-rfkill-switch.fdi
+ 10-tabletPCs.fdi
+ 10-usbcsr-mice.fdi
+ 10-x11-input.fdi
+ 15-storage-luks.fdi
+ 20-storage-methods.fdi
+ 30-wol.fdi
+/usr/share/hal/fdi/preprobe
+/usr/share/hal/fdi/preprobe/10osvendor
+ 10-ide-drives.fdi
+ 20-broken-usb-sticks.fdi
+/var
+/var/cache
+/var/cache/hald
+/var/run
+/var/run/hald
+/var/run/hald/hald-local
+/var/run/hald/hald-runner

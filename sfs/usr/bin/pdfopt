@@ -1,0 +1,25 @@
+#!/bin/sh
+# $Id: pdfopt,v 1.6 2002/02/21 21:49:28 giles Exp $
+# Convert PDF to "optimized" form.
+gs="`dirname $0`/gs"
+if test ! -x "$gs"; then
+	gs=gs
+fi
+
+OPTIONS="-dSAFER -dDELAYSAFER"
+while true
+do
+	case "$1" in
+	-*) OPTIONS="$OPTIONS $1" ;;
+	*)  break ;;
+	esac
+	shift
+done
+
+if test $# -lt 2 -o "$1" = "$2"; then
+	echo "Usage: `basename $0` [ gs options ] input.pdf output.pdf" 1>&2
+	echo "       (input.pdf must be different from output.pdf to avoid corruption)" 1>&2
+	exit 1
+fi
+
+exec "$gs" -q -dNODISPLAY $OPTIONS -- pdfopt.ps "$1" "$2"

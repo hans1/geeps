@@ -1,0 +1,679 @@
+915resolution-0.5.3-patched20110617|915resolution|0.5.3-patched20110617||BuildingBlock|36K||915resolution-0.5.3-patched20110617.pet||add widescreen resolutions to video bios, intel video chips only||||
+a52dec-0.7.4-w5c|a52dec|0.7.4-w5c||BuildingBlock|68K||a52dec-0.7.4-w5c.pet||A free ATSC A52 stream decoder|puppy|wary5||
+a52dec_DEV-0.7.4-w5c|a52dec_DEV|0.7.4-w5c||BuildingBlock|80K||a52dec_DEV-0.7.4-w5c.pet|+a52dec|A free ATSC A52 stream decoder|puppy|wary5||
+abiword-2.9.1-i486-2s|abiword|2.9.1-i486-2s||Document|9524K||abiword-2.9.1-i486-2s.pet||Abiword wordprocessor|slackware|13.37||
+abiword_DEV-2.9.1-i486-2s|abiword_DEV|2.9.1-i486-2s||BuildingBlock|80K||abiword_DEV-2.9.1-i486-2s.pet||abi dev|slackware|13.37||
+acl-2.2.50|acl|2.2.50|1|BuildingBlock|390K|slackware/a|acl-2.2.50-i486-1.txz|+attr|tools for using POSIX Access Control Lists|slackware|13.37||
+acpid-2.0.12-3-s|acpid|2.0.12-3-s||BuildingBlock|100K||acpid-2.0.12-3-s.pet||acpi deamon with dialog box and lid supend||||
+align-1.7.1|align|1.7.1||BuildingBlock|40K||align-1.7.1.pet|+perl_tiny|align text into columns||||
+alsaequal-0.6-1-Spup-i486|alsaequal|0.6-1-Spup-i486||BuildingBlock|52K||alsaequal-0.6-1-Spup-i486.pet|+caps|commandline equaliser|slackware|13.37||
+alsa-info-1|alsa-info|1||BuildingBlock|31K||alsa-info-1.pet||ALSA information gatherer||||
+alsa-lib-1.0.24.1|alsa-lib|1.0.24.1|1|BuildingBlock|1540K|slackware/l|alsa-lib-1.0.24.1-i486-1.txz|+python|Advanced Linux Sound Architecture library|slackware|13.37||
+alsa-utils-1.0.24.2|alsa-utils|1.0.24.2|1|BuildingBlock|1890K|slackware/ap|alsa-utils-1.0.24.2-i486-1.txz|+alsa-lib,+ncurses|Advanced Linux Sound Architecture utilities|slackware|13.37||
+appres-1.0.3|appres|1.0.3|1|BuildingBlock|50K|slackware/x|appres-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+apr-1.4.2|apr|1.4.2|2|BuildingBlock|940K|slackware/l|apr-1.4.2-i486-2.txz|+util-linux|Apache Portable Runtime|slackware|13.37||
+apr-util-1.3.10|apr-util|1.3.10|1|BuildingBlock|450K|slackware/l|apr-util-1.3.10-i486-1.txz|+apr,+cyrus-sasl,+db44,+expat,+openldap-client,+openssl-solibs,+openssl,+util-linux|Apache Portable Runtime utilities|slackware|13.37||
+atk-1.32.0|atk|1.32.0|1|BuildingBlock|2170K|slackware/l|atk-1.32.0-i486-1.txz|+glib2|accessibility functions library|slackware|13.37||
+atkmm-2.22.5|atkmm|2.22.5||BuildingBlock|2388K||atkmm-2.22.5.pet||no description provided|slackware|13.37||
+attr-2.4.45|attr|2.4.45|1|BuildingBlock|220K|slackware/a|attr-2.4.45-i486-1.txz||tools for using extended attributes on filesystems|slackware|13.37||
+audiofile-0.2.7|audiofile|0.2.7|1|BuildingBlock|550K|slackware/l|audiofile-0.2.7-i486-1.txz||audio support library|slackware|13.37||
+aufs-util-3-i486|aufs-util|3-i486||BuildingBlock|204K||aufs-util-3-i486.pet||utilities for aufs|slackware|13.37||
+autoconf-2.68|autoconf|2.68|1|BuildingBlock|2390K|slackware/d|autoconf-2.68-noarch-1.txz||generate configuration scripts|slackware|13.37||
+autologin-1|autologin|1||BuildingBlock|12K||autologin-1.pet||Login as root, no password|puppy|4||
+automake-1.11.1|automake|1.11.1|2|BuildingBlock|1710K|slackware/d|automake-1.11.1-noarch-2.txz||a Makefile generator|slackware|13.37||
+bacon-1.0.23-1|bacon|1.0.23-1||BuildingBlock|220K||bacon-1.0.23-1.pet|+gtk+|runtime library for BaCon HUG gui apps, compiled in wary 5.1.2 should work all recent pups||||
+bacon_DEV-1.0.23-1|bacon_DEV|1.0.23-1||BuildingBlock|2932K||bacon_DEV-1.0.23-1.pet|+bacon|Basic programming language compiler, you need the 'devx' sfs loaded also||||
+bash4-4.1_spup|bash4|4.1_spup||BuildingBlock|792K||bash4-4.1_spup.pet||bash command shell and interpreter|slackware|13.1||
+bbc_provided-2003-static|bbc_provided|2003-static||BuildingBlock|76K||bbc_provided-2003-static.pet||utilities used by network wizard, compiled statically||||
+bc-1.06.95-patched_debian2-w5|bc|1.06.95-patched_debian2-w5||BuildingBlock|88K||bc-1.06.95-patched_debian2-w5.pet||commandline maths calculator||||
+bcrypt-1.1|bcrypt|1.1||BuildingBlock|44K||bcrypt-1.1.pet||File encryption utility|puppy|4||
+bdftopcf-1.0.3|bdftopcf|1.0.3|1|BuildingBlock|50K|slackware/x|bdftopcf-1.0.3-i486-1.txz|+freetype,+libXfont,+libfontenc,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+bigreqsproto-1.1.1|bigreqsproto|1.1.1|1|BuildingBlock|70K|slackware/x|bigreqsproto-1.1.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+bin-11.1|bin|11.1|1|BuildingBlock|180K|slackware/a|bin-11.1-i486-1.txz||some command line utilities|slackware|13.37||
+binutils-2.21.51.0.6|binutils|2.21.51.0.6|1|Develop|14210K|slackware/d|binutils-2.21.51.0.6-i486-1.txz|+zlib|GNU binary development tools|slackware|13.37||
+bison-2.4.3|bison|2.4.3|2|BuildingBlock|1430K|slackware/d|bison-2.4.3-i486-2.txz||parser generator similar to yacc|slackware|13.37||
+bitmap-1.0.5|bitmap|1.0.5|1|BuildingBlock|190K|slackware/x|bitmap-1.0.5-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+boehm-gc-7.1-w5c|boehm-gc|7.1-w5c||BuildingBlock|172K||boehm-gc-7.1-w5c.pet||A garbage collector for C and C++|puppy|wary5||
+boehm-gc_DEV-7.1-w5c|boehm-gc_DEV|7.1-w5c||BuildingBlock|420K||boehm-gc_DEV-7.1-w5c.pet|+boehm-gc|A garbage collector for C and C++|puppy|wary5||
+bones-0.2.2|bones|0.2.2||Develop|44K||bones-0.2.2.pet|+gtkdialog3,+openssh,+wget,+gftp,+xdelta3|simple project version control||||
+boost_cut-1.47.0|boost_cut|1.47.0||BuildingBlock|14468K||boost_cut-1.47.0.pet||header libs||||
+busybox-1.19.3-w5c|busybox|1.19.3-w5c||BuildingBlock|720K||busybox-1.19.3-w5c.pet||system utilities, configured with suid_config|puppy|wary5||
+bzip2-1.0.6|bzip2|1.0.6|1|BuildingBlock|490K|slackware/a|bzip2-1.0.6-i486-1.txz||a block sorting file compressor|slackware|13.37||
+cairo-1.10.2|cairo|1.10.2|2|BuildingBlock|2830K|slackware/l|cairo-1.10.2-i486-2.txz|+binutils,+expat,+fontconfig,+freetype,+glib2,+libX11,+libXau,+libXdmcp,+libXrender,+libpng,+libxcb,+pixman,+zlib|graphics library used by GTK+|slackware|13.37||
+cairomm-1.10.0|cairomm|1.10.0||BuildingBlock|1536K||cairomm-1.10.0.pet||no description provided|slackware|13.37||
+caps-0.4.5-Spup-i486|caps|0.4.5-Spup-i486||BuildingBlock|1080K||caps-0.4.5-Spup-i486.pet||ladpsa lib||||
+cddetect-2.0|cddetect|2.0||BuildingBlock|9K||cddetect-2.0.pet||detect cd/dvd|puppy|4||
+cdparanoia-III_10.2|cdparanoia|III_10.2|1|BuildingBlock|350K|slackware/ap|cdparanoia-III_10.2-i486-1.txz||digital audio extraction tool|slackware|13.37||
+cdrkit-1.1.11|cdrkit|1.1.11|1sl|BuildingBlock|2230K|system/cdrkit/1.1.11|cdrkit-1.1.11-i486-1sl.txz|+attr,+bzip2,+file,+glibc-solibs,+libcap,+perl,+zlib|Command line CDDVD Recorder|slackware|13.37||
+chmlib-0.40|chmlib|0.40|2|BuildingBlock|180K|slackware/l|chmlib-0.40-i486-2.txz||library for accessing CHM files|slackware|13.37||
+chmlib_DEV-0.40-w5c|chmlib_DEV|0.40-w5c||BuildingBlock|52K||chmlib_DEV-0.40-w5c.pet|+chmlib|A library for reading CHM files|puppy|wary5||
+cmake-2.8.4|cmake|2.8.4|1|Develop|34180K|slackware/d|cmake-2.8.4-i486-1.txz|+gcc,+cxxlibs,+gcc-g++,+libidn,+ncurses|cross platform open source make system|slackware|13.37||
+compositeproto-0.4.2|compositeproto|0.4.2|1|BuildingBlock|70K|slackware/x|compositeproto-0.4.2-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+coreutils-6.9-7-p4|coreutils|6.9-7-p4||BuildingBlock|952K||coreutils-6.9-7-p4.pet||core utilities|puppy|4||
+cpio-2.11|cpio|2.11|1|BuildingBlock|790K|slackware/a|cpio-2.11-i486-1.txz||backup and archiving utility|slackware|13.37||
+cups-1.4.6|cups|1.4.6|1|BuildingBlock|12050K|slackware/a|cups-1.4.6-i486-1.txz|+acl,+attr,+cyrus-sasl,+dbus,+gcc,+cxxlibs,+gcc-g++,+libjpeg,+libpng,+libtiff,+libusb,+openldap-client,+openssl-solibs,+openssl,+zlib|Common UNIX Printing System|slackware|13.37||
+cups_pdf-0.8-1|cups_pdf|0.8-1||BuildingBlock|80K||cups_pdf-0.8-1.pet|+cups|print to pdf file||||
+curl-7.21.4|curl|7.21.4|1|BuildingBlock|2100K|slackware/n|curl-7.21.4-i486-1.txz|+cyrus-sasl,+libidn,+openldap-client,+openssl-solibs,+openssl,+zlib|command line URL data transfer tool|slackware|13.37||
+cvs-1.11.23|cvs|1.11.23|1|Develop|1490K|slackware/d|cvs-1.11.23-i486-1.txz||Concurrent Versions System|slackware|13.37||
+cxxlibs-6.0.14|cxxlibs|6.0.14|1|BuildingBlock|2860K|slackware/a|cxxlibs-6.0.14-i486-1.txz|+gcc|C++ shared library compatibility package|slackware|13.37||
+cyrus-sasl-2.1.23|cyrus-sasl|2.1.23|1|BuildingBlock|1600K|slackware/n|cyrus-sasl-2.1.23-i486-1.txz|+gdbm,+openssl-solibs,+openssl|Simple Authentication and Security Layer|slackware|13.37||
+damageproto-1.2.1|damageproto|1.2.1|1|BuildingBlock|50K|slackware/x|damageproto-1.2.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+db44-4.4.20|db44|4.4.20|2|BuildingBlock|5270K|slackware/l|db44-4.4.20-i486-2.txz|+gcc,+cxxlibs,+gcc-g++|Berkeley database library version 4.4.x|slackware|13.37||
+dbus-1.2.4.2permissive-q1|dbus|1.2.4.2permissive-q1||BuildingBlock|812K||dbus-1.2.4.2permissive-q1.pet||inter-process messaging|t2|8.0rc||
+dbus_DEV-1.2.4.2permissive-q1|dbus_DEV|1.2.4.2permissive-q1||BuildingBlock|1652K||dbus_DEV-1.2.4.2permissive-q1.pet|+dbus|inter-process messaging|t2|8.0rc||
+dbus-glib-0.82-q1|dbus-glib|0.82-q1||BuildingBlock|244K||dbus-glib-0.82-q1.pet|+dbus|no description provided|t2|8.0rc||
+dbus-glib_DEV-0.82-q1|dbus-glib_DEV|0.82-q1||BuildingBlock|532K||dbus-glib_DEV-0.82-q1.pet|+dbus-glib|no description provided|t2|8.0rc||
+dconf-0.5.1|dconf|0.5.1|1gv|System|236K|salix/gnome|dconf-0.5.1-i486-1gv.txz|+atk,+cairo,+cxxlibs,+gcc-g++,+expat,+fontconfig,+freetype,+gcc,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+libxml2,+pango,+pixman,+zlib|a low level configuration system|slackware|13.37||
+ddcprobe-0.4.23|ddcprobe|0.4.23||BuildingBlock|20K||ddcprobe-0.4.23.pet||monitor probe|puppy|4||
+defaultmixer-0.1|defaultmixer|0.1||Multimedia|32K||defaultmixer-0.1.pet||generic sound mixer||||
+defaults-chooser-0.8|defaults-chooser|0.8||Setup|32K||defaults-chooser-0.8.pet||Default-Programs-Chooser||||
+desk_icon_theme_stardust-2|desk_icon_theme_stardust|2||Desktop|292K||desk_icon_theme_stardust-2.pet||desktop and menu icons||||
+desksetup-0.7|desksetup|0.7||Desktop|64K||desksetup-0.7.pet||Desksetup Templates for Desk Icons||||
+dhcpcd-5.2.9-spup|dhcpcd|5.2.9-spup||BuildingBlock|212K||dhcpcd-5.2.9-spup.pet||no description provided|slackware|13.37||
+dialog-1.1_20100428|dialog|1.1_20100428|2|BuildingBlock|420K|slackware/a|dialog-1.1_20100428-i486-2.txz|+ncurses|display dialog boxes from shell scripts|slackware|13.37||
+dictd_client-1.10.9|dictd_client|1.10.9||BuildingBlock|112K||dictd_client-1.10.9.pet||dict utility, access online dictionaries|puppy|4||
+didiwiki-0.8-p4|didiwiki|0.8-p4||Personal|92K||didiwiki-0.8-p4.pet||DidiWiki personal wiki|puppy|4||
+dietlibc-0.32-patched-t2-20110407|dietlibc|0.32-patched-t2-20110407||BuildingBlock|4K||dietlibc-0.32-patched-t2-20110407.pet||static c libs||||
+dietlibc_DEV-0.32-patched-t2-20110407|dietlibc_DEV|0.32-patched-t2-20110407||Develop|2456K||dietlibc_DEV-0.32-patched-t2-20110407.pet||c library compile small static executables, compiled quirky141 should work all pups||||
+diffstat-1.53|diffstat|1.53|1|BuildingBlock|50K|slackware/ap|diffstat-1.53-i486-1.txz||produces statistics from diff output|slackware|13.37||
+diffutils-3.0|diffutils|3.0|1|BuildingBlock|1130K|slackware/ap|diffutils-3.0-i486-1.txz||finds differences between files|slackware|13.37||
+disktype-9-patched_pardus_bk|disktype|9-patched_pardus_bk||BuildingBlock|104K||disktype-9-patched_pardus_bk.pet||report specs of a device, compiled statically|puppy|||
+dmidecode-2.11|dmidecode|2.11|1|BuildingBlock|170K|slackware/ap|dmidecode-2.11-i486-1.txz||DMI table decoder|slackware|13.37||
+dmxproto-2.3.1|dmxproto|2.3.1|1|BuildingBlock|60K|slackware/x|dmxproto-2.3.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+dosfstools-3.0.11|dosfstools|3.0.11|2|BuildingBlock|210K|slackware/a|dosfstools-3.0.11-i486-2.txz||tools for working with FAT filesystems|slackware|13.37||
+dpkg-deb-1.15.3.1-w5|dpkg-deb|1.15.3.1-w5||BuildingBlock|152K||dpkg-deb-1.15.3.1-w5.pet||The debian package manager|puppy|wary5||
+dri2proto-2.3|dri2proto|2.3|1|BuildingBlock|50K|slackware/x|dri2proto-2.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+dvdauthor-0.7-i486|dvdauthor|0.7-i486||BuildingBlock|388K||dvdauthor-0.7-i486.pet||dvd autoring tool|slackware|13.37||
+dvd+rw-tools-7.1|dvd+rw-tools|7.1|2|BuildingBlock|350K|slackware/ap|dvd+rw-tools-7.1-i486-2.txz|+gcc,+cxxlibs,+gcc-g++|DVD+ RW tools|slackware|13.37||
+e2fsprogs-1.41.14|e2fsprogs|1.41.14|1|BuildingBlock|2720K|slackware/a|e2fsprogs-1.41.14-i486-1.txz|+util-linux|ext2 and ext3 filesystems utilities|slackware|13.37||
+e3_utf8-2.8|e3_utf8|2.8||Document|40K||e3_utf8-2.8.pet||e3 console editor||||
+edid-1.4.1|edid|1.4.1||BuildingBlock|26K||edid-1.4.1.pet||probe monitor, used by xorgwizard|puppy|4||
+editres-1.0.5|editres|1.0.5|1|BuildingBlock|110K|slackware/x|editres-1.0.5-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+eject-2.1.5|eject|2.1.5|2|BuildingBlock|160K|slackware/a|eject-2.1.5-i486-2.txz||a tool to eject removable media|slackware|13.37||
+elspci-0.0.6-1|elspci|0.0.6-1||BuildingBlock|30K||elspci-0.0.6-1.pet||essential pci analysis boot tool|puppy|4||
+embutils_cut-0.19|embutils_cut|0.19||BuildingBlock|16K||embutils_cut-0.19.pet||some utilities from embutils pkg, compiled statically||||
+enchant-1.5.0|enchant|1.5.0|1|BuildingBlock|460K|slackware/l|enchant-1.5.0-i486-1.txz|+aspell,+dbus,+dbus-glib,+gcc,+cxxlibs,+gcc-g++,+glib2|a wrapper for spellcheck libraries|slackware|13.37||
+epdfview-0.1.7-spup|epdfview|0.1.7-spup||Document|268K||epdfview-0.1.7-spup.pet||PDF document viewer|slackware|13.37||
+esound-0.2.41|esound|0.2.41|1|BuildingBlock|320K|slackware/l|esound-0.2.41-i486-1.txz|+alsa-lib,+audiofile|Enlightened Sound Daemon|slackware|13.37||
+ethtool-2.6.36|ethtool|2.6.36|1|Network|240K|slackware/n|ethtool-2.6.36-i486-1.txz||a tool for examining and tuning a network interface|slackware|13.37||
+evieext-1.1.1|evieext|1.1.1|1|BuildingBlock|40K|slackware/x|evieext-1.1.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+exiv2-0.21.1|exiv2|0.21.1|1|BuildingBlock|3690K|slackware/l|exiv2-0.21.1-i486-1.txz|+expat,+gcc,+cxxlibs,+gcc-g++,+zlib|Exif and IPTC Metadata Library and Tools|slackware|13.37||
+expat-2.0.1|expat|2.0.1|2|BuildingBlock|560K|slackware/l|expat-2.0.1-i486-2.txz||C library for parsing XML|slackware|13.37||
+faac-1.28-w5|faac|1.28-w5||BuildingBlock|436K||faac-1.28-w5.pet||An MPEG4 AAC encoder|puppy|wary5||
+faac_DEV-1.28-w5|faac_DEV|1.28-w5||BuildingBlock|100K||faac_DEV-1.28-w5.pet|+faac|An MPEG4 AAC encoder|puppy|wary5||
+faad2-2.7-w5c|faad2|2.7-w5c||BuildingBlock|284K||faad2-2.7-w5c.pet||An MPEG4 AAC decoder|puppy|wary5||
+faad2_DEV-2.7-w5c|faad2_DEV|2.7-w5c||BuildingBlock|356K||faad2_DEV-2.7-w5c.pet|+faad2|An MPEG4 AAC decoder|puppy|wary5||
+ffconvert-1.2.1|ffconvert|1.2.1||Multimedia|312K||ffconvert-1.2.1.pet|+ffmpeg|FFConvert multimedia converter||||
+ffmpeg-0.8.4-i686-s|ffmpeg|0.8.4-i686-s||Multimedia|6084K||ffmpeg-0.8.4-i686-s.pet||ffmpeg multimedia conversion|slackware|13.37||
+ffmpeg_DEV-0.8.4-i686-s|ffmpeg_DEV|0.8.4-i686-s||BuildingBlock|7060K||ffmpeg_DEV-0.8.4-i686-s.pet||ffmpeg dev headers|slackware|13.37||
+file-5.03-w5|file|5.03-w5||BuildingBlock|1896K||file-5.03-w5.pet||File type identification utility|puppy|wary5||
+file_DEV-5.03-w5|file_DEV|5.03-w5||BuildingBlock|132K||file_DEV-5.03-w5.pet|+file|file mime handling|puppy|wary5||
+file_sharing-curlftpfs-mpscan-0.2-0.9.1-0.1.0|file_sharing-curlftpfs-mpscan|0.2-0.9.1-0.1.0||Network|156K||file_sharing-curlftpfs-mpscan-0.2-0.9.1-0.1.0.pet|+curl,+pure_ftpd|network file sharing|puppy|4||
+findutils-4.4.2|findutils|4.4.2|1|BuildingBlock|1320K|slackware/a|findutils-4.4.2-i486-1.txz||utilities to locate files|slackware|13.37||
+firewallstate-2.0|firewallstate|2.0||Network|104K||firewallstate-2.0.pet||Firewall Tray Icon|ubuntu|lucid||
+firstrun-2.1-s|firstrun|2.1-s||BuildingBlock|400K||firstrun-2.1-s.pet||no description provided||||
+fixesproto-5.0|fixesproto|5.0|1|BuildingBlock|70K|slackware/x|fixesproto-5.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+flac-1.2.1|flac|1.2.1|3|BuildingBlock|3130K|slackware/ap|flac-1.2.1-i486-3.txz|+gcc,+cxxlibs,+gcc-g++,+libogg|Free Lossless Audio Codec|slackware|13.37||
+flex-2.5.35|flex|2.5.35|1|BuildingBlock|770K|slackware/d|flex-2.5.35-i486-1.txz||fast lexical analyzer generator|slackware|13.37||
+floppy_format-1.7-p4|floppy_format|1.7-p4||System|56K||floppy_format-1.7-p4.pet|+gtkdialog3|Format Floppys|puppy|4||
+flsynclient-0.6-p4|flsynclient|0.6-p4||Desktop|304K||flsynclient-0.6-p4.pet|+synclient|Configure your synaptics touchpad|puppy|4||
+fontcacheproto-0.1.3|fontcacheproto|0.1.3|1|BuildingBlock|30K|slackware/x|fontcacheproto-0.1.3-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+fontconfig-2.8.0|fontconfig|2.8.0|1|BuildingBlock|920K|slackware/x|fontconfig-2.8.0-i486-1.txz|+expat,+freetype,+zlib|Font library and tools|slackware|13.37||
+fontsproto-2.1.1|fontsproto|2.1.1|1|BuildingBlock|340K|slackware/x|fontsproto-2.1.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+fonttosfnt-1.0.4|fonttosfnt|1.0.4|1|BuildingBlock|40K|slackware/x|fonttosfnt-1.0.4-i486-1.txz|+freetype,+libfontenc,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+foomatic-filters-4.0.6|foomatic-filters|4.0.6|1|BuildingBlock|220K|slackware/ap|foomatic-filters-4.0.6-i486-1.txz||Universal print filterRIP wrapper|slackware|13.37||
+fossil-1.20-x86|fossil|1.20-x86||BuildingBlock|2640K||fossil-1.20-x86.pet||Fossil Content Management System, runs in any x86 linux||||
+fpm2-0.75-pup4|fpm2|0.75-pup4||Personal|208K||fpm2-0.75-pup4.pet|+gtk+|Figaro password manager|puppy|4||
+freememapplet_tray-2.6|freememapplet_tray|2.6||Filesystem|68K||freememapplet_tray-2.6.pet||Partview free space in drives|slackware|13.37||
+freetype-2.4.4|freetype|2.4.4|1|BuildingBlock|1810K|slackware/l|freetype-2.4.4-i486-1.txz|+zlib|A Free High Quality and Portable Font Engine|slackware|13.37||
+fribidi-0.10.9|fribidi|0.10.9|2|BuildingBlock|260K|slackware/l|fribidi-0.10.9-i486-2.txz||Unicode BiDirectional algorithm library|slackware|13.37||
+frisbee_special-0.2|frisbee_special|0.2||BuildingBlock|264K||frisbee_special-0.2.pet||ONLY TO BE USED IN WOOF||||
+fslsfonts-1.0.3|fslsfonts|1.0.3|1|BuildingBlock|50K|slackware/x|fslsfonts-1.0.3-i486-1.txz|+libFS|For more information about the X.Org Foundation the providers of|slackware|13.37||
+fstobdf-1.0.4|fstobdf|1.0.4|1|BuildingBlock|50K|slackware/x|fstobdf-1.0.4-i486-1.txz|+libFS,+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+fuse-2.8.5|fuse|2.8.5|1|BuildingBlock|490K|slackware/l|fuse-2.8.5-i486-1.txz||Filesystem in Userspace|slackware|13.37||
+galculator-1.3.4-i486|galculator|1.3.4-i486||Business|548K||galculator-1.3.4-i486.pet||Perform simple and scientific calculations|slackware|13.1||
+gamin-0.1.10|gamin|0.1.10|3|BuildingBlock|450K|slackware/l|gamin-0.1.10-i486-3.txz|+glib2|A minimalist FAM replacement|slackware|13.37||
+gawk-3.1.8|gawk|3.1.8|1|BuildingBlock|2200K|slackware/a|gawk-3.1.8-i486-1.txz||pattern scanning and processing language|slackware|13.37||
+gcc-4.5.2|gcc|4.5.2|2|BuildingBlock|34540K|slackware/d|gcc-4.5.2-i486-2.txz|+gmp,+libelf,+libmpc,+mpfr,+zlib|Base GCC package with C support|slackware|13.37||
+gcc-g++-4.5.2|gcc-g++|4.5.2|2|BuildingBlock|20290K|slackware/d|gcc-g++-4.5.2-i486-2.txz|+gcc,+gmp,+libelf,+libmpc,+mpfr,+zlib|C++ for GCC|slackware|13.37||
+gcolor2-0.4|gcolor2|0.4||Graphic|68K||gcolor2-0.4.pet|+gtk+|color chooser and picker|puppy|4||
+gdb-7.2|gdb|7.2|2|BuildingBlock|5840K|slackware/d|gdb-7.2-i486-2.txz|+expat,+ncurses,+zlib|the GNU symbolic debugger|slackware|13.37||
+gdbm-1.8.3|gdbm|1.8.3|4|BuildingBlock|130K|slackware/l|gdbm-1.8.3-i486-4.txz||GNU database routines|slackware|13.37||
+gdk-pixbuf2-2.23.3|gdk-pixbuf2|2.23.3|1|BuildingBlock|3540K|slackware/l|gdk-pixbuf2-2.23.3-i486-1.txz|+glib2,+libX11,+libXau,+libXdmcp,+libjpeg,+libpng,+libtiff,+libxcb,+zlib|image library used by GTK+ v2|slackware|13.37||
+gdmap-0.8.0|gdmap|0.8.0||Filesystem|56K||gdmap-0.8.0.pet|+gtk+|Visual map disk usage|puppy|4||
+geany-5486-i486|geany|5486-i486||Document|2396K||geany-5486-i486.pet||A fast and lightweight IDE using GTK2|slackware|13.1||
+gecko-mediaplayer-1.0.4-i486|gecko-mediaplayer|1.0.4-i486||BuildingBlock|648K||gecko-mediaplayer-1.0.4-i486.pet||browser plugin|slackware|13.37||
+getcurpos-2007|getcurpos|2007||BuildingBlock|3K||getcurpos-2007.pet||reads mouse cursor coords|puppy|4||
+getdir-2006|getdir|2006||BuildingBlock|14K||getdir-2006.pet||no description|puppy|4||
+getflash-0.9|getflash|0.9||Internet|52K||getflash-0.9.pet||GetFlash Install Flashplayer||||
+gettext-0.18.1.1|gettext|0.18.1.1|1|BuildingBlock|770K|slackware/a|gettext-0.18.1.1-i486-1.txz|+gcc,+cxxlibs,+gcc-g++|internationalization framework|slackware|13.37||
+gettext-tools-0.18.1.1|gettext-tools|0.18.1.1|1|BuildingBlock|8530K|slackware/d|gettext-tools-0.18.1.1-i486-1.txz|+acl,+attr,+gcc,+glib2,+libxml2,+ncurses,+zlib|internationalization framework tools|slackware|13.37||
+gexec-0.4-pup1|gexec|0.4-pup1||Utility|40K||gexec-0.4-pup1.pet|+gtk+|commandline|puppy|4||
+gfnrename-0.5|gfnrename|0.5||Filesystem|120K||gfnrename-0.5.pet|+gtk+|batch file renamer|puppy|4||
+gfontsel-1.0.0|gfontsel|1.0.0||Desktop|28K||gfontsel-1.0.0.pet|+gtk+|font viewer|puppy|4||
+gftp-2.0.19|gftp|2.0.19|1|Internet|3540K|slackware/xap|gftp-2.0.19-i486-1.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+ncurses,+openssl-solibs,+openssl,+pango,+pixman,+readline,+zlib|FTP client for X|slackware|13.37||
+ghostscript-8.15.4-q1|ghostscript|8.15.4-q1||BuildingBlock|6824K||ghostscript-8.15.4-q1.pet|+cups|postscript render and printing|t2|8.0rc||
+ghostscript_DEV-8.15.4-q1|ghostscript_DEV|8.15.4-q1||BuildingBlock|12K||ghostscript_DEV-8.15.4-q1.pet|+ghostscript|postscript render and printing|t2|8.0rc||
+giflib-4.1.6|giflib|4.1.6|1|BuildingBlock|750K|slackware/l|giflib-4.1.6-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|GIF image format library|slackware|13.37||
+gifsicle-1.40|gifsicle|1.40||BuildingBlock|188K||gifsicle-1.40.pet||Create and edit GIF images|puppy|4||
+git-1.7.4.4|git|1.7.4.4|1|BuildingBlock|11260K|slackware/d|git-1.7.4.4-i486-1.txz|+curl,+cyrus-sasl,+expat,+libidn,+openldap-client,+openssl-solibs,+openssl,+zlib|the stupid content tracker|slackware|13.37||
+glade3_DEV-3.6.7-w5c|glade3_DEV|3.6.7-w5c||BuildingBlock|2524K||glade3_DEV-3.6.7-w5c.pet|+glade3|A User Interface Builder for Gtk+ and Gnome|puppy|wary5||
+glib-2.28.6-patched-i486|glib|2.28.6-patched-i486||BuildingBlock|2580K||glib-2.28.6-patched-i486.pet||no description provided|slackware|13.37||
+glibc-2.13|glibc|2.13|4|BuildingBlock|133840K|slackware/l|glibc-2.13-i486-4.txz||GNU C libraries|slackware|13.37||
+glibc-solibs-2.13|glibc-solibs|2.13|4|BuildingBlock|9880K|slackware/a|glibc-solibs-2.13-i486-4.txz||shared GNU C libraries|slackware|13.37||
+glibc-zoneinfo-2.13|glibc-zoneinfo|2.13|4|Personal|3170K|slackware/a|glibc-zoneinfo-2.13-noarch-4.txz||timezone database|slackware|13.37||
+glib_DEV-2.28.6-patched-i486|glib_DEV|2.28.6-patched-i486||BuildingBlock|1964K||glib_DEV-2.28.6-patched-i486.pet||no description provided|slackware|13.37||
+glibmm-2.28.1|glibmm|2.28.1||BuildingBlock|16588K||glibmm-2.28.1.pet||no description provided|slackware|13.37||
+glproto-1.4.12|glproto|1.4.12|1|BuildingBlock|140K|slackware/x|glproto-1.4.12-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+gmeasures-0.7|gmeasures|0.7||Business|88K||gmeasures-0.7.pet|+gtk+|weights and measures converter|puppy|4||
+gmp-5.0.1|gmp|5.0.1|1|BuildingBlock|2290K|slackware/l|gmp-5.0.1-i486-1.txz|+gcc,+cxxlibs,+gcc-g++|GNU multiple precision arithmetic library|slackware|13.37||
+gmtk-1.0.5-i486|gmtk|1.0.5-i486||BuildingBlock|132K||gmtk-1.0.5-i486.pet||no description provided|slackware|13.37||
+gnome-menus-2.14.3-pup4|gnome-menus|2.14.3-pup4||BuildingBlock|112K||gnome-menus-2.14.3-pup4.pet|+gtk+|needed by xdg_puppy pkg|puppy|4||
+gnome-menus_DEV-2.14.3-pup4|gnome-menus_DEV|2.14.3-pup4||BuildingBlock|368K||gnome-menus_DEV-2.14.3-pup4.pet|+gnome-menus|needed by xdg_puppy|puppy|4||
+gnome-mplayer-1.0.5-i486|gnome-mplayer|1.0.5-i486||Multimedia|4044K||gnome-mplayer-1.0.5-i486.pet||Play your media||||
+gnumeric-1.10.17-i486-spup|gnumeric|1.10.17-i486-spup||BuildingBlock|12468K||gnumeric-1.10.17-i486-spup.pet||Calculation, Analysis, and Visualization of Information|slackware|13.37||
+gnumeric_DEV-1.10.17-i486-spup|gnumeric_DEV|1.10.17-i486-spup||BuildingBlock|1068K||gnumeric_DEV-1.10.17-i486-spup.pet||no description provided|slackware|13.37||
+gnutls-2.10.5|gnutls|2.10.5|1|BuildingBlock|3590K|slackware/n|gnutls-2.10.5-i486-1.txz|+gcc,+cxxlibs,+gcc-g++,+gmp,+guile,+libgcrypt,+libgpg-error,+libtool,+ncurses,+readline,+zlib|GNU TLS library|slackware|13.37||
+goffice-0.8.17-i486-spup|goffice|0.8.17-i486-spup||BuildingBlock|2904K||goffice-0.8.17-i486-spup.pet||no description provided|slackware|13.37||
+goffice_DEV-0.8.17-i486-spup|goffice_DEV|0.8.17-i486-spup||BuildingBlock|888K||goffice_DEV-0.8.17-i486-spup.pet||no description provided|slackware|13.37||
+gparted-0.8.1-static-spup|gparted|0.8.1-static-spup||Filesystem|4256K||gparted-0.8.1-static-spup.pet||Create, reorganize, and delete partitions|slackware|13.37||
+gphoto2-2.4.11-i486-s|gphoto2|2.4.11-i486-s||BuildingBlock|100K||gphoto2-2.4.11-i486-s.pet||gphoto cam backend|slackware|13.37||
+gphotofs-0.4.0-w5c|gphotofs|0.4.0-w5c||Graphic|28K||gphotofs-0.4.0-w5c.pet|+libgphoto2,+fuse|mount digital camera photos like a filesystem|puppy|wary5||
+gpptp-0.2|gpptp|0.2||Network|40K||gpptp-0.2.pet|+pptp,+gtk+|PPTP VPN client gui, modified by jafadmin (see puppy forum)|puppy|wary5||
+grep-2.7|grep|2.7|1|BuildingBlock|910K|slackware/a|grep-2.7-i486-1.txz||print lines matching a pattern|slackware|13.37||
+grey_fx-0.1|grey_fx|0.1||BuildingBlock|312K||grey_fx-0.1.pet||icon theme||||
+groff-1.21|groff|1.21|1|Document|8100K|slackware/ap|groff-1.21-i486-1.txz|+gcc,+cxxlibs,+gcc-g++,+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|document formatting system|slackware|13.37||
+growl-0.14|growl|0.14||Network|48K||growl-0.14.pet||Growl Security Enhancements||||
+grub-0.97-29ubuntu53|grub|0.97-29ubuntu53||BuildingBlock|552K||grub-0.97-29ubuntu53.pet||grand unified bootloader, legacy edition||||
+grub4dos-0.4.4.v1.7.2|grub4dos|0.4.4.v1.7.2||System|419K||grub4dos-0.4.4.v1.7.2.pet||Grub4Dos bootloader config||13.37||
+gtk+2-2.24.4|gtk+2|2.24.4|1|BuildingBlock|49360K|slackware/l|gtk+2-2.24.4-i486-1.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+openssl-solibs,+openssl,+pango,+pixman,+zlib|multi platform GUI toolkit|slackware|13.37||
+gtk-chtheme-0.3.1|gtk-chtheme|0.3.1||Desktop|48K||gtk-chtheme-0.3.1.pet|+gtk+|gtk theme chooser|puppy|4||
+gtkdialog4-0.8.0-i486-s|gtkdialog4|0.8.0-i486-s||BuildingBlock|191K||gtkdialog4-0.8.0-i486-s.pet||gtk gui builder|slackware|13.37||
+gtkdialog4_DOC-0.8.0-i486-s|gtkdialog4_DOC|0.8.0-i486-s||BuildingBlock|1670K||gtkdialog4_DOC-0.8.0-i486-s.pet||gtkdialog docs including examples||||
+gtklp-1.2.5-w5|gtklp|1.2.5-w5||System|292K||gtklp-1.2.5-w5.pet|+cairo,+gtk+|a graphical Frontend to CUPS|puppy|wary5||
+gtkmm-2.24.0|gtkmm|2.24.0||BuildingBlock|37000K||gtkmm-2.24.0.pet||no description provided|slackware|13.37||
+gtksourceview-2.10.5|gtksourceview|2.10.5|1gv|BuildingBlock|2572K|salix/gnome|gtksourceview-2.10.5-i486-1gv.txz|+atk,+cairo,+cxxlibs,+gcc-g++,+expat,+fontconfig,+freetype,+gcc,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+libxml2,+pango,+pixman,+zlib|syntax highlighting library for GTK+|slackware|13.37||
+gtk_theme_gradient_grey-1.2|gtk_theme_gradient_grey|1.2||Desktop|32K||gtk_theme_gradient_grey-1.2.pet|+gtk+|gtk very basic theme, gradient grey||||
+gtk_theme_stardust_zigbert-0.5|gtk_theme_stardust_zigbert|0.5||Desktop|45K||gtk_theme_stardust_zigbert-0.5.pet|+gtk+|gtk light blue 3d theme||||
+gtrayicon_network-1.1-q1|gtrayicon_network|1.1-q1||BuildingBlock|36K||gtrayicon_network-1.1-q1.pet|+gtk+|trayicon used by pwireless2|t2|8.0rc||
+guess_fs-20090512|guess_fs|20090512||BuildingBlock|21K||guess_fs-20090512.pet||report filesystem type. created by jesse, compiled statically||||
+guile-1.8.8|guile|1.8.8|1|BuildingBlock|5380K|slackware/d|guile-1.8.8-i486-1.txz|+gmp,+libtool,+ncurses,+readline|GNUs extension language library|slackware|13.37||
+gutenprint-5.2.7-i486-s|gutenprint|5.2.7-i486-s||Setup|11288K||gutenprint-5.2.7-i486-s.pet||printer drivers|slackware|13.37||
+gutenprint_DEV-5.2.7-i486-s|gutenprint_DEV|5.2.7-i486-s||BuildingBlock|2004K||gutenprint_DEV-5.2.7-i486-s.pet||gutenprint dev files|slackware|13.37||
+gview-0.9.1a|gview|0.9.1a||Graphic|9K||gview-0.9.1a.pet|+gtk+|very basic image viewer|puppy|4||
+gwhere-0.2.3-1|gwhere|0.2.3-1||Filesystem|688K||gwhere-0.2.3-1.pet|+gtk+|disk cataloger|puppy|4||
+gzip-1.4|gzip|1.4|1|BuildingBlock|280K|slackware/a|gzip-1.4-i486-1.tgz||file compression utility|slackware|13.37||
+hal-0.5.11|hal|0.5.11||BuildingBlock|1092K||hal-0.5.11.pet||hardware abstraction layer. tried to make this pet as useless as possible||||
+hardinfo-0.5.1-p4|hardinfo|0.5.1-p4||System|632K||hardinfo-0.5.1-p4.pet|+gtk+|HardInfo hardware information|puppy|4||
+hiawatha-6.17.1-1-p4|hiawatha|6.17.1-1-p4||Network|340K||hiawatha-6.17.1-1-p4.pet||powerful secure web server|puppy|4||
+hicolor-icon-theme-0.12|hicolor-icon-theme|0.12|1|BuildingBlock|230K|slackware/l|hicolor-icon-theme-0.12-noarch-1.txz||default icon theme|slackware|13.37||
+homebank-4.4-i486-s|homebank|4.4-i486-s||Business|700K||homebank-4.4-i486-s.pet||Homebank personal accounting|slackware|13.37||
+hotplug2stdout-1.2.1|hotplug2stdout|1.2.1||BuildingBlock|20K||hotplug2stdout-1.2.1.pet||kernel uevents to stdout, cddetect_quick|puppy|4||
+htop-0.9-i486|htop|0.9-i486||System|120K||htop-0.9-i486.pet||Process Viewer|slackware|13.1||
+hunspell-1.2.12-w5|hunspell|1.2.12-w5||BuildingBlock|444K||hunspell-1.2.12-w5.pet||spell checking library|puppy|wary5||
+hunspell_DEV-1.2.12-w5|hunspell_DEV|1.2.12-w5||BuildingBlock|1040K||hunspell_DEV-1.2.12-w5.pet|+hunspell|spell checker library|puppy|wary5||
+hunspell-en-us-2|hunspell-en-us|2||BuildingBlock|732K|pet_packages-quirky|hunspell-en-us-2.pet|+hunspell,+enchant|US English dictionary|||official|
+i915_modeset0-0.2|i915_modeset0|0.2||BuildingBlock|7K||i915_modeset0-0.2.pet||rules to avoid black screen on some intel i845 graphic controllers||||
+iceauth-1.0.4|iceauth|1.0.4|1|BuildingBlock|60K|slackware/x|iceauth-1.0.4-i486-1.txz|+libICE|For more information about the X.Org Foundation the providers of|slackware|13.37||
+id3lib-3.8.3|id3lib|3.8.3|1gv|BuildingBlock|660K|salix/l|id3lib-3.8.3-i486-1gv.txz|+cxxlibs,+gcc-g++,+gcc,+zlib|id3lib is an open source cross platform software development library|slackware|13.37||
+ifplugd-0.28-static|ifplugd|0.28-static||BuildingBlock|136K||ifplugd-0.28-static.pet||detect network active, compiled statically||||
+ifplugd_old-0.18-1|ifplugd_old|0.18-1||BuildingBlock|20K||ifplugd_old-0.18-1.pet|+libdaemon|detect alive network|puppy|4||
+igucal-002|igucal|002||Utility|24K||igucal-002.pet||IguCal minimalistic calendar|slackware|13.1||
+imake-1.0.4|imake|1.0.4|1|BuildingBlock|110K|slackware/x|imake-1.0.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+infozip-6.0|infozip|6.0|1|BuildingBlock|1250K|slackware/a|infozip-6.0-i486-1.txz|+bzip2|Info ZIPs zip and unzip utilities|slackware|13.37||
+inkscapelite-0.36.3-i486|inkscapelite|0.36.3-i486||Graphic|2140K||inkscapelite-0.36.3-i486.pet||InkLite vector editor|slackware|13.1||
+inotail-0.5|inotail|0.5||BuildingBlock|16K||inotail-0.5.pet||tail utility uses inotify, essential|puppy|4||
+inotify-tools-3.14|inotify-tools|3.14|1|BuildingBlock|130K|slackware/a|inotify-tools-3.14-i486-1.txz||command line utilities for inotify|slackware|13.37||
+inputproto-2.0.1|inputproto|2.0.1|1|BuildingBlock|330K|slackware/x|inputproto-2.0.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+installwatch-0.6.3|installwatch|0.6.3||BuildingBlock|14K||installwatch-0.6.3.pet||essential, used by petget|puppy|4||
+intltool-0.41.1|intltool|0.41.1|1|BuildingBlock|190K|slackware/d|intltool-0.41.1-i486-1.txz||Utilities for translation support|slackware|13.37||
+iptables-1.4.10|iptables|1.4.10|1|BuildingBlock|1150K|slackware/n|iptables-1.4.10-i486-1.txz||IP packet filter administration|slackware|13.37||
+isomaster-1.3.6-q1|isomaster|1.3.6-q1||Multimedia|224K||isomaster-1.3.6-q1.pet|+gtk+|ISOMaster iso file editor|t2|8.0rc||
+jasper-1.900.1|jasper|1.900.1|3|BuildingBlock|510K|slackware/l|jasper-1.900.1-i486-3.txz|+gcc,+cxxlibs,+gcc-g++,+libICE,+libSM,+libX11,+libXau,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXmu,+libXt,+libXxf86vm,+libdrm,+libjpeg,+libxcb,+mesa,+util-linux|free implementation of the JPEG 2000 standard|slackware|13.37||
+jimtcl-0.70|jimtcl|0.70||BuildingBlock|152K||jimtcl-0.70.pet||tiny Tcl interpreter, compiled in wary should work all puppies. note, used by usb-modeswitch||||
+jwm-578-deco-wider-patched-i486|jwm|578-deco-wider-patched-i486||BuildingBlock|216K||jwm-578-deco-wider-patched-i486.pet||joes window manager with big window deco|slackware|13.37||
+jwmconfig2-120125-slacko|jwmconfig2|120125-slacko||Desktop|300K||jwmconfig2-120125-slacko.pet||JWM configuration||||
+jwm-theme-purplegum-01|jwm-theme-purplegum|01||Desktop|32K||jwm-theme-purplegum-01.pet||jwm theme||||
+kbproto-1.0.5|kbproto|1.0.5|1|BuildingBlock|150K|slackware/x|kbproto-1.0.5-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+kernel_headers-3.1.10-sA|kernel_headers|3.1.10-sA||BuildingBlock|4596K||kernel_headers-3.1.10-sA.pet||linux headers||||
+ktsuss-cae185d-1|ktsuss|cae185d-1||BuildingBlock|36K||ktsuss-cae185d-1.pet||gui for su, run app as different user, compiled in wary should run all puppies||||
+lame-3.98.4|lame|3.98.4|1gv|BuildingBlock|1416K|salix/ap|lame-3.98.4-i486-1gv.txz|+ncurses|MPEG Audio Layer III |slackware|13.37||
+lcms-1.19|lcms|1.19|1|BuildingBlock|620K|slackware/l|lcms-1.19-i486-1.txz|+libjpeg,+libtiff,+zlib|little cms engine|slackware|13.37||
+leafpad-0.8.18.1-s-i486|leafpad|0.8.18.1-s-i486||Document|140K||leafpad-0.8.18.1-s-i486.pet||Simple Text Editor|slackware|13.37||
+less-443|less|443|1|BuildingBlock|250K|slackware/a|less-443-i486-1.txz|+ncurses|file pager|slackware|13.37||
+libarchive-2.8.4|libarchive|2.8.4|1|BuildingBlock|530K|slackware/l|libarchive-2.8.4-i486-1.txz|+acl,+attr,+bzip2,+libxml2,+openssl-solibs,+openssl,+zlib|archive reading library|slackware|13.37||
+libart_lgpl-2.3.21|libart_lgpl|2.3.21|1|BuildingBlock|360K|slackware/l|libart_lgpl-2.3.21-i486-1.txz||graphics library|slackware|13.37||
+libcap-2.20|libcap|2.20|1|BuildingBlock|180K|slackware/l|libcap-2.20-i486-1.txz|+attr|getset POSIX capabilities|slackware|13.37||
+libcddb-1.3.2|libcddb|1.3.2|1|BuildingBlock|300K|slackware/l|libcddb-1.3.2-i486-1.txz|+libcdio|An online CD database library|slackware|13.37||
+libcdio-0.79|libcdio|0.79|1|BuildingBlock|1060K|slackware/l|libcdio-0.79-i486-1.txz|+gcc,+cxxlibs,+gcc-g++,+libcddb,+ncurses|GNU CD access library|slackware|13.37||
+libdaemon-0.13|libdaemon|0.13|1dj|BuildingBlock|56K|salix/l|libdaemon-0.13-i486-1dj.txz||Unix daemonizing library|slackware|13.37||
+libdc1394-2.1.4|libdc1394|2.1.4|1sl|BuildingBlock|520K|libraries/libdc1394/2.1.4|libdc1394-2.1.4-i486-1sl.txz|+glibc-solibs,+libraw1394,+libusb|IEEE 1394 Library|slackware|13.37||
+libdmx-1.1.1|libdmx|1.1.1|1|BuildingBlock|100K|slackware/x|libdmx-1.1.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libdrm-2.4.25-i486-1-s|libdrm|2.4.25-i486-1-s||BuildingBlock|124K||libdrm-2.4.25-i486-1-s.pet||libdrm kernel libraries for video|slackware|13.37||
+libdrm_DEV-2.4.25-i486-1-s|libdrm_DEV|2.4.25-i486-1-s||BuildingBlock|293K||libdrm_DEV-2.4.25-i486-1-s.pet||drm dev files|slackware|13.37||
+libdv-1.0.0|libdv|1.0.0|1gv|BuildingBlock|360K|salix/l|libdv-1.0.0-i486-1gv.txz|+popt|The Quasar  DV codec libdv is a software codec|slackware|13.37||
+libdvdcss-1.2.10|libdvdcss|1.2.10|1tm|BuildingBlock|156K|salix/l|libdvdcss-1.2.10-i686-1tm.txz||a library for accessing encryped DVDs|slackware|13.37||
+libdvdnav-4.1.3|libdvdnav|4.1.3|1tm|BuildingBlock|216K|salix/l|libdvdnav-4.1.3-i686-1tm.txz||libdvdnav is a library that allows easy use of sophisticated|slackware|13.37||
+libdvdplay-1.0.1-w5c|libdvdplay|1.0.1-w5c||BuildingBlock|64K||libdvdplay-1.0.1-w5c.pet|+libdvdread|A library for DVD navigation support|puppy|wary5||
+libdvdplay_DEV-1.0.1-w5c|libdvdplay_DEV|1.0.1-w5c||BuildingBlock|100K||libdvdplay_DEV-1.0.1-w5c.pet|+libdvdplay|A library for DVD navigation support|puppy|wary5||
+libdvdread-4.1.3|libdvdread|4.1.3|1|BuildingBlock|240K|slackware/l|libdvdread-4.1.3-i486-1.txz||library for reading DVDs|slackware|13.37||
+libelf-0.8.13|libelf|0.8.13|2|BuildingBlock|340K|slackware/l|libelf-0.8.13-i486-2.txz||ELF object file access library|slackware|13.37||
+libexif-0.6.20|libexif|0.6.20|1|BuildingBlock|1780K|slackware/l|libexif-0.6.20-i486-1.txz||Exchangeable Image File Format library|slackware|13.37||
+libexif-gtk-0.3.5-w5|libexif-gtk|0.3.5-w5||BuildingBlock|84K||libexif-gtk-0.3.5-w5.pet|+cairo,+gtk+|GTK frontend to the libexif library|puppy|wary5||
+libexif-gtk_DEV-0.3.5-w5|libexif-gtk_DEV|0.3.5-w5||BuildingBlock|200K||libexif-gtk_DEV-0.3.5-w5.pet|+libexif-gtk|GTK frontend to the libexif library|puppy|wary5||
+libfontenc-1.1.0|libfontenc|1.1.0|1|BuildingBlock|80K|slackware/x|libfontenc-1.1.0-i486-1.txz|+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libFS-1.0.3|libFS|1.0.3|1|BuildingBlock|110K|slackware/x|libFS-1.0.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libgcrypt-1.4.6|libgcrypt|1.4.6|1|BuildingBlock|1500K|slackware/n|libgcrypt-1.4.6-i486-1.txz|+libgpg-error|General purpose crypto library|slackware|13.37||
+libgee-0.7.1-w5c|libgee|0.7.1-w5c||Develop|640K||libgee-0.7.1-w5c.pet|+vala|extra data types for vala|puppy|wary5||
+libgee_DEV-0.7.1-w5c|libgee_DEV|0.7.1-w5c||Develop|124K||libgee_DEV-0.7.1-w5c.pet|+libgee|extra data types for vala|puppy|wary5||
+libglade-2.6.4|libglade|2.6.4|4|BuildingBlock|460K|slackware/l|libglade-2.6.4-i486-4.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+libxml2,+pango,+pixman,+zlib|GLADE library|slackware|13.37||
+libgnomecanvas-2.30.2|libgnomecanvas|2.30.2|1gv|BuildingBlock|784K|salix/gnome|libgnomecanvas-2.30.2-i486-1gv.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libart_lgpl,+libpng,+libxcb,+pango,+pixman,+zlib|A powerful object oriented display|slackware|13.37||
+libgnomecups-0.2.3-w5c|libgnomecups|0.2.3-w5c||BuildingBlock|64K||libgnomecups-0.2.3-w5c.pet|+perl-xml-parser|GNOME cups library|puppy|wary5||
+libgnomecups_DEV-0.2.3-w5c|libgnomecups_DEV|0.2.3-w5c||BuildingBlock|132K||libgnomecups_DEV-0.2.3-w5c.pet|+libgnomecups|GNOME cups library|puppy|wary5||
+libgnomeprint-2.18.6-w5|libgnomeprint|2.18.6-w5||BuildingBlock|816K||libgnomeprint-2.18.6-w5.pet|+libart,+libgnomecups,+libxml,+perl-xml-parser|The GNOME printer access library|puppy|wary5||
+libgnomeprint_DEV-2.18.6-w5|libgnomeprint_DEV|2.18.6-w5||BuildingBlock|984K||libgnomeprint_DEV-2.18.6-w5.pet|+libgnomeprint|The GNOME printer access library|puppy|wary5||
+libgnomeprintui-2.18.4-w5|libgnomeprintui|2.18.4-w5||BuildingBlock|248K||libgnomeprintui-2.18.4-w5.pet|+cairo,+gnome-icon-theme,+gtk+,+libart,+libglade,+libgnomecanvas,+libgnomeprint,+libxml,+perl-xml-parser|The UI GNOME printer access library|puppy|wary5||
+libgnomeprintui_DEV-2.18.4-w5|libgnomeprintui_DEV|2.18.4-w5||BuildingBlock|424K||libgnomeprintui_DEV-2.18.4-w5.pet|+libgnomeprintui|The UI GNOME printer access library|puppy|wary5||
+libgpg-error-1.9|libgpg-error|1.9|1|BuildingBlock|470K|slackware/n|libgpg-error-1.9-i486-1.txz||GnuPG Error Definitions Library|slackware|13.37||
+libgphoto2-2.4.11-i486-s|libgphoto2|2.4.11-i486-s||BuildingBlock|1824K||libgphoto2-2.4.11-i486-s.pet||camera library|slackware|13.37||
+libgphoto2_DEV-2.4.11-i486-s|libgphoto2_DEV|2.4.11-i486-s||BuildingBlock|468K||libgphoto2_DEV-2.4.11-i486-s.pet||libgphoto dev files|slackware|13.37||
+libgsf-1.14.21-i486-spup|libgsf|1.14.21-i486-spup||BuildingBlock|384K||libgsf-1.14.21-i486-spup.pet||no description provided|slackware|13.37||
+libgsf_DEV-1.14.21-i486-spup|libgsf_DEV|1.14.21-i486-spup||BuildingBlock|1696K||libgsf_DEV-1.14.21-i486-spup.pet||no description provided|slackware|13.37||
+libgtkhtml-2.11.1-q1|libgtkhtml|2.11.1-q1||BuildingBlock|488K||libgtkhtml-2.11.1-q1.pet||html rendering library|t2|8.0rc||
+libgtkhtml_DEV-2.11.1-q1|libgtkhtml_DEV|2.11.1-q1||BuildingBlock|4208K||libgtkhtml_DEV-2.11.1-q1.pet|+libgtkhtml|html rendering library|t2|8.0rc||
+libICE-1.0.7|libICE|1.0.7|1|BuildingBlock|630K|slackware/x|libICE-1.0.7-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libid3tag-0.15.1b|libid3tag|0.15.1b|4|BuildingBlock|120K|slackware/l|libid3tag-0.15.1b-i486-4.txz|+zlib|ID3 tag manipulation library|slackware|13.37||
+libidl-0.8.14|libidl|0.8.14|1|BuildingBlock|280K|slackware/l|libidl-0.8.14-i486-1.txz|+glib2|IDL library|slackware|13.37||
+libidn-1.19|libidn|1.19|1|BuildingBlock|1290K|slackware/l|libidn-1.19-i486-1.txz||GNU Internationalized Domain Name library|slackware|13.37||
+libieee1284-0.2.11|libieee1284|0.2.11|2|BuildingBlock|280K|slackware/l|libieee1284-0.2.11-i486-2.txz||parallel port library|slackware|13.37||
+libjpeg_old-6b-p4|libjpeg_old|6b-p4||BuildingBlock|116K||libjpeg_old-6b-p4.pet||needed for gimp and others compiled for puppy4|puppy|4||
+libjpeg_old7-7|libjpeg_old7|7||BuildingBlock|196K||libjpeg_old7-7.pet||older version of JPEG library, with libjpeg.so.7|t2|8.0rc||
+libjpeg-v8a|libjpeg|v8a|1|BuildingBlock|670K|slackware/l|libjpeg-v8a-i486-1.txz||Independent JPEG Groups JPEG software|slackware|13.37||
+libmad-0.15.1b|libmad|0.15.1b|3|BuildingBlock|180K|slackware/l|libmad-0.15.1b-i486-3.txz||high quality MPEG audio library|slackware|13.37||
+libmng-1.0.10|libmng|1.0.10|2|BuildingBlock|780K|slackware/l|libmng-1.0.10-i486-2.txz|+lcms,+libjpeg,+zlib|Multiple image Network Graphics library|slackware|13.37||
+libmpc-0.8.2|libmpc|0.8.2|2|BuildingBlock|280K|slackware/l|libmpc-0.8.2-i486-2.txz|+gmp,+mpfr|Multiple Precision Complex Library|slackware|13.37||
+libnl-1.1|libnl|1.1|1|BuildingBlock|450K|slackware/l|libnl-1.1-i486-1.txz||netlink socket library|slackware|13.37||
+libnotify-0.5.2|libnotify|0.5.2|1|BuildingBlock|240K|slackware/l|libnotify-0.5.2-i486-1.txz|+atk,+cairo,+dbus,+dbus-glib,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+pango,+pixman,+zlib|notification library|slackware|13.37||
+libogg-1.2.2|libogg|1.2.2|1|BuildingBlock|390K|slackware/l|libogg-1.2.2-i486-1.txz||Ogg Bitstream library|slackware|13.37||
+liboil-0.3.17|liboil|0.3.17|1|BuildingBlock|1560K|slackware/l|liboil-0.3.17-i486-1.txz||a library of simple functions|slackware|13.37||
+libpcap-1.1.1|libpcap|1.1.1|1|BuildingBlock|820K|slackware/l|libpcap-1.1.1-i486-1.txz|+libnl|packet capture library|slackware|13.37||
+libpciaccess-0.12.1|libpciaccess|0.12.1|1|BuildingBlock|110K|slackware/x|libpciaccess-0.12.1-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libpng-1.4.5-s|libpng|1.4.5-s||BuildingBlock|496K||libpng-1.4.5-s.pet||portable networks graphis share libs|slackware|13.37||
+libpng_DEV-1.4.5-s|libpng_DEV|1.4.5-s||BuildingBlock|1792K||libpng_DEV-1.4.5-s.pet||dev png|slackware|13.37||
+libpthread-stubs-0.3|libpthread-stubs|0.3|1|BuildingBlock|20K|slackware/x|libpthread-stubs-0.3-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libraw1394-2.0.7|libraw1394|2.0.7|1|BuildingBlock|230K|slackware/l|libraw1394-2.0.7-i486-1.txz||user space IEEE 1394 driver|slackware|13.37||
+librsvg-2.32.0|librsvg|2.32.0|1|BuildingBlock|650K|slackware/l|librsvg-2.32.0-i486-1.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libxcb,+libxml2,+pango,+pixman,+zlib|SVG library|slackware|13.37||
+libsigc++-2.2.9|libsigc++|2.2.9|1pw|BuildingBlock|392K|salix/l|libsigc++-2.2.9-i486-1pw.txz|+cxxlibs,+gcc-g++,+gcc|Typesafe callback system for C++|slackware|13.37||
+libSM-1.2.0|libSM|1.2.0|1|BuildingBlock|330K|slackware/x|libSM-1.2.0-i486-1.txz|+libICE,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libsndfile-1.0.24|libsndfile|1.0.24|1|BuildingBlock|860K|slackware/l|libsndfile-1.0.24-i486-1.txz|+alsa-lib,+flac,+libogg,+libvorbis,+sqlite|C library for reading and writing wav files|slackware|13.37||
+libstdc++-5.0.6|libstdc++|5.0.6||BuildingBlock|721K||libstdc++-5.0.6.pet||cpp system library for older apps|puppy|4||
+libtheora-1.1.1|libtheora|1.1.1|1|BuildingBlock|820K|slackware/l|libtheora-1.1.1-i486-1.txz|+libogg|Theora video codec library|slackware|13.37||
+libtiff-3.9.4|libtiff|3.9.4|2|BuildingBlock|1540K|slackware/l|libtiff-3.9.4-i486-2.txz|+gcc,+cxxlibs,+gcc-g++,+libICE,+libSM,+libX11,+libXau,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXmu,+libXt,+libXxf86vm,+libdrm,+libjpeg,+libxcb,+mesa,+util-linux,+zlib|a library for reading and writing TIFF files|slackware|13.37||
+libtool-2.4|libtool|2.4|1|BuildingBlock|2200K|slackware/d|libtool-2.4-i486-1.txz||a generic library support script|slackware|13.37||
+libusb-1.0.8|libusb|1.0.8|2|BuildingBlock|260K|slackware/l|libusb-1.0.8-i486-2.txz||USB library|slackware|13.37||
+libusb-compat-0.1.3-i486-s|libusb-compat|0.1.3-i486-s||BuildingBlock|32K||libusb-compat-0.1.3-i486-s.pet||older compatible libusb|slackware|13.37||
+libusb-compat_DEV-0.1.3-i486-s|libusb-compat_DEV|0.1.3-i486-s||BuildingBlock|96K||libusb-compat_DEV-0.1.3-i486-s.pet||libusb-compat dev files|slackware|13.37||
+libvorbis-1.3.2|libvorbis|1.3.2|1|BuildingBlock|2410K|slackware/l|libvorbis-1.3.2-i486-1.txz|+libogg|Ogg Vorbis library|slackware|13.37||
+libvpx-110630-git-s|libvpx|110630-git-s||BuildingBlock|1220K||libvpx-110630-git-s.pet||codec lib vpx|slackware|13.37||
+libvpx_DEV-110630-git-s|libvpx_DEV|110630-git-s||BuildingBlock|812K||libvpx_DEV-110630-git-s.pet||vpx dev files|slackware|13.37||
+libX11-1.4.3|libX11|1.4.3|2|BuildingBlock|15750K|slackware/x|libX11-1.4.3-i486-2.txz|+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libx86-1.1|libx86|1.1|1|BuildingBlock|20K|slackware/ap|libx86-1.1-i486-1.txz||hardware independent library for x86 code execution|slackware|13.37||
+libXau-1.0.6|libXau|1.0.6|1|BuildingBlock|80K|slackware/x|libXau-1.0.6-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXaw-1.0.9|libXaw|1.0.9|1|BuildingBlock|2210K|slackware/x|libXaw-1.0.9-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libxcb-1.7|libxcb|1.7|1|BuildingBlock|2930K|slackware/x|libxcb-1.7-i486-1.txz|+libXau,+libXdmcp|X protocol C language Binding|slackware|13.37||
+libXcomposite-0.4.3|libXcomposite|0.4.3|1|BuildingBlock|80K|slackware/x|libXcomposite-0.4.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXcursor-1.1.11|libXcursor|1.1.11|1|BuildingBlock|140K|slackware/x|libXcursor-1.1.11-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXfixes,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXdamage-1.1.3|libXdamage|1.1.3|1|BuildingBlock|60K|slackware/x|libXdamage-1.1.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXfixes,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXdmcp-1.1.0|libXdmcp|1.1.0|1|BuildingBlock|280K|slackware/x|libXdmcp-1.1.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXevie-1.0.3|libXevie|1.0.3|1|BuildingBlock|60K|slackware/x|libXevie-1.0.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXext-1.2.0|libXext|1.2.0|1|BuildingBlock|500K|slackware/x|libXext-1.2.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXfixes-5.0|libXfixes|5.0|1|BuildingBlock|70K|slackware/x|libXfixes-5.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXfont-1.4.3|libXfont|1.4.3|1|BuildingBlock|350K|slackware/x|libXfont-1.4.3-i486-1.txz|+freetype,+libfontenc,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXfontcache-1.0.5|libXfontcache|1.0.5|1|BuildingBlock|60K|slackware/x|libXfontcache-1.0.5-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXft-2.2.0|libXft|2.2.0|1|BuildingBlock|160K|slackware/x|libXft-2.2.0-i486-1.txz|+expat,+fontconfig,+freetype,+libX11,+libXau,+libXdmcp,+libXrender,+libxcb,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXi-1.4.2|libXi|1.4.2|1|BuildingBlock|940K|slackware/x|libXi-1.4.2-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXinerama-1.1.1|libXinerama|1.1.1|1|BuildingBlock|70K|slackware/x|libXinerama-1.1.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libxkbfile-1.0.7|libxkbfile|1.0.7|1|BuildingBlock|220K|slackware/x|libxkbfile-1.0.7-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libxml2-2.7.8|libxml2|2.7.8|3|BuildingBlock|10230K|slackware/l|libxml2-2.7.8-i486-3.txz|+python,+zlib|XML parser library|slackware|13.37||
+libXmu-1.1.0|libXmu|1.1.0|1|BuildingBlock|550K|slackware/x|libXmu-1.1.0-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXext,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXp-1.0.1|libXp|1.0.1|1|BuildingBlock|150K|slackware/x|libXp-1.0.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXpm-3.5.9|libXpm|3.5.9|1|BuildingBlock|210K|slackware/x|libXpm-3.5.9-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXext,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXrandr-1.3.1|libXrandr|1.3.1|1|BuildingBlock|130K|slackware/x|libXrandr-1.3.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXrender-0.9.6|libXrender|0.9.6|1|BuildingBlock|110K|slackware/x|libXrender-0.9.6-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXres-1.0.5|libXres|1.0.5|1|BuildingBlock|70K|slackware/x|libXres-1.0.5-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXScrnSaver-1.2.1|libXScrnSaver|1.2.1|1|BuildingBlock|80K|slackware/x|libXScrnSaver-1.2.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libxslt-1.1.26|libxslt|1.1.26|1|BuildingBlock|2830K|slackware/l|libxslt-1.1.26-i486-1.txz|+libgcrypt,+libgpg-error,+libxml2,+zlib|XML transformation library|slackware|13.37||
+libXt-1.1.1|libXt|1.1.1|1|BuildingBlock|1130K|slackware/x|libXt-1.1.1-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXtst-1.2.0|libXtst|1.2.0|1|BuildingBlock|250K|slackware/x|libXtst-1.2.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXi,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXv-1.0.6|libXv|1.0.6|1|BuildingBlock|120K|slackware/x|libXv-1.0.6-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXvMC-1.0.6|libXvMC|1.0.6|1|BuildingBlock|120K|slackware/x|libXvMC-1.0.6-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXv,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXxf86dga-1.1.2|libXxf86dga|1.1.2|1|BuildingBlock|100K|slackware/x|libXxf86dga-1.1.2-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXxf86misc-1.0.3|libXxf86misc|1.0.3|1|BuildingBlock|60K|slackware/x|libXxf86misc-1.0.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+libXxf86vm-1.1.1|libXxf86vm|1.1.1|1|BuildingBlock|100K|slackware/x|libXxf86vm-1.1.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+linux_firewall-2.0rc9-puppy2|linux_firewall|2.0rc9-puppy2||Network|132K||linux_firewall-2.0rc9-puppy2.pet||Firewall||||
+linux_firmware_dvb-1.20|linux_firmware_dvb|1.20||BuildingBlock|48K||linux_firmware_dvb-1.20.pet||dvb usb kernel firmware||||
+linux_kernel-3.1.10-patched_s_4gA|linux_kernel|3.1.10-patched_s_4gA||BuildingBlock|65900K||linux_kernel-3.1.10-patched_s_4gA.pet||linux||||
+linuxtv-dvb-apps-1.1.1-rev1273-p4|linuxtv-dvb-apps|1.1.1-rev1273-p4||BuildingBlock|3984K|pet_packages-4|linuxtv-dvb-apps-1.1.1-rev1273-p4.pet||linux dvb utilities|puppy|4|official|
+linuxtv-dvb-apps_DEV-1.1.1-rev1273-p4|linuxtv-dvb-apps_DEV|1.1.1-rev1273-p4||BuildingBlock|1844K|pet_packages-4|linuxtv-dvb-apps_DEV-1.1.1-rev1273-p4.pet|+linuxtv-dvb-apps|linux dvb utilities|puppy|4|official|
+listres-1.0.2|listres|1.0.2|1|BuildingBlock|50K|slackware/x|listres-1.0.2-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+luit-1.1.0|luit|1.1.0|1|BuildingBlock|80K|slackware/x|luit-1.1.0-i486-1.txz|+libfontenc,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+m4-1.4.16|m4|1.4.16|1|BuildingBlock|480K|slackware/d|m4-1.4.16-i486-1.txz||an implementation of the UNIX macro processor|slackware|13.37||
+make-3.82|make|3.82|2|Utility|1260K|slackware/d|make-3.82-i486-2.txz||GNU make utility to maintain groups of programs|slackware|13.37||
+makebootfat-1.4-patched1-1|makebootfat|1.4-patched1-1||BuildingBlock|31K||makebootfat-1.4-patched1-1.pet||formats usb drive as bootable|puppy|4||
+makedepend-1.0.3|makedepend|1.0.3|1|BuildingBlock|60K|slackware/x|makedepend-1.0.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+man-1.6g|man|1.6g|1|BuildingBlock|500K|slackware/ap|man-1.6g-i486-1.txz|+groff|format and display the on line manual pages|slackware|13.37||
+man_cut-1.6e|man_cut|1.6e||BuildingBlock|48K||man_cut-1.6e.pet||only has man2html from man pkg|puppy|4||
+metamail-2.7|metamail|2.7|5|BuildingBlock|380K|slackware/n|metamail-2.7-i486-5.txz|+ncurses|MIME extensions for mail|slackware|13.37||
+mhwaveedit-1.4.20-i486-spup|mhwaveedit|1.4.20-i486-spup||Multimedia|392K||mhwaveedit-1.4.20-i486-spup.pet||Audio recorder/editor|slackware|13.1||
+mingetty-1.08|mingetty|1.08||BuildingBlock|20K||mingetty-1.08.pet||small getty replacement, features autologin, compiled statically should work all puppies||||
+mirdir-2.1|mirdir|2.1||BuildingBlock|31K||mirdir-2.1.pet||File/directory sync tool|puppy|4||
+mkcomposecache-1.2.1|mkcomposecache|1.2.1|1|BuildingBlock|40K|slackware/x|mkcomposecache-1.2.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+mkfontdir-1.0.6|mkfontdir|1.0.6|1|BuildingBlock|50K|slackware/x|mkfontdir-1.0.6-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+mkfontscale-1.0.8|mkfontscale|1.0.8|1|BuildingBlock|70K|slackware/x|mkfontscale-1.0.8-i486-1.txz|+freetype,+libfontenc,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+mktemp-1.7-w5c|mktemp|1.7-w5c||BuildingBlock|24K||mktemp-1.7-w5c.pet||Make temporary filename unique|puppy|wary5||
+modem_stats-1.0.1|modem_stats|1.0.1||BuildingBlock|6K||modem_stats-1.0.1.pet||send commands to a modem|puppy|4||
+module-init-tools-3.12|module-init-tools|3.12|2|BuildingBlock|1050K|slackware/a|module-init-tools-3.12-i486-2.txz||kernel module utilities|slackware|13.37||
+mountcifs-1.5|mountcifs|1.5||BuildingBlock|28K||mountcifs-1.5.pet||needed by pnethood|puppy|4||
+mp-3.2.13-q1|mp|3.2.13-q1||Document|196K||mp-3.2.13-q1.pet||MP console editor|t2|8.0rc||
+mpfr-3.0.1|mpfr|3.0.1|1|BuildingBlock|1200K|slackware/l|mpfr-3.0.1-i486-1.txz|+gmp|Multiple Precision Floating Point Reliable Library|slackware|13.37||
+mplayer_codecs_basic-20071007|mplayer_codecs_basic|20071007||Multimedia|612K||mplayer_codecs_basic-20071007.pet||minimum essential codecs||||
+mplayer-git-110702-spup|mplayer-git|110702-spup||BuildingBlock|3948K||mplayer-git-110702-spup.pet||media player|slackware|13.37||
+mscw-2|mscw|2||Setup|36K||mscw-2.pet|+alsa-lib,+gtkdialog3|Multiple Sound Card Wizard||||
+ms-sys-2.1.2|ms-sys|2.1.2||BuildingBlock|64K||ms-sys-2.1.2.pet||create windows mbr|puppy|4||
+mtpaint-3.40-s|mtpaint|3.40-s||Graphic|594K||mtpaint-3.40-s.pet||mtPaint image editor|slackware|13.37||
+mtr-0.80|mtr|0.80|1|Network|140K|slackware/n|mtr-0.80-i486-1.txz|+atk,+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libpng,+libtermcap,+libxcb,+ncurses,+pango,+pixman,+zlib|a network diagnostic tool|slackware|13.37||
+mut2-1.3.2.1238|mut2|1.3.2.1238||BuildingBlock|138K|pet_packages-4|mut2-1.3.2.1238.pet||commandline drive info tool|puppy|4||
+nasm-2.09.04|nasm|2.09.04|1|Develop|990K|slackware/d|nasm-2.09.04-i486-1.txz||NASM assembler|slackware|13.37||
+nbtscan-1.5.1a-james-patched|nbtscan|1.5.1a-james-patched||BuildingBlock|36K||nbtscan-1.5.1a-james-patched.pet||needed by pnethood|puppy|4||
+ncurses-5.9|ncurses|5.9|1|BuildingBlock|7020K|slackware/l|ncurses-5.9-i486-1.txz||CRT screen handling and optimization package|slackware|13.37||
+ndiswrapper-3090-w5|ndiswrapper|3090-w5||BuildingBlock|64K||ndiswrapper-3090-w5.pet|+perl_tiny,+linux_kernel&ge3.0|use windows wireless drivers in linux|puppy|wary5||
+nenscript-1.13.3|nenscript|1.13.3||BuildingBlock|36K||nenscript-1.13.3.pet||Text file to Postscript converter|puppy|4||
+neon-0.29.5|neon|0.29.5|1|BuildingBlock|860K|slackware/l|neon-0.29.5-i486-1.txz|+expat,+openssl-solibs,+openssl,+zlib|HTTP and WebDAV client library|slackware|13.37||
+netpbm-10.34-w5|netpbm|10.34-w5||BuildingBlock|684K||netpbm-10.34-w5.pet|+libxml|Collection of primitive graphics tools converters etc|puppy|wary5||
+netpbm_DEV-10.34-w5|netpbm_DEV|10.34-w5||BuildingBlock|340K||netpbm_DEV-10.34-w5.pet|+netpbm|Collection of primitive graphics tools converters etc|puppy|wary5||
+net_setup-20120225|net_setup|20120225||Setup|352K||net_setup-20120225.pet||Network Wizard||||
+net-tools-1.60|net-tools|1.60|3|BuildingBlock|380K|slackware/n|net-tools-1.60-i486-3.txz||base Linux networking utilities|slackware|13.37||
+network_tray-2.4.6-spup|network_tray|2.4.6-spup||Desktop|236K||network_tray-2.4.6-spup.pet||network display|slackware|13.37||
+normalize-0.7.7|normalize|0.7.7|1|BuildingBlock|200K|slackware/ap|normalize-0.7.7-i486-1.txz|+audiofile,+libmad|adjusts volume levels of audio files|slackware|13.37||
+notecase-1.9.8-needs_gtksourceview-1|notecase|1.9.8-needs_gtksourceview-1||Personal|948K||notecase-1.9.8-needs_gtksourceview-1.pet|+gtk+,+gtksourceview|excellent outliner|puppy|4||
+ntfs-3g-2011.1.15|ntfs-3g|2011.1.15|1|BuildingBlock|890K|slackware/a|ntfs-3g-2011.1.15-i486-1.txz||NTFS read write filesystem driver|slackware|13.37||
+ntfsprogs-2.0.0|ntfsprogs|2.0.0|2|BuildingBlock|1000K|slackware/ap|ntfsprogs-2.0.0-i486-2.txz|+util-linux|utilities for working with NTFS volumes|slackware|13.37||
+numlockx-1.2-i486|numlockx|1.2-i486||BuildingBlock|24K||numlockx-1.2-i486.pet||turns on numlock at boot|puppy|wary5||
+openal-soft-1.13-i486|openal-soft|1.13-i486||BuildingBlock|304K||openal-soft-1.13-i486.pet||games lib|slackware|13.37||
+openal-soft_DEV-1.13-i486|openal-soft_DEV|1.13-i486||BuildingBlock|112K||openal-soft_DEV-1.13-i486.pet||openal dev files||||
+opencore-amr-0.1.2|opencore-amr|0.1.2|1gv|BuildingBlock|592K|salix/ap|opencore-amr-0.1.2-i486-1gv.txz|+gcc,+cxxlibs,+gcc-g++|AMR Narrowband and Wideband speech codec|slackware|13.37||
+openldap-client-2.4.23|openldap-client|2.4.23|1|BuildingBlock|1400K|slackware/n|openldap-client-2.4.23-i486-1.txz|+cyrus-sasl,+openssl-solibs,+openssl|OpenLDAP client programs|slackware|13.37||
+openssh-5.8p1|openssh|5.8p1|1|Internet|2180K|slackware/n|openssh-5.8p1-i486-1.txz|+openssl-solibs,+openssl,+zlib|Secure Shell daemon and clients|slackware|13.37||
+openssl-0.9.8r|openssl|0.9.8r|3|BuildingBlock|9250K|slackware/n|openssl-0.9.8r-i486-3.txz||Secure Sockets Layer toolkit|slackware|13.37||
+orc-0.4.11|orc|0.4.11|1gv|BuildingBlock|544K|salix/d|orc-0.4.11-i486-1gv.txz||The Oil Runtime Compiler|slackware|13.37||
+osmo-0.2.10-w5|osmo|0.2.10-w5||Personal|932K||osmo-0.2.10-w5.pet|+gtk+,+libgtkhtml|Osmo personal organizer|puppy|wary5||
+p7zip-9.20.1-i486-w5|p7zip|9.20.1-i486-w5||Utility|2452K||p7zip-9.20.1-i486-w5.pet||7z archive/extract utility, handles many formats|puppy|wary5||
+pango-1.28.4|pango|1.28.4|1|BuildingBlock|3460K|slackware/l|pango-1.28.4-i486-1.txz|+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+glib2,+libX11,+libXau,+libXdmcp,+libXft,+libXrender,+libpng,+libxcb,+pixman,+zlib|library for layout and rendering of text|slackware|13.37||
+pangomm-2.28.2|pangomm|2.28.2||BuildingBlock|2496K||pangomm-2.28.2.pet||no description provided|slackware|13.37||
+parcellite-1.0.2rc2-i486|parcellite|1.0.2rc2-i486||BuildingBlock|88K||parcellite-1.0.2rc2-i486.pet||no description provided|slackware|13.37||
+parted-2.4-w52|parted|2.4-w52||BuildingBlock|2467K||parted-2.4-w52.pet||fat f.s. library|puppy|wary5||
+parted_DEV-2.4-w52|parted_DEV|2.4-w52||BuildingBlock|2467K||parted_DEV-2.4-w52.pet|+parted|fat f.s. library|puppy|wary5||
+patch-2.6.1|patch|2.6.1|1|Filesystem|230K|slackware/a|patch-2.6.1-i486-1.txz||apply a diff file to an original file or files|slackware|13.37||
+pbackup-3.1.9|pbackup|3.1.9||Utility|240K||pbackup-3.1.9.pet|+xdialog,+gtkdialog3,+dvd+rwtools,+cdrkit,+curl|Pbackup Backup and Sync||||
+pburn-3.5.2|pburn|3.5.2||Multimedia|360K||pburn-3.5.2.pet|+gtkdialog,+core-utils,+cdrkit,+dvd+rw-tools,+ffmpeg,+pfilesearch,+dvdauthor,+vobcopy,+vamps,+vcdimager,+normalize,|Pburn CD/DVD/Blu-ray writer|||official|
+pciutils-3.1.7|pciutils|3.1.7|1|BuildingBlock|1040K|slackware/a|pciutils-3.1.7-i486-1.txz|+zlib|PCI utilities|slackware|13.37||
+pclock-0.2|pclock|0.2||Personal|44K||pclock-0.2.pet||pClock Time tools||||
+pcmciautils-017|pcmciautils|017|1|BuildingBlock|110K|slackware/a|pcmciautils-017-i486-1.txz|+sysfsutils|Utilities for using PCMCIA cards with 2.6+ kernels|slackware|13.37||
+pcre-8.12|pcre|8.12|1|BuildingBlock|1590K|slackware/l|pcre-8.12-i486-1.txz|+gcc,+cxxlibs,+gcc-g++|Perl compatible regular expression library|slackware|13.37||
+pdvdrsab-0.1|pdvdrsab|0.1||Multimedia|52K||pdvdrsab-0.1.pet|+gtkdialog3,+dvdauthor,+vobcopy,+vamps,+ffmpeg|dvd rip,shrink,author,burn||||
+peasypdf-1.4|peasypdf|1.4||Document|52K||peasypdf-1.4.pet||Build multi-page PDF documents||||
+peasyscan-1.7|peasyscan|1.7||Graphic|164K||peasyscan-1.7.pet|+sane-backends,+gtkdialog3|Peasyscan simple image scanner, created by rcrsn51||||
+pequalizer-0.4.0|pequalizer|0.4.0||Multimedia|96K||pequalizer-0.4.0.pet|+alsaequal,+caps|pequalizer Graphical Equalizer||||
+perl-5.12.3|perl|5.12.3|1|BuildingBlock|56090K|slackware/d|perl-5.12.3-i486-1.txz|+db44,+expat,+gdbm,+openssl-solibs,+openssl,+zlib|Practical Extraction and Report Language|slackware|13.37||
+perl-digest-sha1_DEV-2.12-w5c|perl-digest-sha1_DEV|2.12-w5c||BuildingBlock|76K||perl-digest-sha1_DEV-2.12-w5c.pet|+perl-digest-sha1|A module for SHA1|puppy|wary5||
+perl-html-parser_DEV-3.64-w5c|perl-html-parser_DEV|3.64-w5c||BuildingBlock|180K||perl-html-parser_DEV-3.64-w5c.pet|+perl-html-parser|A HTMLParser module from CPAN|puppy|wary5||
+pfilesearch-1.28|pfilesearch|1.28||BuildingBlock|80K||pfilesearch-1.28.pet||file finder engine||||
+pfind-4.25|pfind|4.25||Filesystem|188K||pfind-4.25.pet|+gtkdialog3,+pfilesearch,|Pfind file finder|||official|
+picocom-1.2|picocom|1.2||Utility|56K||picocom-1.2.pet||Serial port comms|puppy|4||
+pixman-0.20.2|pixman|0.20.2|1|BuildingBlock|450K|slackware/x|pixman-0.20.2-i486-1.txz||both xorg and cairo.|slackware|13.37||
+pkg-config-0.25|pkg-config|0.25|1|BuildingBlock|160K|slackware/d|pkg-config-0.25-i486-1.txz||system for managing library compilelink flags|slackware|13.37||
+pmirc-0.2|pmirc|0.2||Internet|24K||pmirc-0.2.pet||tiny commandline IRC client||||
+pmirror-0.5-1|pmirror|0.5-1||Utility|48K||pmirror-0.5-1.pet|+mirdir|Pmirror backup a directory||||
+pmirrorget-0.1.1|pmirrorget|0.1.1||Internet|28K||pmirrorget-0.1.1.pet|+gtkdialog3|Website File Grabber||||
+pmusic-2.5.3|pmusic|2.5.3||Multimedia|668K||pmusic-2.5.3.pet|+gtkdialog4,+ffmpeg,+cdrkit,+wget,+pschedule,+pburn,+streamripper,+pfilesearch|-Player -Manaager -Grabber|||official|
+pmusic_tray-0.1-x86_32|pmusic_tray|0.1-x86_32||BuildingBlock|24K||pmusic_tray-0.1-x86_32.pet|+pmusic|Pmusic tray app|slackware|13.37||
+pnethood-0.6.8-2|pnethood|0.6.8-2||Network|100K||pnethood-0.6.8-2.pet|+nbtscan,+mountcifs,+gtkdialog4,+samba_client|connect to samba shares||||
+pns_tool_pup-0.3|pns_tool_pup|0.3||Network|48K||pns_tool_pup-0.3.pet||pns-tool connect from commandline||||
+poppler-0.16.4|poppler|0.16.4|1|BuildingBlock|4630K|slackware/l|poppler-0.16.4-i486-1.txz|+cairo,+expat,+fontconfig,+freetype,+gcc,+cxxlibs,+gcc-g++,+gdk-pixbuf2,+glib2,+gtk+2,+lcms,+libICE,+libSM,+libX11,+libXau,+libXcomposite,+libXcursor,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXi,+libXinerama,+libXrandr,+libXrender,+libjpeg,+libpng,+libxcb,+libxml2,+pango,+pixman,+util-linux,+zlib|a library for rendering PDF documents|slackware|13.37||
+popt-1.7|popt|1.7|3|BuildingBlock|180K|slackware/l|popt-1.7-i486-3.txz||command line parsing library|slackware|13.37||
+pplog-1.1.2-2|pplog|1.1.2-2||Personal|188K||pplog-1.1.2-2.pet|+perl_tiny,+hiawatha|PPLOG personal blog||||
+ppp-2.4.5|ppp|2.4.5|1|BuildingBlock|1130K|slackware/n|ppp-2.4.5-i486-1.txz|+libnl,+libpcap|Point to Point Protocol|slackware|13.37||
+pprocess-2.2.4|pprocess|2.2.4||System|64K||pprocess-2.2.4.pet||Pprocess process manager||||
+pptp-1.7.1|pptp|1.7.1||BuildingBlock|80K||pptp-1.7.1.pet|+ppp||puppy|4||
+prename-0.7|prename|0.7||Filesystem|48K||prename-0.7.pet|+gtkdialog3|batch file renamer||||
+printproto-1.0.5|printproto|1.0.5|1|BuildingBlock|70K|slackware/x|printproto-1.0.5-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+procps-3.2.8|procps|3.2.8|3|BuildingBlock|600K|slackware/a|procps-3.2.8-i486-3.txz|+libtermcap,+ncurses|utilities for displaying process information|slackware|13.37||
+programchooser-0.3|programchooser|0.3||BuildingBlock|76K||programchooser-0.3.pet|+gtkdialog3|used by wallpaper-setter||||
+pschedule-1.0.2|pschedule|1.0.2||System|84K||pschedule-1.0.2.pet|+gtkdialog3|Pschedule task on time||||
+psmisc-22.14-w5c|psmisc|22.14-w5c||BuildingBlock|36K||psmisc-22.14-w5c.pet||Little utilities that use the proc FS|puppy|wary5||
+psync-2.8|psync|2.8||Desktop|124K||psync-2.8.pet||Psync Time Server Synchronisation|slackware|13.37||
+ptiming-0.8|ptiming|0.8||Personal|116K||ptiming-0.8.pet|+gtkdialog|pTiming event timer system|||official|
+PupControl-1.8.8|PupControl|1.8.8||Utility|301K||PupControl-1.8.8.pet||PupControl panel||||
+puppyinputdetect-1.1i|puppyinputdetect|1.1i||BuildingBlock|7K||puppyinputdetect-1.1i.pet||detect mouse, keyboard|puppy|4||
+puppyserialdetect-1.1h|puppyserialdetect|1.1h||BuildingBlock|36K||puppyserialdetect-1.1h.pet||detects mouse, keyboard and modem, jesses latest|puppy|4||
+pupradio-0.14|pupradio|0.14||Multimedia|64K||pupradio-0.14.pet||pupRadio/pupTelly streaming media||||
+pupx-0.3|pupx|0.3||Desktop|48K||pupx-0.3.pet||Pupx X settings||||
+pure_ftpd-1.0.22-2|pure_ftpd|1.0.22-2||Network|92K||pure_ftpd-1.0.22-2.pet||ftp server, with gui frontend|puppy|4||
+pwsget-0.1|pwsget|0.1||Internet|40K||pwsget-0.1.pet|+gtkdialog3|Pwsget secure file downloader||||
+python-2.6.6|python|2.6.6|1|Develop|71410K|slackware/d|python-2.6.6-i486-1.txz||object oriented interpreted programming language|slackware|13.37||
+pzchmview-1.0d-1|pzchmview|1.0d-1||Document|28K||pzchmview-1.0d-1.pet|+chmlib|PZCHMView CHM Viewer||||
+radeon_ucode-20110302|radeon_ucode|20110302|1|Graphic|250K|slackware/x|radeon_ucode-20110302-noarch-1.txz||microcodefirmware for some Radeon graphics cards|slackware|13.37||
+randrproto-1.3.2|randrproto|1.3.2|1|BuildingBlock|160K|slackware/x|randrproto-1.3.2-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+raptor-1.4.21|raptor|1.4.21|1|BuildingBlock|2090K|slackware/l|raptor-1.4.21-i486-1.txz|+curl,+cyrus-sasl,+libidn,+libxml2,+libxslt,+openldap-client,+openssl-solibs,+openssl,+zlib|RDF Parser  Serializer|slackware|13.37||
+rasqal-0.9.21|rasqal|0.9.21|1|BuildingBlock|1570K|slackware/l|rasqal-0.9.21-i486-1.txz|+curl,+cyrus-sasl,+gmp,+libidn,+libxml2,+libxslt,+mpfr,+openldap-client,+openssl-solibs,+openssl,+raptor,+zlib|RDF parsing library|slackware|13.37||
+readline-5.2|readline|5.2|4|BuildingBlock|820K|slackware/l|readline-5.2-i486-4.txz||line input library with editing features|slackware|13.37||
+recordproto-1.14.1|recordproto|1.14.1|1|BuildingBlock|180K|slackware/x|recordproto-1.14.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+redland-1.0.12|redland|1.0.12|1|BuildingBlock|2150K|slackware/l|redland-1.0.12-i486-1.txz|+curl,+cyrus-sasl,+db44,+gmp,+libidn,+libiodbc,+libtool,+libxml2,+libxslt,+mpfr,+mysql,+openldap-client,+openssl-solibs,+openssl,+raptor,+rasqal,+sqlite,+zlib|RDF high level interface library|slackware|13.37||
+rendercheck-1.4|rendercheck|1.4|1|BuildingBlock|100K|slackware/x|rendercheck-1.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+renderproto-0.11.1|renderproto|0.11.1|1|BuildingBlock|90K|slackware/x|renderproto-0.11.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+replaceit-1.0.0|replaceit|1.0.0||BuildingBlock|32K||replaceit-1.0.0.pet||text replacement in a file|puppy|4||
+resourceproto-1.1.1|resourceproto|1.1.1|1|BuildingBlock|40K|slackware/x|resourceproto-1.1.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+retrovol-0.12-i486|retrovol|0.12-i486||BuildingBlock|91K||retrovol-0.12-i486.pet||tray volume app|slackware|13.37||
+rman_DEV-3.2-w5c|rman_DEV|3.2-w5c||BuildingBlock|96K||rman_DEV-3.2-w5c.pet|+rman|A manual page translator to HTML ASCII TkMan DocBook ...|puppy|wary5||
+rox_filer-120220-s|rox_filer|120220-s||Filesystem|1500K||rox_filer-120220-s.pet||ROX-Filer file manager|slackware|13.37||
+rp_pppoe_cli-3.8-patched2-2-p4|rp_pppoe_cli|3.8-patched2-2-p4||Network|448K||rp_pppoe_cli-3.8-patched2-2-p4.pet||roaring penguin pppoe internet connection|puppy|4||
+rsync-3.0.8|rsync|3.0.8|1|BuildingBlock|520K|slackware/n|rsync-3.0.8-i486-1.txz|+acl,+attr,+popt|remote file sync|slackware|13.37||
+rubix-1.03|rubix|1.03||Fun|72K|pet_packages-4|rubix-1.03.pet||Game|puppy|4||
+rxvt-unicode-9.05-1|rxvt-unicode|9.05-1||Utility|||rxvt-unicode-9.05-1.pet||terminal emulator, compatible with rxvt, supports unicode|puppy|4||
+samba_client-3.0.37|samba_client|3.0.37||BuildingBlock|1008K||samba_client-3.0.37.pet||samba client utilities, note, compiled in slackware 13.1 but should work in all puppies||||
+samba_mount_cifs-3.0.37-s131|samba_mount_cifs|3.0.37-s131||BuildingBlock|48K||samba_mount_cifs-3.0.37-s131.pet||mount.cifs and umount.cifs from samba package|slackware|13.1||
+sane-backends-1.0.22-w52|sane-backends|1.0.22-w52||BuildingBlock|9461K||sane-backends-1.0.22-w52.pet||scanner library, used by xsane|puppy|wary5||
+sane-backends_DEV-1.0.22-w52|sane-backends_DEV|1.0.22-w52||BuildingBlock|9461K||sane-backends_DEV-1.0.22-w52.pet|+sane-backends|scanner library|puppy|wary5||
+scale2x-2.0|scale2x|2.0||Graphic|68K||scale2x-2.0.pet||PNG image scaling utility|puppy|4||
+schroedinger-1.0.10|schroedinger|1.0.10|1gv|BuildingBlock|964K|salix/l|schroedinger-1.0.10-i486-1gv.txz|+gcc,+cxxlibs,+gcc-g++,+orc|Library for ende coding video in the Dirac format|slackware|13.37||
+screeny-0.2|screeny|0.2||Graphic|48K||screeny-0.2.pet|+xwd|Screeny Capture Windows and Fullscreen||||
+scrnsaverproto-1.2.1|scrnsaverproto|1.2.1|1|BuildingBlock|120K|slackware/x|scrnsaverproto-1.2.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+SDL-1.2.14-i486|SDL|1.2.14-i486||BuildingBlock|396K||SDL-1.2.14-i486.pet||sdl library|slackware|13.1||
+SDL_DEV-1.2.14-i486|SDL_DEV|1.2.14-i486||BuildingBlock|620K||SDL_DEV-1.2.14-i486.pet||no description provided|slackware|13.1||
+seamonkey-2.9.1-slacko|seamonkey|2.9.1-slacko||Internet|34936K||seamonkey-2.9.1-slacko.pet||SeaMonkey browser suite|slackware|13.37||
+seamonkey_DEV-2.9.1-slacko|seamonkey_DEV|2.9.1-slacko||BuildingBlock|32056K||seamonkey_DEV-2.9.1-slacko.pet||seamonkey headers||||
+sed-4.2.1|sed|4.2.1|1|BuildingBlock|560K|slackware/a|sed-4.2.1-i486-1.txz|+acl,+attr|stream editor|slackware|13.37||
+Send-to-Backgrounds-update-01|Send-to-Backgrounds-update|01||BuildingBlock|8K||Send-to-Backgrounds-update-01.pet||no description provided||||
+sessreg-1.0.6|sessreg|1.0.6|1|BuildingBlock|60K|slackware/x|sessreg-1.0.6-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+setserial-2.17-w5|setserial|2.17-w5||BuildingBlock|24K||setserial-2.17-w5.pet||Utility for doing runtime configuration of the serial driver|puppy|wary5||
+setvol-1.1|setvol|1.1||BuildingBlock|32K||setvol-1.1.pet||Console volume control|puppy|4||
+setxkbmap-1.2.0|setxkbmap|1.2.0|1|BuildingBlock|60K|slackware/x|setxkbmap-1.2.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb,+libxkbfile|For more information about the X.Org Foundation the providers of|slackware|13.37||
+sfs-converter-1.3.2-1|sfs-converter|1.3.2-1||Setup|44K||sfs-converter-1.3.2-1.pet|+gtkdialog3,+squashfs-tools,+squashfs-tools4|Utility to convert sfs 3 to 4, vice versa||||
+sfs_load-1.9.3|sfs_load|1.9.3||Setup|380K||sfs_load-1.9.3.pet||Load Squash files||||
+shared-mime-info-0.70-6|shared-mime-info|0.70-6||BuildingBlock|272K||shared-mime-info-0.70-6.pet||mime information||||
+shared-mime-info_DEV-0.70-6|shared-mime-info_DEV|0.70-6||BuildingBlock|3772K||shared-mime-info_DEV-0.70-6.pet|+shared-mime-info|mime information||||
+showfont-1.0.3|showfont|1.0.3|1|BuildingBlock|50K|slackware/x|showfont-1.0.3-i486-1.txz|+libFS|For more information about the X.Org Foundation the providers of|slackware|13.37||
+slickpet-1.9.5|slickpet|1.9.5||Setup|476K||slickpet-1.9.5.pet||Slickpet Install Popular Programs||||
+smproxy-1.0.4|smproxy|1.0.4|1|BuildingBlock|60K|slackware/x|smproxy-1.0.4-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXmu,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+snap2-4.21|snap2|4.21||Utility|152K||snap2-4.21.pet|+rsync|Snap2 snapshot backup||||
+speex-1.2rc1|speex|1.2rc1|1tm|BuildingBlock|2028K|salix/ap|speex-1.2rc1-i486-1tm.txz|+libogg|The Speex Project aims to lower the barrier of entry|slackware|13.37||
+sqlite-3.7.5|sqlite|3.7.5|1|BuildingBlock|920K|slackware/ap|sqlite-3.7.5-i486-1.txz|+ncurses,+readline|simple self contained database engine|slackware|13.37||
+squashfs-tools-3.3|squashfs-tools|3.3||BuildingBlock|148K||squashfs-tools-3.3.pet||A compressed read-only filesystem for Linux, for squashfs 3.x filesystems|puppy|4||
+squashfs-tools4-4.2-gzip-xz-w5|squashfs-tools4|4.2-gzip-xz-w5||BuildingBlock|200K||squashfs-tools4-4.2-gzip-xz-w5.pet|+linux_kernel&ge2.6.39|squashfs utilities, with gzip and xz compression support, use with kernel 2.6.39 or later and with xz support|puppy|wary5||
+ssh_gui-0.7.1-1-p4|ssh_gui|0.7.1-1-p4||Internet|40K||ssh_gui-0.7.1-1-p4.pet|+gtk+,+openssh_client|secure telnet gui|puppy|4||
+startup-notification-0.10|startup-notification|0.10|1|BuildingBlock|110K|slackware/l|startup-notification-0.10-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libxcb,+util-linux,+xcb-util|busy cursors support|slackware|13.37||
+strace-4.5.20|strace|4.5.20|1|System|270K|slackware/d|strace-4.5.20-i486-1.txz||trace system calls and signals|slackware|13.37||
+streamripper-1.64.6|streamripper|1.64.6|1pw|BuildingBlock|300K|salix/ap|streamripper-1.64.6-i486-1pw.txz|+faad2,+glib2,+libmad,+libogg,+libvorbis|Rip shoutcast radio streams to mp3 files|slackware|13.37||
+subversion-1.6.16|subversion|1.6.16|1|Develop|16950K|slackware/d|subversion-1.6.16-i486-1.txz|+apr,+apr-util,+bzip2,+cyrus-sasl,+db44,+dbus,+expat,+gcc,+cxxlibs,+gcc-g++,+neon,+openldap-client,+openssl-solibs,+openssl,+sqlite,+util-linux,+zlib|a version control system|slackware|13.37||
+sudo-1.8.1p1|sudo|1.8.1p1||BuildingBlock|132K||sudo-1.8.1p1.pet||allow non-root user to run app as root, compiled in wary should work all puppies||||
+sudo_DEV-1.8.1p1|sudo_DEV|1.8.1p1||BuildingBlock|88K||sudo_DEV-1.8.1p1.pet|+sudo|enable non-root user to run apps as root||||
+superscan-0.8-pup1|superscan|0.8-pup1||Network|92K|pet_packages-4|superscan-0.8-pup1.pet|+gtk+|port scanner|puppy|4||
+svgalib-1.9.25|svgalib|1.9.25|2|BuildingBlock|1520K|slackware/l|svgalib-1.9.25-i486-2.txz||A low level graphics library for Linux|slackware|13.37||
+synclient-0.14.6-p4|synclient|0.14.6-p4||BuildingBlock|32K||synclient-0.14.6-p4.pet||synaptics client|puppy|4||
+sys-freedos-200706|sys-freedos|200706||BuildingBlock|108K||sys-freedos-200706.pet|+perl_tiny|puts a freedos boot sector on a fat partition||||
+sysfsutils-2.1.0|sysfsutils|2.1.0|1|BuildingBlock|170K|slackware/a|sysfsutils-2.1.0-i486-1.txz||Utilities for the sysfs filesystem|slackware|13.37||
+syslinux-3.73|syslinux|3.73||BuildingBlock|232K||syslinux-3.73.pet||Linux bootloader collection|puppy|4||
+sysprof-1.0.12-i486-spup|sysprof|1.0.12-i486-spup||BuildingBlock|112K||sysprof-1.0.12-i486-spup.pet||no description provided|slackware|13.37||
+sysvinit-2.86|sysvinit|2.86||BuildingBlock|12K||sysvinit-2.86.pet||cutdown, only last utility needed by hardinfo|puppy|4||
+tar-1.26|tar|1.26|1|BuildingBlock|2450K|slackware/a|tar-1.26-i486-1.tgz||archiving utility|slackware|13.37||
+tcpdump-4.1.1|tcpdump|4.1.1|1|Network|910K|slackware/n|tcpdump-4.1.1-i486-1.txz|+libnl,+openssl-solibs,+openssl|network monitoring tool|slackware|13.37||
+texinfo-4.13a|texinfo|4.13a|4|Help|2270K|slackware/ap|texinfo-4.13a-i486-4.txz|+ncurses|GNU software documentation system|slackware|13.37||
+transmission1-1.20.1-i486|transmission1|1.20.1-i486||Internet|416K||transmission1-1.20.1-i486.pet||Download and share files over BitTorrent|slackware|13.37||
+truncate-1.0|truncate|1.0||BuildingBlock|28K||truncate-1.0.pet||truncate a file, used by pet-tools|puppy|4||
+udev-165|udev|165|2|BuildingBlock|1400K|slackware/a|udev-165-i486-2.txz|+acl,+attr,+glib2,+libusb|dynamic device directory system|slackware|13.37||
+unclutter-0.8-11|unclutter|0.8-11||BuildingBlock|9K||unclutter-0.8-11.pet||hides cursor when not moving|puppy|4||
+unzip-60-w5c|unzip|60-w5c||BuildingBlock|328K||unzip-60-w5c.pet||PKUNZIP compatible compression utility|puppy|wary5||
+usb-modeswitch-1.2.1-w5c|usb-modeswitch|1.2.1-w5c||BuildingBlock|136K||usb-modeswitch-1.2.1-w5c.pet|+jimtcl|hybrid usb device mode switcher, note compiled in wary but should work all puppies, for best results needs woof 20120109+|puppy|wary5||
+usb-modeswitch-data-20111023|usb-modeswitch-data|20111023||BuildingBlock|892K||usb-modeswitch-data-20111023.pet||data for usb-modeswitch pkg||||
+usbutils-0.91-1-w5c|usbutils|0.91-1-w5c||BuildingBlock|624K||usbutils-0.91-1-w5c.pet||Linux USB Utilities|puppy|wary5||
+usbutils_DEV-0.91-1-w5c|usbutils_DEV|0.91-1-w5c||BuildingBlock|20K||usbutils_DEV-0.91-1-w5c.pet|+usbutils|Linux USB Utilities|puppy|wary5||
+util-linux-2.19|util-linux|2.19|1|BuildingBlock|6510K|slackware/a|util-linux-2.19-i486-1.txz|+ncurses,+zlib|a huge collection of essential utilities|slackware|13.37||
+util-macros-1.13.0|util-macros|1.13.0|1|BuildingBlock|130K|slackware/x|util-macros-1.13.0-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+vala_DEV-0.13.1-w5c|vala_DEV|0.13.1-w5c||Develop|8008K||vala_DEV-0.13.1-w5c.pet|+vala|A compiler for the GObject type system|puppy|wary5||
+vamps-0.99.2-i486|vamps|0.99.2-i486||BuildingBlock|108K||vamps-0.99.2-i486.pet||dvd shrinker|slackware|13.37||
+videoproto-2.3.1|videoproto|2.3.1|1|BuildingBlock|80K|slackware/x|videoproto-2.3.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+viewnior-1.1|viewnior|1.1||Graphic|200K||viewnior-1.1.pet|+gtk+|Elegant Image Viewer, note compiled in Wary should work in all puppies||||
+viewres-1.0.3|viewres|1.0.3|1|BuildingBlock|70K|slackware/x|viewres-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+vobcopy-1.1.1|vobcopy|1.1.1||BuildingBlock|48K||vobcopy-1.1.1.pet|+libdvdread|used for dvd ripping|puppy|4||
+waitmax-1.0|waitmax|1.0||BuildingBlock|40K||waitmax-1.0.pet||exec with timeout, compiled statically||||
+wallpaper-0.6.2|wallpaper|0.6.2||Desktop|116K||wallpaper-0.6.2.pet|+gtkdialog&ge0.7.21|Set backdrop image||||
+wavplay-1.4|wavplay|1.4||BuildingBlock|36K|pet_packages-4|wavplay-1.4.pet||WAV audio file player|puppy|4||
+wcpufreq-0.8-k3.x|wcpufreq|0.8-k3.x||System|112K||wcpufreq-0.8-k3.x.pet||CPU Frequency Scaling Tool||||
+wget-1.12|wget|1.12|1|BuildingBlock|1930K|slackware/n|wget-1.12-i486-1.txz|+libidn,+openssl-solibs,+openssl|a non interactive network retriever|slackware|13.37||
+wireless_tools-29-i486|wireless_tools|29-i486||BuildingBlock|156K||wireless_tools-29-i486.pet||wireless tools|slackware|13.37||
+wireless_tools_DEV-29-i486|wireless_tools_DEV|29-i486||BuildingBlock|76K||wireless_tools_DEV-29-i486.pet||no description provided||||
+wpa_supplicant-0.7.3|wpa_supplicant|0.7.3|3|BuildingBlock|1460K|slackware/n|wpa_supplicant-0.7.3-i486-3.txz|+dbus,+ncurses,+openssl-solibs,+openssl,+readline|WPAWPA2IEEE 802.1X Supplicant|slackware|13.37||
+wv-1.2.5-w52|wv|1.2.5-w52||BuildingBlock|2360K||wv-1.2.5-w52.pet||import/export ms .doc files, used by abiword|puppy|wary5||
+wv_DEV-1.2.5-w52|wv_DEV|1.2.5-w52||BuildingBlock|2072K||wv_DEV-1.2.5-w52.pet|+wv|import/export ms .doc files|puppy|wary5||
+wvdial-1.53-3|wvdial|1.53-3||Network|504K|pet_packages-4|wvdial-1.53-3.pet||analog modem dialup utilities|puppy||official|
+x11perf-1.5.3|x11perf|1.5.3|1|BuildingBlock|200K|slackware/x|x11perf-1.5.3-i486-1.txz|+expat,+fontconfig,+freetype,+libX11,+libXau,+libXdmcp,+libXext,+libXft,+libXmu,+libXrender,+libxcb,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+x264-snapshot-20110629-2245-i686-spup|x264-snapshot|20110629-2245-i686-spup||BuildingBlock|1996K||x264-snapshot-20110629-2245-i686-spup.pet||x264 multimedia library|slackware|13.37||
+x264-snapshot_DEV-20110629-2245-i686-spup|x264-snapshot_DEV|20110629-2245-i686-spup||BuildingBlock|1192K||x264-snapshot_DEV-20110629-2245-i686-spup.pet||x264 dev libs|slackware|13.37||
+xarchive-0.2.8-8-p4|xarchive|0.2.8-8-p4||Setup|212K||xarchive-0.2.8-8-p4.pet|+gtk+|XArchive archiver|puppy|4||
+xauth-1.0.5|xauth|1.0.5|1|BuildingBlock|80K|slackware/x|xauth-1.0.5-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXmu,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xbacklight-1.1.2|xbacklight|1.1.2|1|BuildingBlock|40K|slackware/x|xbacklight-1.1.2-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXrandr,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xbiff-1.0.3|xbiff|1.0.3|1|BuildingBlock|60K|slackware/x|xbiff-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xbindkeys-1.8.4|xbindkeys|1.8.4||Utility|52K||xbindkeys-1.8.4.pet||xbindkeys key bindings tool|slackware|13.1||
+xcalc-1.0.4.1|xcalc|1.0.4.1|1|Calculate|100K|slackware/x|xcalc-1.0.4.1-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xcb-proto-1.6|xcb-proto|1.6|1|BuildingBlock|470K|slackware/x|xcb-proto-1.6-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xcb-util-0.3.6|xcb-util|0.3.6|1|BuildingBlock|240K|slackware/x|xcb-util-0.3.6-i486-1.txz|+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xchat-2.8.8-i486|xchat|2.8.8-i486||Internet|636K||xchat-2.8.8-i486.pet||Chat with other people using Internet Relay Chat|slackware|13.1||
+xchat_DEV-2.8.8-i486|xchat_DEV|2.8.8-i486||BuildingBlock|220K||xchat_DEV-2.8.8-i486.pet||xhat dev|slackware|13.1||
+xclip-0.10|xclip|0.10||BuildingBlock|60K||xclip-0.10.pet||copy/paste x-selection and clipboard from script|puppy|4||
+xclipboard-1.1.1|xclipboard|1.1.1|1|Desktop|80K|slackware/x|xclipboard-1.1.1-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+libxkbfile,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xclock-1.0.5|xclock|1.0.5|1|Desktop|90K|slackware/x|xclock-1.0.5-i486-1.txz|+expat,+fontconfig,+freetype,+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXft,+libXmu,+libXpm,+libXrender,+libXt,+libxcb,+libxkbfile,+util-linux,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xcmiscproto-1.2.1|xcmiscproto|1.2.1|1|BuildingBlock|70K|slackware/x|xcmiscproto-1.2.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xcompmgr-1.1.1|xcompmgr|1.1.1||BuildingBlock|40K||xcompmgr-1.1.1.pet||x transparency|slackware|13.37||
+xconsole-1.0.4|xconsole|1.0.4|1|BuildingBlock|60K|slackware/x|xconsole-1.0.4-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xcur2png-0.7.0-p4|xcur2png|0.7.0-p4||BuildingBlock|28K||xcur2png-0.7.0-p4.pet||converter cursor image to png|puppy|4||
+xcursorgen-1.0.4|xcursorgen|1.0.4|1|BuildingBlock|50K|slackware/x|xcursorgen-1.0.4-i486-1.txz|+libX11,+libXau,+libXcursor,+libXdmcp,+libXfixes,+libXrender,+libpng,+libxcb,+zlib|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xdelta-30p-w5|xdelta|30p-w5||BuildingBlock|108K||xdelta-30p-w5.pet||Opensource binary diff deltadifferential compression tools|puppy|wary5||
+xdg_puppy-0.7.6-14-p4|xdg_puppy|0.7.6-14-p4||BuildingBlock|328K||xdg_puppy-0.7.6-14-p4.pet||essential XDG utilities developed by rarsa, -13 has internationalization support|puppy|4||
+xdialog-2.3.1.pup2|xdialog|2.3.1.pup2||BuildingBlock|70K||xdialog-2.3.1.pup2.pet|+gtk+|gui frontend for scripts|puppy|||
+xditview-1.0.2|xditview|1.0.2|1|BuildingBlock|110K|slackware/x|xditview-1.0.2-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xdpyinfo-1.2.0|xdpyinfo|1.2.0|1|BuildingBlock|80K|slackware/x|xdpyinfo-1.2.0-i486-1.txz|+libX11,+libXau,+libXcomposite,+libXdmcp,+libXext,+libXi,+libXinerama,+libXrender,+libXtst,+libXxf86dga,+libXxf86misc,+libXxf86vm,+libdmx,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xdriinfo-1.0.4|xdriinfo|1.0.4|1|BuildingBlock|50K|slackware/x|xdriinfo-1.0.4-i486-1.txz|+gcc,+cxxlibs,+gcc-g++,+libX11,+libXau,+libXdamage,+libXdmcp,+libXext,+libXfixes,+libXxf86vm,+libdrm,+libxcb,+mesa|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xev-1.1.0|xev|1.1.0|1|BuildingBlock|60K|slackware/x|xev-1.1.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xextproto-7.2.0|xextproto|7.2.0|1|BuildingBlock|1280K|slackware/x|xextproto-7.2.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86bigfontproto-1.2.0|xf86bigfontproto|1.2.0|1|BuildingBlock|30K|slackware/x|xf86bigfontproto-1.2.0-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86dga-1.0.3|xf86dga|1.0.3|1|BuildingBlock|50K|slackware/x|xf86dga-1.0.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86dgaproto-2.1|xf86dgaproto|2.1|1|BuildingBlock|40K|slackware/x|xf86dgaproto-2.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86driproto-2.1.1|xf86driproto|2.1.1|1|BuildingBlock|50K|slackware/x|xf86driproto-2.1.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-input-evdev-2.6.0|xf86-input-evdev|2.6.0|1|BuildingBlock|110K|slackware/x|xf86-input-evdev-2.6.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-input-keyboard-1.6.0|xf86-input-keyboard|1.6.0|1|BuildingBlock|100K|slackware/x|xf86-input-keyboard-1.6.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-input-mouse-1.7.0|xf86-input-mouse|1.7.0|1|BuildingBlock|150K|slackware/x|xf86-input-mouse-1.7.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-input-synaptics-1.3.0-i486|xf86-input-synaptics|1.3.0-i486||BuildingBlock|136K||xf86-input-synaptics-1.3.0-i486.pet||no description provided|slackware|13.37||
+xf86-input-synaptics_DEV-1.3.0-i486|xf86-input-synaptics_DEV|1.3.0-i486||BuildingBlock|56K||xf86-input-synaptics_DEV-1.3.0-i486.pet||no description provided|slackware|13.37||
+xf86miscproto-0.9.3|xf86miscproto|0.9.3|1|BuildingBlock|30K|slackware/x|xf86miscproto-0.9.3-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-apm-1.2.3|xf86-video-apm|1.2.3|1|BuildingBlock|180K|slackware/x|xf86-video-apm-1.2.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-ark-0.7.3|xf86-video-ark|0.7.3|1|BuildingBlock|60K|slackware/x|xf86-video-ark-0.7.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-ast-0.91.10|xf86-video-ast|0.91.10|1|BuildingBlock|80K|slackware/x|xf86-video-ast-0.91.10-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-ati-6.14.1|xf86-video-ati|6.14.1|1|BuildingBlock|1120K|slackware/x|xf86-video-ati-6.14.1-i486-1.txz|+libdrm,+libpciaccess,+pixman,+udev|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-chips-1.2.4|xf86-video-chips|1.2.4|1|BuildingBlock|260K|slackware/x|xf86-video-chips-1.2.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-cirrus-1.3.2|xf86-video-cirrus|1.3.2|3|BuildingBlock|110K|slackware/x|xf86-video-cirrus-1.3.2-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-geode-2.11.10|xf86-video-geode|2.11.10|1|Filesystem|310K|slackware/x|xf86-video-geode-2.11.10-i486-1.txz||AMD Geode GX and LX video driver|slackware|13.37||
+xf86-video-i128-1.3.4|xf86-video-i128|1.3.4|1|BuildingBlock|100K|slackware/x|xf86-video-i128-1.3.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-i740-1.3.2|xf86-video-i740|1.3.2|3|BuildingBlock|80K|slackware/x|xf86-video-i740-1.3.2-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-intel-2.15.0|xf86-video-intel|2.15.0|1|BuildingBlock|850K|slackware/x|xf86-video-intel-2.15.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXfixes,+libXv,+libXvMC,+libdrm,+libpciaccess,+libxcb,+xcb-util|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-mach64-6.8.2|xf86-video-mach64|6.8.2|3|BuildingBlock|300K|slackware/x|xf86-video-mach64-6.8.2-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-mga-1.4.13|xf86-video-mga|1.4.13|1|BuildingBlock|240K|slackware/x|xf86-video-mga-1.4.13-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-neomagic-1.2.5|xf86-video-neomagic|1.2.5|1|BuildingBlock|110K|slackware/x|xf86-video-neomagic-1.2.5-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-nouveau-8bb82312|xf86-video-nouveau|8bb82312|1|BuildingBlock|200K|slackware/x|xf86-video-nouveau-8bb82312-i486-1.txz|+libdrm,+udev|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-nv-2.1.18|xf86-video-nv|2.1.18|1|BuildingBlock|230K|slackware/x|xf86-video-nv-2.1.18-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-openchrome-0.2.904|xf86-video-openchrome|0.2.904|2|BuildingBlock|470K|slackware/x|xf86-video-openchrome-0.2.904-i486-2.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXv,+libXvMC,+libdrm,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-r128-6.8.1|xf86-video-r128|6.8.1|3|BuildingBlock|160K|slackware/x|xf86-video-r128-6.8.1-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-rendition-4.2.4|xf86-video-rendition|4.2.4|1|BuildingBlock|140K|slackware/x|xf86-video-rendition-4.2.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-s3-0.6.3|xf86-video-s3|0.6.3|3|BuildingBlock|80K|slackware/x|xf86-video-s3-0.6.3-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-s3virge-1.10.4|xf86-video-s3virge|1.10.4|3|BuildingBlock|110K|slackware/x|xf86-video-s3virge-1.10.4-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-savage-2.3.2|xf86-video-savage|2.3.2|1|BuildingBlock|190K|slackware/x|xf86-video-savage-2.3.2-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-siliconmotion-1.7.5|xf86-video-siliconmotion|1.7.5|1|BuildingBlock|180K|slackware/x|xf86-video-siliconmotion-1.7.5-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-sis-0.10.3|xf86-video-sis|0.10.3|1|BuildingBlock|630K|slackware/x|xf86-video-sis-0.10.3-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-sisusb-0.9.4|xf86-video-sisusb|0.9.4|1|BuildingBlock|120K|slackware/x|xf86-video-sisusb-0.9.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-tdfx-1.4.3|xf86-video-tdfx|1.4.3|3|BuildingBlock|80K|slackware/x|xf86-video-tdfx-1.4.3-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-trident-1.3.4|xf86-video-trident|1.3.4|1|BuildingBlock|190K|slackware/x|xf86-video-trident-1.3.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-tseng-1.2.4|xf86-video-tseng|1.2.4|1|BuildingBlock|90K|slackware/x|xf86-video-tseng-1.2.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-v4l-0.2.0|xf86-video-v4l|0.2.0|4|BuildingBlock|30K|slackware/x|xf86-video-v4l-0.2.0-i486-4.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-vesa-2.3.0|xf86-video-vesa|2.3.0|3|BuildingBlock|80K|slackware/x|xf86-video-vesa-2.3.0-i486-3.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-vmware-11.0.3|xf86-video-vmware|11.0.3|1|BuildingBlock|120K|slackware/x|xf86-video-vmware-11.0.3-i486-1.txz|+libdrm|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-voodoo-1.2.4|xf86-video-voodoo|1.2.4|1|BuildingBlock|60K|slackware/x|xf86-video-voodoo-1.2.4-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86-video-xgi-1.6.0|xf86-video-xgi|1.6.0|1|BuildingBlock|320K|slackware/x|xf86-video-xgi-1.6.0-i486-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xf86vidmodeproto-2.3.1|xf86vidmodeproto|2.3.1|1|BuildingBlock|60K|slackware/x|xf86vidmodeproto-2.3.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xfdiff-cut-4.5.0|xfdiff-cut|4.5.0||Utility|100K|pet_packages-4|xfdiff-cut-4.5.0.pet|+gtk+|compare two files|puppy|4||
+xfontsel-1.0.3|xfontsel|1.0.3|1|BuildingBlock|80K|slackware/x|xfontsel-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xgamma-1.0.4|xgamma|1.0.4|1|BuildingBlock|50K|slackware/x|xgamma-1.0.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXxf86vm,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xhost-1.0.4|xhost|1.0.4|1|BuildingBlock|60K|slackware/x|xhost-1.0.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXmu,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xineramaproto-1.2.1|xineramaproto|1.2.1|1|BuildingBlock|50K|slackware/x|xineramaproto-1.2.1-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xinit-1.3.0|xinit|1.3.0|1|BuildingBlock|90K|slackware/x|xinit-1.3.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xkbcomp-1.2.1|xkbcomp|1.2.1|1|BuildingBlock|240K|slackware/x|xkbcomp-1.2.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb,+libxkbfile|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xkbconfigmanager-1.1-1|xkbconfigmanager|1.1-1||Desktop|140K|pet_packages-4|xkbconfigmanager-1.1-1.pet|+xorg_BASIC|xorg keyboard manager|puppy|4||
+xkbutils-1.0.3|xkbutils|1.0.3|1|BuildingBlock|90K|slackware/x|xkbutils-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xkill-1.0.3|xkill|1.0.3|1|BuildingBlock|50K|slackware/x|xkill-1.0.3-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXmu,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xload-1.1.0|xload|1.1.0|1|System|60K|slackware/x|xload-1.1.0-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xlock_gui-0.2-6|xlock_gui|0.2-6||Desktop|68K||xlock_gui-0.2-6.pet|+xlockmore|screen lock and screensaver||||
+xlockmore-5.31-w1|xlockmore|5.31-w1||BuildingBlock|212K||xlockmore-5.31-w1.pet|+xorg_base|screen lock and screensaver|t2|8.0rc||
+xmag-1.0.4|xmag|1.0.4|1|BuildingBlock|80K|slackware/x|xmag-1.0.4-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xmessage-1.0.3|xmessage|1.0.3|1|BuildingBlock|60K|slackware/x|xmessage-1.0.3-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xmodmap-1.0.5|xmodmap|1.0.5|1|BuildingBlock|80K|slackware/x|xmodmap-1.0.5-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xorg-server-1.9.5|xorg-server|1.9.5|1|Network|8170K|slackware/x|xorg-server-1.9.5-i486-1.txz|+freetype,+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXfixes,+libXfont,+libXi,+libXmu,+libXpm,+libXrender,+libXt,+libdmx,+libdrm,+libfontenc,+libgcrypt,+libgpg-error,+libpciaccess,+libxcb,+pixman,+udev,+util-linux,+zlib|The Xorg server the core of the X Window System|slackware|13.37||
+xprop-1.2.0|xprop|1.2.0|1|BuildingBlock|80K|slackware/x|xprop-1.2.0-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xproto-7.0.21|xproto|7.0.21|1|BuildingBlock|2040K|slackware/x|xproto-7.0.21-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xrandr-1.3.4|xrandr|1.3.4|1|BuildingBlock|130K|slackware/x|xrandr-1.3.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXrandr,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xrdb-1.0.9|xrdb|1.0.9|1|BuildingBlock|60K|slackware/x|xrdb-1.0.9-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXmu,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xrefresh-1.0.4|xrefresh|1.0.4|1|BuildingBlock|50K|slackware/x|xrefresh-1.0.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xsane-0.997-patched-w5c|xsane|0.997-patched-w5c||Multimedia|2144K||xsane-0.997-patched-w5c.pet|+cairo,+gtk+,+lcms,+libgphoto,+sane-backends|A full SANE environment scanner gui|puppy|wary5||
+xset-1.2.1|xset|1.2.1|1|BuildingBlock|90K|slackware/x|xset-1.2.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXfontcache,+libXmu,+libXxf86misc,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xsetroot-1.1.0|xsetroot|1.1.0|1|BuildingBlock|60K|slackware/x|xsetroot-1.1.0-i486-1.txz|+libX11,+libXau,+libXcursor,+libXdmcp,+libXfixes,+libXmu,+libXrender,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xsm-1.0.2|xsm|1.0.2|1|BuildingBlock|130K|slackware/x|xsm-1.0.2-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xsoldier-1.4|xsoldier|1.4||Fun|792K|pet_packages-4|xsoldier-1.4.pet||space war arcade game|puppy|4||
+xstdcmap-1.0.2|xstdcmap|1.0.2|1|BuildingBlock|50K|slackware/x|xstdcmap-1.0.2-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXdmcp,+libXext,+libXmu,+libXt,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xtrans-1.2.6|xtrans|1.2.6|1|BuildingBlock|380K|slackware/x|xtrans-1.2.6-noarch-1.txz||For more information about the X.Org Foundation the providers of|slackware|13.37||
+xvidcore-1.2.2-1-w5c|xvidcore|1.2.2-1-w5c||BuildingBlock|580K||xvidcore-1.2.2-1-w5c.pet||A high performance and high quality MPEG4 video deencoding library|puppy|wary5||
+xvidcore_DEV-1.2.2-1-w5c|xvidcore_DEV|1.2.2-1-w5c||BuildingBlock|768K||xvidcore_DEV-1.2.2-1-w5c.pet|+xvidcore|A high performance and high quality MPEG4 video deencoding library|puppy|wary5||
+xvidtune-1.0.2|xvidtune|1.0.2|1|BuildingBlock|80K|slackware/x|xvidtune-1.0.2-i486-1.txz|+libICE,+libSM,+libX11,+libXau,+libXaw,+libXdmcp,+libXext,+libXmu,+libXpm,+libXt,+libXxf86vm,+libxcb,+util-linux|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xvinfo-1.1.1|xvinfo|1.1.1|1|BuildingBlock|50K|slackware/x|xvinfo-1.1.1-i486-1.txz|+libX11,+libXau,+libXdmcp,+libXext,+libXv,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xwd-1.0.4|xwd|1.0.4|1|BuildingBlock|70K|slackware/x|xwd-1.0.4-i486-1.txz|+libX11,+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xwininfo-1.1.1|xwininfo|1.1.1|1|BuildingBlock|90K|slackware/x|xwininfo-1.1.1-i486-1.txz|+libXau,+libXdmcp,+libxcb|For more information about the X.Org Foundation the providers of|slackware|13.37||
+xz-5.0.2|xz|5.0.2|1|Utility|910K|slackware/a|xz-5.0.2-i486-1.tgz||compression utility based on the LZMA algorithm|slackware|13.37||
+yad-0.16.2-i486|yad|0.16.2-i486||Utility|3020K||yad-0.16.2-i486.pet||Inspect GTK Icon Theme|slackware|13.37||
+yaf_splash-1.02|yaf_splash|1.02||BuildingBlock|60K||yaf_splash-1.02.pet||text splash window|puppy|||
+yasis_icontheme-001-s|yasis_icontheme|001-s||Desktop|204K||yasis_icontheme-001-s.pet||yasis desktop icon theme||||
+yasm-1.1.0-i486|yasm|1.1.0-i486||BuildingBlock|4784K||yasm-1.1.0-i486.pet||no description provided|slackware|13.37||
+z_base_hacks-120505|z_base_hacks|120505||Utility|812K||z_base_hacks-120505.pet||slacko hacks|slackware|13.37||
+z_Buttonhack-0.1|z_Buttonhack|0.1||BuildingBlock|36K||z_Buttonhack-0.1.pet||jwm hack||||
+z_i18n_tray_slacko-0.1|z_i18n_tray_slacko|0.1||BuildingBlock|92K||z_i18n_tray_slacko-0.1.pet||tray applets i18n|slackware|13.37||
+zlib-1.2.5|zlib|1.2.5|4|BuildingBlock|350K|slackware/l|zlib-1.2.5-i486-4.txz||compression library|slackware|13.37||
+z_rox_spup_hacks-1|z_rox_spup_hacks|1||BuildingBlock|52K||z_rox_spup_hacks-1.pet||rox filer hacks||||
+z_spup_cups_authentication_fix-002|z_spup_cups_authentication_fix|002||BuildingBlock|16K||z_spup_cups_authentication_fix-002.pet||||||
+z_spup_fonts_fix-001|z_spup_fonts_fix|001||BuildingBlock|16K||z_spup_fonts_fix-001.pet||enables font antialiasing and makes fonts smooth||||
+zwalls-0.1|zwalls|0.1||BuildingBlock|64K||zwalls-0.1.pet||wallpapers||||
+z_xgammagui-20110108|z_xgammagui|20110108||BuildingBlock|16K||z_xgammagui-20110108.pet||xgamma gui||||

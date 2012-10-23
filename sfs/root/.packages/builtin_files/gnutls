@@ -1,0 +1,32 @@
+/usr
+/usr/bin
+ certtool
+ gnutls-cli
+ gnutls-cli-debug
+ gnutls-serv
+ psktool
+ srptool
+/usr/lib
+ libgnutls-extra.so
+ libgnutls-extra.so.26
+ libgnutls-extra.so.26.16.14
+ libgnutls-openssl.so
+ libgnutls-openssl.so.26
+ libgnutls-openssl.so.26.16.14
+ libgnutls.so
+ libgnutls.so.26
+ libgnutls.so.26.16.14
+ libgnutlsxx.so
+ libgnutlsxx.so.26
+ libgnutlsxx.so.26.16.14
+ libguile-gnutls-extra-v-1.so
+ libguile-gnutls-extra-v-1.so.0
+ libguile-gnutls-extra-v-1.so.0.0.0
+ libguile-gnutls-v-1.so
+ libguile-gnutls-v-1.so.0
+ libguile-gnutls-v-1.so.0.0.0
+/usr/share
+/usr/share/guile
+/usr/share/guile/site
+/usr/share/guile/site/gnutls
+ extra.scm

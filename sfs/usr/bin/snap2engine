@@ -1,0 +1,623 @@
+#!/bin/bash
+
+#    based on the work of Geordy Kitchen and Rob Bos
+#    Copyright 2011 Lloyd Standish
+#    http://www.crnatural.net/snap2
+#    lloyd@crnatural.net
+
+#    This file is part of snap2
+
+#    snap2 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    snap2 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with snap2.  If not, see <http://www.gnu.org/licenses/>.
+
+# Syntax: snap2 <snapshot | mirror | setup> [settingsdir]
+# 'settingsdir' is optional, default is '~/.snap2/default.set' (must end in '.set')
+# 'username' is optional, default is current Unix user. Needed for cron tasks because
+# processes executed by cron do not receive the USER env variable
+version="4.21"
+requiresremotever="4.13"
+
+function findoldest()
+{
+basepath=$1 #$dst/recent
+max=$2
+export oldest
+for oldest in `seq 0 $max`; do
+	if [ ! -d $basepath.$((oldest+1)) ]; then
+		break
+	fi
+done
+checkdir=$basepath.$((oldest+1))
+if [ -d $checkdir ]; then
+	if [ -d $checkdir~ ]; then
+		rm -fr $checkdir~
+	fi
+	mv $checkdir $checkdir~
+fi
+}
+
+
+function setup()
+{
+settingsdir="$1"
+if [ ! -d "$MYHOME/.snap2/$settingsdir" ]; then
+	mkdir "$MYHOME/.snap2/$settingsdir"
+fi
+  if [ ! -f "$MYHOME/.snap2/$settingsdir/settings" ]; then
+    cat << eof > "$MYHOME/.snap2/$settingsdir/settings"
+## snap2 configuration file ##
+# for more information, see http://www.crnatural.net/snap2
+
+# basic configuration
+# Backup root.  All backups will be stored here
+# no trailing slashes allowed!
+# example: dst=/media/BACKUP8GIG/snapbackups
+dst=none
+
+# remote host for offsite backups
+# use fully-qualified domain name.  Example: remotehost=crnatural.net
+# an IP address is also allowed
+# do not specify target directory.  That is determined by 'dst'
+remotehost=none
+# remote login name for offsite backups, default $USER
+remotelogin=$USER
+# remote home directory
+remotehome=$MYHOME
+
+# Number of snapshots to keep before promotion to "daily"
+recent=8
+# Number of "daily" snapshots to keep before promotion to "weekly"
+daily=7
+# Number of "weekly" snapshots to keep before promotion to "monthly"
+weekly=7
+# Max number of monthly backups
+monthly=4
+
+#advanced
+# safe to leave all these at defaults
+# store logfile in snapshot root, default true
+bol_storelog=true
+# compress logfile, default true
+bol_compresslog=true
+# use rsync compression, default true
+bol_rsynccompression=true
+# allow program to create $dst. If not set, prevents accidental backup to wrong media
+# default true, recommend setting false after initial backup is backing up to removeable media
+bol_makedestroot=true
+# if true, then public key authentication is confirmed set up for the current user for remotelogin@remotehost
+# used only in the GUI (snap2)
+bol_remoteauth=false
+# exclude files for multiple snapshot backup are of name "varmailuser" for /var/mail/user
+# exclude files for simple mirror backup are of name "mirrorvarmailuser" for /var/mail/user
+# exclude files for rdiff-backup are of name "rdiffvarmailuser" for /var/mail/user
+
+# *add* the default exclusions to any custom exclusions, default true
+bol_adddefaultexclude=true
+
+# allow backup with no hardlink reference. Useful to catch errors to avoid filling USB drive. default true
+bol_allownoreference=true
+
+# internal state variables
+updateremote=false
+lastsnapshot=never
+lastmirror=never
+eof
+
+echo "$MYHOME/.snap2/$settingsdir/settings created, this configuration file MUST be edited before snap2 will work!"
+fi
+. "$MYHOME/.snap2/$settingsdir/settings"
+
+if [ ! -d "$MYHOME/.snap2/$settingsdir/exclude" ]; then
+	mkdir "$MYHOME/.snap2/$settingsdir/exclude"
+	if [ ! -f "$MYHOME/.snap2/exclude/default" ]; then
+		cat << eof > "$MYHOME/.snap2/$settingsdir/exclude/default"
+- *~
+- *.log
+- temp/
+- tmp
+eof
+		echo "$MYHOME/.snap2/$settingsdir/exclude/default created, this file may need tweaking."
+	fi
+fi
+
+if [ ! -f "$backpathfile" ]; then
+	echo "# backup source paths" > "$backpathfile"
+	echo "# If editing outside of snap2, each line must end in newline." >> "$backpathfile"
+	echo "# Comment lines start with a '#'" >> "$backpathfile"
+	echo "'$backpathfile' created, this file needs to be configured!"
+fi
+if [ ! -f "$mirrorpathfile" ]; then
+	echo "# backup source paths" > "$mirrorpathfile"
+	echo "# If editing outside of snap2, each line must end in newline." >> "$mirrorpathfile"
+	echo "# Comment lines start with a '#'" >> "$mirrorpathfile"
+	echo "'$mirrorpathfile' created, this file may need to be configured!"
+fi
+}
+
+function errorexit()
+{
+	rm -f "$tempexclude" "$snaplog" 2>/dev/null
+	exit 1
+}
+# Configuration
+if [ "$#" -eq 3 -a "$3" != "" ]; then
+	USER="$3"
+fi
+
+settingsdir="default.set"
+if [ "$#" -gt 1 -a "$2" != "" ]; then
+	if ! echo $2 | grep '\.set$' > /dev/null; then
+		echo "Settings directories must end in '.set'"
+		exit 1
+	else
+		settingsdir="$2"
+	fi
+fi
+
+MYHOME=
+if [ "$USER" != "root" ]; then
+    MYHOME=/home
+fi
+MYHOME="$MYHOME/$USER"
+backuptype=$1
+
+export backpathfile="$MYHOME/.snap2/$settingsdir/snapshotsourcepaths"
+export mirrorpathfile="$MYHOME/.snap2/$settingsdir/mirrorsourcepaths"
+export excludefiledir="$MYHOME/.snap2/$settingsdir/exclude"
+#export remotehome
+
+if [ "$backuptype" = "setup" ]; then
+	setup "$settingsdir"
+	echo "Skeleton setup files have been created under $MYHOME/.snap2/$settingsdir/.  These files can be edited manually, or the GUI program snap2 can be used."
+	exit 1
+fi
+if [ ! -f "$MYHOME/.snap2/$settingsdir/settings" ]; then
+    echo "$MYHOME/.snap2/$settingsdir/settings not found.  Run snap2 (GUI program) to configure, or run 'snap2 setup [settingsdir]' to create 'snapshot' type skeleton configuration files for user $USER."
+    exit 1
+fi
+#check for dependencies
+if [ ! `which scp` ]; then
+	echo "scp program not found (required)"
+	exit 1
+fi
+
+if [ ! `which rsync` ]; then
+	echo "rsync not found, quitting."
+	exit 1
+fi
+
+# defaults
+bol_rsynccompression="true"
+remotehome=$MYHOME
+
+. "$MYHOME/.snap2/$settingsdir/settings"
+
+if [ "$dst" = "none" -o "$dst" = "" ]; then
+	echo "snap2 needs to be configured.  Please run snap2"
+	echo "If you prefer manual setup, open $MYHOME/.snap2/$settingsdir/settings"
+	echo "and adjust the '\$dst' (destination directory) variable."
+	echo "In addition, you must edit $backpathfile for (snapshot-type backups)"
+	echo "or $mirrorpathfile (for mirror-type backups)"
+	echo "and (optionally) files in $MYHOME/.snap2/$settingsdir/exclude/"
+	exit 1
+fi
+
+if [ "$remotehost" = "" -o "$remotelogin" = "" ]; then
+	remotehost="none"
+fi
+
+if [ "$remotehost" != "none" -a "$updateremote" = "true" ]; then
+	echo "Update of remote settings file is necessary."
+	if ! ssh "$remotelogin@$remotehost" "test -f $remotehome/.snap2/$settingsdir-remote/settings"; then
+		if ! ssh "$remotelogin@$remotehost" "mkdir -p $remotehome/.snap2/$settingsdir-remote"; then
+			echo "Error creating $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote"
+			exit 1
+		fi
+	fi
+	scp "$MYHOME/.snap2/$settingsdir/settings" "$remotelogin@$remotehost:/$remotehome/.snap2/$settingsdir-remote/"
+	if [ "$?" -ne 0 ]; then
+		echo "Error copying settings file to $remotelogin@$remotehost:/$remotehome/.snap2/$settingsdir-remote/"
+		break
+	else
+		snap2work="/tmp/snap2work-$$.temp"
+		sed '/^updateremote=/d' "$MYHOME/.snap2/$settingsdir/settings" > $snap2work
+		echo "updateremote=false" >> $snap2work
+		mv -f $snap2work "$MYHOME/.snap2/$settingsdir/settings"
+	fi
+fi
+#dst="$dst/$USER"
+prefix=""
+if [ "$remotehost" != "none" ]; then
+	prefix="$remotelogin@$remotehost:"
+else
+	if [ ! -d "$dst" ]; then
+		if [ "$bol_makedestroot" = "true" ]; then
+			mkdir -p $dst
+		else
+			echo "Destination root $dst not found, and \$bol_makedestroot is false.  Check that you have the correct backup media. If so, set 'bol_makedestroot=true' in the settings file or by checking 'Create missing top level dir' in snap2"
+			echo "Quitting."
+			exit 1
+		fi
+	fi
+fi
+
+if [ "$dst" = "" ]; then
+	echo "No \$dst variable is set in $MYHOME/.snap2/$settingsdir/settings"
+	exit 1
+fi
+
+if [ "$bol_adddefaultexclude" = "true" -a -f "$excludefiledir/default" ]; then
+	default="$excludefiledir/default"
+else
+	default=""
+fi
+
+export snaplog=/tmp/snap2engine-$$.temp
+export tempexclude=/tmp/snap2enginexclude-$$.temp
+echo "snap2engine version $version" | tee $snaplog
+echo "Backup run on `date`" | tee $snaplog
+
+if [ ! -w $snaplog ]; then
+	echo "Error: You do not have write privileges to directory /tmp.  Quitting."
+	exit 1
+fi
+
+echo "Using settings from $MYHOME/.snap2/$settingsdir/settings" | tee -a $snaplog
+
+if [ "$bol_rsynccompression" = "true" ]; then
+	echo "Using rsync compression" | tee -a $snaplog
+	z='z'
+else
+	z=''
+fi
+echo "Backing up to: ${prefix}$dst" | tee -a $snaplog
+
+case $backuptype in
+snapshot)
+	if [ ! -f "$backpathfile" ]; then
+		echo "$backpathfile not found, check configuration!"
+		errorexit
+	fi
+	if [ "$remotehost" != "none" ]; then
+		reference=`ssh "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a getreference -v $requiresremotever -r"`
+		errorval=$?
+		if [ "$errorval" -eq 255 ]; then
+			echo "$reference - Check network connectivity and public key authentication."
+			errorexit
+		elif [ "$errorval" -eq 127 ]; then
+		# 127 = executable file not found,
+		# first try to create directory
+			echo "$reference"
+			if ! ssh "$remotelogin@$remotehost" "mkdir -p $remotehome/.snap2"; then
+				echo "Error creating remote snap2 directory $remotehome/.snap2 (check permissions)"
+				errorexit
+			else
+				if [ ! -f /usr/share/snap2/remoteutils2.sh ]; then
+					echo "Error: missing file for backup to remote server"
+					echo "Please copy the file remoteutils2.sh from the snap2 distribution"
+					echo "to /usr/share/snap2/ on the local machine and try again."
+					errorexit
+				fi
+				echo "Updating remote backup executable $remotelogin@$remotehost:$remotehome/.snap2/remoteutils2.sh"
+				if ! scp /usr/share/snap2/remoteutils2.sh $remotelogin@$remotehost:$remotehome/.snap2/; then
+					echo "Error copying remote backup executable to $remotelogin@$remotehost:$remotehome/.snap2/. Backup aborted."
+					errorexit
+				fi
+			fi
+			errorval=5
+			reference=""
+		fi
+		if [ "$errorval" -eq 5 ]; then
+		# no settings file
+			echo "$reference"
+			echo "Copying settings file to $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote/"
+			if ! scp "$MYHOME/.snap2/$settingsdir/settings" "$remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote/"; then
+				echo "Error copying settings file to $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote/ (check permissions)"
+				errorexit
+			fi
+			reference=`ssh "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a getreference -v $requiresremotever -r"`
+			errorval=$?
+		fi
+		if [ "$errorval" -eq 4 ]; then
+			echo "$reference"
+			if [ ! -f /usr/share/snap2/remoteutils2.sh ]; then
+				echo "Error: missing file for backup to remote server"
+				echo "Please copy the file remoteutils2.sh from the snap2 distribution"
+				echo "to /usr/share/snap2/ on the local machine and try again."
+				errorexit
+			fi
+			echo "Updating remote backup executable $remotelogin@$remotehost:$remotehome/.snap2/remoteutils2.sh"
+			if ! scp /usr/share/snap2/remoteutils2.sh $remotelogin@$remotehost:$remotehome/.snap2/; then
+				echo "Error copying remote backup executable to $remotelogin@$remotehost:$remotehome/.snap2/. Backup aborted."
+				errorexit
+			fi
+			reference=`ssh "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a getreference -v $requiresremotever -r"`
+			errorval=$?
+		fi
+		if [ "$errorval" -ne 0 ]; then
+			echo "error: $reference" #debug
+			errorexit
+		fi
+	else
+		for snaptype in recent daily weekly monthly
+		do
+			lastsecs=
+			thissecs=
+			for file in `ls -dt $dst/$snaptype.* 2>/dev/null`
+			do
+				thissecs=`date -r $file +%s`
+				if [ "$lastsecs" ]; then
+					if [ "$lastsecs" -lt "$thissecs" ]; then
+						echo "Snapshot class $snaptype is out of sequence beginning with directory $file!"
+						echo "Directories must be in chronological order with $snaptype.1 as newest."
+						echo "Quitting"
+						errorexit
+					fi
+				fi
+				lastsecs=$thissecs
+			done
+		done
+		
+		reference="none"
+		
+		for snaptype in recent daily weekly monthly
+		do
+			newest=`ls -dtr $dst/$snaptype.* 2>/dev/null | tail -n 1 | sed 's/^.*\.//'`
+			if [ -d "$dst/$snaptype.$newest" ]; then
+				reference="$snaptype.$newest"
+				break
+			fi
+		done
+		if [ "$newest" = "0" ]; then
+			echo "Error: the local snapshot backups were not rotated properly the previous time backup was done.  The last backup is in directory $reference.  It should be $snaptype.1. This indicates that backup rotation was not completed, and the backup itself may be incomplete. Please review, and either delete $reference, or rename it to $snaptype.1."
+			errorexit
+#		elif [ "$reference" != "none" ]; then
+#			cp -al $dst/$reference $dst/recent.0
+		fi
+		if [ "$reference" = "none" -a -d "$dst/mirror" ]; then
+			reference="mirror"
+		fi
+	fi
+	echo "Snapshot hardlink reference: $reference" | tee -a $snaplog
+	wholefile=''
+	if [ "$reference" = "none" ]; then
+		if [ "$bol_allownoreference" != "true" ]; then
+			echo "No snapshot backup reference directory found, and creation of new reference disallowed... aborting!"
+			errorexit
+		fi
+		if [ "$remotehost" != "none" ]; then
+			echo "Not using rsync's delta-transfer algorithm.  Transferring whole files."
+			wholefile='--whole-file '
+		fi
+		reference=""
+	else
+		reference="--link-dest=$dst/$reference "
+	fi
+	{
+		while read i
+		do
+		# Ignore coments and blank lines
+		i="$(echo $i | sed 's/#.*$//')"
+		if [ -z "$i" ] || expr "$i" : "[ \t]*$" > /dev/null; then
+			continue
+		fi
+		
+		# Strip off quotes if any
+		#      pattern=$(echo "$pattern" | sed 's/"//g')
+		
+		echo "" | tee -a $snaplog
+		echo "backing up $i" | tee -a $snaplog
+		#	    excludefile=`echo $i | sed 's/\///g'`
+		exclude=''
+		: > $tempexclude
+		excludefile="$(echo $i | sed 's/\///g')"
+		if [ -f "$excludefiledir/$excludefile" ]; then
+			echo "Using custom exclusion pattern file $excludefiledir/$excludefile" | tee -a $snaplog
+			cp "$excludefiledir/$excludefile" $tempexclude
+		fi
+		if [ "$default" != "" ]; then
+			cat $default >> $tempexclude
+			echo "Using default file exclusion patterns" | tee -a $snaplog
+		fi
+		if [ -f $tempexclude ]; then
+			exclude="--exclude-from=$tempexclude"
+		else
+			echo "Not using any exclusion patterns" | tee -a $snaplog
+		fi
+#  WARNING after hours of bughunting, I found that the following debugging command ruins this program if run from cron!
+#		echo "command is rsync -R -va --delete --delete-excluded $excludefile $i $dst/recent.0"
+#echo "exclude file is $excludefile i is $i dst is $dst"
+
+		rsync -R -va${z} --delete --delete-excluded ${reference}${wholefile}${exclude} "$i" "${prefix}$dst/recent.0" | sed -u '/\/$/d' | tee -a $snaplog
+		echo "rsync done"
+		done
+	} < $backpathfile
+	if [ "$remotehost" = "none" ]; then
+		# Rotate the current list of recent backups, if we can.
+#		oldest=`ls -dt $dst/recent.* | tail -n 1 | sed 's/^.*\.//'`
+		findoldest $dst/recent $recent
+		for i in `seq $oldest -1 0`; do
+		mv $dst/recent.$i $dst/recent.$((i+1)) 2>/dev/null
+		done
+		# finally, make the new snapshot reflect the current date.
+		[ -d "$dst/recent.1" ] && touch $dst/recent.1
+		# if we've rotated the last backup off the stack, promote it to daily if older than one day.
+		if [ -d $dst/recent.$((recent+1)) ]; then
+			secsoldest=`date -r $dst/recent.$((recent+1)) +%s`
+			secsnewestnext=`date -r $dst/daily.1 +%s`
+			echo "'Recent' snapshot stack rolled over..." | tee -a $snaplog
+			# 57600 seconds = 16 hours
+			if [ ! -d "$dst/daily.1" -o $((secsoldest-secsnewestnext)) -gt 57600 ]; then
+				echo "Promoting to daily!" | tee -a $snaplog
+				mv $dst/recent.$((recent+1)) $dst/daily.0
+				# Rotate the current list of daily backups, if we can.
+				findoldest $dst/daily $daily
+#				oldest=`ls -dt $dst/daily.* | tail -n 1 | sed 's/^.*\.//'`
+				for i in `seq $oldest -1 0`; do
+				mv $dst/daily.$i $dst/daily.$((i+1)) 2>/dev/null
+				done
+			
+				# if we've rotated the last backup off the stack, maybe promote it.
+				if [ -d $dst/daily.$((daily+1)) ]; then
+					secsoldest=`date -r $dst/daily.$((daily+1)) +%s`
+					secsnewestnext=`date -r $dst/weekly.1 +%s`
+					echo "'Daily' snapshot stack rolled over..." | tee -a $snaplog
+					# check for backup at least one week minus 8 hours older than last weekly
+					if [ ! -d "$dst/weekly.1" -o $((secsoldest-secsnewestnext)) -gt 576000 ]; then
+						echo "Promoting to weekly!" | tee -a $snaplog
+					#promote to weekly!
+						mv $dst/daily.$((daily+1)) $dst/weekly.0
+			
+						# Rotate the current list of weekly backups, if we can.
+						findoldest $dst/weekly $weekly
+#						oldest=`ls -dt $dst/weekly.* | tail -n 1 | sed 's/^.*\.//'`
+						for i in `seq $oldest -1 0`; do
+							mv $dst/weekly.$i $dst/weekly.$((i+1)) 2>/dev/null
+						done
+						# if we've rotated the last backup off the stack, maybe promote it.
+						if [ -d $dst/weekly.$((weekly+1)) ]; then
+							secsoldest=`date -r $dst/weekly.$((weekly+1)) +%s`
+							secsnewestnext=`date -r $dst/monthly.1 +%s`
+							echo "'Weekly' snapshot stack rolled over..." | tee -a $snaplog
+							# 22 days = 1900800 secs
+							if [ ! -d "$dst/monthly.1" -o $((secsoldest-secsnewestnext)) -gt 1900800 ]; then
+							echo "Promoting to monthly!" | tee -a $snaplog
+	
+							#promote to monthly!
+								mv $dst/weekly.$((weekly+1)) $dst/monthly.0
+								# Rotate the current list of monthly backups, if we can.
+								findoldest $dst/monthly $monthly
+#								oldest=`ls -dt $dst/monthly.* | tail -n 1 | sed 's/^.*\.//'`
+								for i in `seq $oldest -1 0`; do
+									mv $dst/monthly.$i $dst/monthly.$((i+1)) 2>/dev/null
+								done
+								# if we've rotated the last backup off the stack, remove it.
+								[ -d $dst/monthly.$((monthly+1)) ] && rm -rf $dst/monthly.$((monthly+1))
+							else
+								echo "Discarding" | tee -a $snaplog
+								rm -rf $dst/weekly.$((weekly+1))
+							fi	
+						fi
+					else
+						echo "Discarding" | tee -a $snaplog
+						rm -rf $dst/daily.$((daily+1))
+					fi
+				fi
+			else
+				echo "Discarding" | tee -a $snaplog
+				rm -rf $dst/recent.$((recent+1))
+			fi
+			if ls "$dst/*.0" 2>/dev/null; then
+				echo "Error rotating backups: there exists a backup with extension '.0', Please delete or rename."
+					errorexit
+			fi
+		fi
+	else
+		echo "proceeding to rotate backups on remote server..."
+		ssh "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a rotatebackups -v $requiresremotever -r"
+		if [ "$?" -ne 0 ]; then
+			errorexit
+		fi
+	fi
+	if [ "$remotehost" != "none" ]; then
+		ssh "$remotelogin@$remotehost" "rm -f $dst/recent.1/backuplog.txt*"
+	else
+		rm -f "$dst/recent.1/backuplog.txt" "$dst/recent.1/backuplog.txt.gz"
+	fi
+	
+	if [ "$bol_storelog" = "true" ]; then
+		ext=""
+		if [ "$bol_compresslog" = "true" -a `which gzip` ]; then
+			gzip $snaplog
+			ext=".gz"
+		fi
+		scp ${snaplog}${ext} "${prefix}$dst/recent.1/backuplog.txt$ext"
+		rm -f ${snaplog}${ext}
+	fi	
+	;;
+mirror)
+	if [ ! -f "$mirrorpathfile" ]; then
+		echo "$mirrorpathfile not found, check configuration!"
+		errorexit
+	fi
+	if [ "$remotehost" != "none" -a "$lastmirror" = "never" ]; then
+		echo "First-time backup via network: not using rsync's delta-transfer algorithm.  Transferring whole files."
+		wholefile='--whole-file '
+	else
+		wholefile=''
+	fi
+	echo "Beginning simple mirror backup..."
+	{
+		while read i
+		do
+			# Ignore coments and blank lines
+			i="$(echo $i | sed 's/#.*$//')"
+			if [ -z "$i" ] || expr "$i" : "[ \t]*$" > /dev/null; then
+				continue
+			fi
+			
+			# Strip off quotes if any
+			#      pattern=$(echo "$pattern" | sed 's/"//g')
+			
+			echo "backing up (simple mirror) $i" | tee -a $snaplog
+			#	    excludefile=`echo $i | sed 's/\///g'
+			
+			exclude=''
+			: > $tempexclude
+			#--exclude-from=
+			excludefile="mirror$(echo $i | sed 's/\///g')"
+			if [ -f "$excludefiledir/$excludefile" ]; then
+				echo "Using custom exclude file $excludefiledir/$excludefile" | tee -a $snaplog
+				cp "$excludefiledir/$excludefile" $tempexclude
+			fi
+			if [ "$default" != "" ]; then
+				cat $default >> $tempexclude
+				echo "Using default excludes" | tee -a $snaplog
+			fi
+			if [ -f $tempexclude ]; then
+				exclude="--exclude-from=$tempexclude"
+			else
+				echo "Not using any exclusion patterns" | tee -a $snaplog
+			fi
+			
+			rsync -R -va${z} --delete --delete-excluded ${wholefile}${exclude} "$i" "${prefix}$dst/$backuptype" | tee -a $snaplog
+		done
+	} < $mirrorpathfile
+	if [ "$remotehost" != "none" ]; then	
+		ssh "$remotelogin@$remotehost" "rm -f $dst/mirror/backuplog.txt*"
+	else
+		rm -f "$dst/mirror/backuplog.txt" "$dst/mirror/backuplog.txt.gz"
+	fi
+	if [ "$bol_storelog" = "true" ]; then
+		ext=""
+		if [ "$bol_compresslog" = "true" -a `which gzip` ]; then
+			gzip $snaplog
+			ext=".gz"
+		fi
+		scp ${snaplog}${ext} "${prefix}$dst/mirror/backuplog.txt$ext"
+		rm -f ${snaplog}${ext}
+	fi
+	;;
+*)
+	echo "syntax: $0 <snapshot | mirror | setup> [settingsdir]"
+	errorexit
+	;;
+esac
+
+# recycling $snaplog as temp work file.  I think the 'in-place' sed option could be used instead
+sed "/^last$backuptype/d" "$MYHOME/.snap2/$settingsdir/settings" > $snaplog
+echo "last${backuptype}=\"$(date "+%D %r")\"" >> $snaplog
+mv -f $snaplog "$MYHOME/.snap2/$settingsdir/settings"
+rm -f "$tempexclude" 2>/dev/null
+echo "Backup of type $backuptype concluded."
+exit 0

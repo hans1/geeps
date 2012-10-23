@@ -1,0 +1,11 @@
+/usr
+/usr/bin
+ lame
+/usr/lib
+ libmp3lame.so
+ libmp3lame.so.0
+ libmp3lame.so.0.0.0
+/usr/src
+/usr/src/lame-3.98.4
+ build-lame.sh
+ SLKBUILD

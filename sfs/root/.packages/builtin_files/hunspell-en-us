@@ -1,0 +1,15 @@
+/usr
+/usr/share
+/usr/share/enchant
+/usr/share/enchant/myspell
+ en_US.aff
+ en_US.dic
+/usr/share/hunspell
+ en_US.aff
+ en_US.dic
+/usr/share/myspell
+/usr/share/myspell/dicts
+ en_US.aff
+ en-US.aff
+ en_US.dic
+ en-US.dic

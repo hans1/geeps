@@ -1,0 +1,57 @@
+/root
+/root/.config
+/root/.config/geany
+ geany.conf
+ ui_toolbar.xml
+/usr
+/usr/bin
+ geany
+/usr/lib
+/usr/lib/geany
+ classbuilder.so
+ export.so
+ filebrowser.so
+ htmlchars.so
+ saveactions.so
+ splitwindow.so
+/usr/local
+/usr/local/bin
+ defaulttexteditor
+/usr/share
+/usr/share/applications
+ Geany-text-editor.desktop
+/usr/share/geany
+ c99.tags
+/usr/share/geany/colorschemes
+ alt.conf
+/usr/share/geany/templates
+ bsd
+ changelog
+ fileheader
+/usr/share/geany/templates/files
+ file.html
+ file.php
+ file.rb
+ file.tex
+ main.c
+ main.cxx
+ main.d
+ main.java
+ main.py
+ program.pas
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/16x16
+/usr/share/icons/hicolor/16x16/apps
+ classviewer-class.png
+ classviewer-macro.png
+ classviewer-member.png
+ classviewer-method.png
+ classviewer-namespace.png
+ classviewer-other.png
+ classviewer-struct.png
+ classviewer-var.png
+ geany.png
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ geany.png

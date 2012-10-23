@@ -1,0 +1,265 @@
+/etc
+/etc/xdg
+/etc/xdg/rox.sourceforge.net
+/etc/xdg/rox.sourceforge.net/MIME-types
+ application_postscript
+ text
+ text_html
+/root
+/root/Choices
+/root/Choices/MIME-types
+ application_abs
+ application_msword
+ application_notecase-enc
+ application_notecase-plain
+ application_pdf
+ application_pet
+ application_postscript
+ application_pup
+ application_rtf
+ application_scribus
+ application_vnd.ms-excel
+ application_vnd.rn-realmedia
+ application_vym
+ application_x-abiword
+ application_x-bfe
+ application_x-bittorrent
+ application_x-bzip
+ application_x-bzip2
+ application_x-bzip-compressed-tar
+ application_x-cd-image
+ application_x-chm
+ application_x-compressed-tar
+ application_x-deb
+ application_x-delta
+ application_x-ext2-image
+ application_x-ext3-image
+ application_x-flash-video
+ application_x-gnumeric
+ application_x-gzip
+ application_x-ogg
+ application_x-pkg
+ application_x-rar
+ application_x-rpm
+ application_x-shockwave-flash
+ application_x-squashfs-image
+ application_x-tar
+ application_x-tcl
+ application_x-tgz
+ application_x-xz
+ application_x-xz-compressed-tar
+ application_zip
+ audio_basic
+ audio_mp4
+ audio_mpeg
+ audio_x-aiff
+ audio_x-flac
+ audio_x-matroska
+ audio_x-mp3
+ audio_x-ms-wma
+ audio_x-pn-realaudio
+ audio_x-ulaw
+ audio_x-vorbis+ogg
+ audio_x-wav
+ image_bmp
+ image_gif
+ image_jpeg
+ image_png
+ image_svg
+ image_svg+xml
+ image_tiff
+ image_x-pixmap
+ image_x-png
+ image_x-xfig
+ image_x-xpixmap
+ text_abiword
+ text_html
+ text_plain
+ text_x-c
+ text_x-changelog
+ text_x-genie
+ text_x-log
+ text_xml
+ text_x-readme
+ text_x-vala
+ video_3gpp
+ video_asf
+ video_mp4
+ video_mpeg
+ video_quicktime
+ video_x-flv
+ video_x-matroska
+ video_x-msvideo
+ video_x-ms-wmv
+ video_x-theora+ogg
+/root/Choices/ROX-Filer
+ globicons
+ PuppyPin
+ README.txt
+/root/Choices/Templates
+ Script
+ WebPage.html
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+ bcrypt
+ inkscapelite
+ mtpaint
+ pupzip
+/root/.config/rox.sourceforge.net/ROX-Filer
+ menus2
+ Options
+/root/.config/rox.sourceforge.net/SendTo
+/root/.config/tmp
+/root/.Trash
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/ROX-Filer
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/usr/local/apps/ROX-Filer/Help
+ Manual.html
+ README
+ rox-filer.htm
+ rox.htm
+/usr/local/apps/ROX-Filer/images
+ application.png
+ dirs.png
+ iconified.png
+ rox-mounted.png
+ rox-mount.png
+ rox-select.png
+ rox-show-details.png
+ rox-show-hidden.png
+ rox-symlink.png
+ rox-xattr.png
+ symlink.png
+/usr/local/apps/ROX-Filer/Messages
+/usr/local/apps/ROX-Filer/ROX
+ index.theme
+/usr/local/apps/ROX-Filer/ROX/MIME
+ application-msword.png
+ application-octet-stream.png
+ application-ogg.png
+ application-pdf.png
+ application-pet.png
+ application-pgp.png
+ application.png
+ application-postscript.png
+ application-pup.png
+ application-rtf.png
+ application-vnd.ms-access.png
+ application-vnd.ms-excel.png
+ application-vnd.ms-office.png
+ application-vnd.ms-powerpoint.png
+ application-vnd.rn-realmedia.png
+ application-vnd.stardivision.writer.png
+ application-vnd.sun.xml.calc.png
+ application-vnd.sun.xml.calc.template.png
+ application-vnd.sun.xml.draw.png
+ application-vnd.sun.xml.draw.template.png
+ application-vnd.sun.xml.impress.png
+ application-vnd.sun.xml.impress.template2.png
+ application-vnd.sun.xml.impress.template.png
+ application-vnd.sun.xml.writer.global.png
+ application-vnd.sun.xml.writer.png
+ application-vnd.sun.xml.writer.template.png
+ application-x-abiword.png
+ application-x-bfe.xpm
+ application-x-bittorrent.png
+ application-x-bzip-compressed-tar.png
+ application-x-bzip.png
+ application-x-cd-image.png
+ application-x-compressed-tar.png
+ application-x-core.png
+ application-x-deb.png
+ application-x-delta.png
+ application-x-dia-diagram.png
+ application-x-dvi.png
+ application-x-executable.png
+ application-x-font-afm.png
+ application-x-font-linux-pcf.png
+ application-x-font-linux-psf.png
+ application-x-font-pcf.png
+ application-x-font.png
+ application-x-font-speedo.png
+ application-x-font-ttf.png
+ application-x-generic.png
+ application-x-glade.png
+ application-x-gnumeric.png
+ application-x-gzip.png
+ application-x-gzpostscript.png
+ application-xhtml+xml.png
+ application-x-jar.png
+ application-x-java-archive.png
+ application-x-java.png
+ application-x-lyx.png
+ application-xml.png
+ application-x-notecase.png
+ application-x-object.png
+ application-x-perl.png
+ application-x-rar.png
+ application-x-rpm.png
+ application-x-sharedlib.png
+ application-x-shellscript.png
+ application-x-shockwave-flash.png
+ application-x-squashfs-image.png
+ application-x-tar.png
+ application-x-texmacs.png
+ application-x-trash.png
+ application-x-troff-man-compressed.png
+ application-x-troff-man.png
+ application-x-troff.png
+ application-zip.png
+ audio-midi.png
+ audio-mpeg.png
+ audio.png
+ audio-x-generic.png
+ audio-x-mod.png
+ audio-x-mp3.png
+ audio-x-pn-realaudio.png
+ audio-x-wav.png
+ image-gif.png
+ image-jpeg.png
+ image.png
+ image-x-generic.png
+ image-x-xpixmap.png
+ inode-blockdevice.png
+ inode-chardevice.png
+ inode-core.png
+ inode-directory.png
+ inode-fifo.png
+ inode-mount-point.png
+ inode-socket.png
+ message-x-generic.png
+ text-css.png
+ text-html.png
+ text-plain.png
+ text.png
+ text-x-changelog.png
+ text-x-copying.png
+ text-x-c++src.png
+ text-x-csrc.png
+ text-x-diff.png
+ text-x-generic.png
+ text-x-genie.png
+ text-x-java.png
+ text-x-log.png
+ text-x-makefile.png
+ text-xml.png
+ text-x-python.png
+ text-x-readme.png
+ text-x-tcl.png
+ text-x-tex.png
+ text-x-vala.png
+ video-mpeg.png
+ video.png
+ video-quicktime.png
+ video-x-generic.png
+/usr/local/bin
+ rox
+/usr/share
+/usr/share/applications
+ ROX-Filer-file-manager.desktop

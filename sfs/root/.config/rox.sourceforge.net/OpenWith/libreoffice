@@ -1,0 +1,2 @@
+#!/bin/sh
+[ -x /opt/libreoffice*/program/soffice ] && exec /opt/libreoffice*/program/soffice "$@"

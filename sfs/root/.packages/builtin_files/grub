@@ -1,0 +1,28 @@
+/usr
+/usr/bin
+ mbchk
+ mkbimage
+/usr/lib
+/usr/lib/grub
+/usr/lib/grub/i386-pc
+ e2fs_stage1_5
+ fat_stage1_5
+ jfs_stage1_5
+ minix_stage1_5
+ reiserfs_stage1_5
+ stage1
+ stage2
+ stage2_eltorito
+ xfs_stage1_5
+/usr/lib/grub/i386-t2
+/usr/sbin
+ grub
+ grub-floppy
+ grub-install
+ grub-md5-crypt
+ grub-reboot
+ grub-set-default
+ grub-terminfo
+/usr/share
+/usr/share/applications
+ Grub-bootloader-config.desktop

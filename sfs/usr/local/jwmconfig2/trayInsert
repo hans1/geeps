@@ -1,0 +1,129 @@
+#!/bin/sh
+#
+###################
+#
+# trayInsert
+# for use with jwmConfigMgr
+# Allows user to specify
+# 'left' or 'right' as the
+# side for insertion of new
+# programs into the JWM tray
+#
+# author: thoughtjourney
+# date: 27/08/2005
+#
+# Code updated for Puppy 1.0.9, JWM 1.7
+# by Kwiller on 6-May-2006
+#
+###################
+# 23aug2010 shinobar: remove warnings at parsing new config
+
+##-----taskbarConfig----->>
+
+TMP="/tmp/checklist.tmp.$$"
+CONFIG="/root/.jwm/jwmrc-personal"
+CONFIG2="/root/.jwm/jwmrc-personal-bak"
+CONF="/root/.jwm/jwmrc-personal-temp"
+DCL="<TaskListStyle insert=\"left\"/>"
+DCR="<TaskListStyle insert=\"right\"/>"
+DCO="<TaskListStyle insert="
+
+#----Check for current settings---->>
+SET_LEFT=`grep -c "$DCL" $CONFIG`
+SET_RIGHT=`grep -c "$DCR" $CONFIG`
+SET_ON=`grep -c "$DCO" $CONFIG`
+
+#----Set Default Settings---->>
+LEFT_ON=off
+RIGHT_ON=ON
+
+#----Determine if Current Setting non-default----->>
+if [ "$SET_LEFT" -eq "1" ]; then
+    LEFT_ON=ON
+    RIGHT_ON=off
+fi
+
+#-----Backup current settings----->>
+cp $CONFIG $CONFIG2
+
+SEDLEFT=s!insert=\".*\"!insert=\"left\"!g
+SEDRIGHT=s!insert=\".*\"!insert=\"right\"!g
+
+#-------------gui----------->>
+
+Xdialog --backtitle "JWM Taskbar Configuration" \
+	--title "Tray Insertion Option" \
+        --radiolist "Choose which side new programs will enter the tray" 13 46 2 \
+"LEFT"  "New programs enter at left." $LEFT_ON \
+"RIGHT" "New programs enter at right." $RIGHT_ON 2>$TMP
+retval=$?
+
+#--------cancel pressed----->>
+case $retval in
+    1 | 255)  exit 0;;
+esac
+
+#---------save changes----->>
+
+SIDE=`cat $TMP`
+
+if [ "$SET_ON" -eq "1" ]
+then
+#-----If there are current settings change them----->>
+   if [ "$SIDE" = "RIGHT" ]; then
+      sed -e "$SEDRIGHT" $CONFIG > $CONF
+   else
+      sed -e "$SEDLEFT" $CONFIG > $CONF
+   fi
+else
+#-----If there are no current settings add the new one---->>
+
+  echo "  " > $TMP
+  echo '<!-- Tray Task Insert -->' >> $TMP
+  
+  if [ "$SIDE" = "RIGHT" ]; then
+    echo "<TaskListStyle insert=\"right\"/>" >> $TMP
+  else
+    echo "<TaskListStyle insert=\"left\"/>" >> $TMP
+  fi
+
+  sed -e "/<JWM>/r $TMP" $CONFIG > $CONF
+
+fi
+
+mv $CONF $CONFIG
+
+#------check new configuration----->>
+jwm -p 2>&1 | grep -v 'warning' > $TMP
+
+CHECKCONF=`cat $TMP`
+
+if [ "$SIDE" = "RIGHT" ]; then
+  RES=`grep -c "<TaskListStyle insert=\"right\"/>" $CONFIG`
+else
+  RES=`grep -c "<TaskListStyle insert=\"left\"/>" $CONFIG`
+fi
+
+#----notify of result----->>
+
+if [ "$RES" -eq "1" ]; then
+  if [ -z $CHECKCONF ]; then 
+    RESTOP="Change Saved"
+    RESMSG="New programs will enter the tray to the $SIDE"
+    rm -f $CONFIG2
+  else
+    RESTOP="Change Reversed"
+    RESMSG="New config corrupt. Keeping original"
+    mv $CONFIG2 $CONFIG
+  fi
+else
+  RESTOP="Change Failed"
+  RESMSG="Configuration has not been altered"
+  mv $CONFIG2 $CONFIG
+fi
+
+Xdialog --title "$RESTOP" --msgbox "$RESMSG" 0 0
+
+#--------clean exit------->>
+rm -f $TMP
+exit 0

@@ -1,0 +1,9 @@
+/root
+/root/ftpd
+/usr
+/usr/sbin
+ pure-ftpd
+ run-pureftpd
+/usr/share
+/usr/share/applications
+ Pure_FTPd-FTP-server.desktop

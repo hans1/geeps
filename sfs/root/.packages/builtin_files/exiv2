@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ exiv2
+/usr/lib
+ libexiv2.so
+ libexiv2.so.10
+ libexiv2.so.10.0.1

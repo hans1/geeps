@@ -1,0 +1,17 @@
+/root
+/root/.notecase
+ notecase.ini
+/usr
+/usr/bin
+ notecase
+/usr/share
+/usr/share/applications
+ notecase.desktop
+/usr/share/doc
+/usr/share/doc/notecase
+ help.ncd
+/usr/share/mime
+/usr/share/mime/packages
+ notecase.xml
+/usr/share/pixmaps
+ notecase.xpm

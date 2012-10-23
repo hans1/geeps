@@ -1,0 +1,44 @@
+#!/bin/bash
+
+export Pmusic_about="
+<window title=\"Pmusic - about\" icon-name=\"pmusic\" resizable=\"false\">
+ <notebook labels=\"About|License|Credits\">
+  <frame>
+   <text><label>\"\"</label></text>
+   <text use-markup=\"true\">
+    <label>
+     \"<big><big><big><big><span fgcolor='"'darkgreen'"'><b>P</b></span></big></big></big></big><span fgcolor='"'#218021'"' size='"'xx-large'"'><b>music</b></span><span fgcolor='"'darkgreen'"' size='"'xx-large'"'> $VERSION</span>\"
+    </label>
+   </text>
+   <text height-request=\"10\"><label>\"\"</label></text>
+   <hbox homogeneous=\"true\">
+    <hbox>
+     <text angle=\"350\" wrap=\"false\" use-markup=\"true\"><label>\"<b>Sigmund Berglund </b>\"</label></text>
+     <pixmap><input file>$APPDIR/pmusic20.png</input><height>40</height></pixmap>
+     <text angle=\"10\" wrap=\"false\" use-markup=\"true\"><label>\"<b> Copyright 2008-2012</b>\"</label></text>
+    </hbox>
+   </hbox>
+   <text><label>\"\"</label></text>
+   <text><label>\"\"</label></text>
+   <button>
+    <label>\"http://www.murga-linux.com/puppy/viewtopic.php?t=31206\"</label>
+    <action>$BROWSER http://www.murga-linux.com/puppy/viewtopic.php?t=31206 &</action>
+   </button>
+  </frame>
+  <frame>
+   <text use-markup=\"true\"><label>\"   Pmusic is released under the <b>GNU General Public License</b> (GPL). You have the right to use and modify this software in any way you like, so long as any derivative works remain under a GPL license.
+   
+   This program is distributed in the hope that it will be useful, but <b><span color='"'red'"'>WITHOUT ANY WARRANTY</span></b>. See the GNU General Public License homepage for more details.\"</label></text>
+   <hbox>
+    <button>
+     <label>\"http://www.gnu.org/licenses/\"</label>
+     <action>$BROWSER http:\/\/www.gnu.org\/licenses\/</action>
+    </button>
+   </hbox>
+  </frame>
+  <frame>
+   <edit editable=\"false\" left_margin=\"10\">
+   <input file>$APPDIR/txt_about</input></edit>
+  </frame>
+ </notebook>
+</window>"

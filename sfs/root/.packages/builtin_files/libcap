@@ -1,0 +1,15 @@
+/lib
+ libcap.so
+ libcap.so.1
+ libcap.so.2
+ libcap.so.2.20
+/sbin
+ capsh
+ getcap
+ getpcaps
+ setcap
+/usr
+/usr/sbin
+ pcaps4convenience
+ pcaps4server
+ pcaps4suid0

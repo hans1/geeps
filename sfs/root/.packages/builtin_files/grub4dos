@@ -1,0 +1,47 @@
+/usr
+/usr/lib
+/usr/lib/grub4dos
+ default
+ grldr
+ wee.mbr
+/usr/sbin
+ bootlace.com
+ grub4dosconfig
+/usr/share
+/usr/share/applications
+ Grub4DosConfig.desktop
+/usr/share/doc
+/usr/share/doc/help
+/usr/share/doc/help/C
+ grub4dosconfig.html
+ grub4dos.html
+/usr/share/doc/help/images
+ gnibbles.png
+/usr/share/doc/help/ja
+ grub4dosconfig.html
+ grub4dos.html
+/usr/share/doc/nls
+/usr/share/doc/nls/grub4dosconfig
+ de.po
+ fr.po
+ grub4dosconfig.pot
+ ja.po
+ ru.po
+/usr/share/locale
+/usr/share/locale/de
+/usr/share/locale/de/LC_MESSAGES
+ grub4dosconfig.mo
+/usr/share/locale/es
+/usr/share/locale/es/LC_MESSAGES
+ grub4doscpnfig.mo
+/usr/share/locale/fr
+/usr/share/locale/fr/LC_MESSAGES
+ grub4dosconfig.mo
+/usr/share/locale/ja
+/usr/share/locale/ja/LC_MESSAGES
+ grub4dosconfig.mo
+/usr/share/locale/ru
+/usr/share/locale/ru/LC_MESSAGES
+ grub4dosconfig.mo
+/usr/share/pixmaps
+ gnibbles.png

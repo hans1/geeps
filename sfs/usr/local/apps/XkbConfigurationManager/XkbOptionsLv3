@@ -1,0 +1,72 @@
+#!/bin/sh
+# A script to change the XkbOption "lv3" variable in xorg.conf
+# Part of the Puppy XkbConfigurator
+
+##--------variables---------->>
+INFILE='/etc/X11/xorg.conf'
+OUTFILE='/etc/X11/xorg.conf.tmp5'
+OPTION='lv3'
+LIST="/etc/X11/xkb/rules/xorg.lst"
+# exported the following from main
+#ERRMSG='Xdialog --title "ERROR" --msgbox "An Error has occured! Try again." 0 0'
+#SUCCESS='Xdialog --title "Success!" --no-buttons --infobox "Changes applied successfuly!" 0 0 2000'
+
+# the full line containing XkbOptions:
+ORIGINAL=`fgrep '"XkbOptions"' $INFILE | grep -v '^#'`
+
+#find current variants and layouts:
+CURRENT=`echo "$ORIGINAL" | cut -d'"' -f4`
+
+# check if already have one, find description and add to message.
+EXIST=`echo -n "$CURRENT" | tr ',' '\n' | fgrep "$OPTION:"`
+
+if [ ! "$EXIST" = "" ]; then
+	INFO=`fgrep -w "$EXIST" $LIST`
+	MESSAGE="You are currently using the following Third Level settings:
+	"$INFO"
+
+To change it, select a new one below, then press OK.
+To remove it, select it below and press OK.
+To abort press cancel."
+else
+	MESSAGE="Please select the setting you would like to use,
+ then press OK.
+To abort, press cancel."
+fi
+
+# give choice dialog
+CHOICE=`Xdialog --stdout --title "Configure Xkb Option" --left --menubox "$MESSAGE" 20 65 10 lv3:switch "Press Right Control to choose 3rd level." lv3:menu_switch "Press Menu key to choose 3rd level." lv3:win_switch "Press any of Win-keys to choose 3rd level." lv3:lwin_switch "Press Left Win-key to choose 3rd level." lv3:rwin_switch "Press Right Win-key to choose 3rd level." lv3:alt_switch "Press any of Alt keys to choose 3rd level." lv3:lalt_switch "Press Left Alt key to choose 3rd level." lv3:ralt_switch "Press Right Alt key to choose 3rd level."`
+[ ! $? -eq 0 ] && echo "cancelled" && exit 
+echo "$CHOICE"
+
+if [ ! "$EXIST" = "" ]; then # if there's one already
+	if [ "$CHOICE" = "$EXIST" ]; then # the same -> remove
+		NEW=`echo -n $CURRENT | tr ',' '\n' | fgrep -v $CHOICE | tr '\n' ',' | tr -s ',' | sed 's/^,//;s/,$//'`
+	else # change
+		NEW=`echo "$CURRENT" | sed "s/$EXIST/$CHOICE/"`
+	fi
+else
+	NEW="$CURRENT,$CHOICE"
+	[ "$CURRENT" = "" ] && NEW="$CHOICE"
+fi
+
+# add new variant to line, or entire line, if it doesn't exist:
+if [ "$ORIGINAL" = "" ] ;then
+	ORIGINAL=`fgrep '"XkbVariant"' $INFILE | grep -v '^#'`
+	[ "$ORIGINAL" = "" ] && ORIGINAL=`fgrep '"XkbLayout"' $INFILE | grep -v '^#'`
+	MODIFIED="$ORIGINAL\n	Option 		\"XkbOptions\"   \"$NEW\""
+else
+	MODIFIED=`echo "$ORIGINAL" | sed "s%\"$CURRENT\"%\"$NEW\"%"`
+fi
+
+# add to file
+cat $INFILE | sed "s%$ORIGINAL%$MODIFIED%" >$OUTFILE
+
+if ! fgrep -q '"XkbOptions"' $OUTFILE ;then
+	eval $ERRMSG
+	rm -f $OUTFILE
+else
+	mv -f $OUTFILE $INFILE
+	eval $SUCCESS
+fi
+exit

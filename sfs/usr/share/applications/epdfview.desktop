@@ -1,0 +1,16 @@
+[Desktop Entry]
+Encoding=UTF-8
+Comment=PDF document viewer
+Comment[ca]=Visor de documents PDF
+Comment[es]=Visor de documentos PDF
+Exec=epdfview
+GenericName=PDF Viewer
+GenericName[ca]=Visor PDF
+GenericName[es]=Visor PDF
+Icon=/usr/share/epdfview/pixmaps/icon_epdfview-24.png
+Name=ePDFViewer
+Name[ca]=ePDFViewer
+Name[es]=ePDFViewer
+Terminal=false
+Type=Application
+Categories=X-DocumentUtility

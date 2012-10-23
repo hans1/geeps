@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=ScreenSaver Control
+Icon=/usr/local/PupControl/icons/screen20.png
+Comment=ScreenSaver Control
+Exec=/usr/local/PupControl/SS-control
+Terminal=false
+Type=Application
+Categories=X-Desktop;
+GenericName=ScreenSaver Control

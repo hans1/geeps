@@ -1,0 +1,15 @@
+#!/bin/ash
+#101121 --modcheck=<module> call is in rerwin's firmware scripts.
+
+PARAM1="$1"
+
+case $PARAM1 in
+ --modcheck*)
+  MODULE="`echo "$PARAM1" | cut -f 2 -d '='`"
+  lsmod | grep "^${MODULE} " > /dev/null 2>&1
+  exit $?
+ ;;
+esac
+
+exit 0
+###END###

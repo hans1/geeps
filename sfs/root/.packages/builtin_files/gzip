@@ -1,0 +1,14 @@
+/bin
+ gunzip
+ gzexe
+ gzip
+ zcat
+ zcmp
+ zdiff
+ zegrep
+ zfgrep
+ zforce
+ zgrep
+ zless
+ zmore
+ znew

@@ -1,0 +1,24 @@
+/etc
+/etc/init.d
+ sfs_load
+/etc/rc.d
+ BOOTCONFIG.save
+/root
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+/root/.config/rox.sourceforge.net/OpenWith/.application_x-squashfs-image
+ sfs_load
+/usr
+/usr/sbin
+ extrasfsfind
+ sfs_load
+/usr/share
+/usr/share/applications
+ SFS-Load.desktop
+/usr/share/locale
+/usr/share/locale/en
+/usr/share/locale/en/LC_MESSAGES
+ sfs_load.mo
+/usr/share/pixmaps
+ squashfs-image.png

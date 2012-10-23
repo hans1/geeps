@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ id3convert
+ id3cp
+ id3info
+ id3tag
+/usr/lib
+ libid3-3.8.so.3
+ libid3-3.8.so.3.0.0
+ libid3.so
+/usr/src
+/usr/src/id3lib-3.8.3
+ build-id3lib.sh
+ id3lib-3.8.3-gcc43-1.patch
+ patch_id3lib_3.8.3_UTF16_writing_bug.diff
+ SLKBUILD

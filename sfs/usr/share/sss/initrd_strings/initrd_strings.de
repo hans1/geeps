@@ -1,0 +1,97 @@
+[general]
+#3buildistro script in Woof separates out the sections into separate early-boot translations.
+#for example the [init] section becomes file /locales/de/init in the initrd, and 
+#the target file (that gets translated at bootup) is /init (the init script translates
+#itself at startup, and knows where the translation files are located).
+#Please type translation only between the last two % characters. 
+#Keep all formatting exactly the same, that is retain all " ' < > / \ characters.
+# -- do not replace the " and ' with left-side or right-side quote characters.
+#Keep all variables as-is, exs: ${DROPOUT} $DROPOUT -- do not translate!
+
+[init]
+#These are translations for 'init' in the initrd. It is a translation at every bootup.
+#3builddistro creates /locales/de/init in the initrd, and 'init' at bootup reads it and
+#translates itself (if LANG is de*).
+s%SORRY, cannot check filesystem%SORRY, kann Dateisystem nicht checken%
+s%'save file' filesystem check, please wait...%'save file' Dateisystem-Check, bitte warten...%
+s%'${1}' filesystem check, please wait...%'${1}' Dateisystem-Check, bitte warten...%
+s%ERROR: Windows NTFS hibernated partition, cannot mount%FEHLER: Windows NTFS winterschlafende Partition, kann nicht mounten%
+s%"done"%"fertig"%
+s%"failed"%"nicht OK"%
+s%Dumping last lines of /tmp/bootinit.log...%Schreibe letzte Zeilen der Datei /tmp/bootinit.log...%
+s%Dumping last lines of kernel log...%Schreibe letzte Zeilen des Kernel-Logs...%
+s%Pausing for 60 seconds...%Pausiere 60 Sekunden...%
+s%Loading '${PKEYS}' keyboard layout...%Lade '${PKEYS}' Tastaturbelegung...%
+s%Loading drivers needed to access disk drives%Lade Treiber für Zugriff auf Laufwerke%
+s%Searching for Puppy files...%Suche nach Puppy-Dateien...%
+s%${DROPOUT} not found. Dropping out to initial-ramdisk console...%${DROPOUT} nicht gefunden. Falle zurück auf initiale Ramdisk-Konsole...%
+s%Type a number to choose which personal file to use:%Tipp eine Ziffer zur Auswahl der zu benutzenden persönlichen Datei:%
+s%"0  none"%"0 keine"%
+s%Loading personal file $PUPSAVEFILE ($PUPSAVEDEV)...%Lade persönliche Datei $PUPSAVEFILE ($PUPSAVEDEV)...%
+s%Mounting encrypted $PUPSAVEFILE...%Mounte verschlüsselte $PUPSAVEFILE...%
+s%SORRY, cannot resize $PUPSAVEFILE%SORRY, kann $PUPSAVEFILE nicht vergrößern%
+s%Increasing $PUPSAVEFILE by $KILOBIG Kbytes, please wait...%Vergrößere $PUPSAVEFILE um $KILOBIG Kbytes, bitte warten...%
+s%NOTICE: As you type your password nothing will be displayed on the screen.%TRANSLATION REQUIRED%
+s%This is a security measure. Just type it in then press ENTER key...%TRANSLATION REQUIRED%
+s%"Password: "%"Paßwort: "%
+s%...continuing with loading $PUPSAVEFILE...%...weiter mit Laden von $PUPSAVEFILE...%
+s%...successfully mounted%...erfolgreich ge´mount´et%
+s%Can't mount file, press ENTER key to try again.%Kann Datei nicht mounten, drücke Enter-Taste für noch einen Versuch.%
+s%Or, any other char then ENTER for f.s. check then try again.%Oder, irgendeine Taste und dannn Enter für Dateisystem-Check und noch einen Versuch.%
+s%Or, for developers type 'quit' to drop out to console:%Oder, für Entwickler: 'quit' bringt Konsole:%
+s%SORRY, cannot resize ${PUPSAVEFILE}%SORRY, kann ${PUPSAVEFILE} nicht vergrößern%
+s%Increasing $PUPSAVEFILE by $KILOBIG Kbytes, please wait...%Vergrößere $PUPSAVEFILE um $KILOBIG Kbytes, bitte warten...%
+s%This save-file was last used with version $OLDDISTRO_VERSION of Puppy.%Dieser save-file wurde zuletzt benutzt mit Version $OLDDISTRO_VERSION von Puppy.%
+s%Hit the ENTER key only if it is okay to upgrade this file, or to not use it and boot up in RAM only type any other printable character.%Nur die Enter-Taste drücken, falls es in Ordnung ist, diese Datei zu aktualisieren, oder falls diese Datei nicht benutzt werden soll, irgendein druckbares Zeichen und dann die Enter-Taste.%
+s%"ENTER only to upgrade: "%"nur Enter-Taste zum upgrade: "%
+s%Backing off, not using save-file, booting in RAM only,%Backing off, not using save-file, booting in RAM only,%
+s%The main Puppy file '${basepupsfs}' is being loaded off the optical disc.%Die Puppy-Hauptdatei '${basepupsfs}' wird vom optischen Speichermedium geladen.%
+s%Very slow! Type ENTER key only to copy it to the same partition as the save-file then on next boot it will load fast. Type any printable char not to copy it.%Sehr langsam! Nur Enter-Taste drücken zum Kopieren auf dieselbe Partition wie die save-Datei dann beim nächsten Neustart wird schnell geladen. Irgendeine Taste zum nicht kopieren.%
+s%"ENTER key only to copy: "%"nur Enter-Taste zum kopieren: "%
+s%'${basepupsfs}' now copying to hard drive (but only available next boot)...%kopiere '${basepupsfs}' jetzt auf Festplatte (aber erst beim nächsten Neustart verfügbar)...%
+s%Folder $ONEFOLDER marked bad.%Ordner $ONEFOLDER als schlecht markiert.%
+s%Loading folder $ONEFOLDER from CD/DVD...%Lade Ordner $ONEFOLDER von CD/DVD...%
+s%"RAM full"%"RAM voll"%
+s%'copying to ram'%'kopiere ins RAM'%
+s%Loading the '${basepupsfs}' main file...%Lade die Hauptdatei '${basepupsfs}'...%
+s%Setting up the layered filesystem...%Einrichtung des überlagernden Dateisystems...%
+s%Version update, restoring 'official' files, please wait...%Version update, restoring 'offizielle' Dateien, bitte warten...%
+s%(with a slow CPU this may take sometime, please be patient)%(mit einer langsamen CPU kann dies eine Weile dauern, bitte Geduld)%
+s%This is a simulated version upgrade, which performs a file cleanup.%Dies ist ein simuliertes Version-Upgrade, das eine Dateisäuberung durchführt.%
+s%This is a radical file cleanup for broken systems, could alter some settings.%Dies ist eine radikale Dateibereinigung für defekte Systeme, könnte einige Einstellungen verändern.%
+s%You are upgrading Puppy ${OLDstr} ${NEWPVERSION}.%Du upgradest Puppy ${OLDstr} auf ${NEWPVERSION}.%
+s%Overwritten old files have been moved to /tmp/versioncleanup/%Überschriebene alte Dateien wurden verschoben nach /tmp/versioncleanup/%
+s%After bootup please examine this directory (before shutdown) for anything that you might like to recover. Pausing 30 secs so you can read this msg...%Nach dem Start (vor dem Herunterfahren) bitte diesen Ordner examinieren nach allem, was vielleicht wiederverwendet werden soll. Pausiere 30 Sekunden zum Lesen dieser Meldung...%
+s%Overlaying preconfig files...%Überlagere vorkonfigurierte Dateien...%
+s%Performing a 'switch_root' to the layered filesystem...%Mache ein 'switch_root' auf das überlagerte Dateisystem...%
+s%Dropped to initramfs shell. Type 'exec switch' to continue booting Puppy.%Zurückgefallen auf initramfs shell. Eingabe von 'exec switch' läßt Puppy weiterbooten.%
+
+[boot.msg]
+#3builddistro (in Woof) reads this section and translates the first bootup splash screen,
+#if a non-English build of Puppy. This will be file 'boot.msg' in the live-CD.
+s%Just wait 5 seconds for normal startup!%%
+s%For basic help press the <F2> key, for advanced help press <F3> key.%%
+
+[help.msg]
+#3builddistro (in Woof) reads this section and translates the first bootup help screen,
+#if a non-English build of Puppy. This will be file 'help.msg' in the live-CD.
+#Note: be careful that all translations no more than 67 chars to fit nicely in splash screen.
+s%Press <F3> key to go to advanced help%%
+s%If you need particular boot options, type%%
+s%then a space,%%
+s%then each boot option.%%
+s%Some boot options:%%
+s%Default on for PCs >2001, may give boot/shutdown probs.%%
+s%Run totally in RAM ignore saved sessions,%%
+s%number of saved sessions to ignore (multisession-CD),%%
+s%commandline only, do not start X,%%
+s%copy .sfs files to RAM (slower boot, faster running),%%
+s%do not copy .sfs files to RAM (faster boot, slower running),%%
+s%do filesystem check on%%
+s%(and host partition)%%
+s%file cleanup (simulate version upgrade),%%
+s%Locale -- not normally required as asked after bootup.%%
+s%Keyboard layout, choices:%%
+s%Ignore ACPI, French keyboard layout.%%
+s%Run in RAM, do not start X.%%
+

@@ -1,0 +1,11 @@
+/usr
+/usr/lib
+ libtheoradec.so
+ libtheoradec.so.1
+ libtheoradec.so.1.1.4
+ libtheoraenc.so
+ libtheoraenc.so.1
+ libtheoraenc.so.1.1.2
+ libtheora.so
+ libtheora.so.0
+ libtheora.so.0.3.10

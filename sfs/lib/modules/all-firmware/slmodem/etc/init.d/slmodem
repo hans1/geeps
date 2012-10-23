@@ -1,0 +1,89 @@
+#!/bin/sh
+#(c) Copyright Barry Kauler Dec. 2010. License GPL v3 /usr/share/doc/legal.
+# it is possible for a pc to have an on-board modem chip that is not used,
+# instead there is a plugin card, so have put the alsa-modem-detection after
+# detecting pci (slamr.ko) and usb (slusb.ko) smartlink modems.
+#110101 RE Separate USB script, to run early (as Slmodemusb), and process the PCI and ALSA modems last (as slmodem).
+
+#v405 if a different modem selected, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem`" != "ttySL0" ] && exit
+
+[ ! $1 ] && exit
+[ "$1" != "start" ] && exit
+[ "` ps aux | grep ' \/usr\/sbin\/slmodemd '`" != "" ] && exit #v406 Ensure SL daemon used by only one modem type
+
+#COUNTRY_NAME is in /etc/countryinfo, created by /etc/rc.d/rc.country at bootup...
+OPTCOUNTRY=""
+if [ -f /etc/countryinfo ];then
+ . /etc/countryinfo
+ GPATTERN="|${COUNTRY_NAME}|"
+ ALLCOUNTRIES="|`/usr/sbin/slmodemd --countrylist 2>&1 | cut -f 2 -d ' ' | tr '\n' '|'`"
+ [ "`echo -n "$ALLCOUNTRIES" | grep "$GPATTERN"`" != "" ] && OPTCOUNTRY="--country=${COUNTRY_NAME}"
+fi
+
+# slamr.ko is a driver for Smartlink PCI modems....
+if [ -f /lib/modules/$KERNVER/slmodem/slamr.ko ] \
+ && /sbin/pup_event_backend_modprobe_protect --modcheck=slamr ;then  #v432 v406 - skip if not for PCI modem. 110123
+ #note, ungrab-winmodem.ko has to be loaded before slamr.ko, but 
+ #'modprobe slamr' executed by rc.modules will run the pinstall.sh script
+ #in the slmodem firmware package in zdrv, which modifies /etc/modprobe.conf
+ #to cause ungrab-winmodem to load first.
+ echo "#/bin/sh" > /usr/sbin/slmodemdshell
+ echo "/usr/sbin/slmodemd $OPTCOUNTRY /dev/slamr0" >> /usr/sbin/slmodemdshell
+ sync
+ chmod 755 /usr/sbin/slmodemdshell
+ ln -snf ttySL0 /dev/modem
+ /usr/sbin/slmodemdshell &
+ exit
+fi
+
+ALSAMODEMINFO="`cat /proc/asound/pcm 2>/dev/null | grep ' Modem :'`"
+[ "$ALSAMODEMINFO" = "" ] && exit
+
+#NOTE: lsmod renders names like snd-atiixp-modem as snd_atiixp_modem
+
+# alsa modem drivers: snd-via82xx-modem.ko, snd-atiixp-modem.ko, snd-intel8x0m.ko
+if /sbin/pup_event_backend_modprobe_protect --modcheck=snd_via82xx_modem \
+  || /sbin/pup_event_backend_modprobe_protect --modcheck=snd_atiixp_modem \
+  || /sbin/pup_event_backend_modprobe_protect --modcheck=snd_intel8x0m ;then #v432
+#if [ "`lsmod | grep -E '^snd_via82xx_modem|^snd_atiixp_modem|^snd_intel8x0m'`" != "" ];then
+ #[ -e /dev/ttySL0 ] && rm -f /dev/ttySL0
+ echo "#/bin/sh" > /usr/sbin/slmodemdshell
+ echo "/usr/sbin/slmodemd $OPTCOUNTRY --alsa modem:1" >> /usr/sbin/slmodemdshell
+
+#these can also be modems: snd-hda-intel.ko, snd-ali5451
+#if [ "`lsmod | grep '^snd_hda_intel'`" != "" ];then
+elif /sbin/pup_event_backend_modprobe_protect --modcheck=snd_hda_intel ;then #v432
+ #101028 Check for Conexant HDA chipset.
+ if [ "`lsmod | grep '^hsfhda '`" != "" ];then
+  MODEM="`grep 'is a Conexant HSF softmodem' /var/log/messages | grep -w 'HDA' | grep -w -o 'ttySHSF[0-9][0-9]*'`"
+  [ "$MODEM" != "" ] \
+   && ln -snf $MODEM /dev/modem \
+   && exit
+ fi
+ #[ -e /dev/ttySL0 ] && rm -f /dev/ttySL0
+ #may work with hw:0,1 or hw:0,6...
+ SNDHW='hw:0,1'
+ [ "`echo -n "$ALSAMODEMINFO" | cut -f 1 -d ':' | grep '00\-06'`" != "" ] && SNDHW='hw:0,6' 
+ echo "#/bin/sh" > /usr/sbin/slmodemdshell
+ #echo "/usr/sbin/slmodemd $OPTCOUNTRY --alsa hw:0,1 2>/tmp/slmodemderr.log" >> usr/sbin/slmodemdshell
+ #echo -n '[ "`grep "No such device" /tmp/slmodemderr.log`" != "" ] && ' >> usr/sbin/slmodemdshell
+ #echo "/usr/sbin/slmodemd $OPTCOUNTRY --alsa hw:0,6" >> usr/sbin/slmodemdshell
+ echo "/usr/sbin/slmodemd $OPTCOUNTRY --alsa $SNDHW" >> /usr/sbin/slmodemdshell
+
+elif /sbin/pup_event_backend_modprobe_protect --modcheck=snd_ali5451 ;then #v432
+ #[ -e /dev/ttySL0 ] && rm -f /dev/ttySL0
+ echo "#/bin/sh" > /usr/sbin/slmodemdshell
+ echo "/usr/sbin/slmodemd -s $OPTCOUNTRY --alsa hw:0,1" >> /usr/sbin/slmodemdshell
+else
+ exit
+fi
+
+sync
+chmod 755 /usr/sbin/slmodemdshell
+/usr/sbin/slmodemdshell &
+sleep 1 #precaution
+[ -e /dev/ttySL0 ] && ln -snf ttySL0 /dev/modem
+exit
+
+###END###

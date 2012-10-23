@@ -1,0 +1,42 @@
+/etc
+/etc/pango
+/etc/pango/i486-slackware-linux
+ pango.modules
+/usr
+/usr/bin
+ pango-querymodules
+ pango-querymodules-32
+ pango-view
+ update-pango-querymodules
+/usr/lib
+ libpango-1.0.so
+ libpango-1.0.so.0
+ libpango-1.0.so.0.2800.4
+ libpangocairo-1.0.so
+ libpangocairo-1.0.so.0
+ libpangocairo-1.0.so.0.2800.4
+ libpangoft2-1.0.so
+ libpangoft2-1.0.so.0
+ libpangoft2-1.0.so.0.2800.4
+ libpangox-1.0.so
+ libpangox-1.0.so.0
+ libpangox-1.0.so.0.2800.4
+ libpangoxft-1.0.so
+ libpangoxft-1.0.so.0
+ libpangoxft-1.0.so.0.2800.4
+/usr/lib/pango
+/usr/lib/pango/1.6.0
+/usr/lib/pango/1.6.0/modules
+ pango-arabic-fc.so
+ pango-arabic-lang.so
+ pango-basic-fc.so
+ pango-basic-x.so
+ pango-hangul-fc.so
+ pango-hebrew-fc.so
+ pango-indic-fc.so
+ pango-indic-lang.so
+ pango-khmer-fc.so
+ pango-syriac-fc.so
+ pango-thai-fc.so
+ pango-tibetan-fc.so
+/usr/sbin

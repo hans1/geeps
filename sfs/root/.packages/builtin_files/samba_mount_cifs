@@ -1,0 +1,4 @@
+/usr
+/usr/sbin
+ mount.cifs
+ umount.cifs

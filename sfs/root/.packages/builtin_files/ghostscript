@@ -1,0 +1,116 @@
+/etc
+/etc/cups
+ pstoraster.convs
+/usr
+/usr/bin
+ bdftops
+ dumphint
+ dvipdf
+ eps2eps
+ fixmswrd.pl
+ font2c
+ ghostscript
+ gs
+ gsbj
+ gsc
+ gsdj
+ gsdj500
+ gslj
+ gslp
+ gsnd
+ gsx
+ lprsetup.sh
+ pdf2dsc
+ pdf2ps
+ pdfopt
+ pf2afm
+ pfbtopfa
+ printafm
+ ps2ascii
+ ps2epsi
+ ps2pdf
+ ps2pdf12
+ ps2pdf13
+ ps2pdf14
+ ps2pdfwr
+ ps2ps
+ pv.sh
+ unix-lpr.sh
+ wftopfa
+/usr/lib
+/usr/lib/cups
+/usr/lib/cups/filter
+ pstopxl
+ pstoraster
+/usr/share
+/usr/share/cups
+/usr/share/cups/model
+ pxlcolor.ppd
+ pxlmono.ppd
+/usr/share/deforma
+/usr/share/deforma/scripts
+/usr/share/ghostscript
+/usr/share/ghostscript/8.11
+/usr/share/ghostscript/8.15
+/usr/share/ghostscript/8.15/lib
+ acctest.ps
+ addxchar.ps
+ align.ps
+ bdftops.ps
+ bj8gc12f.upp
+ bj8hg12f.upp
+ bj8oh06n.upp
+ bj8pa06n.upp
+ bj8pp12f.upp
+ bj8.rpd
+ bj8ts06n.upp
+ bjc6000a1.upp
+ bjc6000b1.upp
+ bjc610a0.upp
+ bjc610a1.upp
+ bjc610a2.upp
+ bjc610a3.upp
+ bjc610a4.upp
+ bjc610a5.upp
+ bjc610a6.upp
+ bjc610a7.upp
+ bjc610a8.upp
+ bjc610b1.upp
+ bjc610b2.upp
+ bjc610b3.upp
+ bjc610b4.upp
+ bjc610b6.upp
+ bjc610b7.upp
+ bjc610b8.upp
+ caption.ps
+ cbjc600.ppd
+ cbjc800.ppd
+ cdj550.upp
+ cdj690ec.upp
+ cdj690.upp
+ cid2code.ps
+ cidfmap
+/usr/share/ghostscript/8.15/lib/cjkv
+ baseutil.ps
+ cjkcidcm.ps
+ cjkfnmap.ps
+ cjkvinit.ps
+ cjkvttcf.ps
+ tt11util.ps
+ tt42util.ps
+/usr/share/ghostscript/8.15/Resource
+/usr/share/ghostscript/8.15/Resource/CMap
+/usr/share/ghostscript/8.15/Resource/ColorSpace
+ DefaultCMYK
+ DefaultGray
+ DefaultRGB
+/usr/share/ghostscript/8.15/Resource/Decoding
+ Latin1
+ StandardEncoding
+ Unicode
+/usr/share/ghostscript/8.51
+/usr/share/ghostscript/8.54
+/usr/share/ghostscript/8.60
+/usr/share/ghostscript/8.70
+/usr/share/ppd
+/var

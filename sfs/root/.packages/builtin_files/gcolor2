@@ -1,0 +1,10 @@
+/usr
+/usr/bin
+ gcolor2
+/usr/share
+/usr/share/applications
+ gcolor2.desktop
+/usr/share/pixmaps
+/usr/share/pixmaps/gcolor2
+ about_icon.png
+ icon.png

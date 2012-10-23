@@ -1,0 +1,505 @@
+#!/bin/bash
+#
+#'BK' initials where edited.
+#v406 rerwin: fix
+
+#v432 v406 if a different modem found, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem | grep 'ttyS[1-3]'`" = "" ] && exit
+
+#BK (Barry Kauler), configure country, Puppy Linux 2.17...
+#these country names are same as in /etc/rc.d/rc.country...
+COUNTRIES='355 ALBANIA
+213 ALGERIA
+61 AUSTRALIA
+43 AUSTRIA
+973 BAHREIN
+32 BELGIUM
+375 BELARUS
+378 BOSNIA
+55 BRAZIL
+673 BRUNEI
+359 BULGARIA
+107 CANADA
+56 CHILE
+86 CHINA
+385 CROATIA
+972 CTR21EUROPE
+357 CYPRUS
+420 CZECH_REPUBLIC
+45 DENMARK
+20 EGYPT
+372 ESTONIA
+298 FAERO_ISLANDS
+358 FINLAND
+33 FRANCE
+49 GERMANY
+995 GEORGIA
+299 GREENLAND
+30 GREECE
+852 HONG_KONG
+36 HUNGARY
+354 ICELAND
+91 INDIA
+62 INDONESIA
+353 IRELAND
+972 ISRAEL
+39 ITALY
+81 JAPAN
+962 JORDAN
+705 KAZAKHSTAN
+254 KENYA
+82 KOREA
+965 KUWAIT
+371 LATVIA
+961 LEBANON
+370 LITHUANIA
+352 LUXEMBOURG
+389 MACEDONIA
+60 MALAYSIA
+356 MALTA
+52 MEXICO
+212 MOROCCO
+599 NETHERLANDS
+64 NEW_ZEALAND
+47 NORWAY
+968 OMAN
+92 PAKISTAN
+51 PERU
+63 PHILIPPINES
+48 POLAND
+351 PORTUGAL
+40 ROMANIA
+7 RUSSIA
+966 SAUDIARABIA
+65 SINGAPORE
+421 SLOVAKIA
+386 SLOVENIA
+252 SOMALIA
+27 SOUTHAFRICA
+82 SOUTHKOREA
+34 SPAIN
+94 SRILANKA
+46 SWEDEN
+41 SWITZERLAND
+886 TAIWAN
+708 TAJIKISTAN
+66 THAILAND
+216 TUNISIA
+90 TURKEY
+971 UAE
+256 UGANDA
+44 UK
+380 UKRAINE
+598 URUGUAY
+1 USA
+84 VIETNAM'
+if [ -f /etc/countryinfo ];then
+ . /etc/countryinfo #has COUNTRY_NAME variable
+ CPATTERN=" ${COUNTRY_NAME}"'$'
+ MODEM_COUNTRY_CODE="`echo "$COUNTRIES" | grep "$CPATTERN" | cut -f 1 -d ' '`"
+ if [ "$MODEM_COUNTRY_CODE" != "" ];then
+  SPATTERN="s/^Country=.*/Country=${MODEM_COUNTRY_CODE}/"
+#  cat /etc/mwavem.conf | sed -e "$SPATTERN" > /tmp/mwavem.conf
+#  sync
+#  mv -f /tmp/mwavem.conf /etc/mwavem.conf
+  sed -i -e "$SPATTERN" /etc/mwavem.conf #101111
+ fi
+fi
+
+# mwaved	This script loads the wave modem kernel module, starts the
+#		wave manager daemon, and configures the serial port.
+#
+# Author:	Ian Pilcher,
+#		modifications by Paul Schroeder <paulsch@us.ibm.com>
+#
+# chkconfig: 235 30 91
+# description: The Mwave Modem for Linux is a WinModem. It is composed of a
+#              loadable kernel module and a user level application. Together
+#              these components support direct attachment to public
+#              switched telephone networks (PSTNs) and supports selected
+#              world wide countries.
+#
+#	Usage: mwaved {start|stop|restart|status}
+#
+#	    start/stop/restart: returns 0 on success, 1 on failure
+#
+#	    status: returns 0, or the sum of the following:
+#
+#		0x01 - device driver is not enabled
+#		0x02 - Mwave Manager not running
+#		0x04 - serial port not configured
+#
+
+# Do not set DSPIO, DSPIRQ, UARTIRQ, or UARTIO if you have configured your Mwave
+# modem with PS2.EXE, the ThinkPad Setup utility (Windows NT version), or tpctl
+# (hopefully someday).
+
+# These are the default settings for the DSP
+#DSPIO=0x130
+#DSPIRQ=10
+
+# /dev/ttyS1
+#UARTIRQ=3
+#UARTIO=0x2F8
+
+# Set this if you would like to create a link to the Mwave modem tty BK...
+MWMDEV=/dev/modem
+
+# Location of the Mwave Manager (if not /usr/local/bin/mwavem) BK...
+MWAVEM=/usr/bin/mwavem
+
+# Set this to any non-empty string to display the tty (e.g. /dev/ttyS1)
+SHOWTTY=yes
+
+# The following debug trace information is selectable:
+#	0x01	ACP Modem Device driver entry points
+#	0x02	Systems Management API(SMAPI)
+#	0x04	Hardware Interface (3780I)
+#	0x08	Thinkpad Interface (tp3780i)
+#DEBUG=0x0f
+
+
+if [ -z "$MWAVEM" ]; then
+    MWAVEM=/usr/local/bin/mwavem
+fi
+
+MWAVEDD_OPTS=""
+
+if [ -n "$UARTIRQ" ]; then
+    MWAVEDD_OPTS="$MWAVEDD_OPTS mwave_uart_irq=$UARTIRQ"
+fi
+
+if [ -n "$UARTIO" ]; then
+    MWAVEDD_OPTS="$MWAVEDD_OPTS mwave_uart_io=$UARTIO"
+fi
+
+if [ -n "$DSPIRQ" ]; then
+    MWAVEDD_OPTS="$MWAVEDD_OPTS mwave_3780i_irq=$DSPIRQ"
+fi
+
+if [ -n "$DSPIO" ]; then
+    MWAVEDD_OPTS="$MWAVEDD_OPTS mwave_3780i_io=$DSPIO"
+fi
+
+if [ -n "$DEBUG" ]; then
+    MWAVEDD_OPTS="$MWAVEDD_OPTS mwave_debug=$DEBUG"
+fi
+
+
+if [ -f /etc/rc.config ] ; then
+	. /etc/rc.config		# SuSE - for $rc_done and $rc_failed
+else
+	rc_done="  done"		# For Debian
+	rc_failed="  failed"
+
+	killproc()				# For Debian
+	{
+		start-stop-daemon --stop --quiet --exec $MWAVEM 2>&1 /dev/null
+		check_daemon
+		if [ $? = 1 ]; then
+		  start-stop-daemon --stop --quiet --signal 9 --exec $MWAVEM 2>&1 /dev/null
+		fi
+	}
+fi
+
+echo_success()				# For Debian and SuSE
+{
+	echo -e $rc_done
+}
+
+echo_failure()				# For Debian and SuSE
+{
+	echo -e $rc_failed
+}
+
+if [ -f /etc/rc.d/init.d/functions ] ; then
+	. /etc/rc.d/init.d/functions	# RH - for echo_success and echo_failure
+fi
+
+
+start_daemon()
+{
+    nice -n -20 $MWAVEM 2>&1 | logger -t mwave &
+    sleep 3
+    if [ -z "$(pidof $MWAVEM)" ]; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+stop_daemon()
+{
+    killproc $MWAVEM > /dev/null 2>&1
+    sleep 3
+    if [ -n "$(pidof $MWAVEM)" ]; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+check_daemon()
+{
+    if [ -z "$(pidof $MWAVEM)" ]; then
+	return 1			# daemon is not running
+    else
+	return 0			# daemon is running
+    fi
+}
+
+load_module()
+{
+	#BK what! no good, change to modprobe...
+    #insmod mwave $MWAVEDD_OPTS 2>&1 | logger -t mwave
+    modprobe mwave $MWAVEDD_OPTS 2>&1 | logger -t mwave
+    if [ ! -e /proc/mwave ]; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+unload_module()
+{
+    rmmod mwave 2>&1 | logger -t mwave
+    if [ -e /proc/mwave ]; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+check_module()
+{
+   modcount=`grep -c mwave /proc/modules`
+   if [ $modcount = 0 ]; then
+	return 1			# module is not loaded
+   else
+	return 0			# module is loaded
+   fi
+}
+
+check_proc()
+{
+    if [ ! -e /proc/mwave ]; then
+	return 1			# mwave is not enabled
+    else
+	return 0			# mwave is enabled
+    fi
+}
+
+get_tty()
+{
+    set $(grep UART_IO /proc/mwave)
+    case $2 in
+	0x03f8 ) device=ttyS0;;
+	0x02f8 ) device=ttyS1;;
+	0x03e8 ) device=ttyS2;;
+	0x02e8 ) device=ttyS3;;
+    esac
+}
+
+config_tty()
+{
+    if [ ! -e /proc/mwave ]; then
+	return 1
+    fi
+    get_tty
+    if [ -n "$SHOWTTY" ]; then
+	echo -n " (/dev/$device)"
+    fi
+    set $(grep UART_IRQ /proc/mwave)
+    interrupt=$2
+    setserial /dev/$device irq $interrupt autoconfig
+    setserial /dev/$device | logger -t mwave
+    if [ -n "$MWMDEV" ]; then
+	ln -s -f $device $MWMDEV
+    fi
+    return 0
+}
+
+check_tty()
+{
+    if [ ! -e /proc/mwave ]; then
+	return 1
+    fi
+    get_tty
+    if [ -n "$MWMDEV" ]; then
+      if [ ! -h /dev/modem ]; then  #v3.98
+	return 1
+      else
+        set $(setserial /dev/modem)
+      fi
+    else
+        set $(setserial /dev/$device)
+    fi
+    tty_uart=${3%,}			# trim off trailing commas
+    tty_io=${5%,}			#
+    tty_irq=$7
+    set $(grep UART_IO /proc/mwave)
+    mwm_io=$2
+    set $(grep UART_IRQ /proc/mwave)
+    mwm_irq=$2
+    if [ $tty_uart != 16550A ]; then
+	return 1
+    fi
+    if [ $tty_io != $mwm_io ]; then
+	return 1
+    fi
+    if [ $tty_irq != $mwm_irq ]; then
+	return 1
+    fi
+    return 0
+}
+
+start()
+{
+    echo "Starting Mwave modem:"
+
+    check_proc
+    proc_enabled=$?
+    check_module
+    module_enabled=$?
+    if [ "$proc_enabled" = "$module_enabled" ]; then
+	echo -n "    Loading kernel module:"
+	check_module || load_module
+	check_module
+	if [ $? = 1 ]; then
+		echo_failure
+		echo
+		return 1
+	else
+		echo_success
+		echo
+	fi
+    fi
+
+    echo -n "    Starting Mwave Manager:"
+    check_daemon || start_daemon
+    check_daemon
+    if [ $? = 1 ]; then
+	echo_failure
+	echo
+	return 1
+    else
+	echo_success
+	echo
+    fi
+
+    echo -n "    Configuring serial port:"
+    config_tty
+    check_tty
+    if [ $? = 1 ]; then
+	echo_failure
+	echo
+	return 1
+    else
+	echo_success
+	echo
+    fi
+
+    return 0
+}
+
+stop()
+{
+    echo "Stopping Mwave modem:"
+
+    echo -n "    Stopping Mwave Manager:"
+    check_daemon && stop_daemon
+    check_daemon
+    if [ $? = 0 ]; then
+	echo_failure
+	echo
+	return 1
+    else
+	echo_success
+	echo
+    fi
+
+    check_proc
+    proc_enabled=$?
+    check_module
+    module_enabled=$?
+    if [ "$proc_enabled" = "$module_enabled" ]; then
+	echo -n "    Unloading kernel module:"
+	check_module && unload_module
+	check_module
+	if [ $? = 0 ]; then
+		echo_failure
+		echo
+		return 1
+	else
+		echo_success
+		echo
+	fi
+    fi
+
+    return 0
+}
+
+status()
+{
+    check_proc
+    if [ $? = 0 ]; then
+	echo -n "Device driver is enabled"
+	check_module
+	if [ $? = 0 ]; then
+		echo " (via mwave.o module)"
+	else
+		echo
+	fi
+	retval=0
+    else
+	echo "Device driver is NOT enabled"
+        retval=1
+    fi
+
+    check_daemon
+    if [ $? = 0 ]; then
+	echo "Mwave Manager is running"
+    else
+	echo "Mwave Manager is NOT running"
+	retval=$((retval + 2))
+    fi
+
+    check_tty
+    if [ $? = 0 ]; then
+	echo "Serial port is configured"
+    else
+	echo "Serial port is NOT configured"
+	retval=$((retval + 4))
+    fi
+
+    return $retval
+}
+
+case "$1" in
+
+    start )
+	start
+	exit $?
+	;;
+
+    stop )
+	stop
+	exit $?
+	;;
+
+    restart )
+	stop
+	start
+	exit $?
+	;;
+
+    status )
+	status
+	exit $?
+	;;
+
+    * )
+	echo "Usage: mwaved {start|stop|restart|status}"
+	exit 1
+
+esac

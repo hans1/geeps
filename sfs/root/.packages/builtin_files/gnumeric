@@ -1,0 +1,305 @@
+/usr
+/usr/bin
+ gnumeric
+ gnumeric-1.10.17
+ ssconvert
+ ssgrep
+ ssindex
+/usr/lib
+/usr/lib/gnumeric
+/usr/lib/gnumeric/1.10.17
+/usr/lib/gnumeric/1.10.17/plugins
+/usr/lib/gnumeric/1.10.17/plugins/applix
+ applix.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/dif
+ dif.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/excel
+ excel.so
+/usr/lib/gnumeric/1.10.17/plugins/excelplugins
+ plugin.so
+ plugin.xml
+ xlcall32.so
+/usr/lib/gnumeric/1.10.17/plugins/fn-christian-date
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-complex
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-database
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-date
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-derivatives
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-eng
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-erlang
+ erlang.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-financial
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-hebrew-date
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-info
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-logical
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-lookup
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-math
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-numtheory
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-r
+/usr/lib/gnumeric/1.10.17/plugins/fn-random
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-stat
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-string
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/fn-tsa
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/glpk
+ glpk.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/html
+ html.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/lotus
+ lotus.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/lpsolve
+ lpsolve.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/mps
+ mps.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/nlsolve
+ nlsolve.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/oleo
+ oleo.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/openoffice
+ openoffice.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/perl-func
+ perl_func.pl
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/perl-loader
+ perl_loader.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/plan_perfect
+ plan_perfect.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/qpro
+ plugin.xml
+ qpro.so
+/usr/lib/gnumeric/1.10.17/plugins/sample_datasource
+ plugin.xml
+ sample_datasource.so
+/usr/lib/gnumeric/1.10.17/plugins/sc
+ plugin.xml
+ sc.so
+/usr/lib/gnumeric/1.10.17/plugins/sylk
+ plugin.xml
+ sylk.so
+/usr/lib/gnumeric/1.10.17/plugins/uihello
+ hello.xml
+ plugin.so
+ plugin.xml
+/usr/lib/gnumeric/1.10.17/plugins/xbase
+ plugin.xml
+ xbase.so
+/usr/lib/goffice
+/usr/lib/goffice/0.8.17
+/usr/lib/goffice/0.8.17/plugins
+/usr/lib/goffice/0.8.17/plugins/gnumeric
+ gnumeric.so
+ plugin.xml
+/usr/share
+/usr/share/applications
+ gnumeric.desktop
+/usr/share/gnumeric
+/usr/share/gnumeric/1.10.17
+/usr/share/gnumeric/1.10.17/autoformat-templates
+/usr/share/gnumeric/1.10.17/autoformat-templates/3D
+ autoformat.3D.button.xml
+ autoformat.3D.list.xml
+ .category
+/usr/share/gnumeric/1.10.17/autoformat-templates/Classical
+ autoformat.Classical.cool.xml
+ autoformat.Classical.simple.xml
+ autoformat.Classical.trendy.xml
+ .category
+/usr/share/gnumeric/1.10.17/autoformat-templates/Colourful
+ autoformat.Colourful.banana.xml
+ autoformat.Colourful.black.xml
+ autoformat.Colourful.blue.xml
+ autoformat.Colourful.orange.xml
+ autoformat.Colourful.vanilla.xml
+ .category
+/usr/share/gnumeric/1.10.17/autoformat-templates/Financial
+ autoformat.Financial.basic.xml
+ autoformat.Financial.desert.xml
+ autoformat.Financial.ice.xml
+ autoformat.Financial.modern.xml
+ autoformat.Financial.purple.xml
+ .category
+/usr/share/gnumeric/1.10.17/autoformat-templates/General
+ autoformat.General.advanced.xml
+ autoformat.General.basic.xml
+ autoformat.General.empty.xml
+ autoformat.General.table.xml
+ .category
+/usr/share/gnumeric/1.10.17/autoformat-templates/List
+ autoformat.List.basic.xml
+ autoformat.List.green.xml
+ autoformat.List.lila.xml
+ autoformat.List.simple.xml
+ .category
+/usr/share/gnumeric/1.10.17/doc
+/usr/share/gnumeric/1.10.17/doc/C
+/usr/share/gnumeric/1.10.17/templates
+ calendar.gnumeric
+ invoice.gnumeric
+ loan.gnumeric
+ mileage.gnumeric
+ purchase_order.gnumeric
+/usr/share/gnumeric/1.10.17/ui
+ advanced-filter.ui
+ anova-one.ui
+ anova-two.ui
+ autofilter-expression.ui
+ autofilter-top10.ui
+ autoformat.ui
+ autosave.ui
+ cell-comment.ui
+ cell-format-cond.ui
+ cell-format.ui
+ cell-sort.ui
+ chi-squared.ui
+ colrow.ui
+ col-width.ui
+ consolidate.ui
+ correlation.ui
+ covariance.ui
+ dao.ui
+ data-slicer.ui
+ data-table.ui
+ define-name.ui
+ delete-cells.ui
+ descriptive-stats.ui
+ dialog-stf-export.ui
+ dialog-stf.ui
+ dialog-zoom.ui
+ doc-meta-data.ui
+ exp-smoothing.ui
+ fill-series.ui
+ font-sel.ui
+ formula-guru.ui
+ fourier-analysis.ui
+ frequency.ui
+ function-select.ui
+ goalseek.ui
+ goto.ui
+ hf-config.ui
+ hf-dt-format.ui
+ histogram.ui
+ hyperlink.ui
+ insert-cells.ui
+ kaplan-meier.ui
+ mean-tests.ui
+ merge.ui
+ moving-averages.ui
+ normality-tests.ui
+ paste-special.ui
+ plugin-manager.ui
+ preferences.ui
+ principal-components.ui
+ print.ui
+ random-generation-cor.ui
+ random-generation.ui
+ rank.ui
+ regression.ui
+ row-height.ui
+ sampling.ui
+ scenario-add.ui
+ scenario-manager.ui
+ search-replace.ui
+ search.ui
+ sheetobject-size.ui
+ sheet-order.ui
+ sheet-resize.ui
+ shuffle.ui
+ sign-test-two.ui
+ sign-test.ui
+ simulation.ui
+ so-button.ui
+ so-checkbox.ui
+ so-frame.ui
+ so-list.ui
+ solver.ui
+ so-radiobutton.ui
+ so-scrollbar.ui
+ tabulate.ui
+ variance-tests.ui
+ view.ui
+ wilcoxon-mann-whitney.ui
+ workbook-attr.ui
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/16x16
+/usr/share/icons/hicolor/16x16/apps
+ gnumeric.png
+/usr/share/icons/hicolor/22x22
+/usr/share/icons/hicolor/22x22/apps
+ gnumeric.png
+/usr/share/icons/hicolor/24x24
+/usr/share/icons/hicolor/24x24/apps
+ gnumeric.png
+/usr/share/icons/hicolor/32x32
+/usr/share/icons/hicolor/32x32/apps
+ gnumeric.png
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ gnumeric.png
+/usr/share/icons/hicolor/scalable
+/usr/share/icons/hicolor/scalable/apps
+ gnumeric.svg
+/usr/share/pixmaps
+ gnome-application-vnd.lotus-1-2-3.png
+ gnome-application-x-applix-spreadsheet.png
+ gnome-application-x-generic-spreadsheet.png
+ gnome-application-x-gnumeric.png
+ gnome-application-x-xls.png
+/usr/share/pixmaps/gnumeric
+ down-right.png
+ gnome-application-vnd.lotus-1-2-3.png
+ gnome-application-x-applix-spreadsheet.png
+ gnome-application-x-generic-spreadsheet.png
+ gnome-application-x-gnumeric.png
+ gnome-application-x-xls.png
+ gnumeric-about.png
+ orient-horizontal.png
+ orient-vertical.png
+ right-down.png
+ stf-druid.png
+ win32-gnumeric.ico

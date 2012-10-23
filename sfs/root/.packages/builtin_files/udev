@@ -1,0 +1,105 @@
+/etc
+/etc/modprobe.d
+ blacklist.conf
+ isapnp.conf
+ psmouse.conf
+ usb-controller.conf
+ .wh.blacklist.conf.new
+ .wh.isapnp.conf.new
+ .wh.psmouse.conf.new
+ .wh.usb-controller.conf.new
+/etc/rc.d
+ rc.udev
+ .wh.rc.udev.new
+/etc/udev
+/etc/udev/rules.d
+/lib
+/lib/firmware
+/lib/udev
+ ata_id
+ cdrom_id
+ collect
+ create_floppy_devices
+/lib/udev/devices
+/lib/udev/devices/shm
+/lib/udev/keymaps
+ acer
+ acer-aspire_5720
+ acer-aspire_5920g
+ acer-aspire_6920
+ acer-travelmate_c300
+ asus
+ compaq-e_evo
+ dell
+ everex-xt5000
+/lib/udev/keymaps/force-release
+ common-volume-keys
+ dell-touchpad
+ hp-other
+ samsung-other
+/lib/udev/rules.d
+ 40-slackware.rules
+ 50-firmware.rules
+ 50-udev-default.rules
+ 59-non-libata-devices.rules
+ 60-cdrom_id.rules
+ 60-floppy.rules
+ 60-persistent-alsa.rules
+ 60-persistent-input.rules
+ 60-persistent-serial.rules
+ 60-persistent-storage.rules
+ 60-persistent-storage-tape.rules
+ 60-persistent-v4l.rules
+ 61-mobile-action.rules
+ 61-persistent-storage-edd.rules
+ 65-permissions.rules
+ 70-acl.rules
+ 70-hid2hci.rules
+ 75-cd-aliases-generator.rules
+ 75-net-description.rules
+ 75-persistent-net-generator.rules
+ 75-probe_mtd.rules
+ 75-tty-description.rules
+ 78-sound-card.rules
+ 79-fstab_import.rules
+ 80-drivers.rules
+ 90-network.rules
+ 95-keyboard-force-release.rules
+ 95-keymap.rules
+ 95-udev-late.rules
+/sbin
+ scsi_id
+ udevadm
+ udevd
+/usr
+/usr/doc
+/usr/doc/udev-165
+ COPYING
+ README
+ README.keymap.txt
+ TODO
+/usr/include
+/usr/include/gudev-1.0
+/usr/include/gudev-1.0/gudev
+ gudevclient.h
+ gudevdevice.h
+ gudevenumerator.h
+ gudevenums.h
+ gudevenumtypes.h
+ gudev.h
+ gudevtypes.h
+/usr/lib
+/usr/lib/ConsoleKit
+/usr/lib/ConsoleKit/run-seat.d
+ udev-acl.ck
+/usr/lib/pkgconfig
+ gudev-1.0.pc
+ libudev.pc
+ udev.pc
+/usr/man
+/usr/man/man7
+ udev.7.gz
+/usr/man/man8
+ scsi_id.8.gz
+ udevadm.8.gz
+ udevd.8.gz

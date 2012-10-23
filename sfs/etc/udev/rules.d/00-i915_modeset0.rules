@@ -1,0 +1,28 @@
+# For Intel graphic card driver intel-agp/i915, force mode for cards requiring it.
+# The generated mode setting of zero will override a default of 1 produced by configuration file /etc/modprobe.d/i915.conf
+#
+# To create a new rule for a VGA compatible controller:
+#  Obtain controller description by: lspci -nn
+#  Locate the right 4 digits of [8086:dddd] for the graphics controller line and use them in place of the 2562, next.
+#  Obtain subvendor/subdevice by: grep '2562' /tmp/udevtrace.log
+#   and use rightmost 4 digits of sv0000nnnn and sd0000nnnn.
+#  Copy and modify the  ATTR... line, below, and add a description for it.
+
+SUBSYSTEM!="pci", GOTO="i915_end"
+ACTION!="add", GOTO="i915_end"
+ATTR{vendor}!="0x8086", GOTO="i915_end"
+
+### Devices requiring modeset=0:
+
+# IBM NetVista MT-M 8305-42U
+# VGA compatible controller [0300]: Intel Corporation 82845G/GL[Brookdale-G]/GE Chipset Integrated Graphics Device [8086:2562] (rev 01)
+# Subvendor: 1014  Subdevice: 0267
+ATTR{device}=="0x2562", ATTR{subsystem_vendor}=="0x1014", ATTR{subsystem_device}=="0x0267", GOTO="i915_modeset0"
+
+### End of device-specific rules
+
+GOTO="i915_end"
+LABEL="i915_modeset0"
+RUN+="/bin/sh -c 'echo options i915 modeset=0 > /tmp/i915_modeset0.conf'"
+RUN+="/bin/ln -snf /tmp/i915_modeset0.conf /etc/modprobe.d/i915_modeset0.conf"
+LABEL="i915_end"

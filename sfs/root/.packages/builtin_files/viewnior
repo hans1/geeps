@@ -1,0 +1,19 @@
+/usr
+/usr/bin
+ viewnior
+/usr/share
+/usr/share/applications
+ viewnior.desktop
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ viewnior.png
+/usr/share/pixmaps
+ viewnior.png
+/usr/share/viewnior
+/usr/share/viewnior/pixmaps
+ object-flip-horizontal.png
+ object-flip-vertical.png
+ object-rotate-left.png
+ object-rotate-right.png

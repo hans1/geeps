@@ -1,0 +1,126 @@
+#!/bin/bash
+if [ "$SAVE_TASK" = "true" ]; then
+	echo -e "#Pbackup - profile\n\n"					> "$CONF"
+	if [ "$CHAIN" = "true" ]; then
+		#generate TASKCHAIN. This is defined in 'chain', but not when selecting save from the menu.
+		echo -e "\c" > $WORKDIR/pbackup-tmp
+		for I in `cat $WORKDIR/pbackup-chain`; do
+			echo -e "$I \c" >> $WORKDIR/pbackup-tmp
+		done
+		TASKCHAIN=`cat $WORKDIR/pbackup-tmp`
+		#---
+		echo "#[CHAIN]"									>> "$CONF"
+		echo "CHAIN=true"								>> "$CONF"
+		echo "TASKCHAIN=\"$TASKCHAIN\""					>> "$CONF"
+		echo ""											>> "$CONF"
+		echo "#[TASKS]"									>> "$CONF"
+		echo "LASTSUCCESS=---"							>> "$CONF"
+		echo "LASTRUNTXT=---"							>> "$CONF"
+		echo "LASTSTATUS=---"							>> "$CONF"
+	else
+		echo "#[MAIN SETTINGS]"							>> "$CONF"
+		echo "CHKINCREMENTAL=$CHKINCREMENTAL"			>> "$CONF"
+		echo "CHKFULLBACKUP=$CHKFULLBACKUP" 			>> "$CONF"
+		echo "CHKSYNC=$CHKSYNC" 						>> "$CONF"
+		#Update include
+		echo > $WORKDIR/pbackup-tmp
+		while read TMP; do
+			echo -e "$TMP""|\c" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pbackup-include
+		INCLUDE=`cat $WORKDIR/pbackup-tmp`
+		echo "INCLUDE=\"$INCLUDE\""									>> "$CONF" 
+		SAVEMODE=`cat $WORKDIR/pbackup-SAVEMODE`
+		echo "SAVEMODE=$SAVEMODE"									>> "$CONF"
+		echo "echo $SAVEMODE > $WORKDIR/pbackup-SAVEMODE"			>> "$CONF"
+		BCKDEV=`cat $WORKDIR/pbackup-BCKDEV`
+		echo "BCKDEV=\"$BCKDEV\"" 									>> "$CONF"
+		echo "echo $BCKDEV > $WORKDIR/pbackup-BCKDEV"				>> "$CONF"
+		echo "BCKDATE_FROM=$BCKDATE_FROM"							>> "$CONF"
+		echo "echo $BCKDATE_FROM > $WORKDIR/pbackup-BCKDATE_FROM"	>> "$CONF"
+		FTPSERVER=`cat $WORKDIR/pbackup-FTPSERVER`
+		echo "export FTPSERVER=$FTPSERVER"							>> "$CONF"
+		echo "echo $FTPSERVER > $WORKDIR/pbackup-FTPSERVER"			>> "$CONF"
+		FTPSERVERDIR=`cat $WORKDIR/pbackup-FTPSERVERDIR`
+		echo "export FTPSERVERDIR=$FTPSERVERDIR"					>> "$CONF"
+		echo "echo $FTPSERVERDIR > $WORKDIR/pbackup-FTPSERVERDIR"	>> "$CONF"
+		FTPUSERNAME=`cat $WORKDIR/pbackup-FTPUSERNAME`
+		echo "export FTPUSERNAME=$FTPUSERNAME"						>> "$CONF"
+		echo "echo $FTPUSERNAME > $WORKDIR/pbackup-FTPUSERNAME"		>> "$CONF"
+		FTPPASSWORD=`cat $WORKDIR/pbackup-FTPPASSWORD`
+		echo "export FTPPASSWORD=$FTPPASSWORD"						>> "$CONF"
+		echo "echo $FTPPASSWORD > $WORKDIR/pbackup-FTPPASSWORD"		>> "$CONF"
+		echo ""											>> "$CONF"
+		echo "#[BACKUP]"								>> "$CONF"
+		echo "CHKREC=$CHKREC"							>> "$CONF"
+		echo "CHKSYMLN=$CHKSYMLN"						>> "$CONF"
+		echo "CHKMULTISESSION=$CHKMULTISESSION" 		>> "$CONF"
+		echo "CHKCOMPRESS=$CHKCOMPRESS" 				>> "$CONF"
+		echo "CHKJOLIET=$CHKJOLIET" 					>> "$CONF"
+		#Update exclude-backup
+		echo > $WORKDIR/pbackup-tmp
+		while read TMP; do 
+			echo "$TMP""|" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pbackup-exclude_backup
+		EXCLUDE_BACKUP=`cat $WORKDIR/pbackup-tmp`
+		echo "EXCLUDE_BACKUP=\"$EXCLUDE_BACKUP\""		>> "$CONF" 
+		echo "FIND_NAME=\"$FIND_NAME\"" 				>> "$CONF"
+		echo "MNTPNT=\"$MNTPNT\"" 						>> "$CONF"
+		echo ""											>> "$CONF"
+		echo "#[SYNC]"									>> "$CONF"
+		echo "CHKSYNCSYMLN=$CHKSYNCSYMLN" 				>> "$CONF"
+		echo "CHKSYNCATTRIBUTES=$CHKSYNCATTRIBUTES"		>> "$CONF"
+		echo "CHKSYNCUPDATESYM=$CHKSYNCUPDATESYM"		>> "$CONF"
+		echo "CHKTRASH=$CHKTRASH" 						>> "$CONF"
+		echo "CHKLEADING_PATH=$CHKLEADING_PATH"			>> "$CONF"
+		echo "SYNCACTION=$SYNCACTION"					>> "$CONF"
+		#Update exclude-sync
+		echo > $WORKDIR/pbackup-tmp
+		while read TMP; do
+			echo "$TMP""|" >> $WORKDIR/pbackup-tmp
+		done < $WORKDIR/pbackup-exclude_sync
+		EXCLUDE_SYNC=`cat $WORKDIR/pbackup-tmp`
+		echo "EXCLUDE_SYNC=\"$EXCLUDE_SYNC\""			>> "$CONF"
+		echo "TRASHDIR=\"$TRASHDIR\""					>> "$CONF"
+		echo ""											>> "$CONF"
+		echo "#[TASKS]"									>> "$CONF"
+		echo "LASTSUCCESS=$LASTSUCCESS"					>> "$CONF"
+		echo "LASTRUNTXT=\"$LASTRUNTXT\""				>> "$CONF"
+		echo "LASTSTATUS=\"$LASTSTATUS\""				>> "$CONF"
+		echo ""											>> "$CONF"
+		echo "#[MISC]"									>> "$CONF"
+		echo "CHKAUTOMOUNT=$CHKAUTOMOUNT"				>> "$CONF" 
+		echo "CHK_WRITEHIST=$CHK_WRITEHIST" 			>> "$CONF"
+		echo "WARN_FS=$WARN_FS" 						>> "$CONF" 
+		echo "WARN_LEADPATH=$WARN_LEADPATH"				>> "$CONF" 
+		echo "WARN_MOUNT=$WARN_MOUNT"					>> "$CONF" 
+	fi
+	#write history/restore log
+	if [ "$CHK_WRITEHIST" = "true" ] &&  [ "$LASTRUNTXT" != "---" ]; then
+		if [ $CHKCOMPRESS = "true" ]; then
+			echo "$LASTRUNTXT | $PROFILE | $LASTSTATUS | $BCKDEV""/$BACKUPDIR_DATE"".tgz" | sed -e "s/\/\//\//g" >> "$HOME"/.pbackup/history/history
+		else
+			echo "$LASTRUNTXT | $PROFILE | $LASTSTATUS | $BCKDEV""/$BACKUPDIR_DATE" | sed -e "s/\/\//\//g" >> "$HOME"/.pbackup/history/history
+		fi
+		if [ "$LASTSTATUS" = "$LOC491" ]; then #if success, write files for restore
+			if [ "$CHKINCREMENTAL" = "true" ] || [ "$CHKFULLBACKUP" = "true" ]; then #no sync/chain
+				cat $WORKDIR/pupbck-files >> "$HOME"/.pbackup/history/"$LASTRUNTXT"
+				cat $WORKDIR/pupbck-links >> "$HOME"/.pbackup/history/"$LASTRUNTXT"
+				#Dirs are not written. To avoid to complex Prestore.
+			fi
+		fi
+	fi
+fi
+if [ "$WRITE_RC" = "true" ]; then #update rc
+	echo -e "#Pbackup - config\n"					> "$HOME"/.pbackup/pbackuprc
+	echo "VERSION=$VERSION" 						>> "$HOME"/.pbackup/pbackuprc
+#	PROFILE=`basename "$CONF"`
+	echo "export TMPDIR=\"$TMPDIR\"" 				>> "$HOME"/.pbackup/pbackuprc
+	echo "export FILEMANAGER=$FILEMANAGER"			>> "$HOME"/.pbackup/pbackuprc
+	echo "export CRON_EDITOR=$CRON_EDITOR"			>> "$HOME"/.pbackup/pbackuprc
+	echo "export LANGUAGE=\"$LANGUAGE\"" 			>> "$HOME"/.pbackup/pbackuprc
+	echo "" 										>> "$HOME"/.pbackup/pbackuprc
+	echo "export PROFILE=$PROFILE" 					>> "$HOME"/.pbackup/pbackuprc
+fi
+#update entry 'save to' in main window
+echo "$SAVEMODE - $BCKDEV" > $WORKDIR/pbackup-ENTRY_SAVE_TO
+

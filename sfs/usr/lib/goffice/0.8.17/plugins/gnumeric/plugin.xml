@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="GOffice_gnumeric">
+	<information>
+		<name>Component : Gnumeric</name>
+		<description>Spreadsheets</description>
+		<description xml:lang="ast">Fueyes de cálculu</description>
+		<description xml:lang="ca">Fulls de càlcul</description>
+		<description xml:lang="ca@valencia">Fulls de càlcul</description>
+		<description xml:lang="cs">Tabulkové kalkulátory</description>
+		<description xml:lang="de">Tabellenkalkulationen</description>
+		<description xml:lang="dz">ཤོག་ཁྲམ་ཚུ་</description>
+		<description xml:lang="el">Λογιστικά φύλλα</description>
+		<description xml:lang="en_CA">Spreadsheets</description>
+		<description xml:lang="en_GB">Spreadsheets</description>
+		<description xml:lang="es">Hojas de cálculo</description>
+		<description xml:lang="et">Arvutustabelid</description>
+		<description xml:lang="eu">Kalkulu-orriak</description>
+		<description xml:lang="fi">Taulukot</description>
+		<description xml:lang="fr">Feuilles de calcul</description>
+		<description xml:lang="ga">Scarbhileoige</description>
+		<description xml:lang="he">גיליונות אלקטרוניים</description>
+		<description xml:lang="hu">Munkalapok</description>
+		<description xml:lang="id">Spreadsheet</description>
+		<description xml:lang="it">Fogli di calcolo</description>
+		<description xml:lang="ja">スプレッドシート</description>
+		<description xml:lang="lt">Skaičialentės</description>
+		<description xml:lang="mk">Табеларни пресметки</description>
+		<description xml:lang="nb">Regneark</description>
+		<description xml:lang="ne">स्प्रेडशिटहरू</description>
+		<description xml:lang="nl">Spreadsheets</description>
+		<description xml:lang="nn">Rekneark</description>
+		<description xml:lang="oc">Fuèlhs de calcul</description>
+		<description xml:lang="pt">Folhas de Cálculo</description>
+		<description xml:lang="pt_BR">Planilhas</description>
+		<description xml:lang="ru">Электронные таблицы</description>
+		<description xml:lang="rw">Impapurozisesuye</description>
+		<description xml:lang="sl">Preglednice</description>
+		<description xml:lang="sv">Kalkylprogram</description>
+		<description xml:lang="te">స్ర్పెడ్ షీట్స్</description>
+		<description xml:lang="vi">Bảng tính</description>
+		<description xml:lang="zh_CN">电子表格</description>
+		<description xml:lang="zh_TW">試算表</description>
+	</information>
+	<loader type="Gnumeric_Builtin:module">
+		<attribute value="gnumeric" name="module_file"/>
+	</loader>
+	<services>
+		<service type="component_engine" id="GOGnmComponent">
+			<information>
+				<description>Spreadsheets component engine</description>
+			</information>
+		</service>
+		<service type="component_type" id="GOGnmComponent">
+			<mime_type priority="native" name="application/x-gnumeric"/>
+			<information>
+				<description>Spreadsheets</description>
+				<description xml:lang="ast">Fueyes de cálculu</description>
+				<description xml:lang="ca">Fulls de càlcul</description>
+				<description xml:lang="ca@valencia">Fulls de càlcul</description>
+				<description xml:lang="cs">Tabulkové kalkulátory</description>
+				<description xml:lang="de">Tabellenkalkulationen</description>
+				<description xml:lang="dz">ཤོག་ཁྲམ་ཚུ་</description>
+				<description xml:lang="el">Λογιστικά φύλλα</description>
+				<description xml:lang="en_CA">Spreadsheets</description>
+				<description xml:lang="en_GB">Spreadsheets</description>
+				<description xml:lang="es">Hojas de cálculo</description>
+				<description xml:lang="et">Arvutustabelid</description>
+				<description xml:lang="eu">Kalkulu-orriak</description>
+				<description xml:lang="fi">Taulukot</description>
+				<description xml:lang="fr">Feuilles de calcul</description>
+				<description xml:lang="ga">Scarbhileoige</description>
+				<description xml:lang="he">גיליונות אלקטרוניים</description>
+				<description xml:lang="hu">Munkalapok</description>
+				<description xml:lang="id">Spreadsheet</description>
+				<description xml:lang="it">Fogli di calcolo</description>
+				<description xml:lang="ja">スプレッドシート</description>
+				<description xml:lang="lt">Skaičialentės</description>
+				<description xml:lang="mk">Табеларни пресметки</description>
+				<description xml:lang="nb">Regneark</description>
+				<description xml:lang="ne">स्प्रेडशिटहरू</description>
+				<description xml:lang="nl">Spreadsheets</description>
+				<description xml:lang="nn">Rekneark</description>
+				<description xml:lang="oc">Fuèlhs de calcul</description>
+				<description xml:lang="pt">Folhas de Cálculo</description>
+				<description xml:lang="pt_BR">Planilhas</description>
+				<description xml:lang="ru">Электронные таблицы</description>
+				<description xml:lang="rw">Impapurozisesuye</description>
+				<description xml:lang="sl">Preglednice</description>
+				<description xml:lang="sv">Kalkylprogram</description>
+				<description xml:lang="te">స్ర్పెడ్ షీట్స్</description>
+				<description xml:lang="vi">Bảng tính</description>
+				<description xml:lang="zh_CN">电子表格</description>
+				<description xml:lang="zh_TW">試算表</description>
+			</information>
+		</service>
+	</services>
+</plugin>

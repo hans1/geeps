@@ -1,0 +1,10 @@
+/usr
+/usr/sbin
+ peasypdf
+/usr/share
+/usr/share/applications
+ PeasyPDF.desktop
+/usr/share/doc
+ PeasyPDF.html
+/usr/share/pixmaps
+ spacer.pnm

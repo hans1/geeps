@@ -1,0 +1,83 @@
+#!/bin/sh
+#License GPL3 (refer: /usr/share/doc/legal).
+#01micko: helper script to unload nouveau
+#120329 convert t12s to gettext internationalization.
+#120329 Xdialog bug --yesno supposed to "yes" "No" buttons, but they are "OK" "Cancel".
+
+export TEXTDOMAIN=nouveau_unload
+export OUTPUT_CHARSET=UTF-8
+
+Yes_lbl="$(gettext 'Yes')"
+No_lbl="$(gettext 'No')"
+
+LANGPATH=/usr/share/locale/${LANG%_*}/nouveau_unload
+[ -f $LANGPATH ] && . $LANGPATH 
+
+disablefunc() #disables nouveau on reboot
+{
+ echo 'blacklist nouveau
+options nouveau modeset=0' > /etc/modprobe.d/disable-nouveau.conf
+ echo 'blacklist nouveau' >> /etc/modprobe.d/blacklist.conf
+ mv -f /etc/modprobe.d/nouveau.conf /etc/modprobe.d/nouveau.conf.bak
+ mv -f /etc/X11/xorg.conf /etc/X11/xorg.conf.nouveau
+}
+export -f disablefunc
+#X=1 #testing
+if [ $DISPLAY ];then #with X
+ TITLE="$(gettext 'Disable Nouveau; Xorgwizard')"
+ HEAD=Nouveau
+ MSG2="$(gettext 'Nouveau is currently the video driver. It needs to be unloaded for another driver to load. Your machine then must be rebooted.')"
+ MSG3="$(gettext 'If you want to keep nouveau you may be able to change screen resolution using xorgwizard.')"
+ MSG4="$(gettext "After reboot you should arrive back at a desktop. Test the driver with 'report-video'. If you are satisfied you can go on otherwise select xorgwizard from the Setup >> Wizard Menu.")"
+ MSG5="$(gettext 'Choose either the nv or vesa drivers so nouveau does not load and choose resolution.')"
+ if [ -f /tmp/nvidia_install ];then  
+  #if [ $X ];then #testing
+  HEAD=Nvidia
+  # may or may not reboot with nvidia xorg driver
+  MSG4="$(gettext "After reboot you should arrive back at a desktop. Test the driver with 'report-video'. If you have not got 'nvidia' driver listed then select xorgwizard from the Setup >> Wizard Menu. When back to console running xorgwizard select the 'choose' option then select nvidia from the subsequent list. Choose your resolution")"
+  MSG3="__________"
+  MSG5="."
+ fi
+ MSG6="$(gettext 'Would you like to unload nouveau and reboot?')"
+
+ XMSG="$(gettext 'Reboot now?')"
+
+ export GUI='<window title="'"$TITLE"'" resizable="false">
+ <vbox>
+  <text use-markup="true"><label>"<big><b>'"$HEAD"'</b></big>"</label></text>
+  <hseparator></hseparator>
+  <text><label>'"$MSG2"'</label></text>
+  <text><label>'"$MSG3"'</label></text>
+  <text><label>'"$MSG4"' '"$MSG5"'</label></text>
+  <hseparator></hseparator>
+  <text use-markup="true"><label>"<b>'"$MSG6"'</b>"</label></text>
+  <hseparator></hseparator>
+  <hbox homogeneous="true">
+   <button yes></button>
+   <button no></button>
+  </hbox>
+ </vbox>
+ </window>'
+ eval $(gtkdialog4 -c -p GUI)
+ case $EXIT in
+ Yes)
+  echo 'yes' > /tmp/abort_xorgwizard
+  disablefunc
+  Xdialog --ok-label "$Yes_lbl" --cancel-label "$No_lbl" --yesno "$XMSG" 0 0
+	case $? in
+	0)wmreboot ;;
+	*)exit;;
+	esac
+ ;;
+ *)
+  echo "no or aborted" 
+ ;;
+ esac
+else #no X
+ disablefunc
+ echo "rebooting"
+ sleep 2
+ reboot
+fi
+ 
+###END###

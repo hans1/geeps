@@ -1,0 +1,42 @@
+/usr
+/usr/bin
+ gnome-mplayer
+/usr/share
+/usr/share/applications
+ gnome-mplayer.desktop
+/usr/share/glib-2.0
+/usr/share/glib-2.0/schemas
+ apps.gecko-mediaplayer.preferences.gschema.xml
+ apps.gnome-mplayer.preferences.enums.xml
+ apps.gnome-mplayer.preferences.gschema.xml
+ gschemas.compiled
+/usr/share/gnome-control-center
+/usr/share/gnome-control-center/default-apps
+ gnome-mplayer.xml
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/16x16
+/usr/share/icons/hicolor/16x16/apps
+ gnome-mplayer.png
+/usr/share/icons/hicolor/16x16/devices
+ media-optical.png
+/usr/share/icons/hicolor/16x16/places
+ network-server.png
+/usr/share/icons/hicolor/16x16/status
+ media-playlist-repeat.png
+ media-playlist-shuffle.png
+/usr/share/icons/hicolor/22x22
+/usr/share/icons/hicolor/22x22/apps
+ gnome-mplayer.png
+/usr/share/icons/hicolor/24x24
+/usr/share/icons/hicolor/24x24/apps
+ gnome-mplayer.png
+/usr/share/icons/hicolor/32x32
+/usr/share/icons/hicolor/32x32/apps
+ gnome-mplayer.png
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ gnome-mplayer.png
+/usr/share/icons/hicolor/scalable
+/usr/share/icons/hicolor/scalable/apps
+ gnome-mplayer.svg

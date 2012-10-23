@@ -1,0 +1,65 @@
+#!/bin/sh
+#Barry Kauler, LGPL 2007
+
+#if a different modem already selected, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem`" != "ttyS_PCTEL0" ] && exit
+
+[ ! $1 ] && exit
+[ "$1" != "start" ] && exit
+
+#Wait for driver to load.
+/sbin/pup_event_backend_modprobe_protect --modcheck=pctel || exit #v432
+
+ln -snf ttyS_PCTEL0 /dev/modem
+
+#the docs don't say whether can use a hayes command to set country.
+#can do a option when module loads, but problem as on first boot of puppy the
+#module gets auto loaded, before country is determined.
+#so this is a temp thing, really needs a reboot to work...
+COUNTRIES='1 USA
+18 IRELAND
+2 FRANCE
+19 PORTUGAL
+3 GERMANY
+20 POLAND
+4 ITALY
+21 HUNGARY
+5 SWEDEN
+22 FINLAND
+6 UK
+23 DENMARK        
+7 JAPAN
+24 AUSTRIA
+8 AUSTRALIA
+25 SOUTHAFRICA
+9 SPAIN
+26 CTR21EUROPE
+10 TAIWAN
+27 CHINA
+11 SINGAPORE
+28 MALAYSIA
+12 KOREA
+29 LUXEMBOURG
+13 SWITZERLAND
+30 GREECE
+14 NORWAY
+31 ICELAND
+15 NETHERLANDS
+32 NEW_ZEALAND
+16 BELGIUM
+33 BRAZIL
+17 CANADA'
+if [ -f /etc/countryinfo ];then
+ . /etc/countryinfo
+ CPATTERN=" ${COUNTRY_NAME}"'$'
+ COUNTRYCODE="`echo "$COUNTRIES" | grep "$CPATTERN" | cut -f 1 -d ' '`"
+ if [ "`grep '^options pctel country_code' /etc/modprobe.conf`" = "" ];then
+  echo "options pctel country_code=${COUNTRYCODE}" >> /etc/modprobe.conf
+ fi
+ SPATTERN="s/^MODEM_COUNTRY_STRING.*/MODEM_COUNTRY_STRING=''/"
+ cat /etc/countryinfo | sed -e "$SPATTERN" > /tmp/countryinfo
+ sync
+ mv -f /tmp/countryinfo /etc/countryinfo
+fi
+
+###END###

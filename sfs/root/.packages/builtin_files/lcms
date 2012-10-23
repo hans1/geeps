@@ -1,0 +1,13 @@
+/usr
+/usr/bin
+ icc2ps
+ icclink
+ icctrans
+ jpegicc
+ tiffdiff
+ tifficc
+ wtpt
+/usr/lib
+ liblcms.so
+ liblcms.so.1
+ liblcms.so.1.0.19

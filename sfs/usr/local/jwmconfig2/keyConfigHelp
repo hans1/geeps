@@ -1,0 +1,22 @@
+---
+"mask" specifies the modifier keys that must be held to enable this action and "key" 
+specifies the key that is to be pressed. 
+---
+The mask section is optional. It can contain any number of the following values: 
+
+A - Alt
+C - Control
+S - Shift
+H - Hyper
+M - Meta
+P - Super
+---
+"Action" is the action performed when this combination is pressed. 
+---
+See Help for more details
+---
+Remember that JWM needs to be restarted before your changes take effect. You can do
+this most efficiently from the Start Menu:
+
+Start -> Shut Down -> JWM Restart.
+---

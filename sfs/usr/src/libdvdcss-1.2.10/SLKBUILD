@@ -1,0 +1,25 @@
+#Maintainer: Thorsten Muehlfelder <thenktor@gmx.de>
+
+pkgname=libdvdcss
+pkgver=1.2.10
+pkgrel=1tm
+arch=i686
+source=(http://download.videolan.org/pub/libdvdcss/$pkgver/$pkgname-$pkgver.tar.bz2)
+sourcetemplate=http://thenktor.dyndns.org/packages/$pkgname/
+docs=("readme" "install" "copying" "changelog" "authors" "news")
+url="http://www.videolan.org/developers/libdvdcss.html"
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"libdvdcss (a library for accessing encryped DVDs)"
+"libdvdcss is s library designed for accessing DVDs like a block device"
+"without having to bother about decryption."
+)
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --prefix=/usr --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var --sysconfdir=/etc --disable-static
+	make -j2 || return 1
+	make install DESTDIR=$startdir/pkg
+} 

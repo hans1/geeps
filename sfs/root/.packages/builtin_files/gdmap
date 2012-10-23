@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ gdmap
+/usr/share
+/usr/share/applications
+ Gdmap-graphical-disk-usage.desktop
+/usr/share/gdmap
+/usr/share/gdmap/pixmaps
+ gdmap_icon.png

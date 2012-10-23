@@ -1,0 +1,44 @@
+#!/bin/bash
+export include_box="
+<window title=\"Pbackup - $TITLE\" icon-name=\"gtk-refresh\">
+<vbox>
+ <chooser>
+  <height>450</height><width>600</width>
+  <variable>RESULT</variable>
+  <default>$DIR</default>
+ </chooser>
+  <hbox>
+   <button><input file icon=\"gtk-cancel\"></input><label>$LOC_CANCEL</label></button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file icon=\"gtk-apply\"></input>
+    <label>$LOC_OK</label>
+    <action type=\"exit\">99</action>
+   </button>
+  </hbox>
+</vbox>
+</window>"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 --program=include_box --center); do
+	eval $STATEMENTS > /dev/null 2>&1
+done
+IFS=$I
+if [ $EXIT = 99 ]; then
+	#check if hit is directory
+	if [ `readlink "$RESULT"` ]; then
+		TMP2=`readlink "$RESULT"`
+		TMP=`find "$TMP2" -maxdepth 1 -type d` > /dev/null 2>&1
+	else
+		TMP=`find "$RESULT" -maxdepth 1 -type d` > /dev/null 2>&1
+	fi
+	#---
+	if [ -z "$TMP" ]; then 
+		if [ "$CHOOSEDIR" = "true" ]; then
+			FRAME="Error"; TXT2="<b>$LOC513</b>"; IMG="dialog-error"
+			. "$PROG_PATH"box_ok
+			DIR=/
+			. "$PROG_PATH"box_chooser
+		fi
+	else #it's a dir
+		RESULT="$RESULT""/"
+	fi
+fi

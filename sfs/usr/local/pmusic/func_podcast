@@ -1,0 +1,184 @@
+#!/bin/sh
+
+. $APPDIR/func -reset_gtk
+
+[ ! -f $WORKDIR/podcastlist ] && echo "CNN News|1|http://edition.cnn.com/services/podcasting/newscast/rss.xml
+Floss Weekly|7|http://leo.am/podcasts/floss
+Handel on the law|2|http://kfi640.com/podcast/BillHandel.xml" > $WORKDIR/podcastlist
+
+
+podcast_update(){
+	#check internet connection
+	LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/tmp
+	if [ ! "`grep 'connected' $WORKDIR/tmp`" ]; then
+		sleep 0.2
+		TXT1="<b>$LOC669</b>"
+		. $APPDIR/box_ok
+		echo 100 > $WORKDIR/splash #reset progress bar
+		exit
+	fi
+	#---
+	[ ! -e "${WORKDIR}/podcasts_done" ] && echo -n > $WORKDIR/podcasts_done
+	[ ! -e "${WORKDIR}/podcasts_gone" ] && echo -n > $WORKDIR/podcasts_gone
+	COUNT1=0 #for progressbar
+	TOTAL=`grep -c "^" $WORKDIR/podcastlist` #for progressbar
+	#read urls
+	while read I ; do
+		NAME="`echo $I | cut -d'|' -f1`"
+		KEEP_DAYS="`echo $I | cut -d'|' -f2`"
+		URL="`echo $I | cut -d'|' -f3`"
+		#If the line in $WORKDIR/podcastlist is a comment or blank goto next
+		if   [[ $(expr index "# " "$URL") > 0 ]] && [[ $(expr index "# " "$URL") < 2 ]] || [[ $URL == "" ]] ; then
+			continue
+		fi
+		#update progressbar
+		echo "100 * $COUNT1 / $TOTAL" | bc > $WORKDIR/splash 
+		echo "$NAME" > $WORKDIR/progresstext
+		COUNT1=$(($COUNT1+1))
+		#Get filelist from RSS feed (Bash Podder)
+		SOURCEFILE=$(xsltproc parse_enclosure.xsl $URL 2> $STDERR || wget -q $URL -O - | tr '\r' '\n' | tr \' \" | sed -n 's/.*url="\([^"]*\)".*/\1/p') 
+		#read rss
+		COUNT=0
+		for URL in $SOURCEFILE; do
+			COUNT=$(($COUNT+1)) #COUNT is the number of files downloaded so far
+			[ "$COUNT" -gt "$PODCAST_MAX_DL" ] && continue 2 # Back out to main while loop
+			sleep 1
+			#Check in $WORKDIR/podcasts_done to see if file has been downloaded yet
+			[ "`grep -F "$URL" $WORKDIR/podcasts_done`" ] && continue #Not a new file goto next podcast 
+			[ ! -e "$PODCAST_DIR/$NAME/" ] && mkdir -p "$PODCAST_DIR/$NAME/" #If the dir for the podcast files is not there create it
+			FILENAME=$(echo $URL | sed -e 's/.*\/\([^\/]\+\)/\1/' -e 's/%20/ /g') # Get the Podcast file name ie something.mp3 ...
+			echo "${LOC612}: $NAME" > $WORKDIR/progresstext
+			wget -q -c -nH --progress=bar:force -P "$PODCAST_DIR/$NAME/" "$URL" | tr '\r' '\n' # Lets get the file
+			echo $URL $(($((`date +%s`))+($KEEP_DAYS*86400))) "${PODCAST_DIR}/${NAME}/${FILENAME}" >> $WORKDIR/podcasts_done # Rember we downloaded it so we dont re download
+			#metatag if not already tagged
+			. $APPDIR/func_id3io "${PODCAST_DIR}/${NAME}/${FILENAME}" -read
+			if [ ! "$ID3_TITLE" ] || [ "`echo "$ID3_TITLE" | grep -iE "^ $|unknown"`" ]; then 
+				if [ "$(echo $FILENAME | grep -iE "\.ape|\.mp3|\.ogg|\.wma")" != "" ]; then
+					# Rename in case name is screwed up
+					FILENAME2=$(echo $FILENAME | cut -d "." -f 1)
+					[ "`echo "$URL" | grep '.mp3'`" ] && EXT=mp3
+					[ "`echo "$URL" | grep '.ogg'`" ] && EXT=ogg
+					[ "`echo "$URL" | grep '.wma'`" ] && EXT=wma
+					[ "`echo "$URL" | grep '.ape'`" ] && EXT=ape
+					mv "${PODCAST_DIR}/${NAME}/${FILENAME}" "${PODCAST_DIR}/${NAME}/${FILENAME2}.${EXT}" 2> $STDERR
+					# Set id3 tag 
+					ID3_TITLE="${NAME}"
+					ID3_ARTIST="`date +"%d.%b (%H:%M)"`"
+					ID3_YEAR=''; ID3_TRACK=''; ID3_YEAR=''
+					. $APPDIR/func_id3io "${PODCAST_DIR}/${NAME}/${FILENAME2}.${EXT}" -write
+				fi
+			fi
+		done
+	done < $WORKDIR/podcastlist
+
+	#clean up -- delete old podcasts
+	while read URL TIME FILE; do
+		if [ "$TIME" -lt "`date +%s`" ] && [ ! "`grep "$FILE" $WORKDIR/podcasts_gone`" ]; then
+			rm "$FILE"
+			echo "$FILE" >> $WORKDIR/podcasts_gone
+		fi
+	done < $WORKDIR/podcasts_done
+	
+	echo 100 > $WORKDIR/splash
+}
+
+export -f podcast_update
+
+if [ "$1" = "-u" ]; then #run quiet 
+	podcast_update
+	exit
+else
+	S='
+	<window title="Pmusic - '$LOC600' '$LOC_SETUP'" icon-name="pmusic" default_height="450" default_width="400">
+	<vbox>
+	 <vbox> ##to avoid scaling of this frame
+	  <frame 1.  '$LOC618'>
+	   <hbox>
+	    <entry><variable>PODCAST_URL</variable><default>"http://"</default></entry>
+	    <text use-markup="true" width-request="90"><label>"  <b>'$LOC602'</b>"</label></text>
+	    <button tooltip-text="'$LOC608'" width-request="50">
+	     <label>www</label>
+	     <action>defaultbrowser http://www.podcastalley.com &</action>
+	    </button>
+	   </hbox>
+	   <hbox>
+	    <entry><variable>PODCAST_NAME</variable><default>'$LOC601'</default></entry>
+	    <text use-markup="true" width-request="90"><label>"  <b>'$LOC601'</b>"</label></text>
+	    <text width-request="50"><label>""</label></text>
+	   </hbox>
+	  </frame>
+	 </vbox>
+	 <frame 2.  '$LOC619'>
+	  <hbox>
+	    <hbox>
+	   <button tooltip-text="'$LOC609'">
+	    <input file stock="gtk-add"></input>
+	    <action>echo "$PODCAST_NAME|$PODCAST_DAYS|$PODCAST_URL" >> '$WORKDIR'/podcastlist</action>
+	    <action>refresh:PODCASTLIST</action>
+	   </button>
+	   
+	   ## R E M O V E ##
+	   <button tooltip-text="'$LOC610'">
+	    <input file stock="gtk-remove"></input>
+	    <variable>BUTTON_REMOVE</variable>
+	    <visible>disabled</visible>
+	    <action>if [ "$PODCASTLIST" ]; then IMG=dialog-question; FRAME="'$LOC615'"; TXT1="'$LOC616'"; TXT2="'${LOC600}': $PODCASTLIST";. '$APPDIR'/box_yesno; if [ $EXIT = yes ]; then rm -rf "'$PODCAST_DIR'/$PODCASTLIST"; grep -v "$PODCASTLIST" '$WORKDIR'/podcastlist > '$WORKDIR'/tmp; mv -f '$WORKDIR'/tmp '$WORKDIR'/podcastlist; elif [ $EXIT = no ]; then grep -v "$PODCASTLIST" '$WORKDIR'/podcastlist > '$WORKDIR'/tmp; mv -f '$WORKDIR'/tmp '$WORKDIR'/podcastlist; fi; fi</action>
+	    <action>refresh:PODCASTLIST</action>
+	   </button>
+	      
+	   <button tooltip-text="'$LOC611'">
+	    <input file stock="gtk-edit"></input>
+	    <action>defaulttexteditor '$WORKDIR'/podcastlist &</action>
+	   </button>
+	   </hbox>
+
+	   <text use-markup="true"><label>"  '$LOC603'"</label></text>
+	   <hbox width-request="30">
+	    <entry width-request="30"><variable>PODCAST_DAYS</variable><default>7</default></entry>
+	   </hbox>
+	  </hbox>
+	  <tree>
+	   <label>'$LOC601'|'$LOC604'|URL</label>
+	   <variable>PODCASTLIST</variable>
+	   <input>cat '$WORKDIR'/podcastlist</input>
+	   <action signal="button-release-event">enable:BUTTON_REMOVE</action>
+	  </tree>
+	 </frame>
+	 <vbox>
+	 <frame 3.  '$LOC620'>
+	  <hbox>
+	   ## U P D A T E   N O W ##  
+	   <button height-request="30">
+	    <label>"'$LOC606' "</label>
+	    <input file stock="gtk-refresh"></input>
+	    <action>echo "'$LOC606'..." > '$WORKDIR'/splashtext</action>
+	    <action>'$APPDIR'/box_splash_progress &</action>
+	    <action>podcast_update</action>
+	   </button>
+	   ## S H E D U L E ##
+	   <button height-request="30">
+	    <label>" '$LOC607' "</label>'
+	    ! type pschedule > /dev/null 2>&1 && S=$S'<visible>disabled</visible>'	    
+	    S=$S'<action>echo "'$LOC614'..." > '$WORKDIR'/splashtext</action>
+	    <action>'$APPDIR'/box_splash &</action>
+	    <action>pschedule -s -e "pmusic -u" "'$LOC606'" &</action>
+	    <action>sleep 2</action>
+	    <action>echo 100 > $WORKDIR/splash</action>
+	   </button>
+      </hbox>
+	 </frame>
+	 </vbox>
+	 <hbox>
+	  <button tooltip-text="'$LOC613'"><label>'$LOC605'</label><action>defaulttexteditor '$WORKDIR'/podcasts_gone</action></button>
+	  
+	  
+	  <button><input file stock="gtk-preferences"></input><action>'$APPDIR'/func_config -preferences -podcast</action></button>
+	  <button><input file stock="gtk-quit"></input></button>
+	 </hbox>
+	</vbox></window>'
+	[ $TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	export pmusic_podcast="`echo "$S" | sed 's/##.*//'`" #I use double hash (##) for comments. --> as #FF0000
+
+	$GTKDIALOG -p pmusic_podcast
+fi
+

@@ -1,0 +1,489 @@
+#!/bin/sh
+#(c) 01micko ... 01micko@gmail.com
+#released under LGPL http://www.gnu.org/copyleft/lesser.html
+###AS IS #NO WARRANTY ###
+
+
+APP_DIR="`dirname $0`"
+[ "$APP_DIR" = "." ] && APP_DIR="`pwd`"
+export APP_DIR="$APP_DIR"
+export TEXTDOMAIN=pupradio
+export OUTPUT_CHARSET=UTF-8
+VERSION=0.13
+TITLE="pupRadio"
+DESCRIPTION=$(gettext "Play streaming media")
+LONG_TITLE="$TITLE $DESCRIPTION $VERSION"
+#function to create config files
+createworkingfilesfunc()
+{
+mkdir $HOME/.pupradio	
+export WORKINGDIR="$HOME/.pupradio"	
+mkdir -p $WORKINGDIR/bookmarks
+mkdir -p $WORKINGDIR/tbookmarks
+touch $WORKINGDIR/bookmarks/.bookmark-list
+touch $WORKINGDIR/tbookmarks/.tbookmark-list
+
+cat > $WORKINGDIR/stations <<_STATIONS	
+CH1="BBC Radio 4 FM"
+CH2="WA-FM Karratha"
+CH3="BBC BBC7"
+CH4="Old Time Radio"
+CH5="Chinese classical music"
+CH6="vprbbc"
+CH7="VPR classical"
+CH8="P4-Bandit"
+_STATIONS
+
+cat > $WORKINGDIR/tel-stations <<_TELSTATIONS	
+TCH1="ABC Kids 3"
+TCH2="Wiggles!"
+TCH3="TVKNOB FLX Movie"
+TCH4="NASA TV"
+TCH5="Australian Parliament"
+TCH6="Shoutcast Movie"
+TCH7="ABC Kids 1"
+TCH8="CCTV News China"
+_TELSTATIONS
+
+cat > $WORKINGDIR/tel-urls <<_TELURLS	
+TURL1="mms://media4.abc.net.au/broadbandkids/20070521_1500/story6hi.wmv"
+TURL2="mms://media4.abc.net.au/broadbandkids/20070521_1500/story5hi.wmv"
+TURL3="mmsh://streams.tvknob.com/tvloops/Ch7/tvknob.wsx"
+TURL4="mms://a1816.l1856941815.c18569.g.lm.akamaistream.net/D/1816/18569/v0001/reflector:41815"
+TURL5="mms://DMZVIDEO1.aph.gov.au/HMS1V?WMContentBitrate=100000"
+TURL6="http://173.193.48.140:8080;stream.nsv"
+TURL7="mms://media4.abc.net.au/broadbandkids/20070521_1500/story1hi.wmv"
+TURL8="mms://4.71.37.8/cctv9-200"
+_TELURLS
+
+cat > $WORKINGDIR/urls <<_URLS
+URL1="mms://wmlive.bbc.net.uk/wms/bbc_ami/radio4/radio4_bb_live_int_eq1_sw0"
+URL2="mms://audio.wafm.com.au/"
+URL3="mms://wmlive.bbc.net.uk/wms/bbc_ami/bbc7/bbc7_bb_live_int_ep1_sl0"
+URL4="http://lin2.ash.fast-serv.com:9022"
+URL5="http://72.9.152.74:8202/"
+URL6="http://vprbbc.streamguys.net:8000/vprbbc24.mp3"
+URL7="http://vprclassical.streamguys.net:8000/vprclassical128.mp3"
+URL8="http://mms-cluster2.nextra.no/P4_Bandit"
+_URLS
+
+}
+export -f createworkingfilesfunc
+
+#create working dir if it doesn't exist
+[ ! -d $HOME/.pupradio ] && createworkingfilesfunc
+export WORKINGDIR="$HOME/.pupradio"
+
+#first run finds a player
+CUR_PLAYER=""
+[ -f $WORKINGDIR/config ] && CUR_PLAYER=`cat $WORKINGDIR/config`
+DEF_PLAYER="/usr/local/bin/defaultmediaplayer"
+MPLAY=`grep "mplayer" $DEF_PLAYER`
+GPLAY=`grep -w "gxineshell" $DEF_PLAYER`
+XPLAY=`grep -w "xine" $DEF_PLAYER`
+XXPLAY=`grep -w "xineshell" $DEF_PLAYER`
+VPLAY=`grep -w "vlc" $DEF_PLAYER`
+
+if [[ "$CUR_PLAYER" = "PLAYER=" || "$CUR_PLAYER" = "" ]];then
+	if [ "$MPLAY" != "" ];then echo "PLAYER=mplayer" > $WORKINGDIR/config;fi
+	if [ "$GPLAY" != "" ];then echo "PLAYER=gxine" > $WORKINGDIR/config;fi
+	if [ "$XPLAY" != "" ];then echo "PLAYER=xine" > $WORKINGDIR/config;fi
+	if [ "$XXPLAY" != "" ];then echo "PLAYER=xine" > $WORKINGDIR/config;fi
+	if [ "$VPLAY" != "" ];then echo "PLAYER=vlc" > $WORKINGDIR/config;fi
+fi
+
+
+
+BOOK_DIR=$WORKINGDIR/bookmarks
+
+TBOOK_DIR=$WORKINGDIR/tbookmarks
+
+. $WORKINGDIR/stations
+
+. $WORKINGDIR/tel-stations
+
+. $WORKINGDIR/config
+
+RECORD_APP=`which precord`
+#if [ "$RECORD_APP" != "" ]; then 
+REC_TIP="$(gettext 'Record with Precord')"
+ACTIONR="precord &"
+#else REC_TIP="Please install Precord to enable recording feature"
+#		ACTIONR="xmessage -center  -timeout 15 \"please install Precord from http://www.murga-linux.com/puppy/viewtopic.php?t=49907\" &"
+#fi
+export RECORD_APP
+
+
+
+
+MPLAYER=`which mplayer`
+GXINE=`which gxine`
+XINE=`which xine`
+GMPLAYER=`which gnome-mplayer`
+VLC=`which vlc`
+
+echo "" > $WORKINGDIR/playerlist
+if [ "$MPLAYER" != "" ]; then echo "mplayer" >> $WORKINGDIR/playerlist ; fi
+if [ "$GXINE" != "" ]; then echo "gxine" >> $WORKINGDIR/playerlist ; fi
+if [ "$XINE" != "" ]; then echo "xine" >> $WORKINGDIR/playerlist ; fi
+if [ "$GMPLAYER" != "" ]; then echo "gnome-mplayer" >> $WORKINGDIR/playerlist ; fi
+if [ "$VLC" != "" ]; then echo "vlc" >> $WORKINGDIR/playerlist ; fi
+
+echo `cat $WORKINGDIR/playerlist` > $WORKINGDIR/players
+PLAYERLINE=`cat $WORKINGDIR/players`
+
+#dpup uses Ogle at the moment , need to choose player 
+FIRST_RUN=`cat $WORKINGDIR/config`
+if [  "$FIRST_RUN" = "PLAYER=" ] ; then yaf-splash -font "8x16" -margin 4 -outline 0 -bg yellow -timeout 3 -text "$(gettext 'Please choose a player')" &
+fi
+
+PLAYERS="<item>$PLAYER</item>"
+for I in $PLAYERLINE ; do PLAYERS=`echo "$PLAYERS<item>$I</item>"`; done
+
+BOOKS=`ls $BOOK_DIR | awk '{print $1}'`
+echo "$BOOKS" > $BOOK_DIR/.bookmark-list
+BOOKLINE=`cat $BOOK_DIR/.bookmark-list`
+
+for I in $BOOKLINE ; do BOOKMARKS=`echo "$BOOKMARKS<item>$I</item>"`; done
+
+TBOOKS=`ls $TBOOK_DIR`
+echo "$TBOOKS" > $TBOOK_DIR/.tbookmark-list
+TBOOKLINE=`cat $TBOOK_DIR/.tbookmark-list`
+
+for I in $TBOOKLINE ; do TBOOKMARKS=`echo "$TBOOKMARKS<item>$I</item>"`; done
+
+#dialogs for translation
+DLG1=$(gettext "Presets")
+DLG2=$(gettext "Please select a Name for your station, the URL and save as a")
+DLG3=$(gettext "Preset")
+DLG4=$(gettext "Play Now!")
+DLG5=$(gettext "or save as a")
+DLG6=$(gettext "Bookmark")
+DLG7=$(gettext "Name")
+DLG8=$(gettext "Please enter a name for your Preset radio station")
+DLG9=$(gettext "Please enter or copy and paste the URL for your radio station")
+DLG10=$(gettext "Click to save your  radio station as a Preset")
+DLG11=$(gettext "Save Preset")
+DLG12=$(gettext "Click to play  radio station without saving")
+DLG13=$(gettext "Bookmarks")
+DLG14=$(gettext "Click to save  radio station Bookmark. Please note that names with spaces will be truncated to the first word")
+DLG15=$(gettext "Save Bookmark")
+DLG16=$(gettext "Click to play radio station Bookmark")
+DLG17=$(gettext "Play Bookmark")
+DLG18=$(gettext "Please select a Name for your channel, the URL and save as a")
+DLG19=$(gettext "Watch now!")
+DLG20=$(gettext "Please enter a name for your telly channel")
+DLG21=$(gettext "Please enter or copy and paste the URL for your telly channel")
+DLG22=$(gettext "Click to save your  telly channel as a Preset ")
+DLG23=$(gettext "Click to watch your telly channel without saving ")
+DLG24=$(gettext "toggles fullscreen")
+DLG25=$(gettext "Click to save telly channel Bookmark. Please note that names with spaces will be truncated to the first word")
+DLG26=$(gettext "Click to watch telly channel Bookmark")
+DLG27=$(gettext "Preferred Player")
+DLG28=$(gettext "General Help")
+DLG29=$(gettext "Help")
+DLG30=$(gettext "Click to open your browser and browse a radio stream archive site")
+DLG31=$(gettext "Radio")
+DLG32=$(gettext "Click to open your browser and browse a TV stream archive site")
+DLG33=$(gettext "Telly")
+DLG34=$(gettext "Stop")
+DLG35=$(gettext "Quit")
+
+########################
+
+export PUPRADIO="
+<window title=\"pupRadio\">
+<vbox>
+ 
+ <notebook labels=\"pupRadio|pupTelly\">
+   
+   
+   
+ <vbox>
+  <hbox homogeneous=\"true\">
+   <text><label>$DLG1</label></text>
+  </hbox>
+  <hbox homogeneous=\"true\">
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 1: $CH1\"  width-request=\"200\" xalign=\"0\" tooltip-text=\"Click a button!\">
+      <action>. $APP_DIR/func 1</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">
+     <button label=\" 2: $CH2\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 2</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 3: $CH3\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 3</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">
+     <button label=\" 4: $CH4\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 4</action>
+     </button>
+    </hbox>
+   </vbox>
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 5: $CH5\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 5</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">
+     <button label=\" 6: $CH6\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 6</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">  
+     <button label=\" 7: $CH7\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 7</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">
+     <button label=\" 8: $CH8\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func 8</action>
+     </button>
+    </hbox>
+   </vbox>
+  </hbox>
+ 
+ 
+ <vbox>
+  <hbox homogeneous=\"true\">
+    <text width-request=\"450\" use-markup=\"true\"><label>\"$DLG2 <b>$DLG3, $DLG4</b> $DLG5 <b>$DLG6</b>\"</label></text>
+  </hbox>
+  <hbox homogeneous=\"true\">
+    <text><label>$DLG7</label></text>
+     <entry tooltip-text=\"$DLG8\">
+     <variable>STATION</variable>
+    </entry>
+    <text><label>URL</label></text>
+    <entry tooltip-text=\"$DLG9\">
+	 <variable>RSURL</variable>
+    </entry>
+  </hbox> 
+  <hbox height-request=\"40\">
+    <text><label>$(gettext 'Preset No')</label></text>
+    <combobox width-request=\"50\">
+     <variable>RNUMBER</variable>
+     <item>1</item>
+     <item>2</item>
+     <item>3</item>
+     <item>4</item>
+     <item>5</item>
+     <item>6</item>
+     <item>7</item>
+     <item>8</item>
+    </combobox>
+    <button tooltip-text=\"$DLG10\">
+     <label>$DLG11</label>
+     <input file stock=\"gtk-apply\"></input>
+     <action>. $APP_DIR/func apply</action>
+     <action>. $APP_DIR/func restart</action>
+    </button>
+    <button tooltip-text=\"$DLG12\">
+     <label>$DLG4</label>
+     <input file stock=\"gtk-media-play\"></input>
+     <action>. $APP_DIR/func playnow</action>
+    </button>"
+
+if [ "$RECORD_APP" != "" ];then PUPRADIO=${PUPRADIO}"
+    <button tooltip-text=\"$REC_TIP\">
+     <label>$(gettext 'Record')</label>
+     <input file stock=\"gtk-media-record\"></input>
+     <action>$ACTIONR</action>
+    </button>"
+fi
+PUPRADIO=${PUPRADIO}"   
+   </hbox>
+   <hbox homogeneous=\"true\" height-request=\"40\">
+    <text><label>$DLG13</label></text>
+    <combobox width-request=\"150\">
+     <variable>PLAYSTATION</variable>
+ $BOOKMARKS
+    </combobox>
+     <button tooltip-text=\"$DLG14\">
+     <label>$DLG15</label>
+     <input file stock=\"gtk-save\"></input>
+     <action>. $APP_DIR/func radd</action>
+     <action>. $APP_DIR/func restart</action>
+    </button>
+    <button tooltip-text=\"$DLG16\">
+     <label>$DLG17</label>
+     <input file stock=\"gtk-media-play\"></input>
+     <action>. $APP_DIR/func rplay</action>
+    </button>
+   </hbox>
+  </vbox>
+ </vbox>
+ 
+ 
+   
+ <vbox>
+  <hbox homogeneous=\"true\">
+   <text><label>$DLG1</label></text>
+  </hbox>
+  <hbox homogeneous=\"true\">
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 1: $TCH1\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T1</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 2: $TCH2\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T2</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 3: $TCH3\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T3</action>
+     </button>
+	</hbox>
+	<hbox homogeneous=\"true\">
+     <button label=\" 4: $TCH4\" width-request=\"200\" xalign=\"0\">
+     <action>. $APP_DIR/func T4</action>
+     </button>
+    </hbox>
+   </vbox>
+   <vbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 5: $TCH5\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T5</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 6: $TCH6\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T6</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">  
+     <button label=\" 7: $TCH7\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T7</action>
+     </button>
+    </hbox>
+    <hbox homogeneous=\"true\">
+     <button label=\" 8: $TCH8\" width-request=\"200\" xalign=\"0\">
+      <action>. $APP_DIR/func T8</action>
+     </button>
+    </hbox>
+   </vbox> 
+  </hbox>
+
+
+ <vbox>
+  <hbox homogeneous=\"true\">
+   <text width-request=\"450\" use-markup=\"true\"><label>\"$DLG18 <b>$DLG3, $DLG19</b> $DLG5 <b>$DLG6</b>\"</label></text>
+  </hbox>
+  <hbox homogeneous=\"true\">
+   <text><label>$DLG7</label></text>
+    <entry tooltip-text=\"$DLG20\">
+     <variable>CHANNEL</variable>
+    </entry>
+   <text><label>URL</label></text>
+   <entry tooltip-text=\"$DLG21\">
+    <variable>SURL</variable>
+   </entry>
+  </hbox>
+  <hbox homogeneous=\"true\" height-request=\"40\">
+   <text><label>$(gettext 'Preset No')</label></text>
+    <combobox width-request=\"50\">
+     <variable>NUMBER</variable>
+     <item>1</item>
+     <item>2</item>
+     <item>3</item>
+     <item>4</item>
+     <item>5</item>
+     <item>6</item>
+     <item>7</item>
+     <item>8</item>
+    </combobox>
+    <button tooltip-text=\"$DLG22\">
+     <label>$DLG11</label>
+     <input file stock=\"gtk-apply\"></input>
+     <action>. $APP_DIR/func Tapply</action>
+     <action>. $APP_DIR/func restart</action>
+    </button>
+    <button tooltip-text=\"$DLG23\">
+     <label>$DLG19</label>
+     <input file stock=\"gtk-media-play\"></input>
+     <action>. $APP_DIR/func Tplaynow</action>
+    </button>
+    <text use-markup=\"true\"><label>\"<b>F</b> $DLG24\"</label></text>
+   </hbox>
+   <hbox homogeneous=\"true\" height-request=\"40\">
+    <text><label>$DLG13</label></text>
+     <combobox width-request=\"150\">
+      <variable>PLAYCHANNEL</variable>
+ $TBOOKMARKS
+     </combobox>
+     <button tooltip-text=\"$DLG25\">
+      <label>$DLG15</label>
+      <input file stock=\"gtk-save\"></input>
+      <action>. $APP_DIR/func tadd</action>
+      <action>. $APP_DIR/func restart</action>
+     </button>
+     <button tooltip-text=\"$DLG26\">
+      <label>$DLG17</label>
+      <input file stock=\"gtk-media-play\"></input>
+      <action>. $APP_DIR/func tplay</action>
+     </button>
+    </hbox>
+   </vbox>
+  </vbox>
+ </notebook>
+   
+   
+  <hbox>
+   <text><label>$DLG27</label></text>
+    <combobox width-request=\"100\">
+     <variable>PLAYER</variable>
+ $PLAYERS
+    </combobox>
+   </hbox>
+   <hbox>
+    <button tooltip-text=\"$DLG28\">
+     <label>$DLG29</label>
+      <input file stock=\"gtk-help\"></input>
+      <action>$APP_DIR/func help</action>
+    </button>
+    <button tooltip-text=\"$DLG30\">
+     <label>$DLG31 www</label>
+      <input file>/usr/local/lib/X11/mini-icons/mini-audiovol.xpm</input>
+      <action>defaultbrowser http://www.mikesradioworld.com/ &</action>
+    </button>
+    <button tooltip-text=\"$DLG32\">
+     <label>$DLG33 www</label>
+      <input file>/usr/local/lib/X11/mini-icons/mini-display.xpm</input>
+      <action>defaultbrowser  http://watch.squidtv.net/ &</action>
+    </button>
+    <button>
+     <label>$DLG34</label>
+      <input file stock=\"gtk-stop\"></input>
+      <action>. $APP_DIR/func stop</action>
+    </button>
+    <button>
+     <label>$DLG35</label>
+      <input file stock=\"gtk-quit\"></input>
+      <action>. $APP_DIR/func quit</action>
+     <action>EXIT:ok</action>
+    </button>
+  </hbox>
+ </vbox>
+</window>
+"
+I=$IFS; IFS=""
+for STATEMENTS in $(gtkdialog3 -p PUPRADIO);do
+	eval $STATEMENTS
+done
+IFS=$I
+if [ "$EXIT" = "abort" ];then
+	. $APP_DIR/func stop
+fi
+
+unset PUPRADIO
+
+exit

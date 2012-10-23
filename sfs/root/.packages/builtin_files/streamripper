@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ streamripper
+/usr/doc
+/usr/doc/streamripper-1.64.6
+ CHANGES
+ COPYING
+ INSTALL
+ README
+ THANKS
+/usr/man
+/usr/man/man1
+ streamripper.1.gz
+/usr/src
+/usr/src/streamripper-1.64.6
+ SLKBUILD

@@ -1,0 +1,92 @@
+#!/bin/sh
+
+# Written by PANZERKOPF  
+# October 2009
+# Version 1.0
+#100512 fixes for seamonkey 2.0.4
+#100524 use 'surfer' html viewer if present.
+
+[ -d /tmp/chmview* ] && rm -rf /tmp/chmview* #100512 precaution, cleanup.
+
+TITLE="Simple CHM Viewer"
+CHMTMPDIR=/tmp/chmview.$$
+CHMCHARSET="windows-1250"
+
+if [ -z ${DISPLAY} ]; then
+ DIALOG=dialog
+ HTMBROWSER="links"
+else
+ DIALOG=Xdialog
+ HTMBROWSER="defaulthtmlviewer"
+ [ -f /usr/bin/surfer ] && HTMBROWSER='surfer' #100524
+fi
+
+
+clear
+
+if [ -z ${1} ]; then
+ CHMFILE=`Xdialog --stdout --title "$TITLE" --ok-label "Open" --backtitle "Choose CHM file:"  --fselect / 0 0`
+ [ "$?" -ne 0 ] && exit
+else
+ CHMFILE="${1}" 
+fi
+
+if [ ! "`head -c 4 $CHMFILE`" = "ITSF" ]; then
+ ${DIALOG} --stdout --title "$TITLE" --msgbox "$CHMFILE is not a CHM file!" 0 0
+ exec ${0}
+fi
+
+mkdir ${CHMTMPDIR}
+
+${DIALOG} --title ${TITLE} --no-buttons --no-close --infobox "Extract files. \n PLEASE WAIT..." 0 0 100000 &
+MSGPID="$!"
+
+chm2html ${CHMFILE} ${CHMTMPDIR}
+
+cd ${CHMTMPDIR}
+HTMFILES=`ls -1 *.htm* | tr '\n' ' '`
+
+for ONEHTMFILE in ${HTMFILES}; do
+ sed -i "s/MS-ITS.*:\///g" ${ONEHTMFILE}
+done 
+unset ONEHTMFILE
+
+if [ -f ${CHMTMPDIR}/index.htm -o -f ${CHMTMPDIR}/index.html ]; then
+ mv index.html index.htm
+else
+ echo "<HTML><HEAD>" > index.htm
+ echo "<META HTTP-EQUIV=\"Content-Type\" CONTENT=\"text/html; charset=${CHMCHARSET}\"></HEAD>" >> index.htm
+ echo "</HEAD><BODY>" >> index.htm
+ for ONEHTMFILE in ${HTMFILES}; do
+  HREFNAME=`grep -i -e "<TITLE>" ${ONEHTMFILE} | cut -f 2 -d '>' | cut -f 1 -d '<'`    
+  echo "<a href=\"${ONEHTMFILE}\">${HREFNAME}</a><br>" >> index.htm
+ done 
+ unset ONEHTMFILE
+fi
+
+kill ${MSGPID}
+clear
+
+if [ "$HTMBROWSER" != "surfer" ];then #100524
+ #100512 have to kill any instance so won't return immediately...
+ if [ -e /usr/local/bin/gtkmoz -a "`readlink /usr/local/bin/gtkmoz`" = "mozstart" ];then
+  if [ -d /usr/lib/seamonkey-2* ];then
+   #HTMBROWSER='/usr/lib/seamonkey/seamonkey-bin'
+   killall mozilla
+   killall seamonkey
+   killall seamonkey-bin
+  fi
+  if [ -d /usr/lib/firefox-3* ];then
+   #HTMBROWSER='/usr/lib/firefox/firefox-bin'
+   killall mozilla
+   killall firefox
+   killall firefox-bin
+  fi
+ fi
+fi
+
+${HTMBROWSER} ${CHMTMPDIR}/index.htm
+
+#/usr/lib/seamonkey/seamonkey-bin file://${CHMTMPDIR}/index.htm
+
+rm -f -r ${CHMTMPDIR}

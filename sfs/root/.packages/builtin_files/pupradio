@@ -1,0 +1,10 @@
+/usr
+/usr/local
+/usr/local/pupradio
+ func
+ pupradio
+/usr/sbin
+ pupradio
+/usr/share
+/usr/share/applications
+ pupRadio.desktop

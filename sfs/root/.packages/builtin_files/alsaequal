@@ -1,0 +1,5 @@
+/usr
+/usr/lib
+/usr/lib/alsa-lib
+ libasound_module_ctl_equal.so
+ libasound_module_pcm_equal.so

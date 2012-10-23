@@ -1,0 +1,124 @@
+#!/bin/sh
+#Barry Kauler www.puppylinux.com
+#LGPL 2007 Puppy Linux www.puppylinux.com
+#17 june 2007
+#21 June 2007 BK:
+#some usb adaptors have slots for cards, plugging/unplugging these cards
+#does not cause a hotplug event and the kernel does not update /proc.
+#'disktype' does a direct hardware probe which forces /proc update.
+#attempt here to run disktype when appropriate.
+#v3.93 10 dec 2007 BK: updated for 2.6.24 kernel, no /dev/hd*.
+#v3.97 31jan2008 BK: refinement for detecting kernel with /dev/hd support.
+#v3.97 25feb2008 BK: guess_fstype does not work when testing 'makebootfat', use fdisk.
+#v4.01 19may2008 BK: bugfix for 2.6.25.4, ram entries in /proc/partitions.
+#v403 fix for SIZE of drives without partitions.
+#v406 support for old kernel, /proc/ide, /dev/hd*
+#v407 improved filesystem probe for optical discs.
+#110126 remove code for SATADRIVES (not used in PUPSTATE anymore).
+
+. /etc/rc.d/PUPSTATE
+
+SUNITS="$1" #allowed params are '-k' or '-m'.
+OUTPUT=""
+
+GUESSFSTYPE="`which guess_fstype`"
+[ "$GUESSFSTYPE" = "" ] && GUESSFSTYPE="/usr/lib/mut/bin/guess_fstype" #mut.
+
+if [ -f /root/.usb-drive-log-probepart ];then #force /proc upate mechanism
+ for ONEUSBDRV in `cat /root/.usb-drive-log-probepart | tr '\n' ' '`
+ do
+  #disktype /dev/$ONEUSBDRV > /dev/null 2>&1
+  dd if=/dev/$ONEUSBDRV of=/dev/null bs=512 count=1 >/dev/null 2>&1 #v3.97 faster.
+ done
+fi
+
+#devices that have partitions... 
+#([^k] is to eliminate mmcblk0 device -- allow mmcblk0p1 etc) v4.01 bugfix eliminate ram...
+PARTITIONS="`grep '^ .*[^k][0-9]$' /proc/partitions | tr -s ' ' | cut -f 4-5 -d ' ' | grep -vE ' loop| ram' | tr ' ' '|'`"
+
+##all disk devices... 
+#note, /proc/diskstats only updated when a disk accessed, so devs may be missing...
+#NO, NO, NO, /sys is very flakey for hd devices...
+if [ ! -e /proc/ide ];then
+ ALLDRVS="`ls -1 /sys/block | grep -E '^scd|^sd|^mmc|^sr' | tr '\n' ' '`"
+else
+ ALLDRVS="`ls -1 /sys/block | grep -E '^scd|^sd|^mmc|^sr' | tr '\n' ' '``ls -1 /proc/ide | grep '^hd' | tr '\n' ' '`"
+fi
+#all drives and partitions...
+ALLDEVS="`echo "$PARTITIONS" | cut -f 2 -d '|' | tr '\n' ' '`$ALLDRVS"
+
+for ONEDEV in $ALLDEVS
+do
+ FSTYPE="unknown"
+ DPATTERN='|'${ONEDEV}'$'
+ SIZE=`echo "$PARTITIONS" | grep "$DPATTERN" | cut -f 1 -d '|'`
+ DEVICE="`echo "$PARTITIONS" | grep "$DPATTERN" | cut -f 2 -d '|'`"
+ if [ ! $SIZE ];then
+  [ "`echo "$PARTITIONS" | grep "$ONEDEV"`" != "" ] && continue
+  #must be a device without partitions...
+  SIZE=0
+  DEVICE="$ONEDEV"
+  case $DEVICE in
+   hd*)
+    [ "`cat /proc/ide/$DEVICE/media`" = "cdrom" ] && FSTYPE="iso9660"
+   ;;
+   scd*|sr*) #usb,sata,scsi cd/dvd drive.
+    FSTYPE="iso9660"
+   ;;
+  esac
+  if [ -e /sys/block/${DEVICE}/size ];then
+   SIZE=`cat /sys/block/${DEVICE}/size`
+   SIZE=$(($SIZE/2)) #get KB.
+  fi
+  #for hd* or sd* superfloppy, determine size (avoid probing optical drive)...
+  if [ "$FSTYPE" = "unknown" -a $SIZE -eq 0 ];then
+   BSIZE=`disktype /dev/$DEVICE 2>/dev/null | grep '^Block device' | cut -f 2 -d '(' | cut -f 1 -d ' '`
+   [ $BSIZE ] && SIZE=$(($BSIZE/1024)) #KB
+  fi
+  #v407 improve f.s. probe for optical...
+  if [ "$FSTYPE" = "iso9660" ];then
+   opticalPATTERN='^/dev/'"$DEVICE"
+   if [ "`grep "$opticalPATTERN" /proc/mounts`" = "" ];then
+    cddetect_quick -d/dev/${DEVICE} >/dev/null 2>&1 #very fast.
+    #...returns 0 if disc inserted, else 255.
+    [ $? -ne 0 ] && FSTYPE="unknown"
+   fi
+  fi
+ fi
+ [ "$FSTYPE" = "unknown" ] && FSTYPE="`$GUESSFSTYPE /dev/$DEVICE 2>/dev/null`"
+ 
+ #v3.97 guess_fstype fails sometimes...
+ #(using makebootfat to setup a USB-FLOPPY/-HDD/-ZIP combined bootable FAT drive).
+ xFSTYPE=''
+ if [ "$FSTYPE" = "unknown" ];then
+  fsPATTERN='^/dev/'"$DEVICE"' '
+  xDEVICE="`echo -n "$DEVICE" | sed -e 's/[0-9]*$//'`" #"${DEVICE/[0-9]/}" #remove partition number.
+  xFSTYPE="`fdisk -l /dev/$xDEVICE 2>/dev/null | grep "$fsPATTERN" | head -n 1 | grep -o -E 'FAT12$|FAT16$|FAT32$'`"
+  [ "$xFSTYPE" != "" ] && FSTYPE='vfat'
+ fi
+ 
+ #for compatibility with old probepart from antonio gallo...
+ [ "$FSTYPE" = "unknown" ] && FSTYPE="none"
+ 
+ [ "$SUNITS" = "" ] && SIZE=$(($SIZE*2)) #want 512 byte blocks.
+ [ "$SUNITS" = '-m' ] && SIZE=$(($SIZE/1024)) #want MB
+
+ echo "/dev/$DEVICE|$FSTYPE|$SIZE"
+ 
+ #keep record of usb sd*, for forced updating of /proc...
+ case $DEVICE in
+  sd*)
+   #log if usb drive (not a ata drive)...
+   DEVDRV="`echo -n "$DEVICE" | tr -d '[0-9]'`"
+   if [ "`echo "$ATADRIVES" | grep "$DEVDRV"`" = "" ];then #110126
+    echo "$DEVDRV" >> /root/.usb-drive-log-probepart
+    sort -u /root/.usb-drive-log-probepart > /tmp/usb-drive-log-probepart-tmp
+    mv -f /tmp/usb-drive-log-probepart-tmp /root/.usb-drive-log-probepart
+   fi
+   ;;
+ esac
+ 
+done
+
+
+###END###

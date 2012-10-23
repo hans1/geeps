@@ -1,0 +1,60 @@
+<JWM>
+
+<WindowStyle>
+    <Font>Sans-12</Font>
+    <Width>5</Width>
+    <Height>20</Height>     
+    <Active>
+       <Text>#FDFDFA</Text>
+       <Title>#9372A4:#010101</Title>
+       <Outline>#550538</Outline>
+    </Active>
+    <Inactive>
+       <Text>#E6E6E6</Text>
+       <Title>#010101:#746C73</Title>         
+       <Outline>#000000</Outline>
+    </Inactive>
+</WindowStyle> 
+
+<TaskListStyle>
+<Font>-adobe-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*</Font>
+<ActiveForeground>#010101</ActiveForeground>
+<ActiveBackground>#9372A4:#010101</ActiveBackground>
+<Background>#AB9DA7:#746C73</Background>
+<Foreground>#230A24</Foreground>
+</TaskListStyle>
+
+	<!-- TRAY PROPERTIES -->
+
+	<TrayStyle>
+		<Font>-adobe-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*</Font>
+		<Foreground>#230A24</Foreground>
+		<Background>#746C73</Background>
+	</TrayStyle>
+
+	<!-- PAGER PROPERTIES -->
+
+	<PagerStyle>
+		<Outline>#E6E6E6</Outline>
+		<Foreground>#E6E6E6</Foreground>
+		<Background>#010101</Background>
+		<ActiveForeground>#9372A4</ActiveForeground>
+		<ActiveBackground>#010101</ActiveBackground>
+	</PagerStyle>
+
+	<PopupStyle>
+		<Font>-adobe-helvetica-medium-r-*-*-*-140-*-*-*-*-*-*</Font>
+		<Outline>#E6E6E6</Outline>
+		<Foreground>#E6E6E6</Foreground>
+		<Background>#010101</Background>
+	</PopupStyle>
+
+	<MenuStyle>
+		<Font>-adobe-helvetica-medium-r-*-*-*-140-*-*-*-*-*-*</Font>
+		<Foreground>#230A24</Foreground>
+		<Background>#746C73</Background>
+		<ActiveForeground>#FDFAFD</ActiveForeground>
+		<ActiveBackground>#9372A4:#010101</ActiveBackground>
+	</MenuStyle>
+	
+</JWM>

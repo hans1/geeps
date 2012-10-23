@@ -1,0 +1,101 @@
+#!/bin/bash
+#pTiming
+#version=0.6.0
+#language=en_US:english
+#translator=native
+
+# |==================================|
+# | <b>text</b>            Bold text |
+# |==================================|
+
+set -a
+
+LOC_OK="Ok"
+LOC_CANCEL="Cancel"
+LOC_ERROR="Error"
+LOC_WARNING="Warning"
+LOC_YES="Yes"
+LOC_NO="No"
+LOC_QUIT="Quit"
+LOC_VIEW="View"
+LOC_INFO="Info"
+LOC_REMOVE="Remove"
+LOC_CLOSE="Close"
+LOC_NR="Nr"
+
+#Menu
+LOC100="File"
+ LOC101="Export results"
+ LOC102="Preferences"
+LOC110="Timing"
+ LOC111="Set timer"
+ LOC112="Competitors" #one word
+ LOC113="Fullscreen timer"
+LOC120="Sort"
+ LOC121="Sort by"
+ LOC122="ID"
+ LOC123="Name"
+ LOC124="Organization"
+ LOC125="Class"
+ LOC126="Time"
+ LOC127="Lap"
+ LOC128="LapTime"
+ LOC129="StartTime"
+LOC190="Help"
+ LOC191="About"
+ LOC192="Online help"
+
+#Preferences
+LOC200="Default delay between added competitors"
+LOC201="Default empty startTimes for late registrations"
+LOC210="Environment"
+LOC211="Fontsize (this also affects fullscreen)"
+LOC212="Sound at startTime"
+LOC213="Sound before startTime"
+LOC214="Color of entry background"
+LOC215="Color of timer font"
+LOC216="Color of entry font"
+LOC228="Restart pTiming to activate changes"
+
+#main window
+LOC300="Combine next timestamp to a competitor number.
+You can later edit items in result list by click on it."
+LOC301="Set Timestamp"
+LOC310="Apply changes by pressing ENTER"
+LOC311="Delete timestamp"
+
+#set timer
+LOC400="Beep at defined Start-time"
+LOC401="Silence"
+LOC402="1 Beep"
+LOC403="5 Beep"
+LOC410="Options"
+LOC411="Calculate hundredths"
+LOC412="You can switch between ordinary clock and builtin timer"
+LOC413="Use day-time"
+LOC420="Reset Timer"
+LOC421="Countdown seconds"
+LOC422="1 min"
+LOC423="1 hour"
+LOC424="1 day"
+LOC429="Reset timer NOW"
+
+#Competitors
+LOC500="New startlist"
+LOC501="Open startlist"
+LOC502="Save startlist"
+LOC503="Export startlist"
+LOC510="Shuffle Competitors"
+LOC511="Registration"
+LOC512="Delay between Competitors (seconds)"
+LOC513="Delete competitor"
+
+#shuffle
+LOC600="Shuffle_Competitors" #one word
+LOC601="First Start NR"
+LOC602="Delay between Competitors in class (seconds)"
+LOC603="First starttime"
+LOC604="Execute"
+
+#misc
+LOC700="Laps"

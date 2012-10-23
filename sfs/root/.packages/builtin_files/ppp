@@ -1,0 +1,24 @@
+/usr
+/usr/lib
+ libradiusclient.so
+ libradiusclient.so.0
+ libradiusclient.so.0.0.1
+/usr/lib/pppd
+/usr/lib/pppd/2.4.5
+ minconn.so
+ openl2tp.so
+ passprompt.so
+ passwordfd.so
+ pppoatm.so
+ pppol2tp.so
+ radattr.so
+ radius.so
+ radrealms.so
+ rp-pppoe.so
+ winbind.so
+/usr/sbin
+ chat
+ pppd
+ pppdump
+ pppoe-discovery
+ pppstats

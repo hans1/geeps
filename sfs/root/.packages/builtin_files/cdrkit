@@ -1,0 +1,20 @@
+/etc
+ cdrecord.conf
+/usr
+/usr/bin
+ cdda2mp3
+ cdda2ogg
+ cdda2wav
+ cdrecord
+ dirsplit
+ genisoimage
+ icedax
+ list_audio_tracks
+ mkisofs
+ pitchplay
+ readcd
+ readmult
+ readom
+ wodim
+/usr/sbin
+ netscsid

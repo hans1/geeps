@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="Gnumeric_glpk">
+	<information>
+		<name>GLPK Linear Program Solver Interface</name>
+		<name xml:lang="cs">Rozhraní lineárního programového řešitele GLPK</name>
+		<name xml:lang="de">GLPK Benutzeroberfläche für linearen Programmlöser</name>
+		<name xml:lang="el">Διεπαφή γραμμικού προγράμματος επίλυσης GLPK</name>
+		<name xml:lang="en_GB">GLPK Linear Program Solver Interface</name>
+		<name xml:lang="es">Interfaz del programa de resolución lineal GLPK</name>
+		<name xml:lang="fi">Lineaarisen GLPK-ratkaisimen rajapinta</name>
+		<name xml:lang="fr">Interface de programme de solveur linéaire GLPK</name>
+		<name xml:lang="lt">Linijinio GLPK programos sprendiklio sąsaja</name>
+		<description>Solver Interface to GLPK</description>
+		<description xml:lang="cs">Rozhraní řešitele k GLPK</description>
+		<description xml:lang="de">Löser-Schnittstelle zu GLPK</description>
+		<description xml:lang="el">Διεπαφή επίλυσης στο GLPK</description>
+		<description xml:lang="en_GB">Solver Interface to GLPK</description>
+		<description xml:lang="es">Interfaz del resolutor para GLPK</description>
+		<description xml:lang="fi">Ratkaisinrajapinta GLPK:hon</description>
+		<description xml:lang="fr">Interface de solveur vers GLPK</description>
+		<description xml:lang="lt">GLPK sprendiklio sąsaja</description>
+		<description xml:lang="nb">Problemløsergrensesnitt til GLPK</description>
+		<description xml:lang="zh_TW">GLPK 的解答器介面</description>
+	</information>
+	<loader type="Gnumeric_Builtin:module">
+		<attribute value="glpk" name="module_file"/>
+	</loader>
+	<services>
+		<service type="file_saver" save_scope="sheet" mime_type="application/glpk" id="glpk" format_level="write_only" file_extension="cplex">
+			<information>
+				<description>GLPK Linear Program Solver</description>
+				<description xml:lang="cs">Lineární programový řešitel GLPK</description>
+				<description xml:lang="de">GLPK Linearer Programmlöser</description>
+				<description xml:lang="el">Επίλυση γραμμικού προγράμματος GLPK</description>
+				<description xml:lang="en_GB">GLPK Linear Program Solver</description>
+				<description xml:lang="es">Programa de resolución lineal GLPK</description>
+				<description xml:lang="fi">Lineaarinen GLPK-ratkaisin </description>
+				<description xml:lang="fr">Programme de solveur linéaire GLPK</description>
+				<description xml:lang="lt">Linijinis GLPK programos sprendiklis</description>
+				<description xml:lang="nb">GLPK lineært program problemløser</description>
+			</information>
+		</service>
+		<service type="solver" model_type="mip" id="glpk">
+			<information>
+			  <description>GLPK</description>
+			  <description xml:lang="ast">GLPK</description>
+			  <description xml:lang="ca">GLPK</description>
+			  <description xml:lang="cs">GLPK</description>
+			  <description xml:lang="de">GLPK</description>
+			  <description xml:lang="el">GLPK</description>
+			  <description xml:lang="en_GB">GLPK</description>
+			  <description xml:lang="es">GLPK</description>
+			  <description xml:lang="fi">GLPK</description>
+			  <description xml:lang="fr">GLPK</description>
+			  <description xml:lang="lt">GLPK</description>
+			  <description xml:lang="nb">GLPK</description>
+			  <description xml:lang="ru">GLPK</description>
+			  <description xml:lang="zh_TW">GLPK</description>
+			</information>
+		</service>
+	</services>
+</plugin>

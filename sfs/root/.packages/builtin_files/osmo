@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ osmo
+/usr/share
+/usr/share/applications
+ osmo.desktop
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ osmo.png
+/usr/share/pixmaps
+ osmo.png
+/usr/share/sounds
+/usr/share/sounds/osmo
+ alarm.wav

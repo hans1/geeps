@@ -1,0 +1,18 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wizard Wizard
+Name[ru]=Настройка Puppy
+Name[de]=ALLE Einstellungen
+Name[es]=Gestor de Gestores
+Name[fr]=Tableau de Bord
+Name[hu_HU]=Beállítás varázsló
+Name[ja]=Puppyセットアップ
+Name[zh_CN]=向导的向导
+Name[zh_TW]=各種設定精靈
+Icon=mini-dog.xpm
+Comment=Wizard Wizard
+Exec=wizardwizard
+Terminal=false
+Type=Application
+Categories=X-SetupEntry
+GenericName=Wizard Wizard

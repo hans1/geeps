@@ -1,0 +1,30 @@
+/usr
+/usr/bin
+ pdffonts
+ pdfimages
+ pdfinfo
+ pdftoabw
+ pdftohtml
+ pdftoppm
+ pdftops
+ pdftotext
+ poppler-glib-demo
+/usr/doc
+/usr/doc/poppler-0.16.4
+/usr/lib
+ libpoppler-cpp.so
+ libpoppler-cpp.so.0
+ libpoppler-cpp.so.0.2.0
+ libpoppler-glib.so
+ libpoppler-glib.so.4
+ libpoppler-glib.so.5
+ libpoppler-glib.so.6
+ libpoppler-glib.so.6.0.0
+ libpoppler-qt4.so
+ libpoppler-qt4.so.3
+ libpoppler-qt4.so.3.4.0
+ libpoppler.so
+ libpoppler.so.13
+ libpoppler.so.13.0.0
+ libpoppler.so.4
+ libpoppler.so.7

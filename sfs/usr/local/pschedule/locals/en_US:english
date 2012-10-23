@@ -1,0 +1,69 @@
+#!/bin/bash
+#pSchedule
+#version=1.0
+#language=en_US:english
+#translator=native
+
+# |==================================|
+# | <b>text</b>            Bold text |
+# |==================================|
+
+set -a
+
+#engine
+any='any'
+month='month'
+day='day'
+Every_hour_at='Every hour at'
+Every_minute='Every minute'
+during_the_hour='during the hour'
+the='the' #the 3. of May
+of='of' #of January
+IN='in'
+if_its_on="if it's on"
+Mondays='Mondays'
+Tuesdays='Tuesdays'
+Wednesdays='Wednesdays'
+Thursdays='Thursdays'
+Fridays='Fridays'
+Saturdays='Saturdays'
+Sundays='Sundays'
+January='January'
+February='February'
+March='March'
+April='April'
+May='May'
+June='June'
+July='July'
+August='August'
+September='September'
+October='October'
+November='November'
+December='December'
+
+#main gui
+Task_on_time='Task on time'
+Task='Task'
+Schedule='Schedule'
+Cron_command='Cron command'
+Add='Schedule new task'
+Edit='Edit'
+Delete='Delete'
+Run='execute now'
+Quit='Quit'
+About='About'
+
+#editor
+Command='Command'
+Time='Time'
+Task_name='Task name (optional)'
+Hour='Hour'
+Minute='Min.'
+Day='Day'
+Date='Date'
+Month='Month'
+Cron_time='Cron time'
+Next_run='Next run'
+
+#misc
+Delete_selected_task='Delete selected task'

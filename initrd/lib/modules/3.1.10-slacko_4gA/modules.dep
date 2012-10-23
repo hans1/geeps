@@ -1,0 +1,82 @@
+/lib/modules/3.1.10-slacko_4gA/kernel/crypto/cbc.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/aufs/aufs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/fuse/fuse.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/squashfs/squashfs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/nls/nls_iso8859-2.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/nls/nls_utf8.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/nls/nls_cp850.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/nls/nls_cp852.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/fs/btrfs/btrfs.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/lib/zlib_deflate/zlib_deflate.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/lib/libcrc32c.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/lib/zlib_deflate/zlib_deflate.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/lib/libcrc32c.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/block/floppy.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/block/cryptoloop.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/host/sdhci.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/host/sdhci-pci.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/host/sdhci.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/host/tifm_sd.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/drivers/misc/tifm_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/card/mmc_block.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/ssb/ssb.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/mmc/core/mmc_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/parport/parport.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/be2iscsi/be2iscsi.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/iscsi_boot_sysfs.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libiscsi.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/scsi_transport_iscsi.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/nsp32.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libiscsi.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/scsi_transport_iscsi.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/qla2xxx/qla2xxx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/fcoe/libfcoe.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libfc/libfc.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/stex.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/sym53c8xx_2/sym53c8xx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/atp870u.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/sg.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/dmx3191d.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/fnic/fnic.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/fcoe/libfcoe.ko.gz /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libfc/libfc.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/gdth.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/advansys.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/megaraid/megaraid_mbox.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/megaraid/megaraid_mm.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/megaraid/megaraid_sas.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/megaraid/megaraid_mm.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/BusLogic.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/ips.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/megaraid.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/raid_class.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/mpt2sas/mpt2sas.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/raid_class.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/qla4xxx/qla4xxx.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/scsi_transport_iscsi.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/hptiop.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/hpsa.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/bfa/bfa.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/osst.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/aic94xx/aic94xx.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libsas/libsas.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libsas/libsas.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/lpfc/lpfc.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/arcmsr/arcmsr.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/aic7xxx/aic7xxx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/aic7xxx/aic79xx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/aacraid/aacraid.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/scsi_transport_iscsi.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/mvsas/mvsas.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libsas/libsas.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/tmscsim.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pmcraid.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/dc395x.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/dpt_i2o.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/a100u2w.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/st.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/qla1280.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/iscsi_boot_sysfs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/3w-xxxx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/3w-9xxx.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/fdomain.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/ipr.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/3w-sas.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/scsi_wait_scan.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pcmcia/fdomain_cs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pcmcia/sym53c500_cs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pcmcia/aha152x_cs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pcmcia/qlogic_cs.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/qlogicfas408.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pcmcia/nsp_cs.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libfc/libfc.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/initio.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/vmw_pvscsi.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/qlogicfas408.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/pm8001/pm8001.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/scsi/libsas/libsas.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/misc/tifm_core.ko.gz:
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/misc/tifm_7xx1.ko.gz: /lib/modules/3.1.10-slacko_4gA/kernel/drivers/misc/tifm_core.ko.gz
+/lib/modules/3.1.10-slacko_4gA/kernel/drivers/pcmcia/yenta_socket.ko.gz:

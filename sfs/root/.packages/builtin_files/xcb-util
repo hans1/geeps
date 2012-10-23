@@ -1,0 +1,29 @@
+/usr
+/usr/lib
+ libxcb-atom.so
+ libxcb-atom.so.1
+ libxcb-atom.so.1.0.0
+ libxcb-aux.so
+ libxcb-aux.so.0
+ libxcb-aux.so.0.0.0
+ libxcb-event.so
+ libxcb-event.so.1
+ libxcb-event.so.1.0.0
+ libxcb-icccm.so
+ libxcb-icccm.so.1
+ libxcb-icccm.so.1.0.0
+ libxcb-image.so
+ libxcb-image.so.0
+ libxcb-image.so.0.0.0
+ libxcb-keysyms.so
+ libxcb-keysyms.so.1
+ libxcb-keysyms.so.1.0.0
+ libxcb-property.so
+ libxcb-property.so.1
+ libxcb-property.so.1.0.0
+ libxcb-render-util.so
+ libxcb-render-util.so.0
+ libxcb-render-util.so.0.0.0
+ libxcb-reply.so
+ libxcb-reply.so.1
+ libxcb-reply.so.1.0.0

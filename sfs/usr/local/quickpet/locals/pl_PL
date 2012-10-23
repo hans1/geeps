@@ -1,0 +1,262 @@
+#!/bin/bash
+##Slickpet pl_PL
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=polski/polish
+#translator=fafik ##TRANSLATORS please name your version 400 so I know ..Thankyou
+#        ****************LATEST I December 2010************************
+#        ****************Bugfix 07/01/2010 - forgotten section "browser installer", uuups! ********
+
+##################                    PLEASE NOTE                               ###############
+#if you are unfamiliar with coding then you may notice "\n" in some lines                     #
+#this means "new line" and it is important. I realise grammar is different in each language   #
+#do place this "\n" every 6 to 10 words or 40 to 50 characters                                #
+##################                  THANK  YOU                                  ###############
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="Zakończ"
+export LOC_ERROR="Błąd"
+export LOC_WARNING="Ostrzeżenie"
+export LOC_YES="Tak"
+export LOC_NO="Nie"
+export LOC_QUIT="Zakończ "
+export LOC_HELP="Pomoc"
+export LOC_INFO="Info"
+export LOC_FILE="Plik"
+export LOC_BRS=" jest ustawiony jako przeglądarka domyślna. \nDla np. Pobierania plików, zaleca się zainstalowanie \nprzeglądarki z większym zasobem opcji"
+export LOC_CANTINSTALL="Za mało pamięci dla poprawnego procesu instalacji."
+export LOC_WARNINGINSTALL="Po instalacji wolna przestrzeń Pupsave \nwyniesie mniej niż 45MB.\nKontynuować ?"
+
+#browser installer
+export LOC_001="Zapraszamy do instalacji przeglądarki"
+export LOC_002="Aktywuj połączenie z siecią i wybierz przeglądarkę."
+export LOC_003="Porada"
+export LOC_004="Jeśli twoja pamięć RAM wynosi mniej niż 256 MB, zalecamy najpierw stworzyć osobisty plik bezpieczeństwa (Pupsave)."
+export LOC_005="Prosta przeglądarka - jest już zainstalowana"
+export LOC_006="Naciśnij, aby zainstalować Firefoksa"
+export LOC_007="Naciśnij, aby zainstalować Seamonkey"
+export LOC_008="Naciśnij, aby zainstalować Chromium"
+export LOC_009="Naciśnij, aby zainstalować Opera"
+export LOC_010="Kliknij, aby zmienić istniejącą, prostą przeglądarke na domyślną"
+export LOC_011="Naciśnij, aby zainstalować Iron"
+export LOC_012="Naciśnij, aby zainstalować Pidgin"
+
+#yaf messages
+export LOC_101="Błąd: Pobieranie nie działa. Proszę połączyć się z Internetem."
+export LOC_102="Proszę czekać ..."
+export LOC_103="Błąd: Strona aktualizacji nie odpowiada. Proszę sprawdzić połączenie z siecią lub spróbować ponownie później."
+export LOC_104="Nowe aktualizacje są dostępne dla Slacko Puppy"
+export LOC_105="Obecnie nie ma aktualizacji dla Slacko Puppy"
+export LOC_106a="Poczekaj na"
+export LOC_106b="Pobieranie. Zostaniesz poproszony o potwierdzenie instalacji."
+export LOC_107="Koniec limitu czasu połączenia. Spróbuj ponownie później."
+export LOC_108="Błąd: Pobieranie nie powiodło się. Spróbuj ponownie później. Pobieranie zostanie wznowione."
+export LOC_109="Błąd: Pakiet nie może być zainstalowany. Prosimy spróbować ponownie."
+export LOC_110a="Instalacja przebiegła pomyślnie"
+export LOC_110b=""							#split for Swedish grammar, maybe others too #Mhhp mave: nothing in german
+export LOC_111=" Przeglądarka została ustawiona jako domyślna "
+export LOC_112="Slickpet już działa. Proszę czekać ..."
+export LOC_113="Proszę czekać, szukanie pakietu ..."
+
+#NEW yaf messages
+export LOC_114="Sterowniki nie mogą być aktywowane podczas pobierania innych plików." #NEW 1 December
+export LOC_115="Prosimy nie uruchamiać innego pobierania, podczas pobierania sterowników."
+export LOC_116="Niestety, pakiet nie został znaleziony"
+export LOC_117="Obecnie maksymalna liczba rozszerzeń SFS została wykorzystana. Proszę usunąć niepotrzebne pliki SFS w 'Boot Manager', aby aktywować nowe. "
+
+#xmessages
+#export LOC_201=deprecated
+export LOC_202="Witamy w Puppy Slacko Slickpet
+	Istnieją trzy główne zakładki dla pakietów PET.Format pakietów Puppy jest bardzo prosty.
+Po wybraniu i kliknięciu na ikonę pakietu (PET),
+jest on pobierany z repozytorium Puppy ( repozytorium
+sieciowe ). W przypadku wolnych połączeń internetowych, może to chwile potrwać
+-proszę mieć cierpliwość. Następnie włączy się PPM
+(Package Manager Puppy) i zada kilka prostych pytań, aby następnie
+zainstalować oprogramowanie. Następnie pojawi się komunikat o postępie instalacji.
+	W ustawieniach można wybrać repozytorium (źródła oprogramowania),
+które działa najlepiej. Jeśli wybrane jest zbyt wolne lub
+nie jest osiągalne, po prostu wybierz inne.
+	Istnieje również zakładka 'Sterowniki': tutaj znajdziesz pasujące sterowniki karty graficznej.
+Dla Nvidia, istnieją rożne sterowniki w Menedżerze pakietów Puppy (PPM). Dla Radeon i
+Intel zaleca sie pakiet 'High Xorg'.
+	Istnieje również dodatkowa zakładka 'Nowości': tutaj znajdziecie informacje
+na temat poprawek i ulepszeń dla Slacko Puppy.
+	W przypadku trudności, skorzystaj z pomocy w menu 'Wsparcie'(Support).
+Nie zapomnij:inne pakiety oprogramowania można zainstalować za pomocą
+Package Manager Puppy, który znajduje się menu głównym. 
+Możesz również korzystać z pakietów  Slacko Lynx (Ubuntu).
+	Miłej zabawy z Slacko Puppy!"
+	
+export LOC_203="Proszę pamiętać, że pakiety znajdujące sie w aplikacji Slickpet 
+zostały skompilowane przez entuzjastów systemu Puppy i tym samym nie podlegają 
+żadnej gwarancji.
+
+Wiele pakietów jest objętych licencją GNU GPL, lub jego odmianą.
+Większość z nich jest regularnie aktualizowana do najnowszej wersji, 
+aby utrzymać system na bieżąco.
+
+Aby skorzystać z tej możliwości, ważne jest zainstalowanie aktualnej wersji 
+przeglądarki internetowej.
+Proszę nacisnąć przycisk przeglądarki w celu instalacji."
+
+export LOC_204="Jeżeli Slickpet nie zadziała nie jest to jeszcze powodem do zmartwień.
+
+Wszystkie pakiety dostępne są w Menedżerze Pakietów Puppy, po naciśnięciu ikony 
+'Install' na pulpicie.
+W menu Slickpet 'Wsparcie'(Support) jest wpis 'Slickpet w sieci', który połączy 
+nas ze stroną internetową pakietów oprogramowania Slickpet dostępnych do pobrania.
+
+W zakładce #Więcej programów', można znaleźć dodatkowe informacje i linki do programów,
+które działają w Slacko Puppy. Źródła repozytoriów można edytować w menu 'Plik'
+w kategorii 'Ustawienia', np. zmienić serwer, na jeden, który jest bliżej
+lub jest szybszy. Zmiany zapisane zostaną na stałe. Podobnie,
+można edytować ustawienia dotyczące tego, czy pliki pobrane maja zostać zapisane 
+na stałe w /root/.quickpet/Downloads.
+
+Pobrane pakiety zostaną zainstalowane w pliku pupsave (lupusave) instalacji 
+Slacko Puppy. Kliknij na katalog 'Pobrane' w kategorii 'Wsparcie', aby wyświetlić  
+zainstalowane pakiety. Wedle woli, można je np. przenieść w razie potrzeby. 
+Uwaga!!! Opcja 'Usuń pobrane pakiety' usunie wszystkie (!) istniejące w katalogu 
+pakiety oprogramowania.
+
+Zakładka 'Pliki SFS' zawiera specjalne, bardzo duże programy. Dzięki specjalnemu formatowi .SFS nie są one instalowane bezpośrednio w pliku pupsave i nie zajmują zbędnej przestrzeni.
+Więcej informacji na ten temat można znaleźć w menu 'SFS' we wpisie 'Wsparcie SFS'
+
+Miłej zabawy z Slacko Puppy!
+Zespół Puppy." 
+
+#gtkdialog Be careful with escape character "\" here.. 
+#prefs
+export LOC_298="Deaktywuj box w celu stałego zapisu pobieranych pakietów."  # in orig. en_EN-file away since 12/01/2010 (?)
+export LOC_299="Pakiety zostaną usunięte po restarcie z folderu /tmp."
+export LOC_300="Menedżer pakietów Puppy (PPM)"
+export LOC_301="Ustawienia Slickpet"
+# export LOC_302="Zmiany zostaną zapisane po aktywacji'$LOC_OK'."
+export LOC_303="Wybierz repozytorium (źródła) "
+
+#main gui
+export LOC_304="Ustawienia"
+export LOC_305="w sieci"
+export LOC_306="Prawne"
+export LOC_307="Wsparcie"
+export LOC_308="Czytaj"
+export LOC_309="Witamy w"
+export LOC_310="To jest szybka alternatywa do Menedżera pakietów Puppy. Kliknij na ikonę programu w celu automatycznego pobrania programu i instalacji."
+export LOC_311="Popularne"
+export LOC_312="Internetowe"
+export LOC_313="Przydatne"
+export LOC_314="Sterowniki"
+export LOC_315="Aktualności"
+export LOC_316="Wybierz pakiet do instalacji"
+export LOC_317="Wybierz przeglądarkę lub program pocztowy, do instalacji"
+export LOC_318="Wybierz pakiet Pet"
+export LOC_319="Wybierz sterownik"
+export LOC_350="Więcej "
+export LOC_351="Pobrane"
+export LOC_352="Usuń pobrane pakiety"
+export LOC_355="O programie"
+export LOC_356="Informacje o karcie graficznej"
+
+#Tooltips
+export LOC_353="Klikniecie myszką pokaże pobrane do tej pory programy. Możesz je przenieść przy pomocy myszki trzymając przycisk ('drag and drop') do innego folderu, np. gdy chcesz odciążyć katalog 'Pobrane' lub zaoszczędzić miejsce w pliku pupsave."
+export LOC_354="Kliknięcie myszką (!) usunie wszystkie pobrane pakiety."
+export LOC_357="w celu pobrania, user=puppy, password=linux"
+export LOC_360="Istnieją zależności dla"
+#pets
+export LOC_320="Gimp  Edycja obrazu 23MB" 
+export LOC_321="Pwidgets  Widżet pulpitu 283KB"
+export LOC_322="Audacity  Edytor audio 6.7MB"
+export LOC_323="Songbird  zarządzanie muzyką 17MB"
+export LOC_324="Wine  programy Windows w Linux 17MB"
+export LOC_325="Clan Bomber  Gra 5.3MB"
+export LOC_326="Google Earth  Wymaga 'High Graphics' 44MB"
+#internet
+export LOC_501="Firefox  popularna przeglądarka Mozilla  15MB"
+export LOC_502="Seamonkey  pakiet programów internetowych 15MB"
+export LOC_503="Chromium  otwarty projekt przeglądarki internetowej 19MB"
+export LOC_504="Opera  przeglądarka internetowa 16MB"
+export LOC_505="Thunderbird  Program E-Mail 11MB"
+export LOC_506="Kompozer  edytor stron www 9.2MB"
+export LOC_507="Iron  fork przeglądarki internetowej Chrome 27MB"
+export LOC_508="Pidgin  wieloplatformowy komunikator internetowy 3MB"
+#more pets
+export LOC_601="VLC odtwarzacz multimedialny 28MB"
+export LOC_602="Dia  tworzenie diagramów  4.3MB"
+export LOC_603="Cinelerra edycja Video   15MB"
+export LOC_604="JRE Java   36MB"
+export LOC_605="Pdfedit edytor PDF  5.2MB"
+export LOC_606="Inkscape edytor grafiki wektorowej, 23MB"
+
+#drivers
+#export LOC_389="Upewnij się, że masz co najmniej 80 MB wolnego miejsca, zanim przystąpisz do instalacji sterowników karty graficznej." ##NEW
+export LOC_390="Niektóre systemy potrzebują tych dodatkowych sterowników aby móc korzystać z zainstalowanego sprzętu."
+#export LOC_391="RadeonHD dla młodszych kart graficznych ATI  372KB" deprecated, no harm to leave it though
+export LOC_392B="Wybierz zalecany sterownik"
+export LOC_392C="Zaleca się stosowanie najnowszych sterowników"
+#export LOC_392Att="Dla starszych kart graficznych NVIDIA"
+#export LOC_392Btt="Dla młodszych i niektórych nowszych kart graficznych Nvidia"
+#export LOC_392Ctt="Dla wszystkich nowych kart graficznych Nvidia"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.35 14MB"
+export LOC_392x="Xorg High-GLX dla kart Radeon- i Intel 14MB"
+export LOC_392m="Mesa-GLX dla kart Radeon- i Intel" #as above
+export LOC_392h="Kliknij tutaj, aby uzyskać pomoc w instalacji"
+#export LOC_392j="Nvidia-glx 256.36 dla nowszych kart graficznych Nvidia 14MB" #####added
+export LOC_392a="Nvidia-glx dla starszych kart graficznych NVIDIA"
+export LOC_392tt="Kliknij tutaj, aby wybrać jeden trzech sterowników. Jeśli nie wiesz, co następnie- wybierz przycisk powyżej" ##changed
+export LOC_392vid="Kliknij tutaj, aby przetestować kartę graficzną"
+export LOC_392ttvid="Test karty graficznej w celu ustalenia odpowiedniego sterownika" 
+#export LOC_700="\n Jeśli wiesz, że jest to dość nowy \n model karty, kliknij przycisk "Nie" i \n zainstaluj sterowniki Nvidia w Slickpet.\n W innym przypadku, kliknij "Tak", a Twoja \n przeglądarka przeniesie Cię do strony Nvidia. \n Istnieją inne sterowniki Nvidia w PPM. \n Twój model karty to:"
+export LOC_701="\n Użyj pakiet sterowników 'Xorg_High' w Slickpet "
+#export LOC_702="Masz"
+#export LOC_703="Masz"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language###########
+export LOC_704="Karta graficzna"
+export LOC_705="Kliknij, aby otworzyć przeglądarkę i przetłumaczyć tekst powyżej" ###New.. too hard to translate here, better let browser do it.
+export LOC_706="Musisz mieć zainstalowaną  przeglądarkę w Twoim języku"
+
+#News
+#Update IS now "News"
+export LOC_500="Ten duży przycisk przeniesie Cię do strony Slacko Puppy, Tu znajdziesz najnowsze informacje o systemie. Od czasu do czasu pojawiać się tam będą aktualizacje dla Slacko Puppy." ##New
+export LOC_500B="Ten duży przycisk przeniesie Cię do strony Wiki Puppy Slacko. Tam znajdziesz najnowsze wiadomości."
+
+#Xdialog
+#export LOC_401="Slacko Puppy instalacja sterowników"
+#export LOC_402="Został wybrany do instalacji"
+#export LOC_403="Jeśli sterownik grafiki (rozszerzenie pliku.'Pet') został zainstalowany,\n należy przejść do wiersza  poleceń,\n a następnie wystartować 'xorgwizard'.\n W menu głównym  znajduje się 'Shutdown / Zamknij' (lub podobne),\n oraz opcja 'Exit to prompt', którą należy wybrać.\n Następnie wpisujemy 'xorgwizard' i postępujemy według poleceń.\n Po zakonczeniu procedury wpisujemy 'xwin' w wierszu poleceń,\n aby wrócić do środowiska graficznego.\n Kontynuować?"
+#Clear Downloads
+export LOC_801="Usuń pobrane"
+export LOC_802="Chcesz usunąć do tej pory pobrane pakiety (.pet). \n Czy na pewno?"
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" pojawi się polecenie, aby zapisać to jako pakiet pet"
+export LOC_902=". Pojawi się polecenie, aby wystartować komputer na nowo, w celu zakończenia instalacji."
+export LOC_903="Nie załadowano SFS"
+export LOC_910="Kliknij na odpowiedni"
+export LOC_910tt="Kliknij, aby zobaczyć załadowane SFS"
+export LOC_911="pobieranie rozpoczęte."
+export LOC_920="Dostępne pakiety SFS"
+export LOC_920="Opis"
+export LOC_950="Nie zapomnij ponownie uruchomić komputer, zanim przystąpisz do instalacji kolejnych SFS."
+export LOC_951="Zostało już pobrane."
+export LOC_952="Sprawdź czy Bootmnanager jest już załadowany."
+export LOC_953="Za mało pamięci do instalacji."
+export LOC_954="Zakończ"
+export LOC_955="Ze względu na ograniczenia systemu pamięci RAM, brakuje miejsca na instalację."
+export LOC_956="Proszę czekać ... Pobieranie dużych plików .SFS może chwile potrwać."
+
+#NEW stuff AS OF 1 DECEMBER 2010
+export LOC_960="Kliknij $LOC_QUIT jeśli nie wiesz, co zrobić z pobraniem"
+export LOC_961a="Kliknij"
+export LOC_961b="Przycisk rozpocznie bezpośrednie pobranie sterownika"
+export LOC_962="Kliknij Downloads/Pobieranie"
+export LOC_970a="Powinieneś zainstalować przeglądarkę, która jest w stanie tłumaczyć, w celu przetłumaczenia tej strony."
+export LOC_970b="Możesz przetłumaczyć tą stronę za pomocą przeglądarki, z opcją tłumaczeń on-line."
+#NEW stuff AS OF 6 DECEMBER 2010
+export LOC_971a="Aktualizacja została zainstalowana i wydaje się być dostępna. Kliknij"
+export LOC_971b="Aktualizacja została zainstalowana i wydaje się być dostępna. Można to sprawdzić przez uruchomienie polecenia 'glxgears' w oknie terminalu. Kliknij"
+export LOC_972="zainstalowano, ale sterwonik nie działa. Kliknij"
+
+#END
+

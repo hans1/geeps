@@ -1,0 +1,35 @@
+#!/bin/sh
+#(c) Copyright Barry Kauler Dec. 2010. License GPL v3 /usr/share/doc/legal.
+# it is possible for a pc to have an on-board modem chip that is not used,
+# instead there is a plugin card, so have put the alsa-modem-detection after
+# detecting pci (slamr.ko) and usb (slusb.ko) smartlink modems.
+#v406 RE Prioritize and select modem type to test based on ($0) call name (USB='_slmodemusb', PCI='slmodem', ALSA='~slmodemsnd').
+
+#v405 if a different modem selected, quit...
+[ -h /dev/modem ] && [ "`readlink /dev/modem`" != "ttySL0" ] && exit
+
+[ ! $1 ] && exit
+[ "$1" != "start" ] && exit
+[ "` ps aux | grep ' \/usr\/sbin\/slmodemd '`" != "" ] && exit #v406 Ensure SL daemon used by only one modem type
+
+#COUNTRY_NAME is in /etc/countryinfo, created by /etc/rc.d/rc.country at bootup...
+OPTCOUNTRY=""
+if [ -f /etc/countryinfo ];then
+ . /etc/countryinfo
+ GPATTERN="|${COUNTRY_NAME}|"
+ ALLCOUNTRIES="|`/usr/sbin/slmodemd --countrylist 2>&1 | cut -f 2 -d ' ' | tr '\n' '|'`"
+ [ "`echo -n "$ALLCOUNTRIES" | grep "$GPATTERN"`" != "" ] && OPTCOUNTRY="--country=${COUNTRY_NAME}"
+fi
+
+# slusb.ko is a usb modem driver...
+if /sbin/pup_event_backend_modprobe_protect --modcheck=slusb ;then
+ echo "#/bin/sh" > /usr/sbin/slmodemdshell
+ echo "/usr/sbin/slmodemd $OPTCOUNTRY /dev/slusb0" >> /usr/sbin/slmodemdshell
+ sync
+ chmod 755 /usr/sbin/slmodemdshell
+ ln -snf ttySL0 /dev/modem
+ /usr/sbin/slmodemdshell &
+ exit
+fi
+
+###END###

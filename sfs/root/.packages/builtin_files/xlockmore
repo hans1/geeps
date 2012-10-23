@@ -1,0 +1,7 @@
+/etc
+/etc/X11
+/etc/X11/app-defaults
+ XLock
+/usr
+/usr/bin
+ xlock

@@ -1,0 +1,31 @@
+/root
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+/root/.config/rox.sourceforge.net/OpenWith/.inode_directory
+/root/.config/rox.sourceforge.net/OpenWith/.inode_directory/Search with Pfind
+/usr
+/usr/local
+/usr/local/apps
+/usr/local/apps/Pfind
+ AppInfo.xml
+ AppRun
+ .DirIcon
+/usr/local/bin
+ pfind
+/usr/local/pfind
+ box_input
+ box_ok
+ box_splash
+ box_yesno
+ func
+ func_filter
+ func_openastext
+ func_openwith
+ func_run
+ func_showlocation
+/usr/local/pfind/locals
+ en_US:english
+/usr/share
+/usr/share/applications
+ pfind.desktop

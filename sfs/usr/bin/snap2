@@ -1,0 +1,1501 @@
+#! /bin/bash
+#    Copyright 2011 Lloyd Standish
+#    http://www.crnatural.net/snap2
+#    lloyd@crnatural.net
+
+#    This file is part of snap2.
+
+#    snap2 is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    snap2 is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+
+#    You should have received a copy of the GNU General Public License
+#    along with snap2.  If not, see <http://www.gnu.org/licenses/>.
+
+# snytax snap2 [settingsdir]
+
+export version="4.21"
+export requiresremotever="4.13"
+function dowchooser()
+{
+	export DOW_DIALOG="<frame Choose one or more days><hbox><vbox>
+	<checkbox><label>Monday</label><variable>$1_mon</variable><visible>disabled</visible></checkbox>
+	<checkbox><label>Tuesday</label><variable>$1_tue</variable><visible>disabled</visible></checkbox>
+	<checkbox><label>Wednesday</label><variable>$1_wed</variable><visible>disabled</visible></checkbox>
+	<checkbox><label>Thursday</label><variable>$1_thu</variable><visible>disabled</visible></checkbox></vbox><vbox>
+	<checkbox><label>Friday</label><variable>$1_fri</variable><visible>disabled</visible></checkbox>
+	<checkbox><label>Saturday</label><variable>$1_sat</variable><visible>disabled</visible></checkbox>
+	<checkbox><label>Sunday</label><variable>$1_sun</variable><visible>disabled</visible></checkbox>
+	</vbox></hbox></frame>"
+}
+
+function progressbar()
+{
+	if [ ! "$2" ]; then
+		2="Please wait while I process your request."
+	fi
+export PROGRESS_DIALOG="
+<vbox>
+  <frame Progress>
+    <text>
+      <label>$2</label>
+    </text>
+    <progressbar>
+      <label>Progress...</label>
+<input>for i in 0 10 20 30 40 50 60 70 80 90; do echo \$i; sleep 0.3; done</input>
+      <action type=\"exit\">Ready</action>
+    </progressbar>
+  </frame>
+  <hbox>
+   <button cancel></button>
+  </hbox>
+ </vbox>
+"
+($GTKDIALOG --program=PROGRESS_DIALOG > /dev/null) &
+child1=$!
+	while ps -p $1 -o comm= > /dev/null; do
+	sleep 0.3
+	done
+	kill $child1
+}
+
+
+function parseitem()
+{
+#takes filename ar arg, returns xml si hay
+	export TEMP_DIALOG=""
+	thefile="$1"
+	if [ -s "$thefile" ]; then
+		while read i
+		do
+			# Ignore coments and blank lines
+			i="$(echo $i | sed 's/#.*$//')"
+			if [ -z "$i" ] || expr "$i" : "[ \t]*$" > /dev/null; then
+				continue
+			fi
+			excludefile="$(echo $i | sed 's/\///g')"
+			ast=""
+			if [ -f "$excludefiledir/${prefix}$excludefile" ]; then
+				ast="x "
+			fi
+			TEMP_DIALOG="$TEMP_DIALOG<item>${ast}$i</item>"
+		done < "$thefile"
+	fi
+}
+
+function gtkmsgbox()
+{
+	export MSG_DIALOG="<frame Message><hbox>
+    <text>
+    <label>$1</label>
+    </text>
+   </hbox><hbox>
+    <button ok></button>"
+    if [ ! "$2" = "" ]; then
+    	MSG_DIALOG="$MSG_DIALOG<button cancel></button>"
+    fi
+    MSG_DIALOG="$MSG_DIALOG</hbox></frame>"
+	I=$IFS; IFS=""
+	for STATEMENTS in  $($GTKDIALOG --program=MSG_DIALOG); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	if [ "$EXIT" = "Cancel" ]; then
+		return 1
+	fi
+}
+
+function ckandsave()
+{
+	newpath="$2"
+	savetofile="$1"
+	cont=0
+	if ! echo "$newpath" | grep '^/' >/dev/null; then
+		gtkmsgbox "Backup paths should be absolute (begin with '/')"
+		return 0
+	elif grep -x "$newpath" "$savetofile" > /dev/null; then
+		gtkmsgbox "The backup path you entered is already in use"
+		return 0
+	elif [ ! -d "$newpath" ]; then
+		gtkmsgbox "Warning: the backup path you entered does not yet exist.  Choose 'OK' to save this path or 'Cancel' to not save this path." 1
+		cont=$?
+	fi
+	if [ "$cont" -eq 0 ]; then
+		echo "$newpath" >> "$savetofile"
+	fi
+}
+
+function showfile()
+{
+	FSIZE=$(stat -c%s "$1")
+	if [ "$logviewer" != "internal" ]; then
+		"$logviewer" $1
+	elif [ "$FSIZE" -gt 200000 ]; then
+		errmsg="Your file $1 is over 200K - too big to view by gtkdialog. Click OK to view with vi (if found), CANCEL to exit without viewing. Note that if you specify a log  viewer program (BACKUP STORAGE tab), vi will never be used."
+		gtkmsgbox  "$errmsg" 1
+		if [ $? -eq 0 ] && which vi > /dev/null; then
+			$XTERM $esw vi $1
+		fi
+	else
+		export FILE_DIALOG="<vbox>
+	<frame snap2 version $version>
+	<edit editable=\"false\">
+	<width>575</width><height>650</height>
+	<input file>$1</input>
+	</edit>
+	</frame>
+	<hbox>
+	<button><label>Visit www.crnatural.net/snap2</label><action>$BROWSER http://www.crnatural.net/snap2 &</action></button>
+	<button ok></button>
+	</hbox>
+	</vbox>"
+	$GTKDIALOG --program=FILE_DIALOG > /dev/null
+	fi
+}
+
+export MYHOME=
+#if [ "$#" -gt 1 ]; then
+#	USER="$2"
+#fi
+
+if [ "$USER" != "root" ]; then
+    MYHOME=/home
+fi
+MYHOME="$MYHOME/$USER"
+if which gtkdialog >/dev/null; then export GTKDIALOG=gtkdialog
+elif which gtkdialog3 >/dev/null; then export GTKDIALOG=gtkdialog3
+else
+	echo "Please install gtkdialog before running me!"
+	exit 1
+fi
+export settingsdir="default.set"
+if [ "$#" -gt 0 ]; then
+	if ! echo "$1" | grep '^[^ 	/]*\.set$' >/dev/null; then
+		gtkmsgbox "Settings directories must end in '.set' and cannot contain spaces or directories."
+		exit 1
+	else
+		settingsdir="$1"
+	fi
+fi
+#check dependencies
+lacking=""
+if [ ! `which scp` ]; then
+	lacking="$lacking openssh-client"
+fi
+if [ ! `which sed` ]; then
+	lacking="$lacking sed"
+fi
+if [ ! `which grep` ]; then
+	lacking="$lacking grep"
+fi
+if [ "$lacking" != "" ]; then
+	gtkmsgbox "Please install the following packages, required to run snap2: $lacking"
+  	exit 1
+fi
+if [ ! `which snap2engine` ]; then
+	lacking="$lacking snap2engine"
+fi
+if [ ! `which rsync` ]; then
+	lacking="$lacking rsync"
+fi
+if [ ! `which snap2shell` ]; then
+	lacking="$lacking snap2shell"
+fi
+if [ ! "$lacking" = "" ]; then
+	gtkmsgbox "Warning: there are missing programs.  You will not be able to run any backups until the following are installed: $lacking"
+fi
+if which defaulthtmlviewer >/dev/null;	then export BROWSER=defaulthtmlviewer 
+#set browser for helpfile
+	elif which mozilla >/dev/null;	then export BROWSER=mozilla
+	elif which opera >/dev/null;	then export BROWSER=opera
+	elif which firefox >/dev/null;	then export BROWSER=firefox
+	elif which konqueror >/dev/null;then export BROWSER=konqueror
+fi
+
+export esw='-e'
+export XTERM
+if [ "$XTERM" = "" ]; then
+	if which rxvt >/dev/null;then XTERM=rxvt
+	elif which konsole >/dev/null; then XTERM=konsole
+	elif which gnome-terminal >/dev/null; then XTERM=gnome-terminal
+	elif which konsole >/dev/null; then XTERM=konsole
+	elif which xterm >/dev/null; then XTERM=xterm
+	else
+		gtkmsgbox "I can't find a terminal emulator program.  Please install a terminal emulator such as rxvt or xterm, or set the XTERM environmental variable to the name of your oddball terminal emulator."
+		exit 1
+	fi
+elif [ ! `which "$XTERM"` ]; then
+	gtkmsgbox "ERROR: Cannot find your XTERM program $XTERM in \$PATH"
+	exit 1
+fi
+
+if [ "$XTERM" = "gnome-terminal" ]; then
+	esw='-x'
+fi
+
+maintab='page="0"'
+sourcetab='page="0"'
+
+while true # outermost loop. jump here when settings file should be read from disk
+do
+if [ ! -d "$MYHOME/.snap2/$settingsdir" ]; then
+	mkdir -p "$MYHOME/.snap2/$settingsdir"
+fi
+
+export excludefiledir="$MYHOME/.snap2/$settingsdir/exclude"
+
+if [ ! -d "$excludefiledir" ]; then
+	mkdir "$excludefiledir"
+fi
+if [ ! -f "$excludefiledir/default" ]; then
+cat << eof > "$excludefiledir/default"
+- *~
+- *.log
+- temp/
+- tmp
+eof
+
+fi
+backpathfile="$MYHOME/.snap2/$settingsdir/snapshotsourcepaths"
+mirrorpathfile="$MYHOME/.snap2/$settingsdir/mirrorsourcepaths"
+
+if [ ! -f "$backpathfile" ]; then
+	echo "# backup source paths" > "$backpathfile"
+	echo "# If editing outside of snap2, each line must end in newline." >> "$backpathfile"
+	echo "# Comment lines start with a '#'" >> "$backpathfile"
+fi
+if [ ! -f "$mirrorpathfile" ]; then
+	echo "# backup source paths" > "$mirrorpathfile"
+	echo "# If editing outside of snap2, each line must end in newline." >> "$mirrorpathfile"
+	echo "# Comment lines start with a '#'" >> "$mirrorpathfile"
+fi
+
+# Set defaults, needed for new setting file creation
+export remotelogin
+export remotehost
+dst="none"
+remotehost="none"
+remotelogin="$USER"
+bol_enableremote=""
+bol_adddefaultexclude="true"
+bol_makedestroot="true"
+bol_storelog="true"
+bol_allownoreference="true"
+bol_remoteauth="false"
+bol_compresslog="true"
+bol_rsynccompression="true"
+updateremote="false"
+lastsnapshot="never"
+lastmirror="never"
+export logviewer="internal"
+
+if [ -f "$MYHOME/.snap2/$settingsdir/settings" ]; then
+	. "$MYHOME/.snap2/$settingsdir/settings" 2>/dev/null
+fi
+
+if [ "$bol_enableremote" = "" ]; then
+	if [ "$remotehost" != "" -a "$remotehost" != "none" ]; then
+	# backupward compatibility
+		bol_enableremote="true"
+	else
+		bol_enableremote="false"
+	fi
+fi
+
+cd "$MYHOME/.snap2"
+cbitems="<item>$settingsdir</item>"
+for i in `ls -d1F *.set 2>/dev/null | grep '/$' | sed 's/\/$//' | grep -vx "$settingsdir"`
+do
+cbitems="$cbitems<item>$i</item>"
+done
+
+DST="$dst"
+RECENT="$recent"
+DAILY="$daily"
+WEEKLY="$weekly"
+MONTHLY="$monthly"
+REMOTEHOST="$remotehost"
+REMOTELOGIN="$remotelogin"
+REMOTEHOME="$remotehome"
+LOGVIEWER="$logviewer"
+
+BOL_ENABLEREMOTE="$bol_enableremote"
+BOL_ADDDEFAULTEXCLUDE=$bol_adddefaultexclude
+BOL_MAKEDESTROOT=$bol_makedestroot
+BOL_STORELOG=$bol_storelog
+BOL_ALLOWNOREFERENCE=$bol_allownoreference
+BOL_REMOTEAUTH=$bol_remoteauth
+BOL_COMPRESSLOG=$bol_compresslog
+BOL_RSYNCCOMPRESSION=$bol_rsynccompression
+
+if [ "$remotehome" = "" ]; then
+	if [ "$remotelogin" = "root" ]; then
+		remotehome="/root"
+	else
+		remotehome="/home/$remotelogin"
+	fi
+fi
+
+if [ "$bol_adddefaultexclude" = "" ]; then
+	bol_adddefaultexclude="true"
+fi
+if [ "$bol_makedestroot" = "" ]; then
+	bol_makedestroot="true"
+fi
+if [ "$bol_storelog" = "" ]; then
+	bol_storelog="true"
+fi
+if [ "$bol_allownoreference" = "" ]; then
+	bol_allownoreference="true"
+fi
+if [ "$bol_remoteauth" = "" ]; then
+	bol_remoteauth="false"
+fi
+if [ "$bol_compresslog" = "" ]; then
+	bol_compresslog="true"
+fi
+if [ "$bol_rsynccompression" = "" ]; then
+	bol_rsynccompression="true"
+fi
+if [ "$logviewer" = "" ]; then
+	logviewer="internal"
+fi
+
+if [ "$bol_enableremote" = "true" ]; then
+	bol_enableremoteck=' active="true"'
+else
+	bol_enableremoteck=''
+fi
+if [ "$bol_adddefaultexclude" = "true" ]; then
+	bol_adddefaultexcludeck=' active="true"'
+else
+	bol_adddefaultexcludeck=''
+fi
+if [ "$bol_makedestroot" = "true" ]; then
+	bol_makedestrootck=' active="true"'
+else
+	bol_makedestrootck=''
+fi
+if [ "$bol_storelog" = "true" ]; then
+	bol_storelogck=' active="true"'
+	complogvis="enabled"
+else
+	complogvis="disabled"
+	bol_storelogck=''
+fi
+if [ "$bol_compresslog" = "true" ]; then
+	bol_compresslogck=' active="true"'
+else
+	bol_compresslogck=''
+fi
+if [ "$bol_allownoreference" = "true" ]; then
+	bol_allownoreferenceck=' active="true"'
+else
+	bol_allownoreferenceck=''
+fi
+if [ "$bol_remoteauth" = "true" ]; then
+	bol_remoteauthck=' active="true"'
+else
+	bol_remoteauthck=''
+fi
+if [ "$bol_rsynccompression" = "true" ]; then
+	bol_rsynccompressionck=' active="true"'
+else
+	bol_rsynccompressionck=''
+fi
+
+if [ "$remotehost" = "" -o "$bol_enableremote" = "false" ]; then
+	remotehost="none"
+fi
+if [ "$remotehost" = "none" ]; then
+	remotevis="disabled"
+else
+	remotevis="enabled"
+fi
+
+if [ "$recent" = "" ]; then
+	recent=8
+fi
+if [ "$daily" = "" ]; then
+	daily=7
+fi
+if [ "$weekly" = "" ]; then
+	weekly=7
+fi
+if [ "$monthly" = "" ]; then
+	monthly=4
+fi
+if [ "$dst" = "" ]; then
+	dst="none"
+fi
+if [ "$remotelogin" = "" ]; then
+	remotelogin="$USER"
+fi
+
+FILE_DIRECTORY=""
+snapsel=
+mirrorsel=
+sbutvis="enabled"
+mbutvis="enabled"
+
+if [ "$dst" = "none" -o `grep -cv "^\s*#" "$backpathfile"` -eq 0 -o "$lacking" != "" ]; then
+	sck=' sensitive="false"'
+else
+	sck=''
+fi
+if [ "$dst" = "none" -o `grep -cv "^\s*#" "$mirrorpathfile"` -eq 0 -o "$lacking" != "" ]; then
+	mck=' sensitive="false"'
+else
+	mck=''
+fi
+prefix=""
+parseitem $backpathfile
+
+if [ "$TEMP_DIALOG" = "" ]; then
+	TEMP_DIALOG="<text><label>No top-level snapshot-type backup directories are configured. You can add one below.</label></text>
+	<text use-markup=\"true\"><label>\"<b>snapshot</b> type backups create a series of backups, each in its own directory, representing the state of your files at different points in time.  This allows you to recover from any of several past versions of files - including, of course, files you have deleted from your computer.\"</label></text>"
+	sbutvis="disabled"
+else
+	TEMP_DIALOG="<list><variable>snapsel</variable>$TEMP_DIALOG</list>"
+fi
+ADD_DIALOG="<vbox><frame Snapshot Backup Source Directories>$TEMP_DIALOG</frame>
+<text xalign=\"0\"><label>x = has custom exclude patterns</label></text>
+<button tooltip-text=\"Files to exclude from backup for the highlighted backup source path\"><label>Exclusions for Selected Snapshot Entry</label><visible>$sbutvis</visible></button>
+<button><label>Delete Selected Snapshot Entry</label><visible>$sbutvis</visible></button>
+<button tooltip-text=\"Edit all snapshot-type source path entries\"><label>Snapshot Source Path Editor</label></button>
+<frame New Top-Level Source Directory>
+<hbox><entry accept=\"directory\" tooltip-text=\"Either type in a absolute-path directory name, or click the icon at right to choose a directory on your computer. When done, click a button at right to actually add the directory.\">
+<label>Select a Directory</label>
+<variable>FILE_DIRECTORY</variable>
+</entry>
+<button><input file stock=\"gtk-open\"></input><variable>FILE_BROWSE_DIRECTORY</variable><action type=\"fileselect\">FILE_DIRECTORY</action></button>
+<button tooltip-text=\"Add path selected at left as top level directory for a 'snapshot' type backup\">
+<label>Add as Snapshot Backup</label></button></hbox>
+</frame></vbox>"
+prefix="mirror"
+parseitem $mirrorpathfile
+if [ "$TEMP_DIALOG" = "" ]; then
+	TEMP_DIALOG="<text><label>No top-level mirror-type backup directories are configured. You can add one below.</label></text>
+	<text use-markup=\"true\"><label>\"Use <b>mirror</b> type backups when all you need is a single backup copy of the files.  Note that when you delete files or directories that are included in a mirror-type backup, the backup copies of the deleted files will be also be removed the next time you run the backup.\"</label></text>"
+	mbutvis="disabled"
+else
+	TEMP_DIALOG="<list><variable>mirrorsel</variable>$TEMP_DIALOG</list>"
+fi
+ADD_DIALOG="$ADD_DIALOG<vbox><frame Mirror Backup Source Directories>$TEMP_DIALOG</frame>
+<text xalign=\"0\"><label>x = has custom exclude patterns</label></text>
+<button tooltip-text=\"Files to exclude from backup for the highlighted backup source path\"><label>Exclusions for Selected Mirror Entry</label><visible>$mbutvis</visible></button>
+<button><label>Delete Selected Mirror Entry</label><visible>$mbutvis</visible></button>
+<button tooltip-text=\"Edit all mirror-type source path entries\"><label>Mirror Source Path Editor</label></button>
+<frame New Top-Level Source Directory>
+<hbox><entry accept=\"directory\" tooltip-text=\"Either type in an absolute-path directory name, or click the icon at right to choose a directory on your computer. When done, click a button at right to actually add the directory.\">
+<label>Select a Directory</label>
+<variable>FILE_DIRECTORY2</variable>
+</entry>
+<button><input file stock=\"gtk-open\"></input><variable>FILE_BROWSE_DIRECTORY2</variable><action type=\"fileselect\">FILE_DIRECTORY2</action></button>
+<button tooltip-text=\"Add path selected at left as top level directory for a 'mirror' type backup\">
+<label>Add as Mirror Backup</label></button></hbox>
+</frame></vbox>"
+ADD_DIALOG="<text use-markup=\"true\"><label>\"<b>Backup Configuration in 4 Easy Steps</b>
+<b>1.</b>Please click 'Help' below and read 'Snapshot VS Mirror'.
+<b>2.</b> On the DIRECTORIES TO BACK UP tab, add folders to 'Snapshot Backup Paths' or 'Mirror Backup Paths'
+<b>3.</b> (Optional) Add any backup exclusion patterns.
+<b>4.</b> On the BACKUP STORAGE tab, set the storage directory.
+You're done! Click a <b>Backup Now</b> button below.\"</label></text><notebook labels=\"DIRECTORIES TO BACK UP|BACKUP STORAGE|LOGS & REPORTS|ADVANCED\" $maintab><vbox><frame Source Directories><notebook labels=\"Snapshot Backup Paths|Mirror Backup Paths\" $sourcetab>$ADD_DIALOG</notebook></frame></vbox>"
+
+export MAIN_DIALOG="<window title=\"snap2 v$version | User $USER | Settings: $settingsdir\"><hbox><vbox>$ADD_DIALOG<vbox>
+<frame Directory To Store All Backups>
+<hbox><entry accept=\"directory\" tooltip-text=\"All backups will be stored inside this directory (absolute path). If a remote host is specified, this directory will be on the remote host. Either type in a directory name, or click the icon at right to choose a directory on your computer.\">
+<label>Select a Directory</label><default>$dst</default>
+      <variable>dst</variable>
+</entry>
+<button><input file stock=\"gtk-open\"></input><variable>FILE_BROWSE_DIRECTORY</variable><action type=\"fileselect\">dst</action></button>
+</hbox></frame><frame Remote Host Settings>
+<checkbox$bol_enableremoteck tooltip-text=\"When enabled, the backup storage directory specified above will be considered to be on the remote host.  When disabled, backup storage is on the local host.\"><label>Enable Backup to Remote Host</label>
+<variable>bol_enableremote</variable>
+<default>$bol_enableremote</default>
+<action>if true enable:remotehost</action>
+<action>if false disable:remotehost</action>
+<action>if true enable:remotelogin</action>
+<action>if false disable:remotelogin</action>
+<action>if true enable:remotehome</action>
+<action>if false disable:remotehome</action>
+<action>if true enable:bol_remoteauth</action>
+<action>if false disable:bol_remoteauth</action>
+<action>if true enable:Remotekey</action>
+<action>if false disable:Remotekey</action>
+<action>if true enable:Keygen</action>
+<action>if false disable:Keygen</action>
+</checkbox>
+<hbox><text><label>Remote Hostname</label></text><entry tooltip-text=\"Enter a hostname if the target directory is on a remote host, blank or 'none' for local storage. Hostname should be fully-qualified, e.g. tropicalhealthfoods.com.  ('Check Remote Auth' on the ADVANCED tab can be used to check remote authentication.)\" ><default>$remotehost</default><variable>remotehost</variable><visible>$remotevis</visible></entry></hbox>
+<hbox><text><label>Username for remote login</label></text><entry><default>$remotelogin</default><variable>remotelogin</variable><visible>$remotevis</visible></entry></hbox>
+<hbox><text><label>Remote Home Directory</label></text><entry tooltip-text=\"Full path to remote home directory\"><default>$remotehome</default><variable>remotehome</variable><visible>$remotevis</visible></entry></hbox>
+</frame>
+</vbox><vbox><frame Backup Log Settings>
+<vbox><checkbox$bol_storelogck tooltip-text=\"Logfiles are stored in the root of the backup.\">
+<label>Store logfile for each backup</label>
+<variable>bol_storelog</variable>
+<default>$bol_storelog</default>
+<action>if true enable:bol_compresslog</action>
+<action>if false disable:bol_compresslog</action>
+</checkbox>
+<checkbox$bol_compresslogck tooltip-text=\"Compress logfiles, if 'gzip' is available.\">
+<label>Compress logfiles with gzip</label>
+<variable>bol_compresslog</variable>
+<default>$bol_compresslog</default>
+<visible>$complogvis</visible>
+</checkbox></vbox><hbox>
+<text><label>Log viewer program</label></text><entry tooltip-text=\"Set to your favorite external file viewer.  Set blank or enter 'internal' to use internal file viewer\"><default>$logviewer</default><variable>logviewer</variable></entry></hbox></frame>
+<frame Backup Tools><hbox><vbox><text><label>Use the button at right to view backup logs, generate reports, and delete backups</label></text></vbox><vbox><button><label>Backup Tools</label></button></vbox></hbox>
+</frame></vbox>
+<vbox>
+  <frame Snapshot Interval Settings>
+    <hbox>
+    <text>
+    <label>Maximum 'recent' snapshots</label>
+    </text>
+    <entry tooltip-text=\"When this number of 'recent' snapshot backups is reached, the oldest 'recent' backup will be removed.  If it is at least 24 hrs newer than the newest 'daily' backup, it will be 'promoted' to be a 'daily' backup.\">
+      <default>$recent</default>
+      <variable>recent</variable>
+    </entry>
+    </hbox>
+   <hbox>
+   <text>
+    <label>Maximum 'daily' snapshots</label>
+    </text>
+    <entry tooltip-text=\"When this number of 'daily' snapshot backups is reached, the oldest 'daily' backup will be removed.  If it is at least 7 days newer than the newest 'weekly' backup, it will be 'promoted' to be a 'weekly' backup.\">
+      <default>$daily</default>
+      <variable>daily</variable>
+    </entry>
+   </hbox>
+    <hbox>
+    <text>
+    <label>Maximum 'weekly' snapshots</label>
+    </text>
+    <entry tooltip-text=\"When this number of 'weekly' snapshot backups is reached, the oldest 'weekly' backup will be removed.  If it is more than 3 weeks  newer than the newest 'monthly' backup, it will be 'promoted' to be a 'monthly' backup.\">
+      <default>$weekly</default>
+      <variable>weekly</variable>
+    </entry>
+  </hbox>
+    <hbox>
+    <text>
+    <label>Maximum 'monthly' snapshots</label>
+    </text>
+    <entry tooltip-text=\"When this number of 'monthly recent' snapshot backups is reached, the oldest 'monthly' backup will be removed.\">
+      <default>$monthly</default>
+      <variable>monthly</variable>
+    </entry>
+   </hbox>
+ </frame>
+ <frame Miscellaneous Settings>
+ <hbox><vbox>
+    <checkbox$bol_allownoreferenceck tooltip-text=\"If checked, allow snapshot-type backups to be done without a hard link reference directory. Uncheck to help prevent accidental backup to the wrong removeable media.  This MUST be enabled for the first snapshot backup.\">
+       <label>Allow no hardlink reference</label>
+       <variable>bol_allownoreference</variable>
+       <default>$bol_allownoreference</default>
+     </checkbox>
+     <checkbox$bol_makedestrootck tooltip-text=\"This allows snap2 to create the directory specified on the BACKUP STORAGE tab, if it is missing.  Uncheck this to help prevent accidental backup to wrong removeable media.\">
+         <label>Create missing backup storage dir</label>
+        <variable>bol_makedestroot</variable>
+        <default>$bol_makedestroot</default>
+      </checkbox>
+      <checkbox$bol_adddefaultexcludeck tooltip-text=\"If checked, the default backup 'exclusions' found in $MYHOME/.snap2/$settingsdir/exclude/default will be used IN ADDITION to any top-level-backup-path-specific exclusions.\">
+        <label>Add default exclusions</label>
+        <variable>bol_adddefaultexclude</variable>
+        <default>$bol_adddefaultexclude</default>
+      </checkbox>
+      </vbox><vbox>
+      <checkbox$bol_remoteauthck tooltip-text=\"SSH key auth status for local user $USER to access $remotelogin@$remotehost. This setting is automatically updated by snap2, and appears here primarily as a status indicator. Change only if you know what you are doing.\">
+        <label>Remote SSH auth confirmed</label>
+        <variable>bol_remoteauth</variable>
+        <default>$bol_remoteauth</default>
+        <visible>$remotevis</visible>
+      </checkbox>
+      <checkbox$bol_rsynccompressionck tooltip-text=\"Make rsync compress data as it is transmitted to a destination machine.  Reduces bandwidth requirement, increases memory/CPU use.\">
+        <label>Use rsync compression</label>
+        <variable>bol_rsynccompression</variable>
+        <default>$bol_rsynccompression</default>
+      </checkbox>
+      </vbox></hbox></frame>
+      <hbox><text>
+      <label>Active Backup Set</label>
+    </text><combobox tooltip-text=\"Type a new settings directory name, or choose an existing one, THEN CLICK 'CHANGE'. Names must end in '.set'. Use multiple settings directories to do, for example, shapshot-type backups to more than one destination directory or host.\"><variable>newsettingsdir</variable>$cbitems<input>ls</input></combobox>
+    <button tooltip-text=\"Change to an different existing or new settings directory\"><label>Change</label><variable>Change</variable></button>
+    <button tooltip-text=\"Delete an existing settings directory\"><label>Delete</label><variable>Delete</variable></button>
+  </hbox><hbox>
+<button tooltip-text=\"Modify the default backup exclusions patterns\"><label>Default Exclusions</label></button>
+<button tooltip-text=\"Use to test SSH public key authentication on the remote server for local user $USER.\"><label>Check Remote Auth</label><variable>Remotekey</variable><visible>$remotevis</visible></button>
+  <button tooltip-text=\"Force update of the settings on the remote server\"><label>Force Remote Update</label></button></hbox>
+  <hbox><button tooltip-text=\"Generate passwordless SSH key pair for local user $USER, for remote server authorization.\"><label>Generate SSH Keys</label><variable>Keygen</variable><visible>$remotevis</visible></button>
+  <button tooltip-text=\"Schedule automatic backup via cron\"><label>Automatic Backup Scheduler</label></button></hbox></vbox></notebook>
+  <text><label>Last $settingsdir Snapshot: $lastsnapshot</label></text>
+<text><label>Last $settingsdir Mirror Backup: $lastmirror</label></text>
+<hbox><button$sck><label>Snapshot Backup Now</label></button>
+  <button$mck><label>Mirror Backup Now</label></button>
+  <button><label>Help</label></button>
+  <button tooltip-text=\"Save changes and continue. (All other buttons also save changes.)\"><label>SAVE</label></button>
+  <button tooltip-text=\"Quit, save changes\"><label>DONE</label></button></hbox>
+  </vbox>
+</hbox>
+</window>"
+
+
+# the following button, when placed with the buttons above, does not work!
+# <button><label>ABOUT</label><action type=\"launch\">ABOUT_DIALOG</action></button>
+
+#echo "$MAIN_DIALOG"
+
+
+I=$IFS; IFS=""
+for STATEMENTS in  $($GTKDIALOG --program=MAIN_DIALOG); do
+	eval $STATEMENTS
+done
+IFS=$I
+
+if [ $? -ne 0 ]; then
+	echo "ABORT: gtkdialog exited with error $? at $LINENO"
+	exit 1
+fi
+
+
+exit1="$EXIT"
+if [ "$EXIT" = "abort" ]; then
+	exit 1
+fi
+if [ "$exit1" = "Change" ]; then
+	maintab='page="3"'
+	
+	if echo "$newsettingsdir" | grep '^[^ 	/]*\.set$' > /dev/null; then
+		settingsdir="$newsettingsdir"
+	else
+		gtkmsgbox "Settings directory names must end '.set', and must not contain spaces or directory structure."
+	fi
+	continue
+fi		
+
+updatelocal="false"
+[ "$remotelogin" = "" ] && remotelogin="$USER"
+
+# check for changes to form values, to save locally
+if [ "$BOL_ADDDEFAULTEXCLUDE" != "$bol_adddefaultexclude" ]; then updatelocal="true"; maintab='page="3"'
+elif [ "$BOL_STORELOG" != "$bol_storelog" ]; then updatelocal="true"; maintab='page="2"'
+elif [ "$BOL_COMPRESSLOG" != "$bol_compresslog" ]; then updatelocal="true"; maintab='page="2"'
+elif [ "$BOL_RSYNCCOMPRESSION" != "$bol_rsynccompression" ]; then updatelocal="true"; maintab='page="3"'
+elif [ "$LOGVIEWER" != "$logviewer" ]; then updatelocal="true"; maintab='page="2"'
+elif [ "$BOL_ALLOWNOREFERENCE" != "$bol_allownoreference" ]; then updatelocal="true"; maintab='page="3"'
+fi
+
+if [ "$DST" != "$dst" ]; then
+	maintab='page="1"'
+	if ! echo "$dst" | grep '^/[^ 	]*[^/]$' > /dev/null; then
+		gtkmsgbox "The backup storage path cannot contain spaces, must be an absolute path (must BEGIN with '/'), and must not END in '/'."
+#		dst=$DST
+		continue
+	fi
+	updateremote="true"
+fi
+
+if [ "$REMOTEHOST" != "$remotehost" ]; then
+	updateremote="true"
+	if [ "$REMOTEHOST" != "none" -a $bol_remoteauth="true" ]; then
+		if ! gtkmsgbox "Remote host was changed, should I keep your SSH authentication setting?" 1; then 
+			bol_remoteauth="false"
+		fi
+	fi
+elif [ "$REMOTELOGIN" != "$remotelogin" -a $bol_remoteauth="true" ]; then
+	updateremote="true"
+	if ! gtkmsgbox "Remote login was changed, should I keep your SSH authentication setting?" 1; then 
+		bol_remoteauth="false"
+	fi
+elif [ "$updateremote" = "true" ]; then
+	:
+elif [ "$RECENT" != "$recent" ]; then updateremote="true"; maintab='page="3"'
+elif [ "$DAILY" != "$daily" ]; then updateremote="true"; maintab='page="3"'
+elif [ "$WEEKLY" != "$weekly" ]; then updateremote="true"; maintab='page="3"'
+elif [ "$MONTHLY" != "$monthly" ]; then updateremote="true"; maintab='page="3"'
+elif [ "$BOL_MAKEDESTROOT" != "$bol_makedestroot" ]; then updateremote="true"; maintab='page="3"'
+elif [ "$REMOTEHOME" != "$remotehome" ]; then updateremote="true"; maintab='page="1"'
+elif [ "$EXIT" = "Force Remote Update" ]; then updateremote="true"; maintab='page="3"'
+fi
+
+if [ "$updateremote" = "true" ]; then
+	updatelocal="true"
+fi
+if [ "$remotehost" = "" -o "$bol_enableremote" = "false" ]; then
+	remotehost="none"
+fi
+if [ "$logviewer" = "" ]; then
+	logviewer="internal"
+fi
+if [ "$bol_remoteauth" = "true" -a $BOL_REMOTEAUTH != "true" ]; then
+	if ! gtkmsgbox "You have manually set 'Remote SSH Auth Confirmed'.  This is normally checked and set via the 'Check Remote Auth' button.  If remote SSH public key passwordless authentication is improperly configured, some of snap2's remote server operations could lock up your computer.  If you are unsure, please click 'Cancel'." 1; then
+		maintab='page="3"'
+		continue
+	fi
+fi  
+if [ "$logviewer" != "internal" ] && ! which "$logviewer" > /dev/null; then
+	gtkmsgbox "The log viewer program specified is not found in your \$PATH."
+	maintab='page="2"'
+	continue
+fi
+if [ "$remotehost" = "none" ]; then
+	if [ "$bol_enableremote" = "true" ]; then
+		gtkmsgbox "Please specify a remote hostname in order to enable backup to a remote host."
+		maintab='page="1"'
+		continue
+	fi		
+	bol_remoteauth="false"
+	updateremote="false"
+fi
+
+if [ "$dst" != "none" -a "$BOL_ENABLEREMOTE" != "$bol_enableremote" ]; then
+	if [ "$dst" = "$DST" ]; then
+		if ! gtkmsgbox "Remote backup has been either enabled or disabled, but the backup storage directory was not changed.  Are you sure you want to keep the old backup storage directory setting?" 1; then
+			maintab='page="1"'
+			continue
+		fi
+	fi
+fi
+
+# next check for acquiring remote authorization, so bol_remoteauth var can be saved locally
+
+if [ "$exit1" = "Generate SSH Keys" ]; then
+	maintab='page="3"'
+	if [ -f "$MYHOME/.ssh/id_rsa.pub" ]; then
+		gtkmsgbox "You already have a SSH public key at /home/$USER/.ssh/id_rsa.pub. Not generating new key pair."
+	else
+		gtkmsgbox "Click 'OK to generate a new PASSWORDLESS SSH key pair for user $USER now, or 'Cancel' to abort." 1
+		if [ "$?" -ne "0" ]; then
+		  :
+		elif ! ssh-keygen -f "$MYHOME/.ssh/id_rsa" -t rsa -N ""; then
+			gtkmsgbox "There was an error generating the SSH key for user $USER"
+		else
+			gtkmsgbox "Your key pair has been generated.  Now you need to add it to the file ~/.ssh/authorized_keys on the remote server, on its own line.  After that, please click the 'Check Remote Auth' Button on the 'Advanced' tab."
+		fi
+	fi
+elif [ "$exit1" = "Check Remote Auth" ]; then
+	maintab='page="3"'
+	export bol_remoteauth="false"
+	if [ ! -f "$MYHOME/.ssh/id_rsa.pub" ]; then
+		gtkmsgbox "You don't have an SSH public key at /home/$USER/.ssh/id_rsa.pub.  If you have a public key with a different filename, please create a symbolic link to it called /home/$USER/.ssh/id_rsa.pub. If you don't yet have a SSH key pair, you can use the 'Generate SSH Keys' button to make one.  Then you will need to add it to ~/.ssh/authorized_keys on the remote server."
+	elif [ "$remotehost" != "none" ]; then
+		gtkmsgbox "After this message a terminal will open.  If after a few moments you see in the terminal that you have signed-in with no password prompt and no errors, then passwordless SSH public key authentication is configured. (Your next prompt window may lie below the terminal window.)"
+		($XTERM $esw ssh -o stricthostkeychecking=no $remotelogin@$remotehost) &
+		if gtkmsgbox "Did you see in the terminal that you were logged-in without giving a password?  (OK = yes, Cancel = no). (Note that on 32 bit systems you may have to close the terminal before snap2 will proceed.)" 1; then
+		      bol_remoteauth="true"
+	    #additional checks
+		      while true
+		      do # this loop is only to allow breaking out
+			      if [ ! -f "/usr/share/snap2/remoteutils2.sh" ]; then
+				      gtkmsgbox "Error: can't find /usr/share/snap2/remoteutils2.sh.  This snap2 file is necessary for backup to a remote server."
+				      break
+			      fi
+
+			      snap2autherrfile="/tmp/snap2autherr-$$.temp"
+
+			      /usr/share/snap2/remoteutils2.sh -s $settingsdir -v $requiresremotever -a cksnap2remote -d $snap2autherrfile
+#			      wait
+			      if [ `cat $snap2autherrfile` != "0" ]; then
+				      gtkmsgbox "A snap2 file called 'remoteutils2.sh' needs to be transfered to the server.  Should I do that now?"
+				      if [ "$?" -ne "0" ]; then
+					rm -f $snap2autherrfile
+					break
+				      fi
+		      # $XTERM $esw 
+				      /usr/share/snap2/remoteutils2.sh -s $settingsdir -v $requiresremotever -a makesnap2remote -d $snap2autherrfile
+#				      wait
+				      if [ `cat $snap2autherrfile` -ne 0 ]; then
+					      gtkmsgbox "Creation of directory $remotehome/.snap2 on remote host failed.  Check permissions."
+					      rm -f $snap2autherrfile
+					      break
+				      fi
+		      # $XTERM $esw 
+				      /usr/share/snap2/remoteutils2.sh -s $settingsdir -v $requiresremotever -a copymeremote -d $snap2autherrfile
+#				      wait
+				      if [ `cat $snap2autherrfile` -ne 0 ]; then
+					      gtkmsgbox "Copy of remoteutils2.sh to $remotehome/.snap2 on remote host failed.  Check permissions."
+					      rm -f $snap2autherrfile
+					      break
+				      fi
+			      fi
+		      break
+		      done
+		fi
+	fi
+fi
+[ "$BOL_REMOTEAUTH" != "$bol_remoteauth" ] && updatelocal="true" # if bol_remoteauth changed, set flag to update local settings file
+
+if [ "$remotehost" = "none" ]; then
+	if [ "$REMOTEHOST" != "$remotehost" -o "$DST" != "$dst" ]; then
+		if [ "$bol_makedestroot" = "true" ]; then
+			mkdir -p "$dst" 2>/dev/null;
+		fi
+		if [ ! -d "$dst" ]; then
+			gtkmsgbox "Warning: local backup directory $dst is not found and cannot be created, perhaps due to the 'Create missing backup storage dir' setting on the ADVANCED tab.  I have accepted the specified storage directory, but I had to skip the check for filesystem type. Note that snap2 requires a Linux filesystem for proper functioning of snapshot-type backups."
+		else
+			if ! touch "$dst/_file.linktest_" 2>/dev/null; then
+				gktmsgbox "ERROR: $dst is not writeable by user $USR for backup!"
+				continue
+			elif ! ln "$dst/_file.linktest_" "$dst/_link.linktest_" 2>/dev/null; then
+				gtkmsgbox "ERROR: Cannot create hard link on $dst!  Note that snap2 requires a Linux filesystem for proper functioning of snapshot-type backups!  Please use only mirror-type backups."
+				rm -f "$dst/_file.linktest_"
+			else
+				rm -f "$dst/_file.linktest_" "$dst/_link.linktest_" 2>/dev/null
+			fi
+		fi
+	fi
+	if [ "$REMOTEHOST" != "none" ]; then
+		if [ "$BOL_REMOTEAUTH" = "true" ]; then
+			myerrfile="/tmp/snaperr-$$.temp"
+			(ssh -o stricthostkeychecking=no "$REMOTELOGIN@$REMOTEHOST" "rm -fr $remotehome/.snap2/$settingsdir-remote"; echo $? > $myerrfile) &
+			progressbar $! "Removing remote settings directory $REMOTELOGIN@$REMOTEHOST:$remotehome/.snap2/$settingsdir-remote..."
+			errorval=`cat $myerrfile`
+			if [ "$errorval" -ne 0 ]; then
+				gtkmsgbox "Error $errorval deleting remote settings directory $REMOTELOGIN@$REMOTEHOST:$remotehome/.snap2/$settingsdir-remote/ (check permissions). You will have to take care of it manually."
+			fi
+			rm -f "$myerrfile"
+		else
+			gtkmsgbox "Since you don't appear to have remote ssh key authentication, I won't try to remove the old remote settings directory $REMOTELOGIN@$REMOTEHOST:$remotehome/.snap2/$settingsdir-remote"
+		fi
+	fi
+fi
+
+if [ "$updateremote" = "true" -o "$updatelocal" = "true" ]; then
+updatelocal=false
+#echo "updateremote is $updateremote and updatelocal is $updatelocal"
+ #ok to save locally
+cat << eof > "$MYHOME/.snap2/$settingsdir/settings"
+## snap2 configuration file ##
+# for more information, see http://lstandish.net/linux/snap2
+
+# basic configuration
+# Backup root.  All backups will be stored here
+# no trailing slashes allowed!
+# example: dst=/media/BACKUP8GIG/snapbackups
+dst=$dst
+
+# enable remote backup (not used by snap2engine)
+bol_enableremote=$bol_enableremote
+# optional log viewer program
+logviewer=$logviewer
+# remote host for offsite backups
+# use fully-qualified domain name.  Example: remotehost=crnatural.net
+# an IP address is also allowed
+# do not specify target directory.  That is determined by 'dst'
+remotehost=$remotehost
+# remote login name for offsite backups, default $USER
+remotelogin=$remotelogin
+# remote home directory
+remotehome=$remotehome
+
+# Number of snapshots to keep before promotion to "daily"
+recent=$recent
+# Number of "daily" snapshots to keep before promotion to "weekly"
+daily=$daily
+# Number of "weekly" snapshots to keep before promotion to "monthly"
+weekly=$weekly
+# Max number of monthly backups
+monthly=$monthly
+
+#advanced
+# safe to leave all these at defaults
+# store logfile in snapshot root, default true
+bol_storelog=$bol_storelog
+# compress logfile, default true
+bol_compresslog=$bol_compresslog
+# use rsync compression
+bol_rsynccompression=$bol_rsynccompression
+# allow program to create \$dst. If not set, prevents accidental backup to wrong media
+# default true, recommend setting to false after initial backup is backing up to removeable media
+bol_makedestroot=$bol_makedestroot
+# if true, then public key authentication is confirmed set up for the current user for remotelogin@remotehost
+# used only in the GUI (snap2)
+bol_remoteauth=$bol_remoteauth
+
+# exclude files for multiple snapshot backup are of name "varmailuser" for /var/mail/user
+# exclude files for simple mirror backup are of name "mirrorvarmailuser" for /var/mail/user
+# exclude files for rdiff-backup are of name "rdiffvarmailuser" for /var/mail/user
+
+# *add* the default exclusions to any custom exclusions, default true.
+bol_adddefaultexclude=$bol_adddefaultexclude
+
+# allow backup with no hardlink reference. Set false to avoid accidentally filling USB drive. default true
+bol_allownoreference=$bol_allownoreference
+# store pending remote server update request. Do  not modify this variable. Used only by GUI (snap2)
+updateremote=$updateremote
+lastsnapshot="$lastsnapshot"
+lastmirror="$lastmirror"
+eof
+
+fi
+
+while true
+do
+if [ "$remotehost" != "none" -a "$updateremote" = "true" ]; then
+	if [ "$bol_remoteauth" != "true" ]; then
+		gtkmsgbox "WARNING: Update of settings on the remote server is necessary, but remote SSL public key authentication is not confirmed.  Click the 'Check Remote Auth' button on the ADVANCED tab to test authentication."
+		break
+	fi
+	if ! gtkmsgbox "It is necessary to update the settings on the remote server $remotelogin@$remotehost" 1; then
+		break
+	fi
+	myerrfile="/tmp/snaperr-$$.temp"
+#	if ! ssh "$remotelogin@$remotehost" "test -f $remotehome/.snap2/$settingsdir-remote/settings"; then
+	(ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "mkdir -p $remotehome/.snap2/$settingsdir-remote"; echo $? > $myerrfile) &
+	progressbar $! "Checking for $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote..."
+	errorval=`cat $myerrfile`
+	if [ "$errorval" -ne 0 ]; then
+		gtkmsgbox "Error $errorval creating $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote (check permissions)"
+		break
+	fi
+#	fi
+	
+	(scp "$MYHOME/.snap2/$settingsdir/settings" "$remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote/"; echo $? > $myerrfile) &
+	progressbar $! "Updating settings file on remote server..."
+	errorval=`cat $myerrfile`
+	if [ "$errorval" -ne 0 ]; then
+		gtkmsgbox "Error $errorval copying settings file to $remotelogin@$remotehost:$remotehome/.snap2/$settingsdir-remote/ (check permissions)"
+		break
+	else
+		snap2work="/tmp/snap2work-$$.temp"
+		sed '/^updateremote=/d' "$MYHOME/.snap2/$settingsdir/settings" > $snap2work
+		echo "updateremote=false" >> $snap2work
+		mv -f $snap2work "$MYHOME/.snap2/$settingsdir/settings"
+	fi
+fi
+break
+done
+rm -f $myerrfile
+run=`echo "$exit1" | grep -c 'ackup Now'`
+
+if [ "$exit1" = "DONE" ]; then
+	exit 1
+elif [ "$exit1" = "SAVE" ]; then
+	:
+elif [ "$exit1" = "Backup Tools" ]; then
+	maintab='page="2"'
+	showlogfile="/tmp/snapshowlog-$$.temp"
+	myerrfile="/tmp/snaperr-$$.temp"
+	if [ ! -f /usr/share/snap2/remoteutils2.sh ]; then
+		gtkmsgbox "Error: Please copy the file remoteutils2.sh from the snap2 distribution to /usr/share/snap2/ on the local machine and try again."
+		break
+	fi
+	while true; do
+		if [ "$remotehost" != "none" ]; then
+			if [ "$bol_remoteauth" != "true" ]; then
+				gtkmsgbox "SSH public key authentication is not confirmed for the remote server.  Click the 'Check Remote Auth' button on the ADVANCED tab to test authentication."
+				break
+			else
+				
+				(ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a logchoose -v $requiresremotever" -r > $showlogfile 2>&1; echo $? > $myerrfile) &
+				progressbar $! "Retrieving backup list from remote server..."
+				errorval=`cat $myerrfile`
+				logs=`cat $showlogfile`
+				if [ "$errorval" = "255" ]; then
+					gtkmsgbox "ERROR: Network connection failure, or failed public key authentication.  Error message is $logs."
+					break
+				elif [ "$errorval" = "127" -o "$errorval" = "4" ]; then
+			# 127 = executable file not found,
+			# first try to create directory
+			#echo "$reference"
+					gtkmsgbox "$logs: I need to copy remoteutils2.sh to $remotehome/.snap2 on the remote server" 1
+					if [ $? -ne 0 ]; then
+						break
+					else
+						if ! ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "mkdir -p $remotehome/.snap2" > /dev/null; then
+							gtkmsgbox "Error creating remote snap2 directory $remotehome/.snap2 (check permissions)"
+							break
+						else
+							if ! scp /usr/share/snap2/remoteutils2.sh $remotelogin@$remotehost:$remotehome/.snap2/ > /dev/null; then
+								gtkmsgbox "Error copying remoteutils2.sh to $remotelogin@$remotehost:$remotehome/.snap2/"
+								break
+							fi
+							continue
+						fi
+					fi
+				fi
+			fi
+		else
+			logs=`/usr/share/snap2/remoteutils2.sh -s $settingsdir -a logchoose -v $requiresremotever 2>&1`
+			result=$?
+			if [ "$result" -ne 0 ]; then
+				gtkmsgbox "Error: $logs"
+				break
+			fi
+		fi
+		if [ "$logs" = "" ]; then
+			gtkmsgbox "I did not find any backups."
+			break
+		fi
+		while true; do
+			export LOG_DIALOG="<frame Backup Tools><vbox><text xalign=\"0\" use-markup=\"true\"><label>\"<b> 'Show Logfile'</b> lists files and directories backed-up at the time of the selected backup.\"</label></text><text xalign=\"0\" use-markup=\"true\"><label>\"<b>'Report Deleted Files'</b> lists files not present at the time of the selected backup, compared to the previous backup.  It works by running rsync 'in reverse' and in report-only mode.\"</label></text><hbox><combobox width-request=\"400\"><variable>COMBO</variable>$logs</combobox></hbox><hbox><button><label>Show Logfile</label></button><button tooltip-text=\"Show files deleted at the time of selected backup\"><label>Report Deleted Files</label></button><button><label>Delete Backup</label></button><button><label>EXIT</label></button></hbox></vbox></frame>"
+			I=$IFS; IFS=""
+			for STATEMENTS in  $($GTKDIALOG --program=LOG_DIALOG); do
+				eval $STATEMENTS
+			done
+			IFS=$I
+			if [ "$EXIT" = "EXIT" -o "$EXIT" = "abort" ]; then
+				break 2
+			fi
+	#		choice=
+	#		for snaptype in recent daily weekly monthly
+	#		do
+	#			limit=$((snaptype))
+	#			for i in `seq 1 1 $limit`; do
+	#				myvar="${snaptype}_${i}"
+	#				if [ ${!myvar} = "true" ] 2>/dev/null; then
+	#					declare $myvar=
+	#					choice="${snaptype}.$i"
+	#					break 2
+	#				fi
+	#			done
+	#		done
+			choice=`echo "$COMBO" | sed -e "s/^\([^ ]*\).*/\1/"`
+			if [ ! "$choice" ]; then
+				gtkmsgbox "Error: Please choose a backup for the action."
+			elif [ "$EXIT" = "Show Logfile" ]; then
+				if ! echo "$COMBO" | grep "(log available)" > /dev/null; then
+					gtkmsgbox "No logfile available for selected backup."
+					continue
+				fi
+	#			showlogfile="/tmp/snapshowlog-$$.temp"
+				log=
+				if [ "$remotehost" != "none" ]; then
+					ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -a showlog -s $settingsdir -d $choice -v $requiresremotever -r" > $showlogfile 2>&1 &
+					progressbar $! "Retrieving logfile from remote server..."
+				else
+					/usr/share/snap2/remoteutils2.sh -a showlog -s "$settingsdir" -d "$choice" -v "$requiresremotever" > $showlogfile 2>&1
+				fi
+				showfile $showlogfile
+			elif [ "$EXIT" = "Delete Backup" ]; then
+				if gtkmsgbox "Really delete backup $choice?" 1; then
+					if [ "$remotehost" != "none" ]; then
+						ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -a deldir -d $choice -v $requiresremotever -r" > $showlogfile 2>&1 &
+					else
+						/usr/share/snap2/remoteutils2.sh -s "$settingsdir" -a deldir -d "$choice" -v "$requiresremotever" >  $showlogfile 2>&1 &
+					fi
+					progressbar $! "Deleting backup..."
+					if [ -s $showlogfile ]; then
+						showfile "$showlogfile"
+						break # reload list of backups
+					else
+						# success: remove deleted item from combobox, do not reload list
+						logs=`echo "$logs" | sed -e "s/<item>$COMBO<\/item>//"`
+						continue 
+					fi
+				fi
+			elif [ "$EXIT" = "Report Deleted Files" ]; then
+				nextearliest=`echo $logs | sed -e "s/.*$COMBO<\/item><item>//" -e "s/\([a-ln-z.0-9]*\).*/\1/"`
+	#			echo "nextearliest is $nextearliest"
+	#			echo "choice is $choice"
+	#			continue
+				if [ "$choice" = "mirror" -o "$nextearliest" = "" ]; then
+					gtkmsgbox "There is no previous backup to compare the selected backup to."
+					continue
+				fi
+	#			viewlog=/tmp/snapviewlog.temp$$
+				echo "Reporting on files not found in $choice which existed in previous backup $nextearliest" > $showlogfile
+				echo "Directory entries were omitted." >> $showlogfile
+				echo "" >> $showlogfile
+				if [ "$remotehost" != "none" ]; then
+					ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "$remotehome/.snap2/remoteutils2.sh -s $settingsdir -v $requiresremotever -a compare -d $choice -c $nextearliest -r" >> $showlogfile 2>&1 &
+					
+				else
+					rsync -vanu${z} $dst/$nextearliest/* $dst/$choice/ | sed '/\/$/d' >> $showlogfile 2>&1 &
+				fi
+				progressbar $! "Building file list..."
+				showfile $showlogfile
+			fi
+		done
+	done
+	rm -f $showlogfile $myerrfile
+elif [ "$exit1" = "Force Remote Update" ]; then
+	maintab='page="3"'
+elif echo "$exit1" | grep "^Add as" > /dev/null; then
+	maintab='page="0"'
+	if [ "$FILE_DIRECTORY" = "" -a "$FILE_DIRECTORY2" = "" ]; then
+		gtkmsgbox "Please choose or enter a source directory before clicking the 'Add as...' button"
+	elif [ "$exit1" = "Add as Snapshot Backup" ]; then
+		ckandsave "$backpathfile" "$FILE_DIRECTORY"
+		sourcetab='page="0"'
+	elif [ "$exit1" = "Add as Mirror Backup" ]; then
+		ckandsave "$mirrorpathfile" "$FILE_DIRECTORY2"
+		sourcetab='page="1"'
+	else
+		gtkmsgbox "not handled at line $LINENO"
+	fi
+elif [ "$exit1" = "Default Exclusions" ]; then
+	maintab='page="3"'
+	MAIN_DIALOG="<hbox><vbox>
+  <text use-markup=\"true\"><label>\"Use the editor at right to add any number of exclude patterns to apply to all backups, unless 'Add Default Exclusions' is unchecked on the ADVANCED tab.  In that case, only the source path's custom exclusions are used. To specify a path to exclude, start the line with a minus sign.  If you specify a directory, it and all subdirectories will be excluded.  The wildcard '*' matches any portion of a filename, but stops at '/' (directory divisions).  '**' matches filenames AND matches across directory divisions. For more information, click the 'Help' button on the main window.\"</label></text>
+  </vbox>
+  <vbox><frame Default Exclude Patterns><edit><variable>EDITOR</variable><input file>$excludefiledir/default</input><width>350</width><height>150</height></edit>
+<hbox>
+   <button ok></button>
+   <button cancel></button>
+  </hbox></frame>
+ </vbox></hbox>"
+	I=$IFS; IFS=""
+	for STATEMENTS in  $($GTKDIALOG --program=MAIN_DIALOG); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	if [ "$EXIT" = "OK" ]; then
+		echo "$EDITOR" | sed '/^$/d' > "$excludefiledir/default"
+	fi
+elif echo "$exit1" | grep 'Exclusions\|Delete...\|Editor' > /dev/null; then
+	maintab='page="0"'
+	while true
+	do
+		if echo "$exit1" | grep 'Snapshot' > /dev/null; then
+			sourcetab='page="0"'
+			workline="$snapsel"
+			workfile="$backpathfile"
+			prefix=""
+		else
+			sourcetab='page="1"'
+			workline="$mirrorsel"
+			workfile="$mirrorpathfile"
+			prefix="mirror"
+		fi
+		workline=$(echo "$workline" | sed -e 's/^x //')
+		if [ "$workline" = "" ] && ! echo "$exit1" | grep 'Editor'; then
+			maintab='page="0"'
+			gtkmsgbox "Please select a source path to work with."
+			break
+		fi
+		excludefile="$MYHOME/.snap2/$settingsdir/exclude/$prefix$(echo $workline | sed 's/\///g')"
+		if echo "$exit1" | grep 'Editor' > /dev/null; then
+			maintab='page="0"'
+			MAIN_DIALOG="
+		<frame Editor to Modify Multiple Source Paths>
+	<edit>
+	<variable>EDITOR</variable>
+	<input file>$workfile</input>
+	<width>350</width><height>150</height>
+	</edit>
+	<hbox>
+	<button cancel></button>
+	<button ok></button>
+	</hbox>
+	</frame>"
+			I=$IFS; IFS=""
+			for STATEMENTS in  $($GTKDIALOG --program=MAIN_DIALOG); do
+				eval $STATEMENTS
+			done
+			IFS=$I
+			if [ "$EXIT" = "OK" ]; then
+				echo "$EDITOR" | sed '${/^$/!s/$/\
+/;}' | sed '/^$/d' > $workfile # ensure file ends in newline but no empty lines. there  is a newline after $/\ above!
+			fi
+		elif echo "$exit1" | grep 'Delete' > /dev/null; then
+			maintab='page="0"'
+			gtkmsgbox "Are you sure you want to remove source path $workline from your backup configuration?  This will also delete the backup exclusion file $excludefile" 1
+			cont="$?"
+			if [ "$cont" = "0" ]; then
+				tempfile=$(mktemp)
+				grep -v "$workline" "$workfile" > $tempfile
+				myerror="$?"
+				if [ "$myerror" -gt 1 ]; then
+					gtkmsgbox "Error deleting $workline, exit $myerror"
+				fi
+				mv -f $tempfile "$workfile"
+				rm -f "$excludefile"
+			fi
+		elif echo "$exit1" | grep 'Exclusions' > /dev/null; then
+			maintab='page="0"'
+			if [ ! -f "$excludefile" ]; then
+				echo "" > "$excludefile"
+			fi
+			MAIN_DIALOG="<hbox><vbox>
+	<text use-markup=\"true\"><label>\"Use the editor at right to add any number of exclude patterns to apply to the backup of top level directory <b>$workline</b>. To specify a path to exclude, start the line with a minus sign.  If you specify a directory, it and all subdirectories will be excluded.  The wildcard '*' matches any portion of a filename, but stops at '/' (directory divisions).  '**' matches filenames AND matches across directory divisions. Here are 2 examples:\"</label></text>
+	<text use-markup=\"true\"><label>\"<b>- /home/lloyd/iso</b>\"</label></text><text use-markup=\"true\"><label>\"<b>- /home/lloyd/source/*.o</b>\"</label></text>
+	<text use-markup=\"true\"><label>\"The first pattern excludes the directory /home/lloyd/iso and all subdirectories.  The second one excludes all files ending with the '.o' extension in the directory /home/lloyd/source and below.  (To exclude files with this extension in any directory under the top level directory, use simply <b>- *.o</b>)\"</label></text><text><label>For more information, click the 'Help' button on the main window.</label></text>
+	</vbox>
+	<vbox><frame Exclusion patterns for $workline><edit><variable>EDITOR</variable><input file>$excludefile</input><width>350</width><height>150</height></edit>
+	<hbox>
+	<button ok></button>
+	<button cancel></button>
+	</hbox></frame>
+	</vbox></hbox>"
+			I=$IFS; IFS=""
+			for STATEMENTS in  $($GTKDIALOG --program=MAIN_DIALOG); do
+				eval $STATEMENTS
+			done
+			IFS=$I
+			if [ "$EXIT" = "OK" ]; then
+				echo "$EDITOR" | sed '/^$/d' > "$excludefile"
+			fi
+			if [ $(stat --format=%s $excludefile) -lt 3 ]; then
+				rm -f "$excludefile"
+			fi
+		fi
+		break
+	done
+elif [ "$exit1" = "Delete" ]; then
+	maintab='page="3"'
+	if [ ! -r "$MYHOME/.snap2/$newsettingsdir/settings" ]; then
+		gtkmsgbox "$newsettingsdir is not an existing settings directory or does not contain a readable settings file."
+		continue
+	fi
+	
+	. "$MYHOME/.snap2/$newsettingsdir/settings" 2>/dev/null
+	
+	if [ "$remotehost" != "none" -a "$bol_remoteauth" != "true" ]; then
+		gtkmsgbox "Remote authentication on the backup server is not set up for this backup set.   ADVANCED tab of the backup set to delete before deleting the settings directory."
+	elif [ "$newsettingsdir" = "default.set" ]; then
+		gtkmsgbox "You cannot delete the default settings directory."
+	elif ! gtkmsgbox "Are you sure you want to delete the settings directory $newsettingsdir?  This will remove the local settings directory $MYHOME/.snap2/$newsettingsdir as well as the corresponding directory on the remote backup server, if any.  However, any backups made using this settings directory will NOT be deleted." 1; then
+		:
+	else
+		if [ "$remotehost" != "none" ]; then
+			myerrfile="/tmp/snaperr-$$.temp"
+			(ssh -o stricthostkeychecking=no "$remotelogin@$remotehost" "rm -fr $remotehome/.snap2/$newsettingsdir-remote"; echo $? > $myerrfile) &
+			progressbar $! "Removing remote settings directory $remotelogin@$remotehost:$remotehome/.snap2/$newsettingsdir-remote..."
+			errorval=`cat $myerrfile`
+			if [ "$errorval" -ne 0 ]; then
+				gtkmsgbox "Error $errorval deleting remote settings directory $remotelogin@$remotehost:$remotehome/.snap2/$newsettingsdir-remote/ (check permissions). You will have to take care of it manually."
+			fi
+			rm -f "$myerrfile"
+		fi
+		if ! rm -fr "$MYHOME/.snap2/$newsettingsdir"; then
+			gtkmsgbox "Sorry, deletion of the local settings directory $MYHOME/.snap2/$newsettingsdir apparently failed."
+		fi
+		if [ "$settingsdir" = "$newsettingsdir" ]; then
+			settingsdir="default.set"
+		fi
+	fi
+elif [ "$exit1" = "Help" ]; then
+	showfile /usr/share/snap2/readme.txt
+elif [ "$FILE_DIRECTORY" != "" -o "$FILE_DIRECTORY2" != "" ]; then
+	maintab='page="0"'
+	gtkmsgbox "You have entered or selected a new backup directory, but you must click the 'Add as...' button to actually add it."
+elif [ "$dst" = "none" -o "$dst" = "" ]; then
+	maintab='page="1"'
+	gtkmsgbox "You have not specified the storage directory for all backups, on the 'BACKUP STORAGE' tab."
+elif  [ "$run" -gt 0 ]; then
+	if [ "$XTERM" = "" ]; then
+		gtkmsgbox "Sorry, I can't find any installed termimal emulator program."
+	else
+		if [ "$bol_remoteauth" != "true" -a "$remotehost" != "none" ]; then
+			gtkmsgbox "SSL public key authentication is not set up on the remote server.  Please install your public key in the 'authorized_keys' file on the remote server, then click the 'Check Remote Auth' button on the ADVANCED tab."
+		fi
+		if [ "$bol_remoteauth" = "true" -o "$remotehost" = "none" ]; then
+			runerrfile="/tmp/snap2runerr-$$.temp"
+			if [ "$exit1" = "Snapshot Backup Now" ]; then
+				$XTERM $esw snap2shell snapshot $settingsdir $runerrfile
+			else
+				$XTERM $esw snap2shell mirror $settingsdir $runerrfile
+			fi
+			#wait
+			runerr=`cat $runerrfile`
+			rm -f $runerrfile
+			if [ $runerr -ne 0 ]; then
+				gtkmsgbox "Backup was not successful. Error: $runerr"
+			fi
+		fi
+	fi
+elif [ "$exit1" = "Automatic Backup Scheduler" ]; then
+	maintab='page="3"'
+	if ! which crontab >/dev/null; then
+		gtkmsgbox "You need to have cron installed before you can set up automatic backups"
+	elif [ "$mbutvis" = "disabled" -a "$sbutvis" = "disabled" ]; then
+		gtkmsgbox "You need to add backup paths on the 'DIRECTORIES TO BACK UP' tab before you can set up automatic backups"
+	else
+		delsnapbut=''
+		delmirrorbut=''
+		{
+			while read cronline
+			do
+			if echo "$cronline" | grep "snap2engine snapshot $settingsdir" > /dev/null; then
+				min=$(echo "$cronline" | cut -d\  -f1)
+				hour=$(echo "$cronline" | cut -d\  -f2)
+				days=$(echo "$cronline" | cut -d\  -f5)
+				delsnapbut="<radiobutton><label>Remove $days@$hour:$min schedule</label><variable>delsnapcron</variable></radiobutton>"
+			elif echo "$cronline" | grep "snap2engine mirror $settingsdir" > /dev/null; then
+				min=$(echo "$cronline" | cut -d\  -f1)
+				hour=$(echo "$cronline" | cut -d\  -f2)
+				days=$(echo "$cronline" | cut -d\  -f5)
+				delmirrorbut="<radiobutton><label>Remove $days@$hour:$min schedule</label><variable>delmirrorcron</variable></radiobutton>"
+			fi
+			done
+		} < <(crontab -l 2>/dev/null)
+
+		export CRON_DIALOG="<frame $exit1>
+		<text><label>Here you can schedule automatic, recurring snap2 backups for the user $USER, for backup set $settingsdir.  This is done using the cron utility.  Any exisitng cron tasks already scheduled for user $USER will be conserved. If you need more control, please run crontab yourself.</label></text><hbox>"
+		if [ "$sbutvis" = "enabled" ]; then
+			CRON_DIALOG="$CRON_DIALOG<vbox>
+			<frame SNAPSHOT AUTOMATIC BACKUP SETUP>
+			<radiobutton><label>Do Nothing</label></radiobutton>
+			$delsnapbut
+			<radiobutton><label>New/replacement snapshot schedule:</label>
+			<variable>snapshotcron</variable>
+			<action>if true enable:s_mon</action>
+			<action>if false disable:s_mon</action>
+			<action>if true enable:s_tue</action>
+			<action>if false disable:s_tue</action>
+			<action>if true enable:s_wed</action>
+			<action>if false disable:s_wed</action>
+			<action>if true enable:s_thu</action>
+			<action>if false disable:s_thu</action>
+			<action>if true enable:s_fri</action>
+			<action>if false disable:s_fri</action>
+			<action>if true enable:s_sat</action>
+			<action>if false disable:s_sat</action>
+			<action>if true enable:s_sun</action>
+			<action>if false disable:s_sun</action>
+			</radiobutton>"
+			dowchooser "s"
+			CRON_DIALOG="$CRON_DIALOG$DOW_DIALOG
+			<hbox><text><label>Hour</label></text>
+			<combobox><variable>s_hour</variable>
+			<item>0</item><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
+			<item>6</item><item>7</item><item>8</item><item>9</item><item>10</item><item>11</item>
+			<item>12</item><item>13</item><item>14</item><item>15</item><item>16</item><item>17</item>
+			<item>18</item><item>19</item><item>20</item><item>21</item><item>22</item><item>23</item>
+			</combobox></hbox>
+			<hbox><text><label>Minute</label></text>
+			<combobox><variable>s_minute</variable>
+			<item>0</item><item>5</item><item>10</item><item>15</item><item>20</item><item>25</item>
+			<item>30</item><item>35</item><item>40</item><item>45</item><item>50</item><item>55</item>
+			</combobox></hbox></frame></vbox>"
+		fi
+		if [ "$mbutvis" = "enabled" ]; then
+			CRON_DIALOG="$CRON_DIALOG<vbox>
+			<frame MIRROR AUTOMATIC BACKUP SETUP>
+			<radiobutton><label>Do Nothing</label></radiobutton>
+			$delmirrorbut
+			<radiobutton><label>New/replacement mirror schedule:</label>
+			<variable>mirrorcron</variable>
+			<action>if true enable:m_mon</action>
+			<action>if false disable:m_mon</action>
+			<action>if true enable:m_tue</action>
+			<action>if false disable:m_tue</action>
+			<action>if true enable:m_wed</action>
+			<action>if false disable:m_wed</action>
+			<action>if true enable:m_thu</action>
+			<action>if false disable:m_thu</action>
+			<action>if true enable:m_fri</action>
+			<action>if false disable:m_fri</action>
+			<action>if true enable:m_sat</action>
+			<action>if false disable:m_sat</action>
+			<action>if true enable:m_sun</action>
+			<action>if false disable:m_sun</action>
+			</radiobutton>"
+			dowchooser "m"
+			CRON_DIALOG="$CRON_DIALOG$DOW_DIALOG
+			<hbox><text><label>Hour</label></text>
+			<combobox><variable>m_hour</variable>
+			<item>0</item><item>1</item><item>2</item><item>3</item><item>4</item><item>5</item>
+			<item>6</item><item>7</item><item>8</item><item>9</item><item>10</item><item>11</item>
+			<item>12</item><item>13</item><item>14</item><item>15</item><item>16</item><item>17</item>
+			<item>18</item><item>19</item><item>20</item><item>21</item><item>22</item><item>23</item>
+			</combobox></hbox>
+			<hbox><text><label>Minute</label></text>
+			<combobox><variable>m_minute</variable>
+			<item>0</item><item>5</item><item>10</item><item>15</item><item>20</item><item>25</item>
+			<item>30</item><item>35</item><item>40</item><item>45</item><item>50</item><item>55</item>
+			</combobox></hbox></frame></vbox>"
+		fi
+		CRON_DIALOG="$CRON_DIALOG</hbox><hbox><button ok></button>
+	<button cancel></button></hbox></frame>"
+		#echo "$CRON_DIALOG"
+#		exit
+		I=$IFS; IFS=""
+		for STATEMENTS in  $($GTKDIALOG --program=CRON_DIALOG); do
+			eval $STATEMENTS
+#			echo $STATEMENTS
+		done
+		IFS=$I
+		if [ "$EXIT" = "OK" ]; then
+			mirrorcrontask=""
+			snapshotcrontask=""
+			if [ "$mirrorcron" = "true" ]; then
+				m_days=""
+				for i in m_mon m_tue m_wed m_thu m_fri m_sat m_sun
+				do
+					if [ "${!i}" = "true" ]; then
+						if [ "$m_days" != "" ]; then
+							m_days="$m_days,"
+						fi
+						dow=$(echo $i | cut --delimiter=_ -f2)
+						m_days="$m_days$dow"
+					fi
+				done
+				if [ "$m_days" = "" ]; then
+					gtkmsgbox "No day was specified to execute mirror backup, aborting all."
+					continue
+				fi
+				if [ "$m_hour" = "" -o "$m_minute" = "" ]; then
+					gtkmsgbox "Hour or minute field(s) for scheduled mirror backup are empty, aborting all"
+					continue
+				fi
+				if [ "$m_hour"  -lt 0 -o "$m_hour" -gt 23 -o "$m_minute" -lt 0 -o "$m_minute" -gt 59 ]; then
+					gtkmsgbox "Hour or minute field(s) for mirror backup are out of range, aborting all"
+					continue
+				fi
+				mirrorcrontask="$m_minute $m_hour * * $m_days /usr/bin/snap2engine mirror $settingsdir $USER"
+#				echo "$mirrorcrontask"
+			fi
+			if [ "$snapshotcron" = "true" ]; then
+				s_days=""
+				for i in s_mon s_tue s_wed s_thu s_fri s_sat s_sun
+				do
+					if [ "${!i}" = "true" ]; then
+						if [ "$s_days" != "" ]; then
+							s_days="$s_days,"
+						fi
+						dow=$(echo $i | cut --delimiter=_ -f2)
+						s_days="$s_days$dow"
+					fi
+				done
+				if [ "$s_days" = "" ]; then
+					gtkmsgbox "No day is specified to execute snapshot backup, aborting all."
+					continue
+				fi
+				if [ "$s_hour" = "" -o "$s_minute" = "" ]; then
+					gtkmsgbox "Hour or minute field(s) for snapshot backup are empty, aborting all"
+					continue
+				fi
+				if [ "$s_hour"  -lt 0 -o "$s_hour" -gt 23 -o "$s_minute" -lt 0 -o "$s_minute" -gt 59 ]; then
+					gtkmsgbox "Hour or minute field(s) for snapshot backup are out of range, aborting all"
+					continue
+				fi
+				snapshotcrontask="$s_minute $s_hour * * $s_days /usr/bin/snap2engine snapshot $settingsdir $USER"
+#				echo "$snapshotcrontask"
+			fi
+			if [ "$snapshotcrontask" != "" -o "$mirrorcrontask" != "" -o "$delsnapcron" = "true" -o "$delmirrorcron" = "true" ]; then
+				snaptmp=/tmp/snap2cron-$$.temp
+				: > $snaptmp
+				{
+					while read cronline
+					do
+					if echo "$cronline" | grep "snap2engine snapshot $settingsdir" > /dev/null && [ "$snapshotcrontask" != "" -o "$delsnapcron" = "true" ]; then
+						:
+					# throw away if has
+					elif echo "$cronline" | grep "snap2engine mirror $settingsdir" > /dev/null && [ "$mirrorcrontask" != "" -o "$delmirrorcron" = "true" ]; then
+						:
+					else
+						echo "$cronline" >> $snaptmp
+					fi
+					done
+				} < <(crontab -l 2>/dev/null)
+				if [ "$snapshotcrontask" != "" ]; then
+					echo "$snapshotcrontask" >> $snaptmp
+				fi
+				if [ "$mirrorcrontask" != "" ]; then
+					echo "$mirrorcrontask" >> $snaptmp
+				fi
+#				cat $snaptmp
+				crontab $snaptmp
+				rm -f $snaptmp
+			fi
+		fi
+	fi
+fi
+done

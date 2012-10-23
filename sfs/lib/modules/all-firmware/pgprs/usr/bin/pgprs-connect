@@ -1,0 +1,18 @@
+#!/bin/sh
+#120131 rodin.s: internationalized.
+
+export TEXTDOMAIN=pgprs-connect
+export OUTPUT_CHARSET=UTF-8
+
+n="r"
+while  [ "$n" = "r" ]
+do
+/usr/sbin/pppd call gprsmm
+n="q"
+echo "Exit status is $?"
+echo "$(gettext 'DISCONNECTED')"
+echo ""
+echo "$(gettext 'Press ENTER to quit')"
+echo "$(gettext 'Press r ENTER to reconnect/try again')"
+read n
+done

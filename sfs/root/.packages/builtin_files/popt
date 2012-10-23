@@ -1,0 +1,8 @@
+/lib
+ libpopt.so.0
+ libpopt.so.0.0.0
+/usr
+/usr/lib
+ libpopt.so
+ libpopt.so.0
+ libpopt.so.0.0.0

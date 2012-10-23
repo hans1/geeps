@@ -1,0 +1,75 @@
+<JWM>
+<!--
+TITLE: JWM-Vu-darkgray2
+JWM ver: v2.1 - mod by vg
+-->
+
+<!-- WINDOW BORDER PROPERTIES -->
+
+<WindowStyle>
+<Font>DejaVu Sans 13:bold</Font>
+<Width>2</Width>
+<Height>28</Height>
+<Active>
+<Text>yellow</Text>
+<Title>#9dbbdb:black</Title>
+</Active>
+<Inactive>
+<Text>gray90</Text>
+<!-- <Title>lightsteelblue1:gray35</Title> -->
+<Title>gray70:gray30</Title>
+</Inactive>
+</WindowStyle>
+
+<!-- TRAY PROPERTIES -->
+
+<TrayStyle>
+<Font>DejaVu Sans 16:bold</Font>
+<Foreground>yellow</Foreground>
+<Background>#4D525B</Background>
+</TrayStyle>
+
+<!-- TASK LIST PROPERTIES -->
+
+<TaskListStyle>
+<Font>DejaVu Sans 14</Font>
+<ActiveForeground>yellow</ActiveForeground>
+<ActiveBackground>gray50:gray10</ActiveBackground>
+<Foreground>gray90</Foreground>
+<Background>gray60:gray20</Background>
+</TaskListStyle>
+
+<!-- PAGER PROPERTIES -->
+
+<PagerStyle>
+<Foreground>gray70</Foreground>
+<Background>gray45</Background>
+<ActiveForeground>gray65</ActiveForeground>
+<ActiveBackground>gray55</ActiveBackground>
+</PagerStyle>
+
+<!-- SYSTEM LOAD MODULE PROPERTIES -->
+
+
+<!-- POPUP PROPERTIES -->
+
+<PopupStyle>
+<Font>DejaVu Sans 13</Font>
+<Outline>black</Outline>
+<Foreground>black</Foreground>
+<Background>gold</Background>
+</PopupStyle>
+
+<!-- MENU PROPERTIES -->
+
+<MenuStyle>
+<Font>DejaVu Sans 13</Font>
+<Foreground>white</Foreground>
+<Background>#4D525B</Background>
+<ActiveForeground>yellow</ActiveForeground>
+<ActiveBackground>#9dbbdb:black</ActiveBackground>
+</MenuStyle>
+
+<!-- BACKGROUND KEY BINDING -->
+
+</JWM>

@@ -1,0 +1,29 @@
+/etc
+/etc/openldap
+ ldap.conf
+ .wh.ldap.conf.new
+/usr
+/usr/bin
+ ldapadd
+ ldapcompare
+ ldapdelete
+ ldapexop
+ ldapmodify
+ ldapmodrdn
+ ldappasswd
+ ldapsearch
+ ldapurl
+ ldapwhoami
+/usr/lib
+ liblber-2.4.so.2
+ liblber-2.4.so.2.5.6
+ liblber.so
+ libldap-2.4.so.2
+ libldap-2.4.so.2.5.6
+ libldap_r-2.4.so.2
+ libldap_r-2.4.so.2.5.6
+ libldap_r.so
+ libldap.so
+/usr/man
+/usr/man/man1
+/usr/man/man3

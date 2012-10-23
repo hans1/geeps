@@ -1,0 +1,17 @@
+/usr
+/usr/share
+/usr/share/mime
+ aliases
+/usr/share/mime/application
+ initramfs-gz.xml
+ pet.xml
+ pup.xml
+ x-bfe.xml
+ x-delta.xml
+ x-ext2-image.xml
+ x-ext3-image.xml
+ x-ext4-image.xml
+ x-notecase.xml
+ x-squashfs-image.xml
+/usr/share/mime/packages
+ puppy.xml

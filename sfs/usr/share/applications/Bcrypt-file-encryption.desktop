@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Bcrypt file encryption
+Name[ru]=Bcrypt шифрование файлов
+Name[ja]=Bcrypt 暗号化ファイル
+Exec=bcrypt_gui
+Icon=gz.xpm
+Categories=X-Personal

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+if [ -f "$APPDIR/themes/$THEME/icon_back.png" ]; then
+	ICON_BUTTON_BACK="<input file>$APPDIR/themes/$THEME/icon_back.png</input>"
+else
+	ICON_BUTTON_BACK="<input file stock=\"gtk-media-previous\"></input>"
+fi
+if [ -f "$APPDIR/themes/$THEME/icon_next.png" ]; then
+	ICON_BUTTON_NEXT="<input file>$APPDIR/themes/$THEME/icon_next.png</input>"
+else
+	ICON_BUTTON_NEXT="<input file stock=\"gtk-media-next\"></input>"
+fi
+
+GUI_BUTTON_BACK="
+ <button relief=\"2\" tooltip-text=\" $LOC154 \">
+  $ICON_BUTTON_BACK
+  <action>$APPDIR/func_player -back</action>
+ </button>"
+GUI_BUTTON_PLAY="
+ <button relief=\"2\" tooltip-text=\" $LOC_PLAY / $LOC151 \">
+  <input file>$WORKDIR/icon_playpause.png</input> ##this uses theme/icon_play and theme/icon_pause
+  <variable>BUTTON_PLAY</variable>
+  <action>$APPDIR/func_player -play refresh</action>
+  <action>refresh:BUTTON_PLAY</action>
+ </button>"
+GUI_BUTTON_NEXT="
+ <button relief=\"2\" tooltip-text=\" $LOC153 \">
+  $ICON_BUTTON_NEXT
+  <action>cp -f $WORKDIR/PLAYLIST $WORKDIR/tmpPLAYLIST</action> ##RATING:to remember what was played (decrease rating)
+  <action>$APPDIR/func_player -next</action>
+ </button>"
+
+GUI_NAVIGATION="
+ <hbox spacing=\"0\">
+ $GUI_BUTTON_BACK
+ $GUI_BUTTON_PLAY
+ $GUI_BUTTON_NEXT
+ </hbox>
+"

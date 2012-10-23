@@ -1,0 +1,35 @@
+/usr
+/usr/lib
+/usr/lib/libgnomeprint
+/usr/lib/libgnomeprint/2.18.6
+/usr/lib/libgnomeprint/2.18.6/modules
+/usr/lib/libgnomeprint/2.18.6/modules/filters
+ libgnomeprint-clip.so
+ libgnomeprint-draft.so
+ libgnomeprint-frgba.so
+ libgnomeprint-multipage.so
+ libgnomeprint-position.so
+ libgnomeprint-reorder.so
+ libgnomeprint-reverse.so
+ libgnomeprint-rotate.so
+ libgnomeprint-select.so
+ libgnomeprint-zoom.so
+/usr/lib/libgnomeprint/2.18.6/modules/transports
+ libgnomeprint-custom.so
+ libgnomeprint-file.so
+ libgnomeprint-lpr.so
+/usr/share
+/usr/share/libgnomeprint
+/usr/share/libgnomeprint/2.18.6
+ globals.xml
+/usr/share/libgnomeprint/2.18.6/models
+ GNOME-GENERIC-PS.xml
+ GNOME-PDF-WRITER.xml
+/usr/share/libgnomeprint/2.18.6/models/uninstalled
+ GNOME-META.xml
+/usr/share/libgnomeprint/2.18.6/printers
+ GENERIC.xml
+ PDF-WRITER.xml
+/usr/share/libgnomeprint/2.18.6/printers/uninstalled
+ META.xml
+/var

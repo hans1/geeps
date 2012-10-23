@@ -1,0 +1,18 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Icon Browser
+Name[fr]=Navigateur d'Icônes
+Name[ru]=Броузер иконок
+Name[sk]=Prezerač ikon
+Name[uk]=Броузер іконок
+Comment=Inspect GTK Icon Theme
+Comment[fr]=Parcourir les icônes du thème GTK
+Comment[ru]=Исследование темы иконок GTK
+Comment[sk]=Preskúmať tému ikon GTK
+Comment[uk]=Дослідження теми іконок GTK
+Categories=GTK;Development;
+Exec=yad-icon-browser
+Icon=/usr/share/icons/hicolor/16x16/apps/yad.png
+Terminal=false
+Type=Application
+StartupNotify=true

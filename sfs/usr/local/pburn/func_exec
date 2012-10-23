@@ -1,0 +1,271 @@
+#!/bin/sh
+#this script is the final step, and will start the actual burning
+
+BURN="$(<$WORKDIR/BURN)"
+COPY_BURN_ISO="$(<$WORKDIR/COPY_BURN_ISO)" #copy data disc either on-the-fly (false) or with only 1 device (true)
+echo -n > $LOG
+$APPDIR/func -logbox &
+[ "`grep -w 'dd' $WORKDIR/exec_preburn`" ] && echo "$LOC452" >> $LOG #dd gives no output while running
+#sort graft-points to avoid similar items for iso9660
+#this will do the same as 'mkisofs -cache-inodes' (supress hardlinks), pluss it will supress symlinks
+sort -t= -u +0 -1 --output=$WORKDIR/tmp_graft_points $WORKDIR/graft_points
+mv -f $WORKDIR/tmp_graft_points $WORKDIR/graft_points
+#---
+sleep 0.1 #be sure that copy message comes above log
+#pre-operations
+if [ "$(<$WORKDIR/exec_preburn)" ]; then
+	echo "$WORKDIR/exec_preburn >> $LOG 2>&1" > $WORKDIR/exec2_preburn
+	chmod 700 $WORKDIR/exec*
+	#pre-operations should not start after error-dialog on second try.
+	#ensure to start a fresh process (rxvt -e) without redirection. 
+	# - ffmpeg (some compiles) freezes X with rediction inside a process.
+	if [ "`grep -F ffmpeg $WORKDIR/exec2_preburn`" ]; then
+		if which rxvt > /dev/null 2>&1; then
+			rxvt +sb -bg black -fg red -cr black -geometry 60x2+1+1 -title "Pburn preburn operations - DO NOT CLOSE" -e $WORKDIR/exec2_preburn
+		else
+			xterm +sb -bg black -fg red -cr black -geometry 60x2+1+1 -title "Pburn preburn operations - DO NOT CLOSE" -e $WORKDIR/exec2_preburn
+		fi
+	else
+		$WORKDIR/exec2_preburn
+	fi
+fi
+#burn-again-loop
+while [ 1 ]; do
+	echo "$WORKDIR/exec >> $LOG 2>&1" > $WORKDIR/exec2
+	chmod 700 $WORKDIR/exec*
+###	#Puppy 5.3 (Slacko) freezes X if not running through rxvt 
+###	rxvt +sb -bg black -fg red -cr black -geometry 60x2+1+1 -title "Pburn burn operations - DO NOT CLOSE" -e $WORKDIR/exec2
+	$WORKDIR/exec2 
+
+	#check for errors
+	if [ $? != 0 ]; then
+		if [ ! -f $WORKDIR/end_while ]; then #check if user has pressed 'Emergency Stop' button
+			ERROR="<b>$LOC390</b>"
+			case "`cat $LOG`" in
+				*No\ disk*)							ERROR="$LOC387";;
+				*Cannot\ load*)						ERROR="$LOC388";;
+				*Joliet*)							ERROR="$LOC392";;
+				*No\ such\ device*)					ERROR="$LOC393";;
+				*overburn*)							ERROR="$LOC394";;
+				*list\ too\ long*)					ERROR="$LOC395";;
+				*seems\ to\ be\ mounted*)			ERROR="$LOC375";;
+				*No\ space\ left*)					ERROR="$LOC389"; rm "$ISOFILE";;
+				*BLANK\ media*)						ERROR="$LOC397";;
+				*next\ writable\ add*)				ERROR="$LOC398";;
+				*not\ recognized\ as\ recordable*)	ERROR="<b>$LOC391</b>";;
+				*CLOSE\ SESSION\ failed\ with*)		ERROR="$LOC395";;
+			esac
+			[ "$SOUND_ERROR" ] && aplay "$SOUND_ERROR" & #sound when done
+			export pburn_error="
+			<window title=\"Pburn\" icon-name=\"gtk-cdrom\">
+			 <vbox>
+			  <frame $LOC_ERROR>
+			   <pixmap icon_size=\"6\"><input file stock=\"gtk-dialog-error\"></input></pixmap>
+			   <text use-markup=\"true\"><label>\"$ERROR ... $LOC399\"</label></text>
+			   <text><label>\"$LOC261: $BURNDEV\"</label></text>
+			  </frame>
+			  <hbox>
+			   <button><label>$LOC477</label><input file stock=\"gtk-save\"></input><action>. $APPDIR/func -save_log</action></button>
+			   <button><label>$LOC750</label><input file>$APPDIR/pburn20.png</input><action>EXIT:ANOTHER_BURN</action></button>
+			   <button><label>$LOC751</label><input file stock=\"gtk-cancel\"></input></button>
+			  </hbox>
+			 </vbox>
+			</window>"
+			I=$IFS; IFS=""
+			for STATEMENTS in  $($GTKDIALOG -p pburn_error --center); do
+				eval $STATEMENTS
+			done
+			IFS=$I
+			if [ ! "$EXIT" = "ANOTHER_BURN" ]; then
+				for I in `ps | grep -i pburn | grep -iwE "pburn_tail|Xdialog|logbox" | awk '{print $1}'`; do kill -9 $I; done
+				rm -f "$OUTDIR"/Pburn.iso > /dev/null 2>&1
+				rm -f "$OUTDIR"/audio.cddb > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/audio.cdindex > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/pburn*.raw > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/pburn*.inf > /dev/null 2>&1 #audio copy
+				rm -rf "$OUTDIR"/pburn_tmp > /dev/null 2>&1
+				if [ "$EJECT" = "true" ] && [ $BURN != export_iso ]; then
+					eject $BURNDEV &
+				fi
+				exit 0
+			fi
+		fi
+	else #finished
+		while [ 1 ]; do #verify-loop
+			if [ -f "$OUTDIR/Pburn.iso" ] && [ $BURN != export_iso ] && [ $BURN != iso ] && [ $BURN != audio ]; then #save_iso button
+				GUI_SAVE_ISO="<button><label>$LOC473</label><input file stock=\"gtk-save\"></input><action>EXIT:save_iso</action></button>"
+			fi
+			#save slidehow button
+			if [ -f "$OUTDIR/pburn_tmp/slideshow.avi" ] && [ "$BURN" = "video" ]; then 
+				GUI_SAVE_SLIDESHOW="<button><label>$LOC476</label><input file stock=\"gtk-save\"></input><action>EXIT:save_slideshow</action></button>"
+			fi
+			
+			#verify md5sum if burnt iso-image, and no multisession
+			if [ $BURN = iso ] || [ "$COPY_BURN_ISO" = "true" ]; then
+				if [ $MEDIATYPE = CD ] && [ "`grep -v '\-multi ' $WORKDIR/exec`" ]; then MD5_BUTTON=true; fi
+				if [ $MEDIATYPE = DVD_ISO ] && [ "`grep '\-dvd\-compat ' $WORKDIR/exec`" ]; then MD5_BUTTON=true; fi
+				if [ "$MD5_BUTTON" = "true" ]; then
+					TEXT_VERIFY="<text use-markup=\"true\"><label>\"$LOC475\"</label></text>"
+					GUI_VERIFY="<button><label>$LOC470 (md5sum)</label><input file stock=\"gtk-apply\"></input><action>EXIT:md5</action></button>"
+				fi
+			fi
+			#Verify with dd
+			if [ $BURN = data ] && [ "$EXPORT_ISO" != "true" ]; then #verify button
+				TEXT_VERIFY="<text use-markup=\"true\"><label>\"$LOC475\"</label></text>"
+				GUI_VERIFY="<button><label>$LOC470</label><input file stock=\"gtk-apply\"></input><action>EXIT:verify</action></button>"
+			fi
+			#Verify copy-data-disc on-the-fly (off-the-fly uses the iso-image verify)
+			if [ "$COPY_BURN_ISO" = "false" ]; then
+				TEXT_VERIFY="<text use-markup=\"true\"><label>\"$LOC475\"</label></text>"
+				GUI_VERIFY="<button><label>$LOC470</label><input file stock=\"gtk-apply\"></input><action>EXIT:verify_2drives</action></button>"
+			fi
+			
+			
+			#Burn another copy
+			if [ "$EXPORT_ISO" != "true" ] || [ $BURN != blank ]; then
+				GUI_REPEAT="<button><label>$LOC408</label><input file stock=\"gtk-cdrom\"></input><action type=\"exit\">repeat</action></button>"
+			fi
+			#export iso doesn't requires eject
+			[ "$EXPORT_ISO" != "true" ] && GUI_EJECT="<checkbox label=\"$LOC479\"><variable>EJECT</variable><default>true</default></checkbox>"
+			#---
+			[ "$SOUND_FINISH" ] && aplay "$SOUND_FINISH" & #sound when done
+			export finish_box="
+			<window title=\"Pburn $VERSION\" icon-name=\"gtk-cdrom\">
+			 <vbox>
+			  <frame $LOC406>
+			   $SPLASH
+			   <text><label>\"\"</label></text>
+			   <text use-markup=\"true\"><label>\"$LOC407\"</label></text>
+			  </frame>
+			  $GUI_EJECT
+			  $TEXT_VERIFY
+			  <hbox>
+			   <button><label>$LOC477</label><input file stock=\"gtk-save\"></input><action>. $APPDIR/func -save_log</action></button>
+			   $GUI_REPEAT
+			   $GUI_SAVE_ISO
+			   $GUI_SAVE_SLIDESHOW
+			   $GUI_VERIFY
+			   <button><label>$LOC406</label><input file stock=\"gtk-quit\"></input></button>
+			  </hbox>
+			 </vbox>
+			</window>"
+			#show verify box if it is a DATA disc
+			I=$IFS; IFS=""
+			for STATEMENTS in  $($GTKDIALOG -p finish_box --center); do
+				eval $STATEMENTS > /dev/null 2>&1
+			done
+			IFS=$I
+			case $EXIT in
+			save_iso)
+				TITLE="$LOC473"
+				echo "$HOME/pburn.iso" > $WORKDIR/SAVEFILE
+				SAVE_EXT=iso
+				. $APPDIR/box_save
+				if [ -s $WORKDIR/SAVEFILE ]; then
+					SAVEFILE="`cat $WORKDIR/SAVEFILE`"
+					cp "$OUTDIR"/Pburn.iso "$SAVEFILE" >> $LOG
+				fi 
+				;;
+			save_slideshow)
+				TITLE="$LOC476"
+				echo "$HOME/pburn_slideshow.mpg" > $WORKDIR/SAVEFILE
+				SAVE_EXT=mpg
+				. $APPDIR/box_save
+				if [ -s $WORKDIR/SAVEFILE ]; then
+					SAVEFILE="`cat $WORKDIR/SAVEFILE`"
+					cp "$OUTDIR"/pburn_tmp/slideshow.mpg "$SAVEFILE" >> $LOG
+				fi
+				;;
+			verify)
+				$CDRECORD -load dev=$BURNDEV #ensure disc to reload
+				sleep 2 #time to spin up
+				. $APPDIR/func -check_media #did it really happen? (not all drives support auto reload)
+				echo -e "\n\n======================================================\n$LOC431. $LOC434\n$LOC435\n" >> $LOG
+				sleep 3
+				#---	
+				mkdir /tmp/verify 2>/dev/null
+				mount $BURNDEV /tmp/verify -t iso9660
+				diff -r --speed-large-files /tmp/verify $OUTDIR/pburn_symlink_tree | grep -v verify: > $WORKDIR/tmp
+				cat $WORKDIR/tmp >> $LOG
+				echo -e "\n...$LOC432" >> $LOG
+				umount /tmp/verify
+				if [ -s $WORKDIR/tmp ]; then #errors found
+					TXT1="$LOC470 - $LOC472"
+					TXT2="$LOC480"
+					. $APPDIR/box
+				else
+					IMG="dialog-info"; FRAME="$LOC431"
+					TXT1="$LOC471"
+					. $APPDIR/box
+				fi
+				;;
+			verify_2drives)
+				INDRIVE="${INDRIVE%%|*}"
+				#ensure disc to reload
+				$CDRECORD -load dev=$BURNDEV
+				$CDRECORD -load dev=$INDRIVE
+				sleep 2 #time to spin up
+				. $APPDIR/func -check_media #did it really happen? (not all drives support auto reload)
+				echo -e "\n\n======================================================\n$LOC431. $LOC434\n$LOC435\n" >> $LOG
+				sleep 3
+				#---	
+				mkdir /tmp/verify 2>/dev/null
+				mount $BURNDEV /tmp/verify -t iso9660
+				mkdir /tmp/verify2 2>/dev/null
+				mount $INDRIVE /tmp/verify2 -t iso9660
+				diff -r --speed-large-files /tmp/verify /tmp/verify2 | grep -v verify: | grep -v verify2: > $WORKDIR/tmp
+				cat $WORKDIR/tmp >> $LOG
+				echo -e "\n...$LOC432" >> $LOG
+				umount /tmp/verify
+				umount /tmp/verify2
+				if [ -s $WORKDIR/tmp ]; then #errors found
+					TXT1="$LOC470 - $LOC472"
+					TXT2="$LOC480"
+					. $APPDIR/box
+				else
+					IMG="dialog-info"; FRAME="$LOC431"
+					TXT1="$LOC471"
+					. $APPDIR/box
+				fi
+				;;
+			md5)
+				$CDRECORD -load dev=$BURNDEV #ensure disc to reload
+				. $APPDIR/func -check_media #did it really happen? (not all drives support auto reload)
+				echo "$LOC342" > $WORKDIR/splashtext
+				$APPDIR/box_splash &
+				[ ! "$ISOFILE" ] && ISOFILE="$OUTDIR"/Pburn.iso
+				MD5_FS="$( md5sum $ISOFILE | cut -f 1 -d " " )"
+				MD5_DISC="$( dd if=$BURNDEV | head -c `stat --format=%s $ISOFILE` | md5sum | cut -f 1 -d " " )" 
+				echo 100 > $WORKDIR/splash
+				#show result
+				IMG=dialog-info; FRAME=Md5sum
+				TXT1="$MD5_FS - $LOC_ISO
+$MD5_DISC - $LOC341"
+				TXT2="$LOC480"
+				. $APPDIR/box
+				;;
+			repeat)
+				break
+				;;
+			*)
+				for I in `ps | grep -i pburn | grep -iwE "pburn_tail|Xdialog|logbox" | awk '{print $1}'`; do kill -9 $I; done
+				if [ "$EJECT" = "true" ] && [ $BURN != export_iso ]; then
+					eject $BURNDEV &
+				fi
+				[ $BURN != blank ] && . $APPDIR/func -new
+				rm -f "$OUTDIR"/Pburn.iso > /dev/null 2>&1
+				rm -f "$OUTDIR"/audio.cddb > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/audio.cdindex > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/pburn*.raw > /dev/null 2>&1 #audio copy
+				rm -f "$OUTDIR"/pburn*.inf > /dev/null 2>&1 #audio copy
+				rm -rf "$OUTDIR"/pburn_tmp > /dev/null 2>&1
+				rm -f "$OUTDIR"/*.vob > /dev/null 2>&1 & #video copy
+				exit
+				;;
+			esac
+		done
+	 	eject $BURNDEV &
+		IMG="dialog-info"; FRAME="$LOC408"; TXT1="$LOC474"
+		. $APPDIR/box
+	fi
+done #repeat-ac

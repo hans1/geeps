@@ -1,0 +1,45 @@
+#! /bin/bash
+if [ -f /tmp/pschedule-loading ] && [ "$1" = "-a" ]; then exit; fi #Pschedule calls this at <action> in tables, which means it would check 5 times during startup if we hadn't prevented it with the -a switch. See xml code in func_new
+
+[ "$MINUTE" = "$any" ] && MINUTE="*"
+[ "$HOUR" = "$any" ] && HOUR="*"
+[ "$DAY" = "$any" ] && DAY="*"
+
+case "$MONTH" in
+	"$January")		MONTH="1";;
+	"$February")	MONTH="2";;
+	"$March")		MONTH="3";;
+	"$April")		MONTH="4";;
+	"$May" )		MONTH="5";;
+	"$June")		MONTH="6";;
+	"$July")		MONTH="7";;
+	"$August")		MONTH="8";;
+	"$September")	MONTH="9";;
+	"$October")		MONTH="10";;
+	"$November")	MONTH="11";;
+	"$December")	MONTH="12";;
+	*)				MONTH="*";;
+esac
+case "$WEEKDAY" in
+	"$Mondays")		WEEKDAY="1";;
+	"$Tuesdays")	WEEKDAY="2";;
+	"$Wednesdays")	WEEKDAY="3";;
+	"$Thursdays")	WEEKDAY="4";;
+	"$Fridays")		WEEKDAY="5";;
+	"$Saturdays")	WEEKDAY="6";;
+	"$Sundays")		WEEKDAY="0";;
+	*)				WEEKDAY="*";;
+esac
+
+if [ "$MINUTE" = "00" ]; then MINUTE="0"; fi
+if [ "$MINUTE" != "0" ] && [ "$MINUTE" -lt "10" ]; then MINUTE=`echo "$MINUTE" | tr -d 0`; fi
+if [ "$HOUR" = "00" ]; then HOUR="0"; fi
+if [ "$HOUR" != "0" ] && [ "$HOUR" -lt "10" ]; then HOUR=`echo "$HOUR" | tr -d 0`; fi
+DAY=`echo "$DAY" | tr -d .`
+
+echo "$MINUTE"		> /tmp/pschedule-cronminute
+echo "$HOUR"		> /tmp/pschedule-cronhour
+echo "$DAY"			> /tmp/pschedule-cronday
+echo "$MONTH"		> /tmp/pschedule-cronmonth
+echo "$WEEKDAY"		> /tmp/pschedule-cronweekday
+echo "$MINUTE $HOUR $DAY $MONTH $WEEKDAY  " > /tmp/pschedule-cron

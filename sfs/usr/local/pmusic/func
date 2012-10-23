@@ -1,0 +1,1017 @@
+#!/bin/sh
+#Pmusic
+#Copyright 2008,2009,2010,2011,2012
+#Sigmund Berglund
+IFS=$'\n'
+
+case "$1" in
+-dependency_check)
+	if [ "$(which rxvt 2> /dev/null)" ] && [ "`grep -Fi puppy /etc/DISTRO_SPECS`" ]; then
+		rxvt --hold +sb -bg black -fg grey -cr black -geometry 57x18 -title "Pmusic - '$LOC195'" -e pmusic -D &
+	else
+		xterm --hold -e pmusic -D &
+	fi
+	;;
+-window_search_options)
+	. $APPDIR/gui_add
+	#grab the latest info
+	[ -f $WORKDIR/SEARCH_MYMUSIC ] && SEARCH_MYMUSIC="$(<$WORKDIR/SEARCH_MYMUSIC)"
+	[ -f $WORKDIR/SEARCH_COLLECTIONS ] && SEARCH_COLLECTIONS="$(<$WORKDIR/SEARCH_COLLECTIONS)"
+	[ -f $WORKDIR/SEARCH_RADIOHITS ] && SEARCH_RADIOHITS="$(<$WORKDIR/SEARCH_RADIOHITS)"
+	[ -f $WORKDIR/SEARCH_RADIO ] && SEARCH_RADIO="$(<$WORKDIR/SEARCH_RADIO)"
+	[ -f $WORKDIR/SEARCH_WEBMUSIC ] && SEARCH_WEBMUSIC="$(<$WORKDIR/SEARCH_WEBMUSIC)"
+	[ -f $WORKDIR/SEARCH_FILES ] && SEARCH_FILES="$(<$WORKDIR/SEARCH_FILES)"
+	gui_search_options
+	echo '<window title="menu" decorated="false" height-request="140" skip_taskbar_hint="true" window_position="2">
+	 <vbox>
+	  <hbox>
+	   '$GUI_SEARCH_MYMUSIC'
+	   '$GUI_SEARCH_COLLECTIONS'
+	   <hbox space-expand="true" space-fill="true">
+	    <text><label>""</label></text>
+	   </hbox>
+	  </hbox>
+	  '$GUI_SEARCH_RADIOHITS'
+	  '$GUI_SEARCH_RADIO'
+	  '$GUI_SEARCH_WEBMUSIC'
+	  '$GUI_SEARCH_FILES'
+	  <hbox>
+	   '$GUI_SEARCH_PREF'
+	  </hbox>
+	 </vbox>
+	 <action signal="focus-out-event">EXIT:exit</action>
+	</window>' > $WORKDIR/xml_Pmusic_searchoptions
+	
+	$GTKDIALOG -f $WORKDIR/xml_Pmusic_searchoptions > /dev/null
+	;;
+	
+-sec2time) #transform 100 sec to 01:40
+	MIN=$(($2/60))
+	SEC=$(($2-($MIN*60)))
+	echo $(printf "%02d" $MIN):$(printf "%02d" $SEC)
+	;;
+-addmode)
+	case `cat $WORKDIR/ADDMODE` in
+		tail)
+			echo playing > $WORKDIR/ADDMODE
+			cp -f $APPDIR/themes/$THEME/icon_addmode_playing.png $WORKDIR/icon_addmode.png
+			;;
+		playing)
+			echo tail > $WORKDIR/ADDMODE
+			cp -f $APPDIR/themes/$THEME/icon_addmode_tail.png $WORKDIR/icon_addmode.png
+			;;
+	esac 
+	;;
+-playmode)
+	case `cat $WORKDIR/PLAYMODE` in
+		noloop)
+			echo loop > $WORKDIR/PLAYMODE
+			cp -f $APPDIR/themes/$THEME/icon_playmode_loop.png $WORKDIR/icon_playmode.png
+			;;
+		loop)
+			echo shuffle > $WORKDIR/PLAYMODE
+			cp -f $APPDIR/themes/$THEME/icon_playmode_shuffle.png $WORKDIR/icon_playmode.png
+			;;
+		shuffle)
+			echo noloop > $WORKDIR/PLAYMODE
+			cp -f $APPDIR/themes/$THEME/icon_playmode_noloop.png $WORKDIR/icon_playmode.png
+			;;
+	esac 
+	;;
+-reset_gtk) #the Pmusic specific gtk-theme is not meant for all kinds of dialogs...
+	if [ -f "$APPDIR/themes/$THEME/gtkrc" ]; then
+		if [ "`grep -F 'THEME_ALL_DIALOGS=false' $APPDIR/themes/$THEME/themerc 2> $STDERR`" ]; then 
+			if [ -f /etc/gtk-2.0/gtkrc ]; then
+				export GTK2_RC_FILES=':/etc/gtk-2.0/gtkrc' #/etc/gtk-2.0/gtkrc is for < Puppy4
+			else
+				export GTK2_RC_FILES="`grep -m 1 gtkrc $HOME/.gtkrc-2.0 | cut -d'\"' -f2 2> $STDERR`" #get active theme
+			fi
+		fi
+	fi
+	;;
+-faq)
+	TMP=`echo $LANGUAGE | cut -d: -f1`
+	[ "$LANGUAGE" = "auto" ] && TMP="`ls -1 /usr/share/doc/pmusic/ | grep $LANG | cut -d: -f1`"
+	#first check if faq exist on local system, then try www
+	if [ -s /usr/share/doc/pmusic/${TMP}:pmusic_faq.html ]; then
+		defaulthtmlviewer /usr/share/doc/pmusic/${TMP}:pmusic_faq.html
+	elif [ -s /usr/share/doc/pmusic/en_US:pmusic_faq.html ]; then
+		defaulthtmlviewer /usr/share/doc/pmusic/en_US:pmusic_faq.html
+	else 
+		echo "$LOC527..." > $WORKDIR/splashtext
+		$APPDIR/box_splash &
+		#check internet connection
+		LANG=C wget --spider --tries 1 $PING_SERVER 2> $WORKDIR/tmp
+		if [ ! "`grep 'connected' $WORKDIR/tmp`" ]; then
+			sleep 0.2
+			TXT1="<b>$LOC669</b>"
+			. $APPDIR/box_ok
+			echo 100 > $WORKDIR/splash #reset progress bar
+			exit
+		fi
+		#---
+		mkdir /usr/share/doc/pmusic 2> $STDERR
+		wget --tries=1 --user $FTP_USER --password $FTP_PASSWORD --output-document=/usr/share/doc/pmusic/en_US:pmusic_faq.html $FTP_SERVER/pmusic_faq.html
+		echo 100 > $WORKDIR/splash #remove dialog
+		defaulthtmlviewer /usr/share/doc/pmusic/en_US:pmusic_faq.html
+	fi
+	;;
+-statusbar_playlist)
+	#calculate length by sum up columns
+	MIN=`cut -d'|' -f2 $WORKDIR/playlist | awk -F: '{ SUM += $1} END { print SUM*60 }'`
+	SEC=`cut -d'|' -f2 $WORKDIR/playlist | awk -F: '{ SUM += $2} END { print SUM }'`
+	if [ ! "$SEC" ]; then #if list is empty
+		SEC_TOTAL=00; MIN_TOTAL=0
+	else
+		MIN_TOTAL=$((($MIN+$SEC)/60))
+		SEC_TOTAL=$((($MIN+$SEC)-($MIN_TOTAL*60)))
+		[ ${#SEC_TOTAL} -eq 1 ] && SEC_TOTAL="0$SEC_TOTAL" #ensure 2 digits
+	fi
+	#---
+	. $CONFIG #missing array values that won't export
+	echo "(${MIN_TOTAL}:${SEC_TOTAL}) ${PLAYLIST_NAME[$(<$WORKDIR/PLAYLIST1234)]}" > $WORKDIR/statusbar_playlist
+	;;
+
+-update_playlist) #update numbering in playlist. This might take a sec or two
+	if [ "$(<$WORKDIR/DONT_SAVE_PRESET)" ]; then #-j switch --> don't save current playlist
+		cp -f $WORKDIR/playlist.bak $WORKDIR/playlist
+		exit
+	fi
+	#update numbering in playlist
+	NR=1
+	echo -n > $WORKDIR/tmp
+	while read I; do
+		TMP="`echo $I | cut -d '|' -f 1-3`"
+		TMP1="`echo $I | cut -d '|' -f 4 | cut -d ' ' -f 2-`"
+		echo "$TMP|$(printf "%03d" $NR) $TMP1" >> $WORKDIR/tmp
+		NR=$(($NR+1))
+	done < $WORKDIR/playlist
+	cp $WORKDIR/tmp $WORKDIR/playlist
+	cp $WORKDIR/playlist $WORKDIR/playlist"$(<$WORKDIR/PLAYLIST1234)"
+	;;
+
+-radio)
+	#check if db exists
+	if [  ! -s $HOME/.pmusic/index_radio ]; then
+		echo -e "$LOC493" > $WORKDIR/sourcelist
+		echo true > $WORKDIR/UPDATE_SOURCELIST2
+		exit
+	fi
+	#---
+ 	[ "$2" = "-genre" ] && cp -f $APPDIR/radio-tags $WORKDIR/sourcelist
+	[ "$2" = "-country" ] && cp -f $APPDIR/radio-country $WORKDIR/sourcelist
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2 #update source-list
+	;;
+
+-show_add_window) #gui launches from gtkdialog code (only the old Classic frontend actually launches a separate gui)
+	ADD_MODE="$2"
+	[ "$ADD_MODE" = "-auto" ] && ADD_MODE='-browse'
+	case "$ADD_MODE" in
+	-blank)
+		echo '|Please wait...' > $WORKDIR/sourcelist
+		;;
+	-browse)
+		SOURCE="$BROWSERDIR"
+		[ ! "`echo "$SOURCE" | grep "^/"`" ] && SOURCE="  $HOME"
+		. $APPDIR/func -browse
+		;;
+	-source)
+		$APPDIR/func -kill_browser_id3 & #kill ongoing process
+		echo -e "  pmusic_cd_audio|CD\n|${LOC238}\n  $BROWSERDIR|    ${LOC_BROWSE}\n  pmusic_file_search|    ${LOC_SEARCH}\n\n  pmusic_index|${LOC228}...\n  pmusic_songs|    $LOC223\n  pmusic_collections|    $LOC224\n\n  pmusic_radiohits|${LOC229}..." > $WORKDIR/sourcelist
+		#radiohits
+		echo -n > $WORKDIR/tmp
+		while read I; do
+			cut -d'|' -f2 "$HOME/.pmusic/radio-hits preset/$I" | sort -u | grep -v "^$" >> $WORKDIR/tmp
+		done < $WORKDIR/radiohits_presets
+		while read I; do
+			[ ! "`grep -F "pmusic_radiohits:$I|" $WORKDIR/sourcelist`" ] && echo -e "  pmusic_radiohits:$I|    `basename "$I"`" >> $WORKDIR/sourcelist
+		done < $WORKDIR/tmp
+		#---
+		echo -e "\n  pmusic_radio|${LOC222}...\n  pmusic_radio_genre|    ${LOC_GENRE}\n  pmusic_radio_country|    $LOC_COUNTRY\n\n  pmusic_webmusic_manager|${LOC221} (jamendo.com)...\n  pmusic_top100_|    Top100" >> $WORKDIR/sourcelist
+		#webmusic
+		for I in Blues Classical Electro Jazz Hiphop Lounge Metal Pop Rock; do
+			echo -e "  pmusic_top100_$I|    Top100: $I" >> $WORKDIR/sourcelist
+		done
+		echo -e "  pmusic_webmusic|    $LOC_BROWSE" >> $WORKDIR/sourcelist
+		#podcasts
+		echo -e "\n  pmusic_podcast|${LOC600}..." >> $WORKDIR/sourcelist
+		TMP="`find "$PODCAST_DIR" -maxdepth 1 -mindepth 1 -printf "  %p|    %f\n" 2> $STDERR`"
+		[ ! "$TMP" ] && TMP="|    $LOC617"
+		echo -e "$TMP" >> $WORKDIR/sourcelist
+		#bookmarks
+		echo -e "\n  pmusic_bookmarks|${LOC227}..." >> $WORKDIR/sourcelist
+		#turn coloums in bookmarks
+		cut -d '|' -f1 $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+		cut -d '|' -f2 $HOME/.pmusic/bookmarks > $WORKDIR/tmp1
+		paste -d'|' $WORKDIR/tmp1 $WORKDIR/tmp >> $WORKDIR/sourcelist
+		#favorites
+		echo -e "\n  pmusic_rating|${LOC226}" >> $WORKDIR/sourcelist
+		sort -rnst'|' -k3,3 $HOME/.pmusic/index_rating | head -n 20 >> $WORKDIR/sourcelist
+		#recent played
+		echo -e "\n  pmusic_recent|${LOC225}" >> $WORKDIR/sourcelist
+		tail -n 20 $HOME/.pmusic/index_recent | tac >> $WORKDIR/sourcelist
+		echo > $WORKDIR/filebrowser_dir
+		;;
+	esac
+	;;
+-playlist_menu)
+	#external menu
+	if [ $BUTTON = 3 ]; then
+		echo true > $WORKDIR/RIGHT_MENU #if menu, exit -playlist_select)
+		echo -n > $WORKDIR/OUTPUT
+		if [ "$PLAYLIST" ]; then
+			[ "`echo "$PLAYLIST" | grep -E 'cdda:| http'`" ] && MENU_VISIBLE='<sensitive>false</sensitive>' #in case cdda or stream, disable some choices and some new
+			TMP="`echo "$PLAYLIST" | cut -c5-`"
+			[ ! "`grep -wF "$TMP" $HOME/.pmusic/index_rating`" ] && MENU_RATE_VISIBLE='<sensitive>false</sensitive>'
+			[ ! "$AUDIO_EDITOR" ] && AUDIO_EDITOR_SENSITIVE='<sensitive>false</sensitive>'
+			export gtkdialog_menu='
+<window title="menu" decorated="false" height-request="217" skip_taskbar_hint="true" window_position="2">
+ <hbox>
+  <vbox spacing="2">
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-remove"></input></pixmap>
+   <text height-request="2"><label>""</label></text>
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-info"></input></pixmap>
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-open"></input></pixmap>
+   <text height-request="72"><label>""</label></text>
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-convert"></input></pixmap>
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-copy"></input></pixmap>
+   <pixmap height-request="20" icon_size="1"><input file stock="gtk-delete"></input></pixmap>
+  </vbox>
+  <vbox spacing="2">
+   <button height-request="20" xalign="0" can-focus="no" relief="2"><label>" '$LOC136' "</label><action>echo "'$LOC136'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <hseparator></hseparator>
+   <button height-request="20" xalign="0" can-focus="no" relief="2"><label>" '$LOC141'"</label><action>echo info > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_VISIBLE'<label>" '$LOC138'"</label><action>echo "'$LOC138'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_VISIBLE''$AUDIO_EDITOR_SENSITIVE'<label>" '$LOC139'"</label><action>echo "'$LOC139'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <hseparator></hseparator>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_RATE_VISIBLE'<label>" '$LOC210' +5"</label><action>echo rate+5 > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_RATE_VISIBLE'<label>" '$LOC210' -5"</label><action>echo rate-5 > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <hseparator></hseparator>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_VISIBLE'<label>" '$LOC132'"</label><action>echo "'$LOC132'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_VISIBLE'<label>" '$LOC133'"</label><action>echo "'$LOC133'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   <button height-request="20" xalign="0" can-focus="no" relief="2">'$MENU_VISIBLE'<label>" '$LOC134'"</label><action>echo "'$LOC134'" > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+  </vbox>
+ </hbox>
+ <action signal="focus-out-event">EXIT:exit</action>
+</window>'
+			$GTKDIALOG -p gtkdialog_menu > /dev/null
+			OUTPUT=($(<"$WORKDIR/OUTPUT"))
+			case "$OUTPUT" in
+				"$LOC136")
+					$APPDIR/func -remove_from_list
+				;;
+				info)
+					$APPDIR/func_trackinfo "$(cut -c5- <<< "$PLAYLIST")" -norefresh &
+				;;
+				"$LOC138")
+					$APPDIR/func -show_location &
+				;;
+				"$LOC139")
+					#store meta-info because editor will most likely destroy them
+					FILE="$(cut -c5- <<< "$PLAYLIST")"
+					. $APPDIR/func_id3io "$FILE" -read
+					#Run editor
+					$AUDIO_EDITOR "$(cut -c5- <<< "$PLAYLIST")"
+					#save meta-info to new (edited) file
+					. $APPDIR/func_id3io "$FILE" -write
+				;;
+				"$LOC132")
+					$APPDIR/func -rename
+				;;
+				"$LOC133")
+					$APPDIR/func -copy
+				;;
+				"$LOC134")
+					$APPDIR/func -delete
+				;;
+				rate+5)
+					$APPDIR/func_trackinfo -rate +5
+				;;
+				rate-5)
+					$APPDIR/func_trackinfo -rate -5
+				;;
+			esac
+		fi
+	fi
+	;;
+-playlist_select)
+	#button right-click --> already run -playlist_menu
+	if [ "$(<"$WORKDIR/RIGHT_MENU")" = "true" ]; then echo -n > $WORKDIR/RIGHT_MENU; exit; fi
+	#button mid-click
+	if [ $BUTTON = 2 ]; then
+		$APPDIR/func -remove_from_list
+		exit
+	fi
+	#Button left-click
+	PLAYLIST_PRESS_EVENT=($(<"$WORKDIR/PLAYLIST_PRESS_EVENT"))
+	PRESS_EVENT="`grep -F "$PLAYLIST_PRESS_EVENT" $WORKDIR/playlist`"
+	RELEASE_EVENT="`grep -F "$PLAYLIST" $WORKDIR/playlist`"
+	#move song in playlist
+	if [ "$RELEASE_EVENT" != "$PRESS_EVENT" ]; then
+		grep -Fv "$PRESS_EVENT" $WORKDIR/playlist > $WORKDIR/tmp
+		if [ `echo "$RELEASE_EVENT" | grep -c ^` -gt 1 ]; then #move last. RELEASE_EVENT includes all songs if nothing is choosen
+			mv -f $WORKDIR/tmp $WORKDIR/tmp1
+			echo "$PRESS_EVENT" >> $WORKDIR/tmp1
+		else #normal move
+			grep -Fm1 -B1000 "$RELEASE_EVENT" $WORKDIR/tmp | grep -vF "$RELEASE_EVENT" > $WORKDIR/tmp1
+			echo "$PRESS_EVENT" >> $WORKDIR/tmp1
+			grep -Fm1 -A1000 "$RELEASE_EVENT" $WORKDIR/tmp >> $WORKDIR/tmp1
+		fi
+		mv -f $WORKDIR/tmp1 $WORKDIR/playlist
+	else #play
+		if [ "$PLAYLIST_PRESS_EVENT" ]; then
+			echo 0 > $WORKDIR/SS
+			$APPDIR/func_player -stop
+			$APPDIR/func_player -play -refresh
+		fi
+	fi
+	;;
+-remove_from_list)
+	if [ "$PLAYLIST" ]; then
+		grep -vF "$PLAYLIST" $WORKDIR/playlist > $WORKDIR/tmp
+		mv -f $WORKDIR/tmp $WORKDIR/playlist
+		$APPDIR/func -statusbar_playlist & #update statusbar
+	fi
+	;;
+-kill_browser_id3)
+	if [ "$ID3_BROWSER" = "true" ]; then
+		echo false > $WORKDIR/UPDATE_SOURCELIST
+		for I in `ps | grep 'browse_id3' | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+		rm -f $WORKDIR/tmp_statusbar #remove info in statusbar
+	fi
+	;;
+-browse_radiohits) #use a unique browser function because of several unique options --> no id3, no dirs, no .., sort by time
+	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	find "$SOURCE" -maxdepth 1 -type f -printf "  %p|%f|%CY %Cm.%Cd\n" | grep -iE ".mp3|.ogg" | sort -rst'|' -k3,3 --output=$WORKDIR/sourcelist 
+	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+-browse)
+	SOURCE="`echo "$SOURCE" | cut -c 3-`"
+	if [ "`file -L "${SOURCE}" | grep " directory$"`" ]; then
+		$APPDIR/func -kill_browser_id3 #kill ongoing process
+		TMP="`dirname "$SOURCE"`"
+		[ "$SOURCE" = ".." ] && SOURCE="$TMP"
+		if [ "$SOURCE" != "/" ]; then echo "  $TMP|.." > $WORKDIR/sourcelist; else echo -n > $WORKDIR/sourcelist; fi
+		echo "$SOURCE" > $WORKDIR/filebrowser_dir #remember path for next time
+		#find dirs an links
+		find "$SOURCE" -mindepth 1 -maxdepth 1 -type d -printf "  %p|/%f/\n" | grep -v '/\.' | sort >> $WORKDIR/sourcelist
+		find "$SOURCE" -maxdepth 1 -type l -printf  "  %l|/%f/\n" | sort >> $WORKDIR/sourcelist
+		#now find tracks
+		TMP="`find "$SOURCE" -maxdepth 1 -type f -printf "  %p|%f\n" | grep -iE "$AUDIO_FORMATS|\.m3u|\.m3y|\.pls" | sort`"
+		echo "$TMP" >> $WORKDIR/sourcelist
+		#only start id3-browser if tracks in dir
+		if [ "$TMP" ] && [ "$ID3_BROWSER" = "true" ]; then
+			echo true > $WORKDIR/UPDATE_SOURCELIST2
+			$APPDIR/func -browse_id3 &
+		else
+			echo true > $WORKDIR/UPDATE_SOURCELIST2
+		fi
+	fi
+	;;
+-browse_id3)
+	[ $ID3_BROWSER = false ] && exit 
+	echo -n > $WORKDIR/tmp_id3
+	echo " $LOC208..." > $WORKDIR/tmp_statusbar #add info to statusbar
+	echo false > $WORKDIR/UPDATE_SOURCELIST
+	cp $WORKDIR/sourcelist $WORKDIR/sourcelist_old & #keep original for refresh-field-check
+	COUNT=0
+	while read I; do
+		case $I in
+		*__/*|*http:*|*.m3u*) echo "$I||" >> $WORKDIR/tmp_id3;; #URLs and heading for file-search--> do nothing
+		*/*)
+			FILE="`echo "$I" | cut -d'|' -f1 | cut -c3-`"
+			if [ $COUNT -gt $ID3_BROWSER_MAX ] || [ -d "$FILE" ]; then #else it occupies the cpu too long
+				echo "$I||" >> $WORKDIR/tmp_id3
+			else
+#				#Pmusic reads only basic tags, so id3 version 1 is fastest and enough if exist. This is only available for *.mp3 files
+#				if [ "`tail -c 128 "$FILE" | grep TAG`" ]; then #use builtin id3 version 1 grabber
+#					ID3_BITRATE=" $(file -b "$FILE" | cut -d, -f5 | cut -d' ' -f2)"
+#					ID3_TITLE="`tail -c 125 "$FILE" | head -c 30`"
+#					if [ "$ID3_TITLE" ] && [ ! "$(grep -iE "^ $|unknown" <<<"$ID3_TITLE")" ]; then #use meta-tags only if 'title' exists
+#						ID3_ARTIST="`tail -c 95 "$FILE" | head -c 30`"
+#						ID3_ALBUM="`tail -c 65 "$FILE" | head -c 30`"
+#						ID3_YEAR="`tail -c 35 "$FILE" | head -c 4`"
+#						#ID3_COMMENT="`tail -c 31 "$FILE" | head -c 8`"
+#						ID3_TRACK="`tail -c 3 "$FILE" | hexdump -ve '/1 "%02i "' | awk '{ if ($1 == 0 && $2 != 0) print $2" " }'`"
+#						ID3_GENRE="`tail -c 1 "$FILE" | hexdump -ve '/1 "%03i"'`"
+#					fi
+#				else #read the ordinary way - slower (much slower when using ffpmeg)
+					. $APPDIR/func_id3io "$FILE" -read
+#				fi
+				if [ "$ID3_TITLE" ] && [ ! "$(grep -iE "^ $|unknown" <<<"$ID3_TITLE")" ]; then #use meta-tags only if 'title' exists
+					echo "  $FILE|$ID3_TITLE|$ID3_ARTIST|$ID3_BITRATE|$ID3_ALBUM|$ID3_TRACK|$ID3_YEAR|$ID3_GENRE" >> $WORKDIR/tmp_id3
+				else #audio track with no metatags and other stuff like dirs --> for browsing only
+					echo "$I||$ID3_BITRATE" >> $WORKDIR/tmp_id3
+				fi
+				
+				#we count only when a item has id3-tag. This to load only the chosen number of files (defined in preferences)
+				COUNT=$(($COUNT+1))
+			fi
+			;;
+		*) echo "$I||" >> $WORKDIR/tmp_id3;; #headings, messages --> do nothing
+		esac
+	done < $WORKDIR/sourcelist
+	#convert genre number
+	cut -d'|' -f8 $WORKDIR/tmp_id3 | sort -u | grep -v "^$" | grep [0-9] > $WORKDIR/tmp2_id3
+	while read I; do 
+		TMP="`echo "$I" | sed -e 's/^00//' -e 's/^0//'`"
+		ID3_GENRE="`grep -m1 "(${TMP})" $APPDIR/txt_id3genre | cut -d'(' -f1`"
+		[ "$ID3_GENRE" ] && sed -i "s%$I$%$ID3_GENRE%g" $WORKDIR/tmp_id3
+	done < $WORKDIR/tmp2_id3
+	#if user hasn't changed dir during meta-load loop, refresh <table>
+	if [ ! "`diff $WORKDIR/sourcelist $WORKDIR/sourcelist_old`" ]; then #search
+		if [ "$2" = "-search" ]; then #searhing
+			cat $WORKDIR/tmp_id3 > $WORKDIR/sourcelist
+		else #ordinary browsing
+			cat $WORKDIR/tmp_id3 | sort -nst'|' -k6,6 | sort -st'|' -k5,5 | sort -nst'|' -k7,7 | sort -st'|' -k3,3 --output=$WORKDIR/sourcelist #alias sort by artist
+		fi
+	fi
+	echo true > $WORKDIR/UPDATE_SOURCELIST
+	rm -f $WORKDIR/tmp_statusbar #for statusbar
+	;;
+-index_sort_file)
+	sort --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_title)
+	sort -t'|' -k2 --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_artist) #also sort albums and tracks in chronologic order
+	cat $WORKDIR/sourcelist | sort -nst'|' -k6,6 | sort -st'|' -k5,5 | sort -nst'|' -k7,7 | sort -st'|' -k3,3 --output=$WORKDIR/tmp
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_bitrate)
+	sort -t'|' -k4 --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_album) #sort tracks inside album-sort
+	cat $WORKDIR/sourcelist | sort -nst'|' -k6,6 | sort -st'|' -k5,5 --output=$WORKDIR/tmp
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_track)
+	sort -n -t'|' -k6 --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_year)
+	sort -n -t'|' -k7 --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-index_sort_genre)
+	sort -t'|' -k8 --output=$WORKDIR/tmp $WORKDIR/sourcelist
+	grep -vE "^$|^\|__|^\|  " $WORKDIR/tmp > $WORKDIR/sourcelist
+	;;
+-about)
+	. $APPDIR/func -reset_gtk
+	. $APPDIR/gui_about
+	$GTKDIALOG -p Pmusic_about
+	;;
+-undo)
+	$APPDIR/func_store_playlist
+	PLAYLIST_NAME=($(<"$WORKDIR/PLAYLIST_NAME"))
+	[ ! "$PLAYLIST_NAME" ] && PLAYLIST_NAME="`ls $HOME/.pmusic/storage_playlist/ | tail -n 1`"
+	[ -s $WORKDIR/playlist ] && PLAYLIST_NAME="`ls $HOME/.pmusic/storage_playlist/ | grep --before-context=1 -x "$PLAYLIST_NAME" | head -n 1`"
+	cp $HOME/.pmusic/storage_playlist/"$PLAYLIST_NAME" $WORKDIR/playlist
+	echo "$PLAYLIST_NAME" > $WORKDIR/PLAYLIST_NAME
+	$APPDIR/func -statusbar_playlist & #update statusbar
+	;;
+-redo)
+	PLAYLIST_NAME=($(<"$WORKDIR/PLAYLIST_NAME"))
+	TMP="`ls $HOME/.pmusic/storage_playlist/ | grep --after-context=1 -x "$PLAYLIST_NAME" | tail -n 1`"
+	cp $HOME/.pmusic/storage_playlist/"$TMP" $WORKDIR/playlist
+	echo "$TMP" > $WORKDIR/PLAYLIST_NAME
+	$APPDIR/func -statusbar_playlist & #update statusbar
+	;;
+-search_for_song_in_playlists)
+	PLAYLIST=($(<"$WORKDIR/PLAYLIST"))
+	echo -n > $WORKDIR/song_info
+	echo "$LOC657..." > $WORKDIR/splashtext
+	$APPDIR/box_splash_progress &
+	#---
+	COUNT=1
+	TOTAL=`grep -c '^' $HOME/.pmusic/index_playlists`
+	TMP_SONG="`basename "$PLAYLIST"`"
+	cut -c 3- $HOME/.pmusic/index_playlists | cut -d '|' -f 1 > $WORKDIR/tmp
+	while read I; do
+		grep -l "$TMP_SONG" "$I" >> $WORKDIR/song_info
+		#update progress
+		echo $(($COUNT*100/$TOTAL)) > $WORKDIR/splash
+		COUNT=$(($COUNT+1))
+	done < $WORKDIR/tmp
+	echo 100 > $WORKDIR/splash #reset progress bar
+	FRAME="$LOC657":
+	IMG="dialog-info"
+	[ ! -s $WORKDIR/song_info ] && echo "$LOC255" > $WORKDIR/song_info
+	TXT1=($(<"$WORKDIR/song_info"))
+	. $APPDIR/box_ok
+	;;
+-edit_tags)
+	. $APPDIR/func_trackinfo "$FILE"
+	;;
+-time_format)
+	if [ -f $WORKDIR/ffmpeg_TIME_FORMAT ]; then
+		rm $WORKDIR/ffmpeg_TIME_FORMAT
+	else
+		echo remain > $WORKDIR/ffmpeg_TIME_FORMAT
+	fi
+	;;
+-burn)
+	cut -d '|' -f 4 $WORKDIR/playlist | cut -d ' ' -f 2- | grep -vF "('\|cdda:\|://\|')" > $WORKDIR/tmp #do not include CD tracks and streams
+	export BROWSER_DIR=""
+	$APPDIR/func -reset_gtk
+	pburn -i $WORKDIR/tmp
+	;;
+-show_location)
+	PLAYLIST="`echo "$PLAYLIST" | cut -c 5-`" #remove numbering
+	[ ! "$PLAYLIST" ] && exit
+	DIRECTORY="`dirname "$PLAYLIST"`"
+	rox -d "$DIRECTORY" &
+	;;
+-quit)
+	#first quit guis
+	for I in `ps | grep -Fi pmusic | grep -F gtkdialog | grep -vF radiohits_grabber | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done #do not kill radiohits grabber 
+	killall pmusic_tray
+	#stop audio
+	pmusic -s stop
+	#remove play-icon in playlist
+	sed -i "s/gtk-media-play//" $WORKDIR/playlist
+	#update playlist(s) information
+	$APPDIR/func -update_playlist
+	#deactivate equalizer
+	mv -f $HOME/.asoundrc $HOME/.asoundrc.bak 2> $STDERR
+	#remove temporary cd-audio files
+	rm $WORKDIR/*.wav 2> $STDERR
+	rm $WORKDIR/*.inf 2> $STDERR
+	#remove temporary files, some could be big
+	rm $WORKDIR/tmp* 2> $STDERR
+	rm $WORKDIR/trackinfo[0-9]* 2> $STDERR #keep the refreshing trackinfo files
+	rm $WORKDIR/tmp_statusbar 2> $STDERR #be sure to reset statusbar info in case hangup.
+	echo -n > $WORKDIR/statusbar
+	#kill the rest - in case something is still running
+	for I in `ps | grep -i pmusic | grep index | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+	for I in `ps | grep aplay | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+	for I in `ps | grep pmusic | grep playing | awk '{print $1}'`; do kill -9 $I 2> $STDERR; done
+	killall cdda2wav 2> $STDERR
+	#reset info about search filters. Next run will use settings from preferences
+	rm $WORKDIR/SEARCH_*
+	exit 0
+	;;
+-store_playlist1234)
+	#At startup Pmusic runs this from the menuitem <action>. We use it to update the playlist AFTER gui is up and running. This gives a much faster gui-load
+	if [ ! -s $WORKDIR/playlist ]; then
+		cp $WORKDIR/playlist"$(<$WORKDIR/PLAYLIST1234)" $WORKDIR/playlist
+		echo true > $WORKDIR/UPDATE_GUI
+		exit
+	fi
+	#---
+	sed -i "s/gtk-media-play//" $WORKDIR/playlist #do not save play-icon in playlist
+	cp $WORKDIR/playlist $WORKDIR/playlist"$(<$WORKDIR/PLAYLIST1234)" #this is the old list
+	;;
+-rename)
+	PLAYLIST="`echo "$PLAYLIST" | cut -c 5-`" #remove numbering
+	FILE="`basename "$PLAYLIST" | sed -e 's/\.[^\.]*$//'`"
+	EXTENSION="`basename "$PLAYLIST" | sed -e "s/^.*\.//g"`"
+	DIR="`dirname "$PLAYLIST"`"
+	FRAME="$LOC132"; IMG="convert"; TXT1="$FILE"; DEFAULT="$FILE"
+	. $APPDIR/box_input
+	if [ $EXIT = "ok" ]; then
+		#if no name (use of " in name clears variable)
+		if [ ! "$INPUT" ]; then
+			TXT1="$LOC525"
+			. $APPDIR/box_ok
+			exit
+		fi
+		#check if already exist
+		if [ -f "$DIR"/"$INPUT"."$EXTENSION" ]; then
+			TXT1="$DIR"/"$INPUT"."$EXTENSION $LOC503"
+			. $APPDIR/box_ok #error
+			exit			
+		fi
+		#---
+		echo > $WORKDIR/error		
+		mv "$DIR"/"$FILE"."$EXTENSION" "$DIR"/"$INPUT"."$EXTENSION" 2> $WORKDIR/error
+		TXT1=($(<"$WORKDIR/error"))
+		if [ -n "$TXT1" ]; then
+			. $APPDIR/box_ok #error
+		else #update playlist and index
+			NAME="`grep -Fm 1 " $PLAYLIST" $WORKDIR/playlist | cut -d'|' -f3`"
+			#running sed directly gives problems with special chars
+			echo "sed -i 's%|$NAME|%|$INPUT|%g' $WORKDIR/playlist" > $WORKDIR/exec3
+			echo "sed -i 's%$DIR/$FILE.$EXTENSION%$DIR/$INPUT.$EXTENSION%' $WORKDIR/playlist" >> $WORKDIR/exec3
+			echo "sed -i 's%/$FILE.$EXTENSION%/$INPUT.$EXTENSION%' $HOME/.pmusic/index_all" >> $WORKDIR/exec3
+			echo "sed -i 's%|$FILE.$EXTENSION%|$INPUT.$EXTENSION%' $HOME/.pmusic/index_all" >> $WORKDIR/exec3
+			echo "sed -i 's%/$FILE.$EXTENSION%/$INPUT.$EXTENSION%' $HOME/.pmusic/index_alphabetic" >> $WORKDIR/exec3
+			echo "sed -i 's%|$FILE.$EXTENSION%|$INPUT.$EXTENSION%' $HOME/.pmusic/index_alphabetic" >> $WORKDIR/exec3
+			echo "sed -i 's%/$FILE.$EXTENSION%/$INPUT.$EXTENSION%' $HOME/.pmusic/index_recent" >> $WORKDIR/exec3
+			echo "sed -i 's%|$FILE.$EXTENSION%|$INPUT.$EXTENSION%' $HOME/.pmusic/index_recent" >> $WORKDIR/exec3
+			echo "sed -i 's%/$FILE.$EXTENSION%/$INPUT.$EXTENSION%' $HOME/.pmusic/index_rating" >> $WORKDIR/exec3
+			echo "sed -i 's%|$FILE.$EXTENSION%|$INPUT.$EXTENSION%' $HOME/.pmusic/index_rating" >> $WORKDIR/exec3
+			sed -i 's/\&/\\\&/g' $WORKDIR/exec3
+			chmod 777 $WORKDIR/exec3
+			$WORKDIR/exec3
+		fi
+	fi
+	;;
+-copy)
+	PLAYLIST="`echo "$PLAYLIST" | cut -c 5-`" #remove numbering
+	FRAME="$LOC133"; IMG="copy"; TXT1="$PLAYLIST"; DEFAULT="$PLAYLIST"
+	. $APPDIR/box_input
+	if [ $EXIT = "ok" ]; then
+		echo > $WORKDIR/error
+		cp "$PLAYLIST" "$INPUT" 2> $WORKDIR/error
+		TXT1=($(<"$WORKDIR/error"))
+		[ -n "$TXT1" ] && . $APPDIR/box_ok #error
+	fi
+	;;
+-delete)
+	PLAYLIST="`echo "$PLAYLIST" | cut -c 5-`" #remove numbering
+	FRAME="$LOC134"; IMG="clear"; TXT1="$PLAYLIST"
+	. $APPDIR/box_yesno
+	if [ $EXIT = "yes" ]; then
+		echo > $WORKDIR/error
+		rm "$PLAYLIST" 2> $WORKDIR/error
+		if [ -s $WORKDIR/error ]; then
+			TXT1="$LOC526"; IMG=dialog-error
+			. $APPDIR/box_yesno #error
+			[ $EXIT = $LOC_NO ] && exit
+		fi
+		. $APPDIR/func -remove_from_list
+		#clean up index
+		grep -vF "$PLAYLIST" $HOME/.pmusic/index_recent > $WORKDIR/tmp
+		mv -f $WORKDIR/tmp $HOME/.pmusic/index_recent
+		grep -vF "$PLAYLIST" $HOME/.pmusic/index_rating > $WORKDIR/tmp
+		mv -f $WORKDIR/tmp $HOME/.pmusic/index_rating
+		grep -vF "$PLAYLIST" $HOME/.pmusic/index_alphabetic > $WORKDIR/tmp
+		mv -f $WORKDIR/tmp $HOME/.pmusic/index_alphabetic
+		grep -vF "$PLAYLIST" $HOME/.pmusic/index_all > $WORKDIR/tmp
+		mv -f $WORKDIR/tmp $HOME/.pmusic/index_all
+	fi
+	;;
+-set_SAVEFILE)
+	echo "$CHOOSER" > $WORKDIR/SAVEFILE
+	;;
+-save)
+	. $APPDIR/func -reset_gtk
+	TMP="$(<$WORKDIR/last_added_playlist)"
+	DIR="`dirname "$TMP"`"
+	export pmusic_save='
+	<window title="Pmusic - '$LOC102'" icon-name="pmusic">
+	 <vbox>
+	  <frame '$LOC102'>
+	   <hbox>
+	    <text><label>'$LOC281'</label></text>
+	    <entry accept="file" width-request="300" fs-filters="*.m3u" fs-folder="'$DIR'" fs-title="Pmusic - '$LOC102'">
+	     <variable>SAVEFILE</variable>
+	     <input>cat '$WORKDIR'/last_added_playlist</input>
+	    </entry>
+	    <button>
+	     <input file stock="gtk-open"></input>
+	     <action type="fileselect">SAVEFILE</action>
+	    </button>
+	   </hbox>
+	   <checkbox tooltip-text="'$LOC283'">
+	    <label>'$LOC282'</label>
+	    <variable>SAVE_PATH</variable>
+	    <default>true</default>
+	   </checkbox>
+	   <checkbox tooltip-text="'$LOC285'">
+	    <label>'$LOC284'</label>
+	    <variable>SAVE_BOOKMARK</variable>
+	   </checkbox>
+	  </frame>
+	  <hbox>
+	   <button><input file stock="gtk-cancel"></input><label>'$LOC_CANCEL'</label></button>
+	   <button can-default="true" has-default="true" use-stock="true">
+	    <input file stock="gtk-ok"></input>
+	    <label>'$LOC_OK'</label>
+	    <action type="exit">ok</action>
+	   </button>
+	  </hbox>
+	 </vbox>
+	</window>'
+#	[ $TOOLTIPS = false ] && pmusic_save="`echo "$pmusic_save" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	I=$IFS; IFS=""
+	for STATEMENTS in $($GTKDIALOG -p pmusic_save --center); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	if [ "$EXIT" = "ok" ]; then
+		SAVEFILE=`echo "$SAVEFILE" | sed -e "s%\.m3u%%g"` #remove extension if exist.
+		if [ -s "$SAVEFILE".m3u ]; then #already exist
+			IMG=dilaog-warning
+			FRAME="$LOC_WARNING"
+			TXT1="<b>$SAVEFILE.m3u $LOC503</b>"
+			TXT2="$LOC504"
+			. $APPDIR/box_yesno
+			if [ $EXIT = no ]; then 
+				echo -n > $WORKDIR/SAVEFILE
+			fi
+		fi
+		if [ "$SAVEFILE" ]; then
+			#add EXT info which will speed up reading of the playlist (skip length detection)
+			echo '#EXTM3U' > "$SAVEFILE".m3u
+			while read I; do
+				MIN="`echo "$I" | cut -d'|' -f2 | awk -F: '{ SUM += $1} END { print SUM*60 }'`"
+				SEC="`echo "$I" | cut -d'|' -f2 | awk -F: '{ SUM += $2} END { print SUM }'`"
+				LENGTH="`echo "$MIN + $SEC" | bc`"
+				ADR="`echo "$I" | cut -d'|' -f4 | cut -d' ' -f2-`"
+				if [ $SAVE_PATH = false ] && [ -f "$ADR" ]; then	
+					ADR="`basename "$ADR"`" #remove path of files if choosen in gui
+				fi
+				NAME="`echo "$I" | cut -d'|' -f3`"
+				#---
+				echo -e "#EXTINFO:${LENGTH},$NAME\n$ADR" >> "$SAVEFILE".m3u
+			done < $WORKDIR/playlist
+			#---
+			echo "$SAVEFILE".m3u > $WORKDIR/last_added_playlist
+		fi
+		if [ "$SAVE_BOOKMARK" = "true" ]; then
+			BOOKMARK_NAME="`basename "$SAVEFILE"`"
+			BOOKMARK_PATH="$SAVEFILE".m3u
+			. $APPDIR/func_bookmarks -bookmark_add
+		fi
+	fi
+	;;
+-open_all)
+	. $APPDIR/func -reset_gtk
+	export add_all="
+<window title=\"Pmusic\" icon-name=\"pmusic\">
+ <vbox>
+  <frame $LOC230>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-add\"></input></pixmap>
+   <text><label>\"\"</label></text>
+   <text use-markup=\"true\"><label>\"$LOC516\"</label></text>
+   <text><label>\"\"</label></text>
+   <checkbox>
+    <label>$LOC517</label>
+    <variable>ADD_RECURSIVELY</variable>
+   </checkbox>
+  </frame>
+  <hbox>
+   <button cancel></button>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file stock=\"gtk-apply\"></input>
+    <label>$LOC230</label>
+    <action type=\"exit\">ok</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+	I=$IFS; IFS=""
+	for STATEMENTS in  $($GTKDIALOG -p add_all --center); do
+		eval $STATEMENTS
+	done
+	IFS=$I
+	if [ $EXIT = "ok" ]; then
+		if [ $ADD_RECURSIVELY = true ]; then MAXDEPTH=100; else MAXDEPTH=1; fi
+		TMP="`cut -b 3- $WORKDIR/filebrowser_dir`"
+		find -P "$TMP" -maxdepth $MAXDEPTH -printf "%p\n" | grep -iE "$AUDIO_FORMATS" | sort > $WORKDIR/pmusic.m3u
+		SOURCE="  $WORKDIR/pmusic.m3u"
+		. $APPDIR/func_add -add
+	fi
+	;;
+-new)
+	echo -n > $WORKDIR/playlist
+	echo -n > $WORKDIR/PLAYLIST_PRESS_EVENT
+	echo 000 > $WORKDIR/PLAYLIST_NR
+	$APPDIR/func -statusbar_playlist & #update statusbar
+	;;
+
+
+
+	
+##############      Search      ################
+
+-search)
+	$APPDIR/func -kill_browser_id3 & #kill ongoing process
+	kill -9 `ps | grep pmusic | grep search2 | awk '{print $1}'` 2> $STDERR #kill ongoing search
+	case $SEARCH in
+		*/*) echo ;;
+		*) $APPDIR/func -search2 &;;
+	esac
+	;;
+-search2)
+	#this is searching while typing -- only use this for local files (speed issue)
+	#grab the latest info from quick-menu (via search-field-icon)
+	[ -f $WORKDIR/SEARCH_MYMUSIC ] && SEARCH_MYMUSIC="$(<$WORKDIR/SEARCH_MYMUSIC)"
+	[ -f $WORKDIR/SEARCH_RADIO ] && SEARCH_RADIO="$(<$WORKDIR/SEARCH_RADIO)"
+	[ -f $WORKDIR/SEARCH_WEBMUSIC ] && SEARCH_WEBMUSIC="$(<$WORKDIR/SEARCH_WEBMUSIC)"
+	if [ $SEARCH_MYMUSIC = false ] && [ $SEARCH_RADIO = false ] && [ $SEARCH_WEBMUSIC = false ]; then exit; fi
+	#---
+	echo -n "cat " > $WORKDIR/tmp_exec
+	[ $SEARCH_MYMUSIC = true ] && echo -n "$HOME/.pmusic/index_all " >> $WORKDIR/tmp_exec
+	[ $SEARCH_RADIO = true ] && echo -n "$HOME/.pmusic/index_radio " >> $WORKDIR/tmp_exec
+	[ $SEARCH_WEBMUSIC = true ] && echo -n "$HOME/.pmusic/index_webmusic* " >> $WORKDIR/tmp_exec
+	IFS=" "
+	for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+	echo -n " > $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+	chmod 700 $WORKDIR/tmp_exec
+	$WORKDIR/tmp_exec 2> $STDERR #execute
+	echo "$SEARCH" > $WORKDIR/filebrowser_dir #remember searchtext for next keystroke
+	#refresh browser field only if small amount of hits
+	if [ `grep -c '^' $WORKDIR/sourcelist` -lt 100 ]; then echo true > $WORKDIR/UPDATE_SOURCELIST; fi
+	;;
+-search_refresh) #called when pressing the enter-key
+	case $SEARCH in
+		'')
+			echo > $WORKDIR/sourcelist
+			exit
+			;;
+		*http://*)
+			SOURCE="  $SEARCH"
+			. $APPDIR/func_add -add
+			echo true > $WORKDIR/UPDATE_GUI
+			;;
+		*/*) #if file --> add to playlist
+			if [ -f "$SEARCH" ]; then
+				SOURCE="  $SEARCH"
+				. $APPDIR/func_add -add
+				echo true > $WORKDIR/UPDATE_GUI
+			else #browse
+				SOURCE="  $SEARCH"
+				. $APPDIR/func -browse
+			fi
+			;;
+		*) #search
+			#if only one song in list --> add to playlist 
+			if [ `wc -l $WORKDIR/sourcelist | awk '{print $1}'` = 1 ]; then
+				SOURCE="`cut -d'|' -f1 $WORKDIR/sourcelist`"
+				. $APPDIR/func_add -add
+				echo true > $WORKDIR/UPDATE_GUI
+			#else, search
+			else
+				#grab the latest info from quick-menu (via search-field-icon)
+				[ -f $WORKDIR/SEARCH_MYMUSIC ] && SEARCH_MYMUSIC="$(<$WORKDIR/SEARCH_MYMUSIC)"
+				[ -f $WORKDIR/SEARCH_COLLECTIONS ] && SEARCH_COLLECTIONS="$(<$WORKDIR/SEARCH_COLLECTIONS)"
+				[ -f $WORKDIR/SEARCH_RADIOHITS ] && SEARCH_RADIOHITS="$(<$WORKDIR/SEARCH_RADIOHITS)"
+				[ -f $WORKDIR/SEARCH_RADIO ] && SEARCH_RADIO="$(<$WORKDIR/SEARCH_RADIO)"
+				[ -f $WORKDIR/SEARCH_WEBMUSIC ] && SEARCH_WEBMUSIC="$(<$WORKDIR/SEARCH_WEBMUSIC)"
+				[ -f $WORKDIR/SEARCH_FILES ] && SEARCH_FILES="$(<$WORKDIR/SEARCH_FILES)"
+				#this seperates searchresults in different groups
+				#it is run INSTEAD of -search and -search2
+				$APPDIR/func -kill_browser_id3 & #kill ongoing process
+				kill -9 `ps | grep pmusic | grep search2 | awk '{print $1}'` #kill ongoing search
+				IFS=" "
+				echo "echo -n > $WORKDIR/sourcelist" > $WORKDIR/tmp_exec
+				#pfilesearch
+				if [ $SEARCH_FILES = true ] && [ `which pfilesearch` ]; then
+					#no heading is necessary if user don't use any of the indexes.
+					if [ $SEARCH_MYMUSIC = true ] || [ $SEARCH_WEBMUSIC = true ] || [ $SEARCH_RADIO = true ]; then
+						echo "echo '|__${SEARCHPATH}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+					#---
+					echo "pfilesearch -bb -f music -c \"${SEARCH// /[AND]}\" -d \"$SEARCHPATH\"" >> $WORKDIR/tmp_exec
+					echo 'sort -u --output='$WORKDIR'/tmp3 '$HOME'/.pfilesearch/hits' >> $WORKDIR/tmp_exec
+					echo 'paste -d"|" '$WORKDIR'/tmp3 '$WORKDIR'/tmp3 | sed -e "s/^/  /g" >> '$WORKDIR'/sourcelist' >> $WORKDIR/tmp_exec
+				fi
+				#My music
+				if [ $SEARCH_MYMUSIC = true ]; then
+					#index tracks
+					echo "echo -e '\n|__${LOC223}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					if [ -f $HOME/.pmusic/index_alphabetic ]; then
+						echo -n "cat $HOME/.pmusic/index_alphabetic" >> $WORKDIR/tmp_exec
+						for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+						echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					else #message. This message can't be shown under __Tracks__ because -browse_id3) will remove it
+						echo "echo -e \"$LOC318\" >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+					if [ $SEARCH_COLLECTIONS = true ]; then
+						#index albums
+						if [ -f $HOME/.pmusic/index_playlists ]; then
+							echo "echo -e '\n|__${LOC224}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+							echo -n "cat $HOME/.pmusic/index_playlists" >> $WORKDIR/tmp_exec
+							for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+							echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+						fi
+					fi
+				fi
+				#radiohits
+				if [ $SEARCH_RADIOHITS = true ]; then
+					echo "echo -e '\n|__${LOC229}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					if [ `which streamripper` ]; then
+						echo -n > $WORKDIR/tmp
+						while read I; do
+							cut -d'|' -f2 "$HOME/.pmusic/radio-hits preset/${I}" >> $WORKDIR/tmp
+						done < $WORKDIR/radiohits_presets
+						sort -u -o $WORKDIR/tmp1 $WORKDIR/tmp #several presets might save to the same directory --> searchresult would show up several times 
+						while read I; do
+							echo -n "find \"$I\" -maxdepth 1 -type f -printf \"  %p|%f\n\"" >> $WORKDIR/tmp_exec
+							for J in $SEARCH; do echo -n " | grep -iF '$J'" >> $WORKDIR/tmp_exec; done
+							 echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+						done < $WORKDIR/tmp1
+					else
+						echo "echo -e \"|$LOC761\" >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+				fi
+				#radio
+				if [ $SEARCH_RADIO = true ]; then
+					echo "echo -e '\n|__${LOC222}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					if [ -f $HOME/.pmusic/index_radio ]; then
+						echo -n "cat $HOME/.pmusic/index_radio" >> $WORKDIR/tmp_exec
+						for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+						echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					else #message
+						echo "echo -e \"$LOC493\" >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+				fi
+				#webmusic
+				if [ $SEARCH_WEBMUSIC = true ]; then
+					echo "echo -e '\n|__${LOC221}__' >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					if [ -f $HOME/.pmusic/index_webmusic_youtube ]; then
+						echo -n "cat $HOME/.pmusic/index_webmusic_youtube" >> $WORKDIR/tmp_exec
+						for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+						echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+					if [ -f $HOME/.pmusic/index_webmusic_jamendo ]; then
+						echo -n "cat $HOME/.pmusic/index_webmusic_jamendo" >> $WORKDIR/tmp_exec
+						for I in $SEARCH; do echo -n "| grep -iF '$I' " >> $WORKDIR/tmp_exec; done
+						echo " >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+					fi
+					#if no indexes is present - search jamendo.com
+					if [ ! -f $HOME/.pmusic/index_webmusic_youtube ] && [ ! -f $HOME/.pmusic/index_webmusic_jamendo ]; then
+					
+						echo "echo -e \"$LOC636\n\" >> $WORKDIR/sourcelist" >> $WORKDIR/tmp_exec
+						echo "wget -t 1 --connect-timeout=1 -O - \"http://api.jamendo.com/get2/id+name+artist_name+url+album_name+numalbum+dates+genre+duration/track/plain/track_album+album_artist/?searchquery=${SEARCH// /+}&order=searchweight_desc&n=500\" | tr '\t' '|' | sed -e 's/http:/  96      /g' -e 's/Array//g' -e 's/^/  http:\/\/api.jamendo.com\/get2\/stream\/track\/redirect\/?streamencoding=mp31\&id=/g' > $WORKDIR/tmp_wget" >> $WORKDIR/tmp_exec
+						echo "if grep -F http: $WORKDIR/tmp_wget; then cat $WORKDIR/tmp_wget >> $WORKDIR/sourcelist; echo >> $WORKDIR/sourcelist; fi" >> $WORKDIR/tmp_exec
+					fi
+				fi
+				#execute
+				chmod 700 $WORKDIR/tmp_exec
+				$WORKDIR/tmp_exec
+				echo "$SEARCH" > $WORKDIR/filebrowser_dir #remember searchtext for next keystroke
+#				echo true > $WORKDIR/UPDATE_SOURCELIST2
+#				sleep 0.2 #wait for <table> to refresh
+				$APPDIR/func -browse_id3 -search &
+			fi
+			;;
+	esac
+	;;
+-pfilesearch)
+	#check if pfilesearch is installed
+	if [ ! `which pfilesearch` ]; then
+		TXT1="<b>Pfilesearch</b> $LOC505"
+		. $APPDIR/box_ok
+		exit
+	fi
+	#---
+	pfilesearch -bb -f music
+	sort -u --output=$WORKDIR/tmp $HOME/.pfilesearch/hits
+	paste -d'|' $WORKDIR/tmp $WORKDIR/tmp | sed -e "s/^/  /g" > $WORKDIR/sourcelist
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+
+
+##############       Misc        #################
+
+-index_songs)
+ 	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	if [ ! -s $HOME/.pmusic/index_alphabetic ]; then
+		echo -e "$LOC318" > $WORKDIR/sourcelist
+	else
+		cp $HOME/.pmusic/index_alphabetic $WORKDIR/sourcelist
+	fi
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+-index_playlists)
+  	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	if [ ! -s $HOME/.pmusic/index_alphabetic ]; then
+		echo -e "$LOC318" > $WORKDIR/sourcelist
+	else
+		cp $HOME/.pmusic/index_playlists $WORKDIR/sourcelist
+	fi
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+-index_recent)
+  	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	NR=1000
+	#reverse list to get last item on top.
+	echo -n > $WORKDIR/tmp
+	while read I; do
+		echo "$NR|$I" >> $WORKDIR/tmp
+		NR=$(($NR+1))
+	done < $HOME/.pmusic/index_recent
+	sort -r $WORKDIR/tmp | cut -d '|' -f 2- > $WORKDIR/sourcelist
+	tail -n 1000 $WORKDIR/tmp | cut -d '|' -f 2- > $HOME/.pmusic/index_recent #keep only the last 1000
+ 	#---
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+-index_rating)
+  	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	sort -rnst'|' -k3,3 $HOME/.pmusic/index_rating | head -n 1000 > $WORKDIR/sourcelist
+ 	echo true > $WORKDIR/UPDATE_SOURCELIST2
+	;;
+-info_IWantMusic)
+	FRAME="$LOC_INFO"
+	IMG="dialog-info"
+	TXT1="<b>$LOC900</b>"
+	TXT2="$LOC901"
+	. $APPDIR/box_ok &
+	;;
+-info_IAmLowPowered)
+	FRAME="$LOC_INFO"
+	IMG="dialog-info"
+	TXT1="<b>$LOC902</b>"
+	TXT2="$LOC903"
+	. $APPDIR/box_ok &
+	;;
+esac

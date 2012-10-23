@@ -1,0 +1,31 @@
+#Maintainer: George Vlahavas <vlahavas~at~gmail~dot~com>
+
+pkgname=id3lib
+pkgver=3.8.3
+pkgrel=1gv
+arch=i486
+source=("http://downloads.sourceforge.net/project/id3lib/id3lib/3.8.3/id3lib-3.8.3.tar.gz" "id3lib-3.8.3-gcc43-1.patch" "patch_id3lib_3.8.3_UTF16_writing_bug.diff")
+docs=("readme" "install" "copying" "changelog" "authors" "news" "todo" "history")
+url=http://id3lib.sourceforge.net/
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"id3lib - library for ID3v1 and ID3v2 tags"
+"id3lib is an open-source, cross-platform software development library"
+"for reading, writing, and manipulating ID3v1 and ID3v2 tags. It is an"
+"on-going project whose primary goals are full compliance with the"
+"ID3v2 standard, portability across several platforms, and providing a"
+"powerful and feature-rich API with a highly stable and efficient"
+"implementation."
+)
+
+
+build() {
+	cd $startdir/src/$pkgname-$pkgver
+	patch -p1 < $startdir/src/id3lib-3.8.3-gcc43-1.patch || exit 1
+        patch -p1 < $startdir/src/patch_id3lib_3.8.3_UTF16_writing_bug.diff || exit 1
+	./configure --prefix=/usr --libdir=/usr/lib${LIBDIRSUFFIX} --localstatedir=/var --sysconfdir=/etc --disable-static
+	make || return 1
+	make install DESTDIR=$startdir/pkg
+} 

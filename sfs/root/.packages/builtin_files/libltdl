@@ -1,0 +1,6 @@
+/usr
+/usr/lib
+ libltdl.so
+ libltdl.so.3
+ libltdl.so.7
+ libltdl.so.7.3.0

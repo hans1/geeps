@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ flac
+ metaflac
+/usr/lib
+ libFLAC.so
+ libFLAC.so.8
+ libFLAC.so.8.2.0

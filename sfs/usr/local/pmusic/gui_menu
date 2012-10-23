@@ -1,0 +1,353 @@
+#!/bin/bash
+
+#built top 100 menuitems for jamendo
+TOP100_MENU=''
+for I in ' ' Blues Classical Electro Jazz Hiphop Lounge Metal Pop Rock; do
+  TOP100_MENU=$TOP100_MENU'<menuitem label="Top 100 '$I'">
+   <action>'$APPDIR'/func_webmusic -jamendo_top100 '$I' &</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>'
+done
+#---
+
+S='
+<menu label="'$LOC100'">
+ <menuitem stock="gtk-new" label="'$LOC111'" accel-key="0x06e" accel-mods="4">
+  <action>'$APPDIR'/func_store_playlist</action>
+  <action>'$APPDIR'/func -new</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>'
+ #when using an external source window (Classic)
+ [ "`echo "$*" | grep 'open'`" ] && S=$S'<menuitem stock="gtk-open" accel-key="0x06f" accel-mods="4">
+  <label>'$LOC101'...</label>
+  <action>show_sources_window</action>
+ </menuitem>'
+ #---
+ S=$S'<menuitem stock="gtk-cdrom" label="'$LOC105'">'
+  [ "$CD_DEV" = false ] && S=$S'<visible>disabled</visible>'
+  S=$S'<action>'$APPDIR'/func_cd -play_cd</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>
+ <menuitem stock="gtk-save" label="'$LOC102'" accel-key="0x073" accel-mods="4"><action>. '$APPDIR'/func -save</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-preferences" label="'$LOC103'"><action>'$APPDIR'/func_config -preferences &</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem label="'$LOC_EQUALIZER'">
+  <label>'$LOC_EQUALIZER'...</label>
+  '
+  ! type pequalizer > /dev/null 2>&1 && S=$S' 
+  <visible>disabled</visible>
+  '
+ S=$S'<action>'$APPDIR'/func -reset_gtk</action>
+  <action>pequalizer &</action>
+ </menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-cdrom" label="'$LOC108'">'
+  [ "$CD_DEV" = false ] && S=$S'<visible>disabled</visible>'
+  S=$S'<action>'$APPDIR'/func_player -stop</action>
+  <action>eject</action>
+ </menuitem>
+ <menuitem stock="gtk-quit" label="'$LOC_QUIT'" accel-key="0x071" accel-mods="4">
+  <action>'$APPDIR'/func -write_config</action>
+  <action>EXIT:quit</action>
+ </menuitem>
+</menu>'
+GUI_MENU_FILE="$S"
+
+#music-sources
+ S='<menuitem stock="gtk-about" label="'$LOC172'">
+  <action>. '$APPDIR'/func -show_add_window -source</action>
+  <action>clear:SOURCE</action>
+  <action>refresh:SOURCE</action>
+ </menuitem>
+ <menuitemseparator></menuitemseparator>'
+ S=$S'
+ <menuitem label="CD">'
+  [ "$CD_DEV" = false ] && S=$S'<visible>disabled</visible>'
+  S=$S'<action>echo "|'$LOC708'" > '$WORKDIR'/browser</action>
+  <action>'$APPDIR'/func_cd -read_cd &</action>
+  <action>clear:SOURCE</action>
+  <action>refresh:SOURCE</action>
+ </menuitem>
+ <menu label="'$LOC238'">
+  <menuitem label="'$LOC_SETUP'"><action>'$APPDIR'/func_config -preferences -source &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC_BROWSE'">
+   <action>export SOURCE="  '$BROWSERDIR'"; . '$APPDIR'/func -browse</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC_SEARCH'"><action>'$APPDIR'/func -pfilesearch</action></menuitem>
+ </menu>
+ <menu label="'$LOC228'">
+  <menuitem label="'$LOC_SETUP'"><action>'$APPDIR'/func_index -update_index &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC223'">
+   <action>. '$APPDIR'/func -index_songs</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC224'">
+   <action>. '$APPDIR'/func -index_playlists</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+
+##Radio Hits
+ <menu label="'$LOC229'">
+  <menuitem label="'$LOC_SETUP'"><action>. '$APPDIR'/func_radiohits &</action></menuitem>
+  <menuitemseparator></menuitemseparator>'
+echo -n > $WORKDIR/tmp_gui_menu
+while read I; do
+	cut -d'|' -f2 "$HOME/.pmusic/radio-hits preset/$I" | sort -u | grep -v "^$" >> $WORKDIR/tmp_gui_menu
+done < $WORKDIR/radiohits_presets
+while read I; do
+  S=$S'<menuitem label="'$I'">
+   <action>export SOURCE="'$I'"; . '$APPDIR'/func -browse_radiohits</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>'
+done < $WORKDIR/tmp_gui_menu
+ S=$S'</menu>
+
+##Radio stations 
+ <menu label="'$LOC222'">
+  <menuitem label="'$LOC_SETUP'"><action>. '$APPDIR'/func_radio &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC_GENRE'">
+   <action>. '$APPDIR'/func -radio -genre</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC_COUNTRY'">
+   <action>. '$APPDIR'/func -radio -country</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+
+##Webmusic
+ <menu label="'$LOC221'">
+  <menuitem label="'$LOC_SETUP'"><action>'$APPDIR'/func_webmusic -webmusic_manager &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  '$TOP100_MENU'
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC_BROWSE'">
+   <action>'$APPDIR'/func_webmusic -webmusic &</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+ <menu label="'$LOC600'">
+  <menuitem label="'$LOC_SETUP'"><action>. '$APPDIR'/func_podcast &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC600'">
+   <action>if [ ! "`find "'$PODCAST_DIR'" -mindepth 1`" ]; then echo "|'$LOC617'" > '$WORKDIR'/sourcelist; else SOURCE="  '$PODCAST_DIR'"; . '$APPDIR'/func -browse; fi</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+ <menu label="'$LOC227'">
+  <menuitem label="'$LOC_SETUP'"><action>. '$APPDIR'/func_bookmarks -manage_bookmarks &</action></menuitem>
+  <menuitemseparator></menuitemseparator>
+  <menuitem label="'$LOC227'">
+   <action>. '$APPDIR'/func_bookmarks -show_bookmarks</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+ <menuitemseparator></menuitemseparator>
+ <menuitem label="'$LOC225'">
+  <action>. '$APPDIR'/func -index_recent</action>
+  <action>clear:SOURCE</action>
+  <action>refresh:SOURCE</action>
+ </menuitem>
+ <menuitem label="'$LOC226'">
+  <action>. '$APPDIR'/func -index_rating</action>
+  <action>clear:SOURCE</action>
+  <action>refresh:SOURCE</action>
+ </menuitem>'
+GUI_MENU_SOURCES_MAIN="$S"
+
+GUI_MENU_SOURCES_LIST='
+ ##bookmark
+ <menuitem label="'$LOC240'">
+  <action>'$APPDIR'/func_bookmarks -manage_bookmarks -add_source</action>
+ </menuitem>
+ 
+ 
+ <menuitem label="'$LOC116'"><action>export LIST='$WORKDIR'/sourcelist; '$APPDIR'/func_id3tagger</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-sort-ascending" label="'$LOC233' '$LOC236' '$LOC237'">
+  <action>'$APPDIR'/func -index_sort_file</action>
+  <action>clear:SOURCE</action>
+  <action>refresh:SOURCE</action>
+ </menuitem>
+ 
+ ##sort submenu
+ <menu stock="gtk-sort-ascending" label="'$LOC233' '$LOC236' '$LOC840'">
+  <menuitem label="'$LOC233' '$LOC236' '$LOC_TITLE'">
+   <action>'$APPDIR'/func -index_sort_title</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem stock="gtk-sort-ascending" label="'$LOC233' '$LOC236' '$LOC_ARTIST'">
+   <action>'$APPDIR'/func -index_sort_artist</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC233' '$LOC236' '$LOC_ALBUM'">
+   <action>'$APPDIR'/func -index_sort_album</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC233' '$LOC236' '$LOC_TRACK'">
+   <action>'$APPDIR'/func -index_sort_track</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC233' '$LOC236' '$LOC_YEAR'">
+   <action>'$APPDIR'/func -index_sort_year</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC233' '$LOC236' '$LOC_GENRE'">
+   <action>'$APPDIR'/func -index_sort_genre</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+  <menuitem label="'$LOC233' '$LOC236' '$LOC294'">
+   <action>'$APPDIR'/func -index_sort_bitrate</action>
+   <action>clear:SOURCE</action>
+   <action>refresh:SOURCE</action>
+  </menuitem>
+ </menu>
+ ##---
+
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-add" label="'$LOC232'">
+  <action>'$APPDIR'/func_add -add_random</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>
+ <menuitem stock="gtk-add" label="'$LOC230'">
+  <action>'$APPDIR'/func_add -add_all</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>
+'
+
+GUI_MENU_SOURCES='
+<menu label="'$LOC170'">
+ '$GUI_MENU_SOURCES_MAIN'
+ <menuitemseparator></menuitemseparator>
+ '$GUI_MENU_SOURCES_LIST'
+</menu>'
+
+S='
+<menu label="'$LOC110'">
+ <menuitem stock="gtk-save-as" label="'$LOC290'..." tooltip-text="'$LOC2913'"><action>'$APPDIR'/func_export &</action></menuitem>
+ <menuitem stock="gtk-cdrom" label="'$LOC115'...">'
+  if [ ! -f /usr/local/pburn/pburn ] || [ "$CD_DEV" = false ]; then S=$S'<visible>disabled</visible>'; fi
+  S=$S'<action>'$APPDIR'/func -burn &</action>
+ </menuitem>
+ <menuitem label="'$LOC116'..."><action>export LIST='$WORKDIR'/playlist; '$APPDIR'/func_id3tagger</action></menuitem>
+ <menuitemseparator></menuitemseparator>'
+#multiple playlists
+for I in $(seq 1 9); do RADIO[$I]=false; done; RADIO[$(<$WORKDIR/PLAYLIST1234)]=true #find active playlist
+for I in $(seq 1 9); do
+ S=$S'<menuitem radiobutton="'${RADIO[$I]}'" accel-key="0x03'$I'" accel-mods="4">
+  <label>"'${PLAYLIST_NAME[$I]}'"</label>
+  <action>if true '$APPDIR'/func -store_playlist1234; echo '$I' > '$WORKDIR'/PLAYLIST1234; cp '$WORKDIR'/playlist'$I' '$WORKDIR'/playlist; '$APPDIR'/func -statusbar_playlist</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>'
+done
+#---
+ S=$S'<menuitem stock="gtk-edit"label="'$LOC137'"><action>'$APPDIR'/func_config -preferences -playlist &</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-undo" label="'$LOC118'" accel-key="0x07a" accel-mods="4">
+  <action>. '$APPDIR'/func -undo</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>
+ <menuitem stock="gtk-redo"label="'$LOC119'" accel-key="0x079" accel-mods="4">
+  <action>. '$APPDIR'/func -redo</action>
+  <action>refresh:PLAYLIST</action>
+ </menuitem>
+</menu>'
+GUI_MENU_PLAYLIST="$S"
+
+
+
+
+GUI_MENU_TRACK='
+<menu label="'$LOC140'">
+ <menuitem label="'$LOC142'" accel-key="0x062" accel-mods="4"><action>'$APPDIR'/func_bookmarks -manage_bookmarks -add_playing &</action></menuitem>
+ <menuitem label="'$LOC141'" stock="gtk-info" accel-key="0x069" accel-mods="4"><action>'$APPDIR'/func_trackinfo &</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-media-play" label="'$LOC_PLAY' / '$LOC151'" accel-key="0x020" accel-mods="8"><action>'$APPDIR'/func_player -play</action></menuitem>
+ <menuitem stock="gtk-media-next" label="'$LOC153'" accel-key="0xff53" accel-mods="8"><label>'$LOC153'</label><action>cp -f '$WORKDIR'/PLAYLIST '$WORKDIR'/tmpPLAYLIST</action><action>'$APPDIR'/func_player -next</action></menuitem>
+ <menuitem stock="gtk-media-previous" label="'$LOC154'" accel-key="0xff51" accel-mods="8"><action>'$APPDIR'/func_player -back</action></menuitem>
+ <menuitem label="'$LOC155'" accel-key="0x06A" accel-mods="4"><action>'$APPDIR'/func_player -jump_to</action></menuitem>
+</menu>'
+
+
+#ITEMS=`ls "$APPDIR"/presets | awk '{print "<menuitem><label>"$1"</label><action>. $APPDIR/func -update_playlist</action><action>pmusic -p "$1"</action></menuitem>"}'`
+S='
+<menu>
+ <menuitem icon="gtk-fullscreen">
+  <label>'$LOC181'</label>
+  <action>. '$APPDIR'/func -update_playlist</action>
+  <action>exec pmusic -j -p .NowPlaying -T .NowPlaying</action>
+ </menuitem>
+ <menuitemseparator></menuitemseparator>'
+
+ls -1 "$APPDIR"/presets | grep -v ".pre$" > $WORKDIR/tmp
+while read I; do
+	S=$S'<menuitem '
+	if [ "`echo "$PMUSIC_PRESET" | grep -w $I`" ]; then S=$S'radiobutton="true"'; else S=$S'radiobutton="false"'; fi
+	S=$S'><label>"'$I'"</label><action>if true export PMUSIC_PRESET='$I'; . '$APPDIR'/func_config -write_config; . '$APPDIR'/func -update_playlist; pmusic -p "'$I'"</action></menuitem>'
+done < $WORKDIR/tmp
+
+ S=$S'<label>'$LOC180'</label>
+</menu>'
+GUI_MENU_VIEW="$S"
+
+
+GUI_MENU_HELP='
+<menu label="'$LOC190'">
+ <menuitem stock="gtk-about" label="'$LOC191'"><action>'$APPDIR'/func -about &</action></menuitem>
+ <menuitem stock="gtk-help" label="'$LOC192'" accel-key="0xffbe" accel-mods="0"><action>'$APPDIR'/func -faq &</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem stock="gtk-help" label="'$LOC900'"><action>'$APPDIR'/func -info_IWantMusic</action></menuitem>
+ <menuitem stock="gtk-help" label="'$LOC902'"><action>'$APPDIR'/func -info_IAmLowPowered</action></menuitem>
+ <menuitemseparator></menuitemseparator>
+ <menuitem label="'$LOC195'"><action>'$APPDIR'/func -dependency_check</action></menuitem>
+</menu>'
+
+
+S="
+<hbox spacing=\"1\">
+ <hbox space-expand=\"true\" space-fill=\"true\">
+ <menubar>
+  $GUI_MENU_FILE
+  $GUI_MENU_SOURCES
+  $GUI_MENU_PLAYLIST
+  $GUI_MENU_TRACK
+  $GUI_MENU_VIEW
+  $GUI_MENU_HELP
+ </menubar>
+ </hbox>"
+ if [ $FIRST_RUN = true ]; then S=$S'
+ <button>
+  <input file stock="gtk-help"></input>
+  <label>'$LOC900'</label>
+  <action>'$APPDIR'/func -info_IWantMusic</action>
+ </button>
+ <button>
+  <input file stock="gtk-help"></input>
+  <label>'$LOC902'</label>
+  <action>'$APPDIR'/func -info_IAmLowPowered</action>
+ </button>'
+ fi
+GUI_MENUS=$S'</hbox>'
+

@@ -1,0 +1,49 @@
+# vim: set syn=sh:
+# Packager: Phill Watkins <ubemail~at~ymail~dot~com>
+# Former Packager(s): George Vlahavas (vlahavas~AT~gmail~DOT~com)
+
+pkgname=libsigc++
+pkgver=2.2.9
+pkgrel=1pw
+#arch=noarch
+source=("http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/$(echo $pkgver | awk -F. '{print $1"."$2}')/libsigc++-$pkgver.tar.bz2")
+sourcetemplate=http://people.salixos.org/pwatk/packages/13.2/l/$pkgname
+docs=("AUTHORS" "ChangeLog" "COPYING" "INSTALL" "NEWS" "README" "TODO")
+url=http://libsigc.sourceforge.net/
+
+slackdesc=\
+(
+#|-----handy-ruler------------------------------------------------------|
+"libsigc++ (Typesafe callback system for C++)"
+"Libsigc++ implements a typesafe callback system for standard C++. It"
+"allows you to define signals and to connect those signals to any"
+"callback function, either global or a member function, regardless of"
+"whether it is static or virtual. It also contains adaptor classes for"
+"connection of dissimilar callbacks and has an ease of use unmatched"
+"by other C++ callback libraries. Libsigc++ is licensed under the GNU"
+"Library General Public License, LGPL."
+)
+
+build() {
+	set -e
+	
+	cd $startdir/src/$pkgname-$pkgver
+	./configure \
+	  --prefix=/usr \
+	  --sysconfdir=/etc \
+	  --localstatedir=/var \
+	  --libdir=/usr/lib${LIBDIRSUFFIX} \
+	  --mandir=/usr/man \
+	  --infodir=/usr/info \
+	  --docdir=/usr/doc/$pkgname-$pkgver \
+	  --build=$arch-slackware-linux \
+	  --disable-documentation \
+	  --disable-static
+	make -j $numjobs \
+	  libdocdir=/usr/doc/$pkgname-$pkgver
+	make install \
+	  DESTDIR=$startdir/pkg \
+	  libdocdir=/usr/doc/$pkgname-$pkgver
+
+	set +e
+} 

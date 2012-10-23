@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=pns-tool connect from commandline
+Icon=networkout.xpm
+Comment=pns-tool connect from commandline
+Exec=pns-tool-wrapper
+Terminal=false
+Type=Application
+Categories=Network
+GenericName=pns-tool connect from commandline

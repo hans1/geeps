@@ -1,0 +1,6 @@
+/usr
+/usr/include
+/usr/lib
+ libpixman-1.so
+ libpixman-1.so.0
+ libpixman-1.so.0.20.2

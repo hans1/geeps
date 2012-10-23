@@ -1,0 +1,5 @@
+/usr
+/usr/bin
+ installwatch
+/usr/lib
+ installwatch.so

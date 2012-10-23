@@ -1,0 +1,23 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=cups_shell
+GenericName=
+Icon=tb_print.xpm
+MimeType=
+Path=
+StartupNotify=false
+Terminal=false
+TerminalOptions=
+Type=Application
+X-DCOP-ServiceType=
+X-KDE-SubstituteUID=false
+X-KDE-Username=
+Name=CUPS manage printing
+Name[ru]=CUPS управление печатью
+Name[de]=CUPS Drucker Verwalter
+Name[es]=CUPS-Administra Impresiones
+Name[ja]=印刷の管理
+Name[zh_CN]=CUPS 打印管理器
+Name[zh_TW]=CUPS印表機管理
+Comment=CUPS Web Interface
+Categories=System

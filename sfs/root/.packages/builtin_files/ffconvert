@@ -1,0 +1,79 @@
+/root
+/root/.config
+/root/.config/rox.sourceforge.net
+/root/.config/rox.sourceforge.net/OpenWith
+/root/.config/rox.sourceforge.net/OpenWith/.application_ogg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.application_vnd.rn-realmedia
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.application_x-flash-video
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.application_x-ogg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_basic
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_mpeg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_ogg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_vnd.rn-realaudio
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-aiff
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-flac
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-mp3
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-ms-wma
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-pn-realaudio
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-ulaw
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-vorbis+ogg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.audio_x-wav
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_mp4
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_mpeg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_ogg
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_quicktime
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_webm
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_x-flv
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_x-ms-asf
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_x-msvideo
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_x-ms-wmv
+ ffconvert
+/root/.config/rox.sourceforge.net/OpenWith/.video_x-theora+ogg
+ ffconvert
+/usr
+/usr/bin
+ ffconvert
+/usr/share
+/usr/share/applications
+ ffconvert.desktop
+/usr/share/doc
+/usr/share/doc/ffconvert
+ ffconvert.html
+ ffconvert_inside.txt
+/usr/share/doc/ffconvert/images
+ ffconvert_convert.png
+ ffconvert_destination.png
+ ffconvert_main_dialog.png
+ ffconvert.png
+ ffconvert_preset.png
+ ffconvert_source.png
+/usr/share/ffconvert
+ preset
+/usr/share/ffconvert/preset.d
+ MS_Compatible_AVI_msmpeg4v2
+/usr/share/pixmaps
+ ffconvert.png

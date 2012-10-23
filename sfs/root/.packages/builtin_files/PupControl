@@ -1,0 +1,96 @@
+/tmp
+/usr
+/usr/local
+/usr/local/bin
+ PupControl
+ Pup-SysInfo
+/usr/local/PupControl
+ Apps.html
+ desktops
+ func
+ Help.html
+ hkey_func
+/usr/local/PupControl/icons
+ add-remove20.png
+ antivirus20.png
+ apps20.png
+ boot20bw.png
+ button20.png
+ camera20.png
+ cd20.png
+ clock20.png
+ clockformat20.png
+ console20.png
+ control-panel_16.png
+ control-panel_20.png
+ control-panel_48.png
+ country20.png
+ cpu20.png
+ cursor20.png
+ desktop20.png
+ disk20.png
+ encrypt20.png
+ event20.png
+ execute20.png
+ files20.png
+ find20.png
+ firewall20.png
+ flash20.png
+ font20.png
+ fontsize20.png
+ glipper20.png
+ grub20.png
+ gtkhash20.png
+ hdisk20.png
+ help20.png
+ icons20.png
+ info6.png
+ internetconnect20.png
+ keyboard20.png
+ mount20.png
+ net20.png
+ notebook18.png
+ notes20.png
+ notification20.png
+ off.png
+ on.png
+ partition20.png
+ pet20.png
+ preferences20.png
+ printer20.png
+ pupinstall20.png
+ Pup-SysInfo20.png
+ reboot20.png
+ remaster20.png
+ samba20.png
+ scanner20.png
+ schedule20.png
+ screen20.png
+ sfs20.png
+ shutdown20.png
+ sound20.png
+ status.png
+ suspend-ram20.png
+ systeminfo20.png
+ task20bw.png
+ thememaker20.png
+ themes20.png
+ timedate20.png
+ timeupdate20.png
+ timezone20.png
+ touchpad20.png
+ tray20.png
+ wallpaper20.png
+ webcam20.png
+ window20.png
+ wireless20.png
+ wm20.png
+ x20.png
+ xdelta20.png
+ xfdiff20.png
+ xorg20.png
+/usr/share
+/usr/share/applications
+ PupControl.desktop
+ Pup-SysInfo.desktop
+ SS-control.desktop

@@ -1,0 +1,35 @@
+#!/bin/bash
+case $1 in
+-action)
+	if [ ! "$ACTION" ]; then
+		TXT1="$LOC131"
+		. "$PROGPATH"/box_ok
+	fi
+	case $ACTION in
+		"$LOC101") kill -9 `echo "$LIST" | awk '{print $1}'`;;
+		"$LOC104 - $LOC105") renice -10 `echo "$LIST" | awk '{print $1}'`;; #high
+		"$LOC104 - $LOC106") renice 0 `echo "$LIST" | awk '{print $1}'`;; #normal
+		"$LOC104 - $LOC107") renice 10 `echo "$LIST" | awk '{print $1}'`;; #low
+		*)	#send signal
+			KILL_SIGNAL="`echo "$ACTION" | cut -d ' ' -f 3`"
+			TMP="-`echo "$KILL_SIGNAL" | cut -d " " -f 1`"
+			if [  $TMP = "-0" ]; then TMP=""; fi
+			kill $TMP `echo "$LIST" | awk '{print $1}'`
+	esac
+	;;
+-set_filter)
+	echo "$FILTER_STRING" > /tmp/pprocess-filter
+	;;
+-filter)
+	ps > /tmp/pprocess-ps_source
+	FILTER_STRING=($(<"/tmp/pprocess-filter"))
+	grep -i "$FILTER_STRING" /tmp/pprocess-ps_source > /tmp/pprocess-ps
+	;;
+-logfile)
+	if [ $LOG_FILE = top ]; then
+		rxvt -name pburn -bg black -fg green -geometry 80x20 -title "Pprocess - Running processes" -e top
+	fi
+	Xdialog --title "Pprocess" --fixed-font --no-ok --cancel-label "$LOC_CANCEL" --tailbox $LOG_FILE 500x500
+	;;
+
+esac

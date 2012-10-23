@@ -1,0 +1,22 @@
+/root
+/root/.sane
+/root/.sane/xscanimage
+ xscanimage.rc
+/usr
+/usr/local
+/usr/local/bin
+ peasyscan
+/usr/local/lib
+/usr/local/lib/X11
+/usr/local/lib/X11/mini-icons
+ peasyscan.xpm
+/usr/local/lib/X11/pixmaps
+ peasyscan.png
+/usr/local/peasyscan
+ ADF
+/usr/local/peasyscan/config
+/usr/share
+/usr/share/applications
+ peasyscan.desktop
+/usr/share/sane
+ sane-style.rc

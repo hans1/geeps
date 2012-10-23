@@ -1,0 +1,37 @@
+#!/bin/bash
+
+if [ -z "$WIDTH" ]; then WIDTH=450; fi
+export listbox="
+<window title=\"Pbackup\" icon-name=\"gtk-refresh\">
+<vbox>
+  <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+  <frame $FRAME>
+   <hbox>
+    <tree rules_hint=\"true\" headers_visible=\"false\"  activates-default=\"true\">
+     <width>$WIDTH</width><height>130</height>
+     <label>a|b|c</label>
+     <variable>TREE</variable>
+     $ITEMS
+     <action type=\"exit\">99</action>
+    </tree>
+   </hbox>
+  </frame>
+ <hbox>
+  <button>
+   <input file icon=\"gtk-cancel\">
+   </input><label>$LOC_CANCEL</label>
+   <action type=\"exit\">98</action>
+  </button>
+  <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+   <input file icon=\"gtk-apply\"></input>
+   <label>$LOC_OK</label>
+   <action type=\"exit\">99</action>
+  </button>
+ </hbox>
+</vbox></window>"
+I=$IFS; IFS=""
+for STATEMENTS in  $(gtkdialog3 --program=listbox --center); do
+	eval $STATEMENTS
+done
+IFS=$I
+FRAME=""; IMG="" #reset to avoid alien text in next box

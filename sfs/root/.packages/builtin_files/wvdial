@@ -1,0 +1,16 @@
+/etc
+/etc/ppp
+/etc/ppp/peers
+/usr
+/usr/bin
+ wvdial
+ wvdialconf
+/usr/lib
+ libwvstreams.so.3.7
+ libwvutils.so.3.7
+/usr/share
+/usr/share/doc
+/usr/share/doc/wvdial
+ wvdial.conf.txt
+ wvdialconf.txt
+ wvdial.txt

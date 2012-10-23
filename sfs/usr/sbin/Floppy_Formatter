@@ -1,0 +1,238 @@
+#! /bin/bash
+#USB Floppy Formatter GUI by 8-bit Sept. 12, 2009
+#Modified Oct. 19,2009  Very little error checking done. Can it be implemented without external programs?
+#Written with the idea someone might get some use out of it.
+#Consider this program to be open source to modify as you wish.
+llfloppy()
+{
+#gxmessage -center -name     Floppy_Formatter "Insert writable unmounted floppy in drive."
+ERR0=1
+while [ ! $ERR0 -eq 0 ];do
+  xmessage -center -name     Floppy_Formatter "Please wait...Low-level formatting disk " &
+ if [ $CBOX3 = "true" ];then
+  ufiformat -f $COMBO1 $WORD1
+ else
+  if [ $CBOX4 = "true" ];then
+	fdformat /dev/fd0u$COMBO1
+ else
+  if [ $CBOX5 = "true" ];then
+    fdformat /dev/fd1 $COMBO1
+
+	gxmessage -center -name     Floppy_Formatter "No internal floppy drive found."
+	return
+  fi
+ fi
+ fi
+ ERR0=$?
+ killall xmessage
+ if [ ! $ERR0 -eq 0 ];then
+  xmessage -bg "#ffe0e0" -name "loformat" -title "    Lo-level Formatter" -center \
+  -buttons "Try again":20,"MENU":10 -file -<<XMSG
+ERROR low-level formatting disk.
+Is the write-protect tab closed?
+XMSG
+
+  AN0=$?
+  if [ $AN0 -eq 10 ];then
+   ERR0=0
+  fi
+  if [ $AN0 -eq 0 ];then
+   ERR0=0
+  fi
+  if [ $AN0 -eq 1 ];then
+   ERR0=0
+  fi
+ else
+   gxmessage -center -name     Floppy_Formatter  "Formatting of disk is finished. "
+ fi
+done
+return
+}
+dosfloppy()
+{
+#gxmessage -center -name     Floppy_Formatter "Insert writable unmounted floppy in drive."
+ERR0=1
+while [ ! $ERR0 -eq 0 ];do
+  if [ $CBOX3 = "true" ];then
+    xmessage -center -name     Floppy_Formatter "Please wait...making dos filesystem. And checking for errors " &
+    $CBOX2 $WORD1 $COMBO1
+  else
+    if [ $CBOX4 = "true" ];then
+      xmessage -center -name     Floppy_Formatter "Please wait...making dos filesystem. And checking for errors " &
+      $CBOX2 /dev/fd0 $COMBO1
+  else
+    if [ $CBOX5 = "true" ];then
+      xmessage -center -name     Floppy_Formatter "Please wait...making dos filesystem. And checking for errors" &
+  fi
+  fi
+ fi
+ ERR0=$?
+ killall xmessage
+ if [ ! $ERR0 -eq 0 ];then
+#gxmessage -center -name USB_Floppy_Formatter "Error is "$ERR0""
+  xmessage -bg "#ffe0e0" -name "loformat" -title "    Lo-level Formatter" -center \
+  -buttons "Try again":30,"MENU":10 -file -<<XMSG
+ERROR making DOS filesystem.
+Is the write-protect tab closed?
+If this is second try, Floppy
+has bad sectors. Low level format
+or replace floppy!
+XMSG
+
+  AN0=$?
+  if [ $AN0 -eq 10 ];then
+   ERR0=0
+  fi
+  if [ $AN0 -eq 0 ];then
+   ERR0=0
+  fi
+  if [ $AN0 -eq 1 ];then
+   ERR0=0
+  fi
+ else
+   gxmessage -center -name     Floppy_Formatter  "Making dos filesystem is finished. "
+ fi
+done
+return
+}
+top_menu()
+{
+ export CHOOSER="
+<window title=\"    Floppy Formatter  \"icon-name=\"gtk-floppy\">
+<vbox>
+<frame             Choose type of floppy drive             >
+<hbox>
+     <checkbox>
+      <label>USB floppy Drive                                  </label>
+      <variable>CBOX3</variable>
+      <default>false</default>
+    </checkbox>
+
+</hbox>
+<hbox>
+    <checkbox>
+      <label>Internal floppy drive 0                          </label>
+      <variable>CBOX4</variable>
+      <default>false</default>
+    </checkbox>
+</hbox>
+<hbox>
+    <checkbox>
+      <label>Internal floppy drive 1                          </label>
+      <variable>CBOX5</variable>
+      <default>false</default>
+    </checkbox>
+</hbox>
+ </frame>
+ 
+  <frame choose size of floppy:>
+    <combobox>
+     <variable>COMBO1</variable>
+      <item>1440</item>
+      <item>720</item>
+    </combobox>   
+</frame>
+<frame choose Options: >
+<hbox>
+     <checkbox>
+      <label>Low level format                                </label>
+      <variable>CBOX1</variable>
+      <default>false</default>
+    </checkbox>
+
+</hbox>
+<hbox>
+    <checkbox>
+      <label>MSDOS file system.                            </label>
+      <variable>CBOX2</variable>
+      <default>false</default>
+    </checkbox>
+</hbox>
+ </frame>
+
+<hbox>
+  <button>
+   <input file icon=\"gtk-ok\"></input>
+        <label>OK</label>
+        <action type=\"exit\">EXIT_OK</action>
+   </button>
+   <button>
+   <input file icon=\"gtk-quit\"></input>
+        <label>QUIT</label>
+        <action type=\"exit\">EXIT_NOW</action>
+      </button>
+</hbox>
+</vbox>
+</window>
+"
+
+CHOOSER2==`gtkdialog3 --program=CHOOSER --center`
+
+if [ "`echo $CHOOSER2 | grep EXIT_NOW`" != "" ]; then
+ exit 0
+fi
+
+#Get all of the variables
+CBOX1="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep CBOX1 | sed 's/CBOX1//'`"
+CBOX2="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep CBOX2 | sed 's/CBOX2//'`"
+CBOX3="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep CBOX3 | sed 's/CBOX3//'`"
+CBOX4="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep CBOX4 | sed 's/CBOX4//'`"
+CBOX5="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep CBOX5 | sed 's/CBOX5//'`"
+COMBO1="`echo "$CHOOSER2" | sed 's/\"//g' | sed 's/=//g' | grep COMBO1 | sed 's/COMBO1//'`"
+if [ $CBOX3 = "true" ];then
+ #Added Test for presence of USB floppy drive
+ FLOP="`ufiformat -i`"
+ WORD1="`echo $FLOP | cut -f 3 -d ' '`"
+ if  [ -z $WORD1 ];then
+   gxmessage -center -name USB_Floppy_Formatter "  No USB Drive Found             "
+   top_menu
+ fi
+#End of added test
+fi
+if [ $CBOX4 = "true" ];then
+ IN="`which /root/.pup_event/drive_fd0/AppRun`"
+ echo $IN
+ if [ -z $IN ];then
+   gxmessage -center -name Floppy_Formatter "No internal floppy drive found    "
+   top_menu
+ fi
+fi
+if [ $CBOX5 = "true" ];then
+ IN="`which /root/.pup_event/drive_fd1/AppRun`"
+ echo $IN
+ if [ -z $IN ];then
+   gxmessage -center -name Floppy_Formatter "No internal floppy drive found    "
+   top_menu
+ fi
+fi
+
+
+
+if [ $CBOX3 = "false" ] && [ $CBOX4 = "false" ] && [ $CBOX5 = "false" ];then
+   gxmessage -center -name USB_Floppy_Formatter "  Error-No drive type selected!  "
+   top_menu
+else
+  if [ $CBOX1 = "false" ] && [ $CBOX2 = "false" ];then
+   gxmessage -center -name USB_Floppy_Formatter "  Error-No Options selected!     "
+   top_menu
+else
+  if [ $CBOX1 = "true" ];then
+   llfloppy
+    #rxvt +sb -bg green -geometry 80x4 -e $CBOX1 $COMBO1 $WORD1
+  else
+    CBOX1="" #setting it back to "null" allows us to pass all parameters without doing more "if thens"
+  fi
+fi
+fi
+if [ $CBOX2 = "true" ];then
+    CBOX2="mkfs.msdos -v -c -I "
+  dosfloppy
+ #rxvt +sb -bg green -geometry 80x4 -e $CBOX2 $WORD1
+else
+ CBOX2="" #setting it back to "null" allows us to pass all parameters without doing more "if thens"
+fi
+
+unset CHOOSER
+top_menu
+}
+top_menu

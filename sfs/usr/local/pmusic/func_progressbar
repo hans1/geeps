@@ -1,0 +1,96 @@
+#!/bin/sh
+#Pmusic - progressbar daemon
+#Copyright 2008,2009,2010,2011,2012 - GPL
+#Sigmund Berglund
+
+WORKDIR=$HOME/.pmusic/tmp
+IFS=$'\n'
+
+#loading id3 info
+if [ -f $WORKDIR/tmp_statusbar ]; then
+	cp -f $WORKDIR/tmp_statusbar $WORKDIR/statusbar
+
+#play info
+elif [ "`grep -m1 -F 'kbits' $WORKDIR/ffmpeg_output`" ]; then
+	NOW_PLAYING="`cut -d'|' -f1 $HOME/.pmusic/nowplaying`"
+	#if new song differs from last played, then read song info
+	if [ ! "$NOW_PLAYING" ]; then
+		FILE=($(<"$WORKDIR/PLAYLIST"))
+		DURATION="`grep -m1 -F "$FILE" $WORKDIR/playlist | cut -d'|' -f2`"
+		NOW_PLAYING="`grep -m1 -F "$FILE" $WORKDIR/playlist | cut -d'|' -f3`"
+		LENGTH=`echo "(${DURATION%:*}*60)+${DURATION#*:}" | bc` #min*60+sec=total_sec -- using bc since bash struggles with leading 0 makes sum octal.
+		echo "$LENGTH" > $WORKDIR/ffmpeg_length
+		echo "$NOW_PLAYING|$FILE" > $HOME/.pmusic/nowplaying
+		#update trackinfo - check is defined in frontend code
+		[ "$(<$WORKDIR/TRACKINFO_REFRESH)" != false ] && $APPDIR/func_trackinfo -quiet &
+	else
+		#if playing radio we might want to show meta info
+		if [ $METAINFO_RADIO = true ]; then
+			if [ "`grep 'Duration: N/A,' $WORKDIR/ffmpeg_output`" ] && [ `which streamripper` ]; then
+				NOW_PLAYING="$NOW_PLAYING     `tail -n 1 $WORKDIR/streamripper_output | cut -d']' -f2 | cut -d'[' -f1`"
+			fi
+		fi
+		#---
+		LENGTH=($(<"$WORKDIR/ffmpeg_length"))
+	fi
+	#find played seconds
+	TMP=`tail -c 120 $WORKDIR/ffmpeg_output | cut -d'=' -f 3 | cut -d ' ' -f 1 | cut -d: -f 2-3 | cut -d. -f1` #ffmpeg-0.8 shows min:sec while ffmpeg-0.6 shows only sec
+	SEC_PLAYED=`echo "(${TMP%:*}*60)+${TMP#*:}+$(<"$WORKDIR/SS")" | bc`
+	#skip this if playing a radio stream
+	if [ $LENGTH != 0 ]; then
+		#echo percent for progress slider
+		TMP=`tail -c 120 $WORKDIR/ffmpeg_output | cut -d'=' -f 3 | cut -d ' ' -f 1 | cut -d: -f 2-3 | cut -d. -f1` #ffmpeg-0.8 shows min:sec while ffmpeg-0.6 shows only sec
+		SEC_PLAYED=`echo "(${TMP%:*}*60)+${TMP#*:}+$(<"$WORKDIR/SS")" | bc`
+		echo $((($SEC_PLAYED*100/$LENGTH)+1)) > $WORKDIR/PERCENT_BAR #for progress hscale and external apps (like the widget in Pwidgets)
+	fi
+	#calculate time of seconds played
+	TIME_MIN=$(($SEC_PLAYED/60))
+	TIME_SEC=$(($SEC_PLAYED-($TIME_MIN*60)))
+	[ $TIME_SEC -lt 10 ] && TIME_SEC="0$TIME_SEC" #ensure 2 digits for seconds
+	#skip this if playing a radio stream
+	if [ $LENGTH != 0 ]; then
+		#calculate time of seconds remaining if not playing a radio stream
+		SEC_PLAYED=$(($LENGTH-$SEC_PLAYED))
+		TIME_MIN2=$(($SEC_PLAYED/60))
+		TIME_SEC2=$(($SEC_PLAYED-($TIME_MIN2*60)))
+		[ $TIME_SEC2 -lt 10 ] && TIME_SEC2="0$TIME_SEC2" #ensure 2 digits for seconds
+		TIME_REMAINING="/${TIME_MIN2}:${TIME_SEC2}"
+	fi
+	#output
+	echo " $(<$WORKDIR/statusbar_playlist)     (${TIME_MIN}:${TIME_SEC}$TIME_REMAINING) ${NOW_PLAYING}" > $WORKDIR/statusbar
+
+#output when no tracks playing
+else
+	if [ ! -s $WORKDIR/ffmpeg_output ]; then #stopped
+		echo " $(<$WORKDIR/statusbar_playlist)" > $WORKDIR/statusbar
+	elif grep -E "I/O error|Connection refused" $WORKDIR/ffmpeg_output; then
+		if grep -F '://' $WORKDIR/PLAYLIST; then #no connection
+			echo " $LOC203" > $WORKDIR/statusbar
+		else #corrupted file
+			echo " $LOC204" > $WORKDIR/statusbar
+		fi
+	elif grep -E "Unknown format|could not find codec parameters" $WORKDIR/ffmpeg_output; then
+		echo " $LOC207" > $WORKDIR/statusbar
+	else
+		if [ ! -f $WORKDIR/PLAYLIST ] && [ ! "`grep -F '://' $WORKDIR/PLAYLIST`" ]; then #file has been renamed/moved --> not found
+			echo " $LOC507" > $WORKDIR/statusbar
+		elif [ "`grep "$LOC709" $WORKDIR/sourcelist`" ]; then
+			echo " $LOC522" > $WORKDIR/statusbar
+		elif grep -F 'no such file or directory' $WORKDIR/ffmpeg_output || ! grep -F 'Input #0' $WORKDIR/ffmpeg_output ; then
+			if [ ! "`grep -F '://' $WORKDIR/PLAYLIST`" ]; then
+				TMP="`ps`"
+				if [ "`echo "$TMP" | grep -F 'func_player -playing'`" ] && [ "`echo "$TMP" | grep -F 'cdda2wav'`" ]; then  #reading CD
+					echo " ${LOC730}..." > $WORKDIR/statusbar
+				else  #file/CD-track doesn't exist. For some unkown reason $PLAYLIST may hold ««« while reading the track. This only happens when using navigation buttons. Not when clicking in playlist.
+					[ ! "`grep -F '«««' $WORKDIR/PLAYLIST`" ] && echo "$LOC519" > $WORKDIR/statusbar
+				fi
+			else #connecting
+				echo " ${LOC492}..." > $WORKDIR/statusbar
+			fi
+		elif grep -F 'error' $WORKDIR/aplay_error; then #playback error - this might be the result of user 'works' too much with the <hscale> slider.
+			echo " $LOC205" > $WORKDIR/statusbar
+		else #buffering
+			echo " $LOC202" > $WORKDIR/statusbar
+		fi
+	fi
+fi

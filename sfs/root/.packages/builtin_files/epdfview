@@ -1,0 +1,30 @@
+/usr
+/usr/bin
+ epdfview
+/usr/share
+/usr/share/applications
+ epdfview.desktop
+/usr/share/epdfview
+/usr/share/epdfview/pixmaps
+ icon_epdfview-24.png
+ icon_epdfview-32.png
+ icon_epdfview-48.png
+ stock_find_next_24.png
+ stock_find_previous_24.png
+ stock_rotate-270.png
+ stock_rotate-90.png
+ stock_zoom-page-width.png
+/usr/share/epdfview/ui
+ epdfview-ui-print.xml
+ epdfview-ui.xml
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/24x24
+/usr/share/icons/hicolor/24x24/apps
+ epdfview.png
+/usr/share/icons/hicolor/32x32
+/usr/share/icons/hicolor/32x32/apps
+ epdfview.png
+/usr/share/icons/hicolor/48x48
+/usr/share/icons/hicolor/48x48/apps
+ epdfview.png

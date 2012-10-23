@@ -1,0 +1,18 @@
+#!/bin/bash
+
+FILE=`echo "$*" | cut -b 2-`
+if [ -z "$FILE" ]; then TXT1="<b>$LOC710</b>"
+	. "$PROGPATH"box_ok
+	exit
+else
+	FRAME="$LOC111"; TXT1="$LOC528 $TREE"
+	. "$PROGPATH"box_input
+	if [ $EXIT = "ok" ]; then
+		echo > /tmp/pfind-error$PROGPID
+		exec $INPUT "$FILE" 2> /tmp/pfind-error$PROGPID
+		TXT1=`cat /tmp/pfind-error$PROGPID`
+		if [ -n "$TXT1" ]; then . "$PROGPATH"box_ok; fi #error
+	fi
+fi
+
+

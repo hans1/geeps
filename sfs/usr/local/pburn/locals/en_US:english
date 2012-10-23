@@ -1,0 +1,371 @@
+#!/bin/bash
+#Pburn
+#version=3.5.2
+#language=en_US:english
+#translator=native
+
+# |==================================|
+# | <b>text</b>            Bold text |
+# |==================================|
+
+set -a
+
+LOC_OK="Ok"
+LOC_CANCEL="Cancel"
+LOC_INFO="Information"
+LOC_ERROR="Error"
+LOC_YES="Yes"
+LOC_NO="No"
+LOC_APPLY="Apply"
+LOC_QUIT="Exit"
+LOC_OPTIONS="Options"
+LOC_ISO="ISO-image"
+
+LOC001="CD/DVD/Blu-ray Burner"
+
+#Menu
+LOC100="File"
+ LOC102="Open" #this is not in use by menu anymore but still in box
+ LOC103="Save" #this is not in use by menu anymore but still in box
+ LOC104="Import session(s) from disc"
+ LOC108="Import (play)list"
+ LOC107="Import ISO-image"
+ LOC105="Export to ISO-image"
+ LOC106="Preferences"
+LOC110="Edit"
+ LOC111="New directory"
+ LOC112="Rename"
+ LOC113="Remove"
+ LOC117="Search"
+ LOC150="Add selection"
+ LOC151="Add audio files"
+ LOC152="Add videos"
+ LOC153="Add images"
+ LOC154="Add all"
+ LOC116="Add content of (play)list"
+ LOC120="Burn"
+ LOC121="Data CD/DVD/Blu-ray"
+ LOC122="Audio CD"
+ LOC129="Video DVD/CD"
+ LOC124="ISO-image"
+ LOC123="Audio from TOC file"
+ LOC127="Audio from CUE file"
+ LOC125="Copy data disc"
+ LOC128="Copy audio CD"
+ LOC160="Copy/shrink video DVD"
+ LOC126="Blank disc"
+LOC130="Tools"
+ LOC132="Eject disc"
+ LOC133="Load tray"
+ LOC134="Verify CD quality"
+ LOC135="Fixate"
+ LOC136="Disc info"
+LOC140="Help"
+ LOC141="About"
+
+#Main gui
+LOC200="Burn mode"
+LOC201="Burn Data"
+LOC202="Burn Audio"
+LOC219="Burn Video"
+LOC203="Burn ISO-image"
+LOC204="Add data from here... (mouse-click-right)"
+LOC208="name"
+LOC211="right click"
+LOC212="...burn content of this list"
+LOC213="size"
+LOC214="Minimum size"
+LOC218="Min" #minutes
+LOC215="A data-disc contains files (and directories) for
+PCs, mp3-players, Divx-players...
+Add from the browser/search to the burn list."
+LOC216="An Audio CD can be used in ordinary CD-players.
+Supported formats are: *.mp3 *.ogg *.wav *.wma ..."
+LOC217="1. Burn your movies and images, and play it on your TV.
+    Formats: *.avi *.flv *.mpg *.wmv ... *.gif *.jpg *.png ...
+2. Make an image slideshow with background music.
+3. Burn a predefined DVD-video filesystem (video_ts)."
+LOC220="Desktop"
+LOC221="Home"
+LOC222="Free"
+LOC223="Added"
+LOC224="No CD"
+LOC225="read only"
+
+###### SETTINGS #######
+#General
+LOC227="Show hidden files in browser"
+LOC228="Search options / MIME settings"
+LOC229="General"
+LOC231="Show tooltips (restart required)"
+LOC232="Language"
+LOC233="Themes"
+LOC234="Search paths"
+LOC600="Sound when burn succeeds"
+LOC601="Sound when burn fails"
+#Burn
+LOC235="Disc options"
+LOC236="Mediatype"
+LOC237="Multisession - Allow more burning on this disc later"
+LOC238="Close disc - Make disc unwritable after this burn"
+LOC239="Temporary storage"
+LOC240="On-the-fly - No temporary storage (DVD/Blu-ray recommended)"
+LOC241="Use temporary storage (CD recommended)"
+LOC242="free"
+LOC243="Overburn"
+#iso-image
+LOC230="Where should the new ISO-image be saved?"
+#file system
+LOC249="Filesystem"
+LOC250="Base filesystem"
+LOC251="Iso9660 level 1 - 8.3 chars. This is very compatible."
+LOC252="Iso9660 level 3 - max 31 uppercase chars and no spaces."
+LOC253="Extended filesystem"
+LOC254="Rockridge - Long filenames in Linux"
+LOC255="Joliet - Long filenames in Windows"
+LOC256="Follow symlink - (When off, 'size' will probably show more than you actually need)"
+LOC257="UDF - Allow large files > 4Gb (linux only)"
+#devices
+LOC260="Burner device"
+LOC261="Device"
+LOC262="Media"
+LOC263="The CD burn speed"
+LOC264="The DVD burn speed"
+LOC267="Input device"
+LOC268="The device you want to copy from, may be the same as the burner device"
+#audio
+LOC270="Burn mode"
+LOC271="Raw mode - Some burners support only this"
+LOC272="Track-at-once - Safe mode"
+LOC273="Disc-at-once - No gaps between songs"
+LOC440="Volume"
+LOC441="Normalize volume"
+LOC442="Tune volume level"
+#CD-text
+LOC290="CD-text"
+LOC291="Activate CD-text"
+LOC292="Artist - Song"
+LOC293="Album title"
+LOC294="Album artist"
+LOC295="Retrieve CD-text from disc or internet"
+#Video
+LOC700="TV standard"
+LOC701="Aspect ratio"
+LOC704="widescreen"
+LOC705="Country"
+LOC706="Pause between movies (in seconds)"
+#slideshow
+LOC713="Activate image slideshow"
+LOC710="Slideshow"
+LOC711="View images (in seconds)"
+LOC712="Background music"
+LOC714="seconds"
+LOC715="images"
+LOC716="Only build Slideshow file (*.mpg) - NO burn"
+LOC717="Time"
+#publish
+LOC274="Publish"
+LOC276="Publisher"
+LOC277="Preparer"
+LOC278="Project label"
+#blank disc
+LOC401="Fast blank - Erase table of context"
+LOC402="Blank complete - Erase all datas on disc"
+LOC403="Type"
+#copy
+LOC420="Please insert the disk you want to copy in"
+LOC421="Since you are using the same drive for both read and write this will be done in two stages."
+LOC422="Copying to harddisk, please wait..."
+LOC423="Insert a blank disc in"
+LOC428="Copy"
+LOC429="and a blank disc into"
+LOC450="On-the-fly - No temporary storage (MUST BE 2 different drives)"
+LOC451="Use temporary storage (Can copy with only 1 drive)"
+LOC452="Reading content of disc ... Please wait ..."
+#copy video
+LOC461="Title (Field shows title with most chapters):"
+LOC462="Copy the complete DVD - (requires most often to burn a dual layer DVD)"
+LOC463="Copy only movie - shrink to fit on a common (single-layer) DVD"
+LOC464="Subtitle channel (your language):"
+LOC465="Audiostream (for dubbed movie):"
+LOC466="The Video-DVD is now ripped, and you could optional test/save it. If you want to convert it to a compressed format like avi, you could use a program FFconvert or similar. Be aware that the ripped file will be removed after burning is completed. The file is located in"
+LOC467="This is a reminder that your temporary storage is less than 9Gb. If you intend to shrink the video-DVD you might need more."
+#advanced
+LOC279="Advanced"
+LOC280="Refresh command"
+LOC281="Allow manual edit"
+LOC282="Edit burn-command (below) and pre-operations"
+LOC284="Define CPU-priority"
+
+##### DIALOGS #####
+#finished
+LOC406="Finished"
+LOC407="Operation finished!"
+LOC408="Burn another copy"
+LOC470="Verify burn"
+LOC475="Note! <b>Verify may take time.</b> Depending on burnt complexity." 
+LOC471="No errors returned"
+LOC472="Errors found! Check the Pburn log"
+LOC473="Save ISO"
+LOC474="Insert new disc, WAIT FOR MEDIA TO SPIN UP, and press OK."
+LOC476="Save Slideshow file"
+LOC477="Save log"
+LOC479="Eject disc when finished."
+LOC480="<b>Note!</b>
+Depending on the linux kernel, you might need to reload disc to verify it correct. Please reload (eject and insert) disc and try again."
+
+#error
+LOC750="Start burning once more"
+LOC751="Start all over again"
+
+#encode
+LOC410="Select a toc file"
+LOC416="Select a cue file"
+LOC411="You are about to create a CD using the file"
+LOC413="Continue?"
+
+#log
+LOC430="Emergency STOP"
+LOC431="Verifying disc"
+LOC434="Please wait..."
+LOC435="NB! Do not use disc while verifying..."
+LOC432="Verifying finished"
+LOC433="Burning progress"
+
+#c2scan
+LOC500="
+This scans the disc for C2 errors. The reader tries to interpolate these gaps in data, but if there are too many errors, it could give a reading failure. C2 errors can occur because the disc is physically out-of-balance (like a wheel which is out-of-round, or heavier on one side), in which case they may be avoided by reducing the burning speed.
+
+<b>Start scanning disc and evaluate output.</b>"
+
+#fixate
+LOC505="
+It could happend that the burning process burns fine, but halts at the final fixating. The disc is like this not usable. Fixating disc builds data coordinates, so the disc will be readable.
+
+<b>Start fixating disc.</b>"
+
+#Disc info
+LOC506="Content of disc"
+LOC507="Md5sum"
+LOC508="No info"
+LOC509="Media size"
+LOC510="Free space"
+LOC511="Closed disc"
+LOC512="No writable media"
+
+#tooltips
+LOC801="Go to burn options"
+LOC802="Exit Pburn"
+LOC803="Move item UP"
+LOC804="Move item DOWN"
+LOC805="Create new directory on the burn disc."
+LOC806="Rename item on the burn disc. 
+This will NOT change source file."
+LOC807="Remove item from burn list.
+This will NOT delete source file."
+LOC808="Add item to burn-list. (mouse-click-right)"
+LOC809="Search for filename"
+
+#startup check
+LOC490="Skip this message at next startup"
+LOC495="Pburn is already running, or it was previously exited incorrectly.
+<b>Clear storage, and continue?</b>"
+
+##### ERRORS / MESSAGES#####
+LOC301="List is empty."
+LOC302="Nothing to burn."
+LOC303="<b>Can't find a valid Video-DVD.</b>
+Please wait for the disc to spin up before trying again."
+LOC304="Please insert disc.
+If disc is already in tray, - Please reload it."
+LOC306="File is not recognized as an iso-image.
+It could still be valid.
+
+Press 'Yes' to continue burn process."
+LOC307="<b>Inserted disc is not blank or writable</b>
+
+- Burning <b>Audio/Video</b> requires a blank disc.
+- Burning <b>Data</b> requires a writeable or blank disc.
+- Burning <b>iso-image</b> may require a blank disc. You can mix data from the chosen iso-image with the content on the disc, but if burning a bootable disc it might be corupted. An exception is when updating the LIVE-disc to a newer version. Files in the new image will replace similar files on the disc. Press 'Continue' to add more data from the iso-image to the disc."
+LOC309="Specify only one iso-file."
+LOC311="Not a valid file!"
+LOC312="Imports external data"		#splash
+LOC313="Checking media...
+Building command"		#splash
+LOC315="Imports session(s) from"		#splash
+LOC319="Pfilesearch is not installed. Search will not work."
+LOC321="Another ISO-image is already imported."
+LOC322='<b>You have chosen to burn an *.iso filesystem image.
+
+Normally the filesystem should be unpacked onto the disc</b>, unless for some reason you want to put the *.iso on the disc as a single file.
+
+What would you like to do?'
+LOC324="<b>Not valid file format.</b> Operation failed."
+LOC325="Volume: 'normalize' is not installed."
+LOC326="<b>vcdimager</b> must be installed to support Video CD (VCD/SVCD)."
+LOC327="<b>dvdauthor</b> must be installed to support Video DVD."
+LOC328="<b>vobcopy</b> must be installed to copy Video DVD."
+LOC329="<b>vamps</b> must be installed to shrink Video DVD."
+LOC330="<b>ffmpeg</b> must be installed to burn Audio and convert Video."
+LOC331="Pburn can't open files from imported sessions."
+LOC332="<b>Nothing to add.</b> Select item in the left pane.
+
+Note! You can also add by mouse right click on item."
+LOC333="Pburn's <b>temporary storage is small</b>. This can cause problems when burning a large amount of data. If running a system inside a virtual filesystem (like Puppylinux), We recommend you to change this setting to a directory on a mounted hard drive. 10Gb of free space would do for most burning tasks.
+
+<b>Temporary storage on a Windows FAT partition works mostly, but will fail for audio/video burning.</b> NTFS is fine."
+LOC334="It seems that your burner drive is not autodetected by Pburn, and it is set to /dev/cdrom. This will often work ok, but to be sure you should define (click on) the correct one."
+LOC335="See File->Preferences."
+LOC336="Adding content..."
+LOC337="Unpack filesystem" #Button: burn iso-image the normal way
+LOC338="Single file" #Button: burn iso-image as is
+LOC339="Continue with valid disc"
+LOC340="Blanking disc, please wait...
+
+This operation runs a fast blank. If it for some reason fails to blank your disc, please use the 'blank complete' function from menu 'Burn'."
+LOC341="Burnt disc" #show md5sum of content of filesystem on burnt disc
+LOC342="Calculating md5sum, please wait ..."
+LOC343="Temporary storage should not be located inside
+../pburn_symlink_tree/"
+LOC344="<b>Important!</b> Temporary storage does not exist, or points to an unmounted partition. Please change the location, or mount the partition. <b>NOW!</b>"
+LOC345="It's not a valid CD in tray."
+LOC346="Command 'close' is not installed."
+LOC347="No valid audio-CD inserted."
+LOC348="Missing dependency"
+LOC349="Already in burn list"
+LOC350="About burning a Puppy iso-image"
+LOC351="Normally we recommend to close session after burning an iso-image. Closed session is the only way to verify burning using md5sum. However, Puppy Linux supports writing user-data back to the Live-CD/DVD during shutdown - no harddrive is needed. To do this, the disc must be open for more burning. You should choose a multisession burn if you intend to use the CD/DVD as your personal storage."
+LOC352="The size of burn content is more than the official media size."
+LOC353="Do you want to activate Overburning?"
+LOC354="Scanning disc ... Please wait"
+LOC355="File(s) to be burnt, does not exist"
+
+
+
+LOC375="Disc is mounted."
+LOC376="Do you want to unmount it and continue?"
+LOC377="No (play)list is selected."
+LOC378="The list seems to be a music playlist. Should Pburn number the songs to keep them in order?"
+LOC379="Create new directory"
+LOC380="Pburn can't rename files from imported sessions."
+LOC381="<b>Nothing is selected.</b>"
+LOC382="Pburn can't remove files from imported sessions."
+LOC383="File not found."
+LOC384="Unable to open file."
+LOC385="File already exists."
+LOC386="Do you want to overwrite existing file?"
+LOC387="No disc inserted"
+LOC388="<b>No blank disk detected, or no valid multisession disk.</b>"
+LOC389="<b>Not enough space in temporary storage.</b> Free up some space, or change the temporary storage location from menu 'File-Preferences-Burn'."
+LOC390="Unknown error."
+LOC391="Inserted disc is not writeable
+
+It could be that the disc is spinning up.
+If so, please wait and try to burn again."
+LOC392="<b>Joliet error.</b> Consider to deactivate the joliet filesystem."
+LOC393="<b>Can't detect burner.</b>"
+LOC394="<b>Too much data for chosen burn-media.</b>"
+LOC395="<b>This is probably NOT critical</b>. Pburn reports problem with closing session, but if media is a new Blu-ray disc, please reload and you will most likely find everything ok."
+LOC397="<b>Can't blank this media.</b> Be sure to use a complete blank." 
+LOC398="<b>Media seems to be closed for more data.</b>"
+LOC399="See log for more information."

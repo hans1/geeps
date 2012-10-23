@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=LoginManager configure login
+Name[ru]=LoginManager настроить логин
+Icon=so.xpm
+Comment=LoginManager configure login
+Comment[ru]=LoginManager настроить логин
+Exec=loginmanager
+Terminal=false
+Type=Application
+Categories=X-SystemSchedule
+GenericName=loginmanager

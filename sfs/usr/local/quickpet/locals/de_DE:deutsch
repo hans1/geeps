@@ -1,0 +1,247 @@
+#!/bin/bash
+# Slickpet de_DE
+# V 1.6.2_de_locales by mave 10/22/2011
+#please translate this file and if possible keep the descriptions the same length or shorter 
+#language=deutsch/german
+#translator=native ##TRANSLATORS please name your version 400 so I know ..Thankyou
+#        ****************LATEST I December 2010************************
+#        ****************Bugfix 07/01/2010 - forgotten section "browser installer", uuups! ********
+
+##################                    PLEASE NOTE                               ###############
+#if you are unfamiliar with coding then you may notice "\n" in some lines                     #
+#this means "new line" and it is important. I realise grammar is different in each language   #
+#do place this "\n" every 6 to 10 words or 40 to 50 characters                                #
+##################                  THANK  YOU                                  ###############
+
+#Buttons and warnings
+export LOC_OK="Ok"
+export LOC_CANCEL="Abbruch"
+export LOC_ERROR="Fehler"
+export LOC_WARNING="Warnung"
+export LOC_YES="Ja"
+export LOC_NO="Nein"
+export LOC_QUIT="Beenden"
+export LOC_HELP="Hilfe"
+export LOC_INFO="Info"
+export LOC_FILE="Datei"
+export LOC_BRS=" ist momentan als Standard-Browser eingestellt. \nFür z.B. Datei-Download, wird empfohlen, einen Browser \nmit größerem Funktionsumfang zu installieren."
+export LOC_CANTINSTALL="Es ist nicht genug Speicher für die Installation vorhanden."
+export LOC_WARNINGINSTALL="Das Paket wird nach der Installation weniger als 45MB \n von der pupsave-Datei oder Partition übrig lassen.\nFortfahren?"
+
+#browser installer #NOT used in Slacko
+
+#yaf messages
+export LOC_101="FEHLER: Download funktioniert nicht. Bitte mit dem Internet verbinden."
+export LOC_101="FEHLER: Download funktioniert nicht. Bitte mit dem Internet verbinden."
+export LOC_102="Bitte warten ..."
+export LOC_103="FEHLER: Die Update-Seite antwortet nicht. Bitte Verbindung prüfen oder später nochmal versuchen."
+export LOC_104="Neue Updates für Slacko Puppy sind vorhanden"
+export LOC_105="Zurzeit gibt es keine Updates für Slacko Puppy"
+export LOC_106a="Bitte warten auf den"
+export LOC_106b="Download. Sie werden dann um Bestätigung der Installation gebeten."
+export LOC_107="Timeout der Verbindung. Bitte später noch einmal versuchen."
+export LOC_108="FEHLER: Download fehlgeschlagen. Bitte später noch einmal versuchen. Der Download wird dann fortgesetzt."
+export LOC_109="FEHLER: Paket konnte nicht installiert werden. Bitte noch einmal versuchen."
+export LOC_110a="Erfolgreich installiert"
+export LOC_110b=""							#split for Swedish grammar, maybe others too #Mhhp mave: nothing in german
+export LOC_111=" Browser ist nun als Standard gesetzt"
+export LOC_112="Slickpet läuft bereits. Bitte warten..."
+export LOC_113="Bitte warten, versuche das Paket zu finden..."
+
+#NEW yaf messages
+export LOC_114="Treiber können während eines anderen Download nicht geladen werden" #NEW 1 December
+export LOC_115="Bitte keinen anderen Download starten, während gerade ein Treiber-Download aktiv ist"
+export LOC_116="Tut mir leid, das Paket konnte nicht gefunden werden"
+export LOC_117="Momentan ist die maximale Anzahl von SFS-Erweiterungen geladen. Bitte im 'Bootmanager' einige entfernen, um neue SFS aktivieren zu können"
+
+#xmessages
+#export LOC_201=deprecated
+export LOC_202="Willkommen zu Slacko Puppys Slickpet
+	Es gibt drei Haupt-Tabs für Pets. Das Puppy-Paketformat ist sehr einfach gehalten.
+Nach Auswahl und Mausklick auf das jeweilige Icon eines Paketes (Pet),
+erfolgt der Download vom Puppy-Repository (Paketquelle
+im Internet). Bei langsamen Internetverbindungen kann das etwas 
+dauern - dann bitte Geduld haben. Danach meldet sich der PPM 
+(Puppy Paket Manager) und stellt einige einfache Fragen, um anschließend
+die Software zu installieren. Danach wird eine Meldung über den Installationsverlauf ausgegeben.
+	In den Einstellungen kann das Repository (Paketquelle) ausgewählt werden,
+welches am Besten funktioniert. Ist es zu langsam oder
+nicht erreichbar, einfach ein anderes aktivieren.
+	Es gibt auch den Tab 'Treiber': hier finden sich passende Grafikkarten-Treiber.
+Für Nvidia gibt es auch andere Treiber im Puppy Paket Manager. Für Radeon-
+und Intel-Grafikkarten wird das 'Xorg High' Paket empfohlen.
+	Es gibt auch einen extra Tab 'Neuigkeiten': hier finden sich Informationen
+zu Fehlerbehebungen und Erweiterungen für Slacko Puppy.
+	Bei Schwierigkeiten gibt es eine Hilfe im 'Support'-Menü.
+Nicht vergessen: Software-Pakete können über den eigentlichen
+Puppy Paket Manager im Puppy-Hauptmenü installiert werden.
+	Viel Spass mit Slacko Puppy!"
+	
+export LOC_203="Bitte beachten, dass es sich bei den aufgeführten Einträgen in
+Slickpet um Software (Pakete) handelt, die von Puppy-Enthusiasten kompiliert und ohne 
+Garantie zur Verfügung gestellt wird.
+
+Viele Pakete fallen unter die GNU GPL-Lizenz oder deren Varianten.
+Die meisten werden regelmäßig gewartet und für gewöhnlich liegen 
+die allerneueste Fassung vor, um das Betriebssystem auf dem neuesten
+Stand zu halten.
+
+Es muss ein Web-Browser installiert sein, um diese Möglichkeit zu nutzen.
+Bitte das Browser-Icon anklicken, um einen Browser zu installieren."
+
+export LOC_204="Sollte Slickpet fehlschlagen, ist das kein Grund, zu verzweifeln.
+
+Alle Pakete sind im Puppy Paket Manager verfügbar über das 'Install'-Icon auf dem Desktop.
+Unter 'Neuigkeiten' finden sich aktuelle Informationen und auch Updates.
+
+Im Tab 'Mehr Programme' finden sich zusätzliche Links und Hinweise zu Programmen,
+die in Slacko Puppy funktionieren. Das Download-Repository kann im 'Datei'-Menü 
+unter 'Einstellungen' geändert werden, z.B. ein Server, der in der Nähe ist 
+und/oder schnellere Verbindung liefert. Dies wird dauerhaft gespeichert. Ebenso kann
+eingestellt werden, ob die Downloads in /root/.quickpet/Downloads gespeichert werden
+sollen.
+
+Download-Pakete werden in der pupsave-Datei (lupusave) der Slacko Puppy Installation
+gespeichert. Ein Klick auf 'Download-Verzeichnis' im 'Support'-Menü zeigt vorhandene
+Pakete. Diese können z.B., wenn gewünscht, verschoben werden. 'Download-Pakete löschen',
+entfernt alle (!) dort vorhandenen Software-Pakete.
+
+Es gibt einen Tab für SFS-Dateien. Das sind spezielle Pakete, die normalerweise
+sehr umfangreiche Software enthalten, in dieser Form aber keinen Speicherplatz in der
+pupsave-Datei belegen. Für weitere Informationen über SFS-Dateien, im 'SFS'-Menü
+den Eintrag 'SFS Support' anklicken.
+
+Viel Spass mit Slacko Puppy!
+Das Puppy-Team." 
+
+#gtkdialog Be careful with escape character "\" here.. 
+#prefs
+# export LOC_298 gone in slickpet version... => # LOC_299
+export LOC_299="Box deaktivieren, um die Download-Pakete dauerhaft zu speichern"  # in orig. en_EN-file away since 12/01/2010 (?)
+# export LOC_299="Pakete werden nach einem Neustart aus /tmp gelöscht"
+export LOC_300="Puppy Paket Manager (PPM)"
+export LOC_301="Einstellungen für Slickpet"
+# export LOC_302="Änderungen werden erst aktiv, nachdem '$LOC_OK' betätigt wurde."
+export LOC_303="Repository (Paketquelle) wählen"
+
+#main gui
+export LOC_304="Einstellungen"
+export LOC_305="im Web"
+export LOC_306="Rechtliches"
+export LOC_307="Support"
+export LOC_308="Liesmich"
+export LOC_309="Willkommen zu"
+export LOC_310="Das ist hier ist eine schnelle Alternative zu Puppys Package Manager (PPM). Ein Klick auf ein Programm-Icon wird automatisch die gewünschte Software herunter laden und installieren."
+export LOC_311="Beliebte Pets"
+export LOC_312="Internet Pets"
+export LOC_313="Nützliche Pets"
+export LOC_314="Treiber"
+export LOC_315="Neuigkeiten"
+export LOC_316="Paket zum Installieren auswählen"
+export LOC_317="Browser oder E-Mail-Programm zum Installieren auswählen"
+export LOC_318="Pet-Paket auswählen"
+export LOC_319="Treiber auswählen"
+export LOC_350="Mehr Pets"
+export LOC_351="Download-Verzeichnis"
+export LOC_352="Download-Pakete löschen"
+export LOC_355="Über"
+export LOC_356="Info über Video/Grafikkarte"
+
+#Tooltips
+export LOC_353="Ein Mausklick und die bisher herunter geladenen Pakete werden angezeigt. Man kann sie durch Ziehen mit der Maus ('drag and drop') woanders hin kopieren, wenn z.B. das Download-Verzeichnis entlastet werden soll oder man überhaupt Speicherplatz in der pupsave-Datei sparen will."
+export LOC_354="Ein Mausklick wird alle (!) herunter geladene Pakete löschen."
+export LOC_357="für den Download, user=puppy, password=linux"
+export LOC_360="Es existieren Abhängigkeiten für"
+#pets
+export LOC_320="Gimp - umfangreiche Bildbearbeitung" 
+export LOC_321="Psip Puppyphone - Internettelephonie"
+#export LOC_321="Pwidgets  Kleine Desktop-Programme 283KB"
+export LOC_322="Browser-Default - den Standard-Browser wechseln"
+export LOC_323="Cloud - internetbasierende Applikationen"
+export LOC_324="Wine - Windows-Software in Linux"
+export LOC_327="Gnome Games Lite  - viel Spass..."
+#internet
+export LOC_501="Firefox - der beliebte Mozilla Web-Browser"
+export LOC_502="Dillo - kleiner und schneller Browser"
+export LOC_503="Chromium  - Googles Chrome Browser"
+export LOC_504="Opera - schnelle Browser-Suite"
+export LOC_505="Transmission  - Peer to peer Bit Torrent Client"
+export LOC_506="Kompozer  - Web-Seiten verwalten"
+export LOC_507="Iron  - Googles Chrome Browser von SWare"
+export LOC_508="Pidgin  - umfassenders Chat-Programm"
+#This is an exztra, TOR browser may be an inclusion
+export LOC_TOR="TOR Browser  - sicher im Internet unterwegs"
+
+#drivers
+#export LOC_389="Bitte sicherstellen, dass mindestens 80MB freier Speicher vorhanden sind, bevor der Grafikkarten-Treiber installiert wird." ##NEW
+export LOC_390="Einige Systeme benötigen diese extra Treiber, um die vorhandene Hardware besser nutzen zu können."
+#export LOC_391="RadeonHD  für jüngere ATI Video Grafikkarten 372KB" deprecated, no harm to leave it though
+export LOC_392B="Den empfohlenen Treiber auswählen"
+export LOC_392C="Es wird empfohlen, den aktuellsten Treiber zu verwenden"
+#export LOC_392Att="Dies ist für ältere Nvidia-Grafikkarten"
+#export LOC_392Btt="Dies ist für jüngere und einige neueren Nvidia-Grafikkarten"
+#export LOC_392Ctt="Dies ist für ganz neue Nvidia-Grafikkarten"
+#export LOC_392_96="Nvidia-96.43.16 7.4MB"
+#export LOC_392_173="Nvidia-173.14.25 10MB"
+#export LOC_392_256="Nvidia-256.35 14MB"
+export LOC_392x="Xorg High-GLX für Radeon- und Intel-Grafikkarten 14MB"
+export LOC_392m="Mesa-GLX Für Radeon- und Intel-Grafikkarten" #as above
+export LOC_392h="Hier klicken für Hilfe zur Installation"
+#export LOC_392j="Nvidia-glx 256.36 für neuere Nvidia-Grafikkarten 14MB" #####added
+export LOC_392a="Nvidia-glx für spätere NvidiaModelle"
+export LOC_392tt="Hier klicken für eine Auswahl von 3 Treibern. Wenn Sie nicht wissen, welcher dann den Button oberhalb anwählen" ##changed
+export LOC_392ttr="Bitte sicher gehen, dass Ihre ATI-AMDcard laut Video-Test unterstützt wird."
+export LOC_392vid="Hier klicken, um die Grafikkarte zu testen"
+export LOC_392ttvid="Dies wird die Grafikkarte testen, um den passenden Treiber zu ermitteln" 
+#export LOC_700="\n If you know that it is a fairly recent \n model  then click 'No' and \n Install the Nvidia driver in Slickpet.\n Other wise click 'Yes' and your browser \n will take you to the Nvidia website. \n There are other Nvidia drivers in PPM. \n The model of your card is: \n "
+export LOC_701="\n Verwenden Sie das 'Xorg_High'-Treiberpaket in Slickpet"
+#export LOC_702="Sie haben"
+#export LOC_703="Sie haben"   #hmmm duplicated because different in French, Please run gui "test-vid" to see the context needed for your language###########
+export LOC_704="Grafikkarte"
+export LOC_705="Klicken, um den Browser zu öffnen und den Text oberhalb zu übersetzen" ###New.. too hard to translate here, better let browser do it.
+export LOC_706="Sie müssen einen Browser in Ihrer Sprache installiert haben"
+
+#News
+#Update IS now "News"
+export LOC_500="Dieser grosse Button bringt Sie auf die Web-Seite von Slacko Puppy, auf der die neuesten Informationen zu finden sind. Von Zeit zu Zeit werden dort Updates für Slacko Puppy bereit gestellt." ##New
+export LOC_500B="Dieser grosse Button bringt Sie auf die Wiki-Seite mit den aktuellesten Neuigkeiten über"
+
+#Xdialog
+#export LOC_401="Slacko Puppy Treiber-Installation"
+#export LOC_402="Zur Installation wurde ausgewählt"
+#export LOC_403="Wenn der Grafik-Treiber (Dateiendung '.pet') installiert wurde,\nmuss auf der Befehlsebene das Programm 'xorgwizard' gestartet\nwerden. Schauen Sie im Hauptmenü nach einem Eintrag \n'Shutdown/Beenden' (o.ä.), um dann 'Exit to prompt' / 'Prompt aufzurufen' und \nstarten Sie von dort dann 'xorgwizard'. Dann den Anweisungen folgen.\nDanach müssen Sie 'xwin' eingeben, um die grafische Oberfläche \nwieder zu starten.\nFortfahren?"
+#Clear Downloads
+export LOC_801="Lösche Downloads"
+export LOC_802="Sie haben gewählt, die bisherigen Download-Pakete (Pets) zu löschen. \nSind Sie sicher?"
+
+#NEW SFS stuff AS OF 2 NOVEMBER 2010
+export LOC_901=" dann erfolgt eine Aufforderung, es in ein Pet-Paket zu speichern"
+export LOC_902="Dann muss Puppy neu gestartet werden, um die Installation abzuschließen."
+export LOC_903="Kein SFS geladen"
+export LOC_910="Einfach das gewünschte anklicken"
+export LOC_910tt="klicken, um die geladenen SFS anzusehen"
+export LOC_911="und der Download erfolgt. "
+export LOC_920="Verfügbare SFS"
+export LOC_920="Beschreibung"
+export LOC_950="Neustart nicht vergessen, \nbevor neue SFS-Dateien installiert werden."
+export LOC_951="Sie haben den Download schon."
+export LOC_952="Bootmnanager prüfen, ob es schon geladen ist."
+export LOC_953="Nicht genug Speicher vorhanden, um zu installieren"
+export LOC_954="Abbrechen"
+export LOC_955="Aufgrund der RAM-Beschränkungen des Systems,\nist nicht genug Speicher für die Installation vorhanden."
+export LOC_956="Bitte warten...\n Der Download einer großen SFS-Datei kann dauern."
+
+#NEW stuff AS OF 1 DECEMBER 2010
+export LOC_960="$LOC_QUIT klicken, wenn Sie mit dem Download unsicher sind"
+export LOC_961a="Klicken des"
+export LOC_961b="Buttons wird den direkten Download des Treibers starten"
+export LOC_962="Downloads klicken"
+export LOC_970a="Sie sollten wirklich einen Broiwser installieren, der übersetzungsfähig ist, damit diese Seite übersetzt werden kann."
+export LOC_970b="Sie können diese Seite mit einem Browser übersetzen lassen, der Onlineübersetzungen unterstützt."
+#NEW stuff AS OF 6 DECEMBER 2010
+export LOC_971a="das Upgrade wurde installiert und scheint zu vfunktionieren. Klicken"
+export LOC_971b="das Upgrade wurde installiert und scheint zu funktionieren. Sie können das überprüfen durch Starten von \"glxgears\" in einem Terminal-Fenster. Klicken"
+export LOC_972="wurde installiert, aber der Treiber funktioniert nicht. Klicken Sie"
+
+#END
+

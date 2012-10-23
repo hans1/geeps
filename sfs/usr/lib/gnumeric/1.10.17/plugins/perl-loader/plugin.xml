@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin id="Gnumeric_PerlLoader">
+	<information>
+		<name>Perl plugin loader</name>
+		<name xml:lang="ast">Cargador de complementos Perl</name>
+		<name xml:lang="bg">Програма за зареждане на модули на Perl</name>
+		<name xml:lang="ca">Carregador del connector del Perl</name>
+		<name xml:lang="ca@valencia">Carregador del connector del Perl</name>
+		<name xml:lang="cs">Načítání zásuvných modulů v jazyce Perl</name>
+		<name xml:lang="de">Perl-Plugin-Starter</name>
+		<name xml:lang="dz">པརཱལ་པ་ལག་ཨིན་མངོན་གསལ་འབད་མི་</name>
+		<name xml:lang="el">Φορτωτής πρόσθετων λειτουργιών Perl</name>
+		<name xml:lang="en_CA">Perl plugin loader</name>
+		<name xml:lang="en_GB">Perl plugin loader</name>
+		<name xml:lang="es">Cargador de complementos Perl</name>
+		<name xml:lang="et">Perli pluginate laadija</name>
+		<name xml:lang="eu">Perl pluginen kargatzailea</name>
+		<name xml:lang="fi">Perl-liitännäislatain</name>
+		<name xml:lang="fr">Chargeur de greffon en Perl</name>
+		<name xml:lang="gu">Perl પ્લગઇન લોડર</name>
+		<name xml:lang="he">טוען תוספי Perl</name>
+		<name xml:lang="hu">Perl bővítménybetöltő</name>
+		<name xml:lang="id">Pemuat plugin Perl</name>
+		<name xml:lang="it">Caricatore plugin Perl</name>
+		<name xml:lang="lt">Perl papildinių įkėlimas</name>
+		<name xml:lang="mk">Папка со Perl приклучоци</name>
+		<name xml:lang="nb">Tilleggslaster for Perl</name>
+		<name xml:lang="ne">पर्ल प्लगइन लोडर</name>
+		<name xml:lang="nl">Perl pluginlader</name>
+		<name xml:lang="nn">Perl tilleggsmodullastar</name>
+		<name xml:lang="pt_BR">Carregador do plugin Perl</name>
+		<name xml:lang="ru">Загрузчик дополнения Perl</name>
+		<name xml:lang="sl">Nalagalnik vstavkov Perl</name>
+		<name xml:lang="sv">Inläsare för Perl-insticksmoduler</name>
+		<name xml:lang="vi">Bộ tải bổ sung Perl</name>
+		<name xml:lang="zh_TW">Perl 增效模組總管</name>
+		<description>This plugin provides support for Perl plugins</description>
+		<description xml:lang="ast">Esti complementu proporciona sofitu pa los complementos de Perl</description>
+		<description xml:lang="bg">Този модул осигурява поддръжка на модули на Perl</description>
+		<description xml:lang="ca">Aquest connector permet habilitar els connectors del Perl</description>
+		<description xml:lang="ca@valencia">Este connector permet habilitar els connectors del Perl</description>
+		<description xml:lang="cs">Tento zásuvný modul poskytuje podporu pro zásuvné moduly v jazyce Perl</description>
+		<description xml:lang="de">Dieses Plugin bietet Unterstützung für Perl-Plugins</description>
+		<description xml:lang="dz">འ་ནི་པ་ལག་ཨིན་འདི་གིས་ པ་རཱལ་པ་ལག་ཨིན་ཚུ་གི་དོན་ལུ་ རྒྱབ་སྐྱོར་བྱིནམ་ཨིན།</description>
+		<description xml:lang="el">Αυτή η πρόσθετη λειτουργία παρέχει υποστήριξη για πρόσθετες λειτουργίες Perl</description>
+		<description xml:lang="en_CA">This plugin provides support for Perl plugins</description>
+		<description xml:lang="en_GB">This plugin provides support for Perl plugins</description>
+		<description xml:lang="es">Este complemento proporciona soporte para los complementos de Perl</description>
+		<description xml:lang="et">See plugin võimaldab Perli pluginate toe</description>
+		<description xml:lang="eu">Perl pluginetarako euskarria duzu plugin hau</description>
+		<description xml:lang="fi">Tämä liitännäinen tarjoaa tuen Perl-liitännäisille</description>
+		<description xml:lang="fr">Ce greffon fournit une prise en charge pour les greffons en Perl</description>
+		<description xml:lang="hu">Ez a bővítmény támogatást biztosít Perl bővítményekhez</description>
+		<description xml:lang="id">Plugin ini memberikan dukungan untuk plugin Perl</description>
+		<description xml:lang="it">Questo plugin fornisce supporto per i plugin Perl</description>
+		<description xml:lang="ko">이 플러그인은 펄 플러그인을 지원합니다</description>
+		<description xml:lang="lt">Šis papildinys įjungia Perl papildinių palaikymą</description>
+		<description xml:lang="nb">Dette tillegget gir støtte for Perl-tillegg</description>
+		<description xml:lang="ne">पर्ल प्लगइनका लागि यो प्लगइनले समर्थन प्रदान गर्छ</description>
+		<description xml:lang="nl">Deze plugin levert ondersteuning voor Perl plugins</description>
+		<description xml:lang="pt_BR">Este plugin dá suporte aos plugins Perl</description>
+		<description xml:lang="ru">Это дополнение предоставляет поддержку для дополнений Perl</description>
+		<description xml:lang="sv">Denna insticksmodul tillhandahåller stöd för Perl-insticksmoduler</description>
+		<description xml:lang="vi">Bổ sung hỗ trợ bổ sung Perl</description>
+		<description xml:lang="zh_TW">本增效模組提供 Perl 增效模組的支援</description>
+		<require_explicit_enabling/>
+	</information>
+	<loader type="Gnumeric_Builtin:module">
+		<attribute value="perl_loader" name="module_file"/>
+	</loader>
+	<services>
+		<service type="plugin_loader" id="perl"/>
+	</services>
+</plugin>

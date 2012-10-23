@@ -1,0 +1,16 @@
+/usr
+/usr/bin
+ gsf
+ gsf-office-thumbnailer
+ gsf-vba-dump
+/usr/lib
+ libgsf-1.so.114
+ libgsf-1.so.114.0.21
+ libgsf-gnome-1.so.114
+ libgsf-gnome-1.so.114.0.21
+/usr/lib/python2.6
+/usr/lib/python2.6/site-packages
+/usr/lib/python2.6/site-packages/gsf
+ gnomemodule.so
+ _gsfmodule.so
+ __init__.py

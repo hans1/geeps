@@ -1,0 +1,646 @@
+#!/bin/bash
+#script uses arrays which are supported by bash but possibly not other shells
+#Pnethood
+#Copyright Will Davies 22/07/2008
+#Update clarf 03/08/2011
+#with thanks to Dougal and Disciple for various contributions and criticism
+#thanks to thunor for improving gtkdialog
+#Pnethood is released under the GNU General Public License (GPL).
+#You have the right to use and modify this software in any way you like,
+# so long as any derivative works remain under a GPL license.
+#This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.
+#See the GNU General Public License homepage for more details. <http://www.gnu.org/licenses/>.
+#------------------------------
+
+###Check for gtkdialog
+GTKDIALOG=""
+
+if [ "`which gtkdialog4`" != "" ]; then
+GTKDIALOG=gtkdialog4
+fi
+if [ "`which gtkdialog`" != "" ]; then
+GTKDIALOG=gtkdialog
+fi
+
+#Check gtkdialog version and enable new features
+GTK_FEATURES=false
+if [ "$GTKDIALOG" = "" ]; then
+  echo "you need to install gtkdialog"
+else
+  GTKDV=($($GTKDIALOG -v))
+  GTKDV=${GTKDV[2]}
+  echo Found gtkdialog-$GTKDV
+  GTKDV=(${GTKDV//./ })
+  [ ${GTKDV[1]} -lt 10 ] && GTKDV[1]=${GTKDV[1]}0
+  [ ${GTKDV[2]} -lt 10 ] && GTKDV[2]=0${GTKDV[2]}
+  [ ${GTKDV[1]}${GTKDV[2]} -gt "7020" ] && GTK_FEATURES=true
+fi
+
+#Adjust share box size
+SCRNXY="`xwininfo -root | grep -o '\-geometry .*' | tr -s ' ' | cut -f 2 -d ' ' | cut -f 1 -d '+'`"
+SCRN_Y="`echo -n "$SCRNXY" | cut -f 2 -d 'x'`"
+[ $SCRN_Y -le 600 ] && SBOX_SIZE=300 || SBOX_SIZE=400
+
+PLOG_def="<item>20</item>
+<item>40</item>
+<item>60</item>
+<item>80</item>
+<item>100</item>"
+
+SCANSPEED_def="<item>1</item>
+<item>5</item>
+<item>10</item>
+<item>30</item>
+<item>60</item>"
+
+FILER=rox
+VERSION=0.6.8
+PROGPATH=$(dirname $0)
+export TMP=/tmp/pnethood/
+MOUNTBASE=/mnt/network/
+
+export SERVERSCOUNT=9
+export SAVEPASSWORDS=false
+export PURGELOG=100
+export SCANSPEED=1
+export USECIFS=true
+export USEDOMAINID=false
+export IOCHARSET=false
+export DLE=false
+[ -f "$HOME/.pnethood/pnethood.rc" ] && source "$HOME/.pnethood/pnethood.rc"
+
+[ "$USEDOMAINID" = "true" ] && ADOMAINID="<visible>enabled</visible>" || ADOMAINID="<visible>disabled</visible>"
+
+#clarf fix to log cleaning and too many arguments error
+#[ -e "$/tmp/pnethood/log" -a $(du /tmp/pnethood/log | sed 's/\([0-9]*\).*/\1/') -gt 100 ] && : > ${TMP}log #clear log at 100K
+if [ -e "/tmp/pnethood/log" ] && [ $(du /tmp/pnethood/log | sed 's/\([0-9]*\).*/\1/') -gt "$PURGELOG" ]; then
+: > ${TMP}log #clear log at 100K
+fi
+
+#puppymike fix for troubling Servers
+load_extensions () {
+ if [ "$DLE" = "true" ]; then
+   [ ! -e /proc/fs/cifs ] && sleep 1
+   [ ! -e /proc/fs/cifs ] && sleep 1
+   echo 0 > /proc/fs/cifs/LinuxExtensionsEnabled
+ else
+   [ ! -e /proc/fs/cifs ] && sleep 1
+   [ ! -e /proc/fs/cifs ] && sleep 1
+   echo 1 > /proc/fs/cifs/LinuxExtensionsEnabled
+ fi
+}
+export -f load_extensions
+
+save_settings () {
+#Prevent errors when user left blank parameters, use default values
+[ "$SCANSPEED" = "" ] && SCANSPEED=1
+[ "$PURGELOG" = "" ] && PURGELOG=100
+[ "$SERVERSCOUNT" = "" ] && SERVERSCOUNT=9
+echo "export SAVEPASSWORDS=$SAVEPASSWORDS
+export SCANSPEED=$SCANSPEED
+export DOMAINID=$DOMAINID
+export USEDOMAINID=$USEDOMAINID
+export USECIFS=$USECIFS
+export IOCHARSET=$IOCHARSET
+export DLE=$DLE
+export PURGELOG=$PURGELOG
+export SERVERSCOUNT=$SERVERSCOUNT" > "$HOME/.pnethood/pnethood.rc"
+sync
+}
+export -f save_settings
+
+export MSG_SCANNING_NETWORK="
+<window title=\"Pnethood Scanning\" icon-name=\"gtk-network\">
+ <hbox>
+  <pixmap icon_size=\"5\">
+   <input file stock=\"gtk-dialog-info\"></input>
+  </pixmap>
+  <text>
+   <label>Pnethood scanning network, please wait</label>
+  </text>
+ </hbox>
+</window>"
+export MSG_NO_NETWORK="
+<window title=\"Pnethood Error\" icon-name=\"gtk-network\">
+ <vbox>
+   <text wrap=\"true\">
+    <label>No active network interface found, there is nothing to scan. Pnethood will quit. Please setup your network first.</label>
+   </text>
+  <hbox homogeneous=\"true\">
+   <pixmap icon_size=\"5\">
+    <input file stock=\"gtk-dialog-error\"></input>
+   </pixmap><button ok></button>
+  </hbox>
+ </vbox>
+</window>"
+
+modprobe cifs
+[ "$PROGPATH" = "." ] && PROGPATH="`pwd`"
+mkdir -p "${HOME}/.pnethood/"
+mkdir -p $TMP
+touch "${HOME}/.pnethood/passwords"
+
+[ `which $FILER` ] || echo rox not found show button will not work
+[ `which rxvt` ] || echo rxvt not found info button will not work
+[ `which nbtscan` ] || echo nbtscan not found pnethood will not work
+[ `which smbclient` ] || echo smbclient not found pnethood will not work
+[ `which smbmount` ] && echo smb mounting enabled
+if [ "$(lsmod | grep cifs)" ]; then
+echo cifs mounting enabled
+load_extensions
+else
+[ `which smbmount` ] || echo no cifs support and smbmount not found pnethood will not work
+fi
+
+while [ "anything" ]; do #big loop
+echo ------------------------- >> ${TMP}log
+SUBNETS=`ifconfig | grep "inet " | grep -v "127.0.0.1" | grep -v P-t-P | sed 's/\ *inet addr:\([0-9]\{1,3\}.[0-9]\{1,3\}\.\).*/\10\.0\/16/g;$!N; /^\(.*\)\n\1$/!P; D'`
+if [ -z "${SUBNETS}" ] ; then
+    "$GTKDIALOG" --program=MSG_NO_NETWORK --center
+    exit 0
+fi
+##### write a list of servers to file
+if [ ! "$1" = "" ]; then
+: > ${TMP}temp
+  echo "$1" | tr ',' '\n' | sed 's/[\\\/]//g' > ${TMP}specified-servers
+  shift #ensures that rescan doesn't just use the input server
+  while read SERVERNAME ; do
+  	if [ "$(echo $SERVERNAME | grep '^[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}$')" ]; then
+  		echo "${SERVERNAME}:${SERVERNAME}" >> ${TMP}temp && continue
+  	fi
+#requirement for nmblookup removed
+	TIMEOUT=1
+	unset IP
+	while [ $TIMEOUT -lt 10000 -a -z "$IP" ]; do
+		for SUBNET in $SUBNETS; do
+		[ -z "$IP" ] && IP=$(nbtscan -t $TIMEOUT -qs : $SUBNET | grep "$SERVERNAME" | sed 's/:.*//')
+		done
+		((TIMEOUT+=1000))
+	done
+#the lookup above will probably fail over the internet
+#now try converting a domain name to an ip
+	[ -z "$IP" ] && IP=$(ping -c 1 "$SERVERNAME" | head -1 | sed 's/.*(\(.*\)).*/\1/')
+  	echo "$SERVERNAME:$IP"  >> ${TMP}temp
+  done < ${TMP}specified-servers
+##always show machines we have shares mounted from
+#funky use of sed looks extremely fragile
+mount 2>>${TMP}log | grep -E 'smbfs' | sed 's/\/\/\(.*\)\/\(.*\) on \(.*\) type smbfs (.*)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/' | sort -u >> ${TMP}temp
+mount 2>>${TMP}log | grep -E 'cifs' | sed 's/\\\\\(.*\)\\\(.*\) on \(.*\) type cifs (.*)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/' | sort -u >> ${TMP}temp
+sort -u -o ${TMP}servers ${TMP}temp 
+unset SERVERIPS
+unset SERVERNAMES
+oIFS=$IFS; IFS=$':'
+while read SERVERNAME SERVERIP ; do
+SERVERIPS[${#SERVERIPS[@]}]=$SERVERIP
+SERVERNAMES[${#SERVERNAMES[@]}]=$SERVERNAME
+done < ${TMP}servers
+IFS=$oIFS
+
+MACHINES_ITEMS=""
+for SERVERNAME in ${SERVERNAMES[@]}; do
+MACHINES_ITEMS=${MACHINES_ITEMS}$(echo $SERVERNAME | sed 's/^/<item>/;s/$/<\/item>/')
+done 
+else
+"$GTKDIALOG" --program=MSG_SCANNING_NETWORK --center &
+PID=$!
+echo scanning network>> ${TMP}log
+   ##build list of servers
+  :> ${TMP}temp
+  for SUBNET in $SUBNETS; do
+echo $SUBNET
+  nbtscan -t 100 -qs : $SUBNET | cut -d : -f 1-2  | sed 's/ *$//g;s/\(.*\):\(.*\)/\2:\1/' >> ${TMP}temp
+  #running the scan twice works better than increasing the timeout, duplicate entries are removed by sort later
+  nbtscan -t $(($SCANSPEED*1000)) -qs : $SUBNET | cut -d : -f 1-2  | sed 's/ *$//g;s/\(.*\):\(.*\)/\2:\1/' >> ${TMP}temp
+  done
+ 
+ #get servers with already mounted shares 
+  mount 2>>${TMP}log | grep -E 'smbfs' | sed 's/\/\/\(.*\)\/\(.*\) on \(.*\) type smbfs (.*)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/' >> ${TMP}temp
+  mount 2>>${TMP}log | grep -E 'cifs' | sed 's/\/\/\(.*\)\/\(.*\) on \(.*\) type cifs \(.*\)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/'>> ${TMP}temp
+
+##remove duplicates and the stupid server that identifies itself as <unknown> and breaks gtkdialog
+grep -v 'unknown' ${TMP}temp | sort -u -o ${TMP}servers
+
+unset SERVERIPS
+unset SERVERNAMES
+oIFS=$IFS; IFS=$':'
+while read SERVERNAME SERVERIP  ; do
+SERVERIPS[${#SERVERIPS[@]}]=$SERVERIP
+SERVERNAMES[${#SERVERNAMES[@]}]=$SERVERNAME
+done < ${TMP}servers
+IFS=$oIFS
+  
+  ## count number of servers, handle too many, run with servers chosen by user
+  if [ ${#SERVERNAMES[@]} -gt $SERVERSCOUNT ] ; then
+  	MACHINES_ITEMS=""
+	for SERVERNAME in ${SERVERNAMES[@]}; do
+		MACHINES_ITEMS=${MACHINES_ITEMS}$(echo $SERVERNAME | sed 's/^/<item>/;s/$/<\/item>/')
+	done 
+    echo "<window title=\"Pnethood\" icon-name=\"gtk-network\"><vbox>
+<text wrap=\"true\"><label>Scan found ${#SERVERNAMES[@]} servers found. Please choose one from the list.</label></text>
+    <list><height>300</height>
+    <variable>LIST</variable>
+    "${MACHINES_ITEMS}"
+    </list>
+    <hbox>
+     <button ok></button>
+     <button cancel></button>
+    </hbox>
+  </vbox>
+  </window>"> ${TMP}gui
+    export pnethood_machine_chooser=`cat ${TMP}gui`
+    kill $PID 2> /dev/null > /dev/null
+    
+    eval `"$GTKDIALOG" --program=pnethood_machine_chooser` 2> /dev/null
+    [ "${EXIT}" = "Cancel" ] && exit 0
+    I=0
+    :> ${TMP}temp
+    while [ $I -lt ${#SERVERNAMES[@]} ]; do
+    	if [ "${SERVERNAMES[$I]}" = "${LIST}" ]; then
+    		echo ${SERVERNAMES[$I]}:${SERVERIPS[$I]} >> ${TMP}temp
+    	fi
+    	((I++))
+    done
+ #get servers with already mounted shares 
+	mount 2>>${TMP}log | grep -E 'smbfs' | sed 's/\/\/\(.*\)\/\(.*\) on \(.*\) type smbfs (.*)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/' >> ${TMP}temp
+	mount 2>>${TMP}log | grep -E 'cifs' | sed 's/\/\/\(.*\)\/\(.*\) on \(.*\) type cifs \(.*\)/\1:\3/;s/\(.*\):\(.*\)\/\(.*\)\/\(.*\)/\3:\1/'>> ${TMP}temp
+	sort -u -o ${TMP}servers ${TMP}temp
+    unset SERVERIPS
+	unset SERVERNAMES
+	oIFS=$IFS; IFS=$':'
+	while read SERVERNAME SERVERIP  ; do
+		SERVERIPS[${#SERVERIPS[@]}]=$SERVERIP
+		SERVERNAMES[${#SERVERNAMES[@]}]=$SERVERNAME
+	done < ${TMP}servers
+	IFS=$oIFS
+  fi
+fi
+echo Scan completed: $SUBNETS >> ${TMP}log
+
+while [ "anything" ]; do #smaller loop doesn't rescan network
+##### labels for tabs
+TABLABELS=${SERVERNAMES[@]/#/|} #put a pipe in front of each machine
+TABLABELS=`echo $TABLABELS |sed 's/^|//'` #remove the leading pipe
+echo servers found=${TABLABELS} >> ${TMP}log
+
+#### iterate through servers loading passwords and creating save actions for usernames/passwords
+#this is made more awkward because we can't guarantee that the servers are listed
+#in the same order as the last run. A hashmap would be nice but it is not safe to use the server names as a key
+unset USERNAMES
+unset PASSWORDS
+PASSWORDSAVER=""
+I=0
+while [ $I -lt ${#SERVERNAMES[@]} ]; do
+	PASSWORDSAVER=$PASSWORDSAVER"
+<action>echo OLDUSERNAMES[$I]=\$USER$I</action>
+<action>echo OLDPASSWORDS[$I]=\$PASSWORD$I</action>"
+	PASSWORDLINE="$(grep -E "^${SERVERNAMES[$I]}:" $HOME/.pnethood/passwords)"
+	if [ "$PASSWORDLINE" ]; then
+		USERNAMES[$I]="$(echo $PASSWORDLINE | cut -f 2 -d ':')"
+		PASSWORDS[$I]="$(echo $PASSWORDLINE | cut -f 3 -d ':')"
+	fi
+	J=0
+#values from password file are always overwitten by values entered before hitting refresh
+	while [ $J -lt ${#OLDSERVERNAMES[@]} ]; do 
+		if [ "${SERVERNAMES[$I]}" = "${OLDSERVERNAMES[$J]}" ];then
+			USERNAMES[$I]="${OLDUSERNAMES[$J]}"
+			PASSWORDS[$I]="${OLDPASSWORDS[$J]}"
+			#echo "SERVERNAMES[$I]=${SERVERNAMES[$I]}
+#USERNAMES[$I]=${USERNAMES[$I]}
+#PASSWORDS[$I]=${PASSWORDS[$I]}"
+		fi
+		((J++))
+	done
+	((I++))
+done
+
+PNETHOOD_GUI="<window title=\"Pnethood ${VERSION} - open windows shares\" icon-name=\"gtk-network\">
+<vbox>
+<hbox>
+   <button>
+    <variable>RESCAN</variable>
+    <input file stock=\"gtk-refresh\"></input>
+    <label>RESCAN NETWORK</label>
+    $PASSWORDSAVER
+    <action>echo SCANSPEED=\$SCANSPEED</action>
+    <action>echo PURGELOG=\$PURGELOG</action>
+    <action>echo SERVERSCOUNT=\$SERVERSCOUNT</action>
+	<action>echo DOMAINID=\$DOMAINID</action>
+    <action>echo RESCANNETWORK=true</action>
+	<action type=\"exit\">closewindow</action>
+   </button>
+   <button>
+    <input file stock=\"gtk-help\"></input>
+    <label>HELP</label>
+    <action>man pnethood &</action>
+    </button>
+    <button>
+    <input file stock=\"gtk-info\"></input>
+    <label>LOG</label>
+    <action>rxvt -g 80x10 -bg black -fg orange -e tail -f ${TMP}log &</action>
+    </button>
+    <button>
+    <input file stock=\"gtk-quit\"></input>
+    <label>QUIT</label>
+    </button>
+   </hbox>
+   <hbox>
+       <button>
+    <variable>REFRESH</variable>
+    <input file stock=\"gtk-refresh\"></input>
+    <label>REFRESH</label>
+    $PASSWORDSAVER
+    <action>echo SCANSPEED=\$SCANSPEED</action>
+	<action>echo PURGELOG=\$PURGELOG</action>
+	<action>echo SERVERSCOUNT=\$SERVERSCOUNT</action>
+ 	<action>echo DOMAINID=\$DOMAINID</action>
+	<action type=\"exit\">closewindow</action>
+   </button>
+     <button>
+	   <input file stock=\"gtk-info\"></input>
+	   <label>OPTIONS</label>
+		<action>source \"$HOME/.pnethood/pnethood.rc\"</action> 
+		<action type=\"launch\">PNETHOOD_OPT</action>
+    </button>
+<checkbox>
+	<label>use cifs</label>
+	<variable>USECIFS</variable>
+	<default>$USECIFS</default>
+	<action>echo USECIFS=\$USECIFS</action>
+	<action>[ ! \"$(which smbmount)\" -a \$USECIFS = 'false' ] && gxmessage 'smbmount not found, please re-enable cifs' </action>
+</checkbox>
+<checkbox>
+	<label>Domain</label>
+	<variable>USEDOMAINID</variable>
+	<default>$USEDOMAINID</default>
+   <action>echo USEDOMAINID=\$USEDOMAINID</action>
+	<action>if true enable:DOMAINID</action>
+	<action>if false disable:DOMAINID</action>	
+</checkbox>
+</hbox>"
+    
+
+[ "$TABLABELS" ] && PNETHOOD_GUI=$PNETHOOD_GUI"<notebook labels=\"$TABLABELS\">"
+#### build a pane for each machine
+
+I=0
+while [ $I -lt ${#SERVERNAMES[@]} ]; do
+kill $PID 2> /dev/null
+
+export MSG_SCANNING_MACHINE="
+<window title=\"Pnethood Scanning\" icon-name=\"gtk-network\">
+ <hbox>
+  <pixmap icon_size=\"5\"><input file stock=\"gtk-dialog-info\"></input></pixmap>
+  <text><label>Pnethood probing ${SERVERNAMES[$I]}</label></text>
+ </hbox>
+</window>"
+"$GTKDIALOG" --program=MSG_SCANNING_MACHINE --center &
+PID=$!
+
+echo >> ${TMP}log
+echo "started probing ${SERVERNAMES[@]}" >> ${TMP}log
+:> ${TMP}temp
+smbclient -N -L "${SERVERNAMES[$I]}" 2>>${TMP}log| grep Disk | sed 's/[\t]\(.*\) *Disk.*/\1/g;s/ *$//' >> ${TMP}temp
+smbclient -U guest%guest -L ${SERVERIPS[$I]} 2>>${TMP}log | grep Disk | sed 's/[\t]\(.*\) *Disk.*/\1/g;s/[\t ]*$//g'>> ${TMP}temp
+if [ "$DOMAINID" != "" ]; then
+smbclient -U "${USERNAMES[$I]}%${PASSWORDS[$I]}" -W "${DOMAINID}" -L "${SERVERNAMES[$I]}" 2>>${TMP}log | grep Disk | sed 's/[\t]\(.*\) *Disk.*/\1/g;s/ *$//'>> ${TMP}temp
+else
+smbclient -U "${USERNAMES[$I]}%${PASSWORDS[$I]}" -L "${SERVERNAMES[$I]}" 2>>${TMP}log | grep Disk | sed 's/[\t]\(.*\) *Disk.*/\1/g;s/ *$//'>> ${TMP}temp
+fi
+if [ $(wc -w ${TMP}temp | awk '{print $1}') -lt 1 ]; then #no shares reported, check to see if they are all mounted
+#if I have all the shares connected I get session setup failed: doing NT_STATUS_REQUEST_NOT_ACCEPTED
+	echo ${SERVERNAMES[$I]} still reports no shares, checking mount in case there are shares mounted already >>${TMP}log
+mount | grep "${SERVERIPS[$I]}" | sed 's/ type .*//g;s/.*\///g;s/\\040/ /g' >> ${TMP}temp       
+fi
+sort -u ${TMP}temp > ${TMP}shares
+[ $(wc -w ${TMP}shares | awk '{print $1}') -lt 1 ] && echo "Trying to contact ${SERVERNAMES[$I]}, no shares reported" >>${TMP}log
+
+##### load share names into array
+oIFS=$IFS
+IFS=$'\n'
+SHARES=($(cat ${TMP}shares))
+IFS=$oIFS
+#UNAME and UPASSWORD needed as gtkdialog gets upset if there is an empty <default> element
+UNAME=""
+UPASSWORD=""
+UDOMAINID=""
+[ "${USERNAMES[$I]}" ] && [ ! "${USERNAMES[$I]}" = "" ] && UNAME="<default>${USERNAMES[$I]}</default>"
+[ "${PASSWORDS[$I]}" ] && [ ! "${PASSWORDS[$I]}" = "" ] && UPASSWORD="<default>${PASSWORDS[$I]}</default>"
+[ "${DOMAINID}" ] && [ ! "${DOMAINID}" = "" ] && UDOMAINID="<default>${DOMAINID}</default>"
+
+#Define scrollable box size if shares found
+if [ ${#SHARES[@]} -ne 0 -a "$GTK_FEATURES" = "true" ]; then
+PNETHOOD_GUI=$PNETHOOD_GUI"<vbox height-request=\"$SBOX_SIZE\">"
+else
+PNETHOOD_GUI=$PNETHOOD_GUI"<vbox>"
+fi
+
+#BK  invisible_char=\"*\" visibility=\"false\"
+
+PNETHOOD_GUI=$PNETHOOD_GUI"<hbox>
+   <text><label>username</label></text>
+   <entry>
+   	<variable>USER$I</variable>$UNAME
+   </entry>
+   </hbox>
+   <hbox>
+   <text><label>password</label></text>
+   <entry>
+		<visible>password</visible>
+		<variable>PASSWORD$I</variable>$UPASSWORD
+	</entry>
+      </hbox>
+	     <hbox>
+   <text><label>Domain</label></text>
+   <entry>
+		$ADOMAINID
+		<variable>DOMAINID</variable>$UDOMAINID
+	</entry>
+</hbox>"
+
+#Add scrollable box for shares
+if [ ${#SHARES[@]} -eq 0 ] ; then
+PNETHOOD_GUI=$PNETHOOD_GUI"<vbox>"
+PNETHOOD_GUI=$PNETHOOD_GUI"<text><label>no shares</label></text>"
+else
+PNETHOOD_GUI=$PNETHOOD_GUI"<vbox scrollable=\"true\">"
+fi
+
+#[ ${#SHARES[@]} -eq 0 ] && PNETHOOD_GUI=$PNETHOOD_GUI"<text><label>no shares</label></text>"
+
+J=0
+while [ $J -lt ${#SHARES[@]} ]; do
+
+MOUNTPOINT="${MOUNTBASE}${SERVERNAMES[$I]}/${SHARES[$J]}"
+MOUNT="$(mount | grep $(echo $MOUNTPOINT | sed 's/\$/\\$/g;s/ /\\\\040/g'))$(mount | grep "$MOUNTPOINT")"
+MOUNTED="false"; NOTMOUNTED="true"
+[ "$MOUNT" ] && MOUNTED="true" && NOTMOUNTED="false"
+echo "share=${SHARES[$J]}, mountpoint=${MOUNTPOINT}" >> ${TMP}log
+
+PNETHOOD_GUI=$PNETHOOD_GUI"<hbox>
+<text><label>${SHARES[$J]}</label></text>
+ <button sensitive=\"$MOUNTED\">
+   <label>show</label>
+ 	<variable>SHOW_${I}_${J}</variable>
+    <input file stock=\"gtk-directory\"></input>
+    <action>${FILER} \"${MOUNTPOINT}\"</action>
+   </button>
+ 	<button sensitive=\"$NOTMOUNTED\">
+   <label>connect</label>
+ 	<variable>MOUNT_${I}_${J}</variable>
+    <input file stock=\"gtk-connect\"></input>
+    <action>echo OLDUSERNAMES[$I]=\$USER$I;echo OLDPASSWORDS[$I]=\$PASSWORD$I</action> 
+	<action>echo IOCHARSET=\$IOCHARSET</action>
+	<action>${PROGPATH}/func_mount \"${SERVERNAMES[$I]}\" \"${SERVERIPS[$I]}\" \"${SHARES[$J]}\" \"${MOUNTPOINT}\" \"\$USER${I}\" \"\$PASSWORD${I}\" \"\${USECIFS}\" \"\${IOCHARSET}\" \"\${DOMAINID}\"</action>
+    <action>echo OLDUSERNAMES[$I]=\$USER$I;echo OLDPASSWORDS[$I]=\$PASSWORD$I</action>
+    <action type=\"enable\">UNMOUNT_${I}_${J}</action>
+    <action type=\"enable\">SHOW_${I}_${J}</action>
+    <action type=\"refresh\">STATUS</action>
+    <action type=\"disable\">MOUNT_${I}_${J}</action>
+   </button>
+   <button sensitive=\"$MOUNTED\">
+   <label>disconnect</label>
+ 	<variable>UNMOUNT_${I}_${J}</variable>
+    <input file stock=\"gtk-disconnect\"></input>
+    <action>${PROGPATH}/func_unmount \"${MOUNTPOINT}\"</action>
+    <action type=\"enable\">MOUNT_${I}_${J}</action>
+    <action type=\"disable\">SHOW_${I}_${J}</action>
+    <action type=\"refresh\">STATUS</action>
+    <action type=\"disable\">UNMOUNT_${I}_${J}</action>
+   </button>
+   </hbox>"
+  ((J++))
+done
+
+PNETHOOD_GUI=$PNETHOOD_GUI"</vbox>
+</vbox>"
+
+echo "finished probing $MACHINE" >> ${TMP}log
+((I++))
+done
+#### end of panes
+
+###Options
+PNETHOOD_OPT="<window title=\"Pnethood Options\">
+<vbox>
+<frame Information>
+  <text>
+    <label>The Refresh or Rescan Network buttons must be used, before test any new configuration change.</label>
+  </text>
+</frame>
+<frame Options>
+   <checkbox>
+	<label>save passwords</label>
+	<default>$SAVEPASSWORDS</default>
+	<variable>SAVEPASSWORDS</variable>
+	<action>echo SAVEPASSWORDS=\$SAVEPASSWORDS</action>
+    </checkbox>
+   <checkbox tooltip-text=\"UTF-8 Charset will be used to convert local path names to and from Unicode\">
+	<label>UTF-8 Charset (cifs)</label>
+	<default>$IOCHARSET</default>
+	<variable>IOCHARSET</variable>
+	<action>echo IOCHARSET=\$IOCHARSET</action>
+    </checkbox>
+    <checkbox tooltip-text=\"Disable symbolic link suppport and UID/GID server maps, could help cifs to work with buggy samba devices\">
+	<label>Disable Linux Extensions (cifs)</label>
+	<default>$DLE</default>
+	<variable>DLE</variable>
+	<action>echo DLE=\$DLE</action>
+	<action>load_extensions</action>
+    </checkbox>
+<hbox>
+    <text>
+     <label>Number of servers to show list</label>
+    </text>
+    <combobox tooltip-text=\"Change requires a pnethood  restart\">
+	 <variable>SERVERSCOUNT</variable>
+	 <item>$SERVERSCOUNT</item>
+      $SCANSPEED_def
+	</combobox>
+</hbox>
+<hbox>
+    <text>
+     <label>Network Scan (seconds)</label>
+    </text>
+    <combobox tooltip-text=\"You can write any integer value\">
+	 <variable>SCANSPEED</variable>
+	 <item>$SCANSPEED</item>
+      $SCANSPEED_def
+	</combobox>
+</hbox>
+<hbox>
+    <text>
+    <label>Purge log file (Kilobytes)</label>
+    </text>
+    <combobox tooltip-text=\"You can write any integer value\">
+	  <variable>PURGELOG</variable>
+	  <item>$PURGELOG</item>
+       $PLOG_def
+	</combobox>
+</hbox>
+<hbox>
+     <button use-stock=\"true\" label=\"gtk-save\" has_focus=\"true\">
+     <label>Apply</label>		
+	<action>save_settings</action>
+	<variable>PNETHOOD_OPT</variable>
+	<action type=\"closewindow\">PNETHOOD_OPT</action>
+	</button>
+</hbox>
+</frame>
+</vbox>
+</window>"
+export PNETHOOD_OPT
+
+
+[ "$TABLABELS" ] && PNETHOOD_GUI=$PNETHOOD_GUI"</notebook>" || echo no servers found, try refreshing >> ${TMP}log
+
+PNETHOOD_GUI=$PNETHOOD_GUI"<entry has_frame=\"false\" editable=\"false\">
+   <variable>STATUS</variable>
+    <input>tail -n 1 ${TMP}log</input>
+    </entry>
+  </vbox>
+</window>"
+
+export PNETHOOD_GUI
+echo $PNETHOOD_GUI > ${TMP}gui #line for debugging, should normally be removed to hide passwords
+kill $PID 2> /dev/null >/dev/null
+RESULT=($("$GTKDIALOG" --program=PNETHOOD_GUI --center)) 2> /dev/null
+
+OLDSERVERNAMES=(${SERVERNAMES[@]})
+OLDUSERNAMES=(${USERNAMES[@]})
+OLDPASSWORDS=(${PASSWORDS[@]})
+
+for FOO in ${RESULT[@]}; do
+[ "$(echo $FOO | cut -c 1-16| grep -E 'USEDOMAINID|DOMAINID|SCANSPEED|USECIFS|SAVEPASSWORDS|EXIT|OLDUSERNAMES|OLDPASSWORDS|RESCANNETWORK|PURGELOG|IOCHARSET|DLE|SERVERSCOUNT')" ] && eval "$FOO" 
+done
+I=0
+while [ $I -lt ${#SERVERNAMES[@]} ]; do
+((I++))
+done
+
+I=0
+while [ $I -lt ${#OLDSERVERNAMES[@]} -a "$SAVEPASSWORDS" = "true" ]; do
+
+	if [ "$(grep -E "^${OLDSERVERNAMES[$I]}:" $HOME/.pnethood/passwords)" ]; then
+		sed -i 's/'${OLDSERVERNAMES[$I]}'.*/'${OLDSERVERNAMES[$I]}:${OLDUSERNAMES[$I]}:${OLDPASSWORDS[$I]}'/g' $HOME/.pnethood/passwords
+	else
+		echo ${OLDSERVERNAMES[$I]}:${OLDUSERNAMES[$I]}:${OLDPASSWORDS[$I]} >> $HOME/.pnethood/passwords
+	fi
+	((I++))
+done
+[ "$USEDOMAINID" = "true" ] && ADOMAINID="<visible>enabled</visible>" || ADOMAINID="<visible>disabled</visible>"
+
+if [ ! "${EXIT}" = "closewindow" ]; then
+[ "$USEDOMAINID" = "false" ] && export DOMAINID=""
+ if [ -f "$HOME/.pnethood/pnethood.rc" ]; then
+   sed -i "3s/.*/export DOMAINID=$DOMAINID/" "$HOME/.pnethood/pnethood.rc"
+   sed -i "4s/.*/export USEDOMAINID=$USEDOMAINID/" "$HOME/.pnethood/pnethood.rc"
+   sed -i "5s/.*/export USECIFS=$USECIFS/" "$HOME/.pnethood/pnethood.rc"
+ else
+ save_settings
+ fi
+exit 0
+fi
+
+[ "$RESCANNETWORK" = "true" ] && RESCANNETWORK=false && break
+done
+done

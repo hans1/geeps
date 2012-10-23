@@ -1,0 +1,6 @@
+/usr
+/usr/bin
+ cmp
+ diff
+ diff3
+ sdiff

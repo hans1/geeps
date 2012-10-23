@@ -1,0 +1,312 @@
+#!/bin/bash
+#Pmusic - export
+#GPL 2011,2012 - Copyright Sigmund Berglund
+
+. $APPDIR/func -reset_gtk
+cd $HOME
+echo ' ' > $WORKDIR/splash_copy_text #echo nothing will delete existing splash
+
+help_tag (){
+	export FRAME="$LOC_INFO"
+	export IMG=info
+	export TXT1="<b>%a</b> - $LOC_ARTIST
+<b>%A</b> - $LOC_ALBUM
+<b>%n</b> - $LOC722
+<b>%t</b> - $LOC_TITLE"
+	$APPDIR/box_ok &
+}
+export -f help_tag
+
+GUI_CDAUDIO='
+<frame '$LOC720'>
+ <hbox>
+  <text><label>'$LOC721'</label></text>
+  <entry>
+   <variable>CD_FILE_NAME</variable>
+   <input>echo "%a - %t"</input>
+  </entry>
+  <button>
+   <input file stock="gtk-help"></input>
+   <action>help_tag</action>
+  </button>
+ </hbox>
+ <checkbox tooltip-text="'$LOC724' .mp3 .ogg .wma .ape">
+  <label>'$LOC723'</label>
+  <default>true</default>
+  <variable>ADD_META</variable>
+ </checkbox>
+</frame>
+'
+
+S='
+<window title="Pmusic - '$LOC_EXPORT'" icon-name="pmusic" resizable="false">
+ <vbox>
+  <frame '$LOC299'>
+   <hbox>
+    <text><label>'$LOC291'</label></text>
+    <entry accept="directory">
+     <variable>COPYDIR</variable>
+     <input>echo $HOME</input>
+    </entry>
+    <button>
+     <input file stock="gtk-open"></input>
+     <action type="fileselect">COPYDIR</action>
+    </button>
+   </hbox>
+   <checkbox>
+    <label>'$LOC292'</label>'
+    if [ "`grep -F 'cdda:' $WORKDIR/playlist`" ];then S=$S'<visible>disabled</visible>'; fi
+    S=$S'<variable>ADD_NUMBERING</variable>
+   </checkbox>
+   <checkbox>
+    <label>'$LOC725'</label>
+    <variable>ADD_M3U</variable>
+   </checkbox>
+   <checkbox tooltip-text="'$LOC288'">
+    <label>'$LOC287'</label>'
+    if [ ! "`which streamripper`" ] || [ ! "`cat $WORKDIR/playlist $WORKDIR/PLAYLIST | grep -F 'http:'`" ]; then S=$S'<visible>disabled</visible><default>false</default>'; fi #also grep $WORKDIR/PLAYLIST for the radio-frontend which has no ordinary playlist 
+    S=$S'<default>true</default>
+    <variable>SPLIT_RADIOSTREAM</variable>
+   </checkbox>
+   <checkbox>
+    <label>'$LOC2910'</label>
+    <variable>BOOKMARK_TARGET</variable>
+   </checkbox>
+  </frame>
+
+  <frame '$LOC297'>
+   <hbox tooltip-text="'$LOC2911''
+   [ "`which streamripper`" ] && S=$S"
+   
+$LOC2912"
+    S=$S'">
+    <vbox>
+    <checkbox>
+     <label>'$LOC298'</label>
+     <variable>CHK_OUTPUT_STREAM</variable>
+     <action>if true enable:COPY_BITRATE</action>
+     <action>if true enable:COPY_SAMPLE</action>
+     <action>if true enable:COPY_CHANNEL</action>
+     <action>if true enable:COPY_FORMAT</action>
+     <action>if true enable:TXT_COPY_BITRATE</action>
+     <action>if true enable:TXT_COPY_SAMPLE</action>
+     <action>if true enable:TXT_COPY_CHANNEL</action>
+     <action>if true enable:TXT_COPY_FORMAT</action>
+     <action>if false disable:COPY_BITRATE</action>
+     <action>if false disable:COPY_SAMPLE</action>
+     <action>if false disable:COPY_CHANNEL</action>
+     <action>if false disable:COPY_FORMAT</action>
+     <action>if false disable:TXT_COPY_BITRATE</action>
+     <action>if false disable:TXT_COPY_SAMPLE</action>
+     <action>if false disable:TXT_COPY_CHANNEL</action>
+     <action>if false disable:TXT_COPY_FORMAT</action>
+    </checkbox>
+    </vbox>
+ 
+    <hbox space-expand="true" space-fill="true">
+     <text><label>""</label></text>
+    </hbox>
+
+    <vbox spacing="0">
+     <hbox>
+      <text><variable>TXT_COPY_FORMAT</variable><visible>disabled</visible><label>'$LOC293'</label></text>
+      <comboboxentry width-request="80">
+       <variable>COPY_FORMAT</variable>
+       <visible>disabled</visible>
+  	   <item>aiff</item>
+	   <item>asf</item>
+	   <item>au</item>
+	   <item>flac</item>
+	   <item>mp3</item>
+	   <item>ogg</item>
+	   <item>rm</item>
+	   <item>voc</item>
+	   <item>wav</item>
+      </comboboxentry>
+     </hbox>
+     <text height-request="8"><label>""</label></text>
+     <hbox>
+      <text height-request="18"><variable>TXT_COPY_BITRATE</variable><visible>disabled</visible><label>'$LOC294'</label></text>
+      <hbox width-request="80">
+       <entry height-request="18"><variable>COPY_BITRATE</variable><visible>disabled</visible><default>192000</default></entry>
+      </hbox>
+     </hbox>
+     <hbox>
+      <text height-request="18"><variable>TXT_COPY_SAMPLE</variable><visible>disabled</visible><label>'$LOC295'</label></text>
+      <hbox width-request="80">
+       <entry height-request="18"><variable>COPY_SAMPLE</variable><visible>disabled</visible><default>44100</default></entry>
+      </hbox>
+     </hbox>
+     <hbox>
+      <text height-request="18"><variable>TXT_COPY_CHANNEL</variable><visible>disabled</visible><label>'$LOC296'</label></text>
+      <hbox width-request="80">
+       <entry height-request="18"><variable>COPY_CHANNEL</variable><visible>disabled</visible><default>2</default></entry>
+      </hbox>
+     </hbox>
+    </vbox>
+   </hbox>
+  </frame>'
+  [ ! "`grep -vF 'cdda:' $WORKDIR/playlist`" ] && S=$S$GUI_CDAUDIO
+  S=$S'<hbox>
+   <button><input file stock="gtk-cancel"></input><label>'$LOC_CANCEL'</label></button>
+   <button can-default="true" has-default="true" use-stock="true">
+    <input file stock="gtk-save-as"></input>
+    <label>'$LOC_EXPORT'</label>
+    <action type="exit">ok</action>
+   </button>
+  </hbox>
+ </vbox>
+</window>'
+
+export pmusic_copy="$S"
+[ $TOOLTIPS = false ] && pmusic_copy="`echo "$pmusic_copy" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+I=$IFS; IFS=""
+for STATEMENTS in $($GTKDIALOG -p pmusic_copy); do
+	eval $STATEMENTS
+done
+IFS=$I
+if [ $EXIT = "ok" ]; then
+	#splash
+	echo 0 > $WORKDIR/splash_copy
+	export pmusic_copy_splash='
+	<window title="Pmusic" icon-name="pmusic" allow-grow="false">
+	<vbox>
+	 <frame>
+	  <text><label>""</label></text>
+	  '"<text use-markup=\"true\"><label>\"<b><span color='"'gray30'"' size='"'x-large'"'>Pmusic  </span><span color='"'gray30'"' size='"'large'"'>$VERSION</span></b>\"</label></text>
+	  <text><label>$LOC_EXPORT</label></text>
+	 </frame>
+	 <progressbar>
+	  <input>"'while [ "$I" != "100" ]; do I=`cat '$WORKDIR'/splash_copy`; TXT=`cat '$WORKDIR'/splash_copy_text`; echo $I; echo "$TXT"; sleep 1; done</input>
+	  <action type="exit">Ready</action>
+	 </progressbar>
+	 <hbox>
+	  <button cancel>
+	   <action>killall exec_copy</action>
+	   <action>killall cdda2wav</action>
+	   <action>killall ffmpeg</action>
+	   <action>killall streamripper</action>
+	   <action>eject</action>
+	   <action>echo 100 > '$WORKDIR'/splash_copy</action>
+	   <action>exit:EXIT</action>
+	  </button> 
+	 </hbox>
+	</vbox></window>'
+	$GTKDIALOG --program=pmusic_copy_splash --center &
+
+	#bookmark
+	if [ $BOOKMARK_TARGET = true ]; then
+		BOOKMARK_PATH="$COPYDIR"
+		BOOKMARK_NAME="`basename "$COPYDIR"`"
+		. $APPDIR/func_bookmarks -bookmark_add
+	fi
+	#---
+	cut -d '|' -f 4 $WORKDIR/playlist > $WORKDIR/tmp_export3
+	TMP="`echo "$COPYDIR""/" | sed -e s%//%/%g`" #be sure to end with one /
+	COPYDIR="$TMP"
+	COUNT_TOTAL=$(wc -l $WORKDIR/playlist | awk '{print $1}') #for progress in splash-window
+	COUNT=0
+	echo -n $WORKDIR/exportlist
+	echo '#!/bin/sh' > $WORKDIR/exec_copy
+	while read I; do
+		[ "$CHK_OUTPUT_STREAM" = "true" ] && OUTPUT_STREAM="-ac $COPY_CHANNEL -ar $COPY_SAMPLE -ab $COPY_BITRATE"
+		FILE="`echo $I | cut -d ' ' -f 2-`"
+		#update progress in spash-window
+		COUNT=$(($COUNT+1))
+		echo "echo \"$(($COUNT*100/($COUNT_TOTAL+1)))\" > $WORKDIR/splash_copy" >> $WORKDIR/exec_copy
+		echo "echo \"$(basename $FILE | sed -e 's/\.[^\.]*$//') ( $COUNT / $COUNT_TOTAL )\" > $WORKDIR/splash_copy_text" >> $WORKDIR/exec_copy
+
+		#CD-audio
+		if [ "`echo $I | grep -F cdda:`" ]; then
+			pmusic -s stop
+			#define tags which we stored when reading CD
+			ID3_NR="`echo "$FILE" | cut -d: -f2`"
+			ID3_ARTIST="`grep "|${ID3_NR}|" $WORKDIR/cddb | cut -d'|' -f3`"
+			ID3_TITLE="`grep "|${ID3_NR}|" $WORKDIR/cddb | cut -d'|' -f2`"
+			ID3_ALBUM="`grep "|${ID3_NR}|" $WORKDIR/cddb | cut -d'|' -f5`"
+			ID3_YEAR=''
+			ID3_GENRE=''
+			[ ! "$ID3_TITLE" ] && ID3_TITLE="CD-track $ID3_NR" #not all CDs are available in the cddb
+			#---
+			NAME="`echo "$CD_FILE_NAME" | sed -e "s/%a/$ID3_ARTIST/" -e "s/%t/$ID3_TITLE/" -e "s/%A/$ID3_ALBUM/" -e "s/%n/$ID3_NR/"`"
+			[ ! "$NAME" ] && NAME="CD-track_`echo $I | cut -d ' ' -f 1 | sed -e 's/\.[^\.]*$//'`" #if no metatags exists
+			[ ! "$COPY_FORMAT" ] && COPY_FORMAT=wav #no formating is chosen, but we need one for ffmpeg
+			CDDA_TRACK="`echo $I | cut -d: -f 2`" 
+			echo -n "cdda2wav dev=$CD_DEVICE -t $CDDA_TRACK -Owav - | " >> $WORKDIR/exec_copy
+			echo -n "ffmpeg -i pipe:0 -f $COPY_FORMAT $OUTPUT_STREAM " >> $WORKDIR/exec_copy
+			[ "$ADD_META" = "true" ] && echo -n "-id3v2_version 3 -metadata artist=\"$ID3_ARTIST\" -metadata title=\"$ID3_TITLE\" -metadata album=\"$ID3_ALBUM\" -metadata year=\"$ID3_YEAR\" -metadata track=\"$ID3_NR\" -metadata genre=\"$ID3_GENRE\"" >> $WORKDIR/exec_copy
+			echo -n " -y \"" >> $WORKDIR/exec_copy
+			echo -n "$COPYDIR$NAME.$COPY_FORMAT" | sed -e 's/`/\\\`/g' -e 's/"/\\\"/g' >> $WORKDIR/exec_copy #allow ` and " in filename 
+			echo "\"" >> $WORKDIR/exec_copy
+			#build playlist
+			[ "$ADD_M3U" = "true" ] && echo "$NAME.$COPY_FORMAT" >> "$COPYDIR$ID3_ARTIST - $ID3_ALBUM.m3u"
+			#---
+			continue
+		fi
+		
+		#start streamripper if available
+		if [ "`which streamripper`" ] && [ "`echo "$FILE" | grep -Fv 'youtube.com' | grep -F 'http:'`" ]; then
+			#test if it is really a radio stream and not a song with a defined length.
+			ffmpeg -i "$FILE" 2> $WORKDIR/tmp_export
+			if [ "`grep 'Duration: N/A,' $WORKDIR/tmp_export`" ] || [ ! "`grep 'Duration:' $WORKDIR/tmp_export`" ] ; then
+				if [ $SPLIT_RADIOSTREAM = true ]; then #split tracks 
+					echo "streamripper '$FILE' -d '$COPYDIR' -s -o never -k 1 -u WinampMPEG/5.0" >> $WORKDIR/exec_copy
+				else
+					echo "streamripper '$FILE' -d '$COPYDIR' -A -a -u WinampMPEG/5.0" >> $WORKDIR/exec_copy
+				fi
+				continue
+			fi
+		fi
+
+		#use ffmpeg
+		TARGET="`basename "$FILE"`"
+		[ $ADD_NUMBERING = true ] && TARGET="`echo $I | cut -d ' ' -f 1`"_"`basename "$FILE"`"
+		#Convert output
+		if [ "$COPY_FORMAT" ]; then
+			NAME="`echo "$TARGET" | sed -e 's/\.[^\.]*$//'`" #remove extension
+			#check if already exist
+			if [ -f "$COPYDIR""$NAME.$COPY_FORMAT" ]; then
+				IMG=dialog-warning; FRAME="$LOC_WARNING"; TXT1="<b>$COPYDIR$NAME.$COPY_FORMAT $LOC503</b>"; TXT2="$LOC504"
+				sleep 1
+				. $APPDIR/box_yesno
+				if [ $EXIT != yes ]; then continue; fi
+			fi
+			#---
+			echo -n "ffmpeg -i \"" >> $WORKDIR/exec_copy
+			#if youtube url we need to find the exact URL. And if exist, use name from the webmusic_index.
+			if [ "`echo "$FILE" | grep -F 'youtube.com'`" ]; then
+				. $APPDIR/func  -get_youtube_url "$FILE"
+				FILE=$URL
+				NAME="$ARTIST - $TITLE"
+			fi
+			#jamendo
+			[ "`echo "$FILE" | grep -F 'jamendo.com'`" ] && NAME="`grep -F "$FILE" $WORKDIR/playlist | cut -d'|' -f3`"
+			#---
+			echo -n "$FILE" | sed -e 's/`/\\\`/g' -e 's/"/\\\"/g' >> $WORKDIR/exec_copy #allow ` and " in filename 
+			echo -n "\" -f $COPY_FORMAT $OUTPUT_STREAM -y \"" >> $WORKDIR/exec_copy
+			echo -n "$COPYDIR$NAME.$COPY_FORMAT" | sed -e 's/`/\\\`/g' -e 's/"/\\\"/g' >> $WORKDIR/exec_copy #allow ` and " in filename 
+			echo "\"" >> $WORKDIR/exec_copy 
+		else
+			#check if already exist
+			if [ -f "$COPYDIR""$TARGET" ]; then
+				IMG=dialog-warning; FRAME="$LOC_WARNING"; TXT1="<b>$FILE $LOC503</b>"; TXT2="$LOC504"
+				sleep 1
+				. $APPDIR/box_yesno
+				if [ $EXIT != yes ]; then continue; fi
+			fi
+			#---
+			echo -n "cp -f \"" >> $WORKDIR/exec_copy
+			echo -n "$FILE" | sed -e 's/`/\\\`/g' -e 's/"/\\\"/g' >> $WORKDIR/exec_copy #allow ` and " in filename 
+			echo -n "\" \"" >> $WORKDIR/exec_copy 
+			echo -n "$COPYDIR$TARGET" | sed -e 's/`/\\\`/g' -e 's/"/\\\"/g' >> $WORKDIR/exec_copy #allow ` and " in filename 
+			echo "\"" >> $WORKDIR/exec_copy
+		fi
+		#build playlist
+		[ "$ADD_M3U" = "true" ] && echo "$NAME.$COPY_FORMAT" >> $WORKDIR/exportlist
+	done < $WORKDIR/tmp_export3
+	chmod 700 $WORKDIR/exec_copy
+	$WORKDIR/exec_copy
+	echo 100 > $WORKDIR/splash_copy #reset progress bar
+	#save playlist
+	[ "$ADD_M3U" = "true" ] && $APPDIR/func -save
+fi

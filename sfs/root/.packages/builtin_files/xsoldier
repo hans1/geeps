@@ -1,0 +1,50 @@
+/usr
+/usr/bin
+ xsoldier
+/usr/share
+/usr/share/applications
+ Xsoldier.desktop
+/usr/share/doc
+ xsoldier.htm
+/usr/share/games
+/usr/share/games/xsoldier
+ Boss1.xpm
+ Boss2.xpm
+ Boss3.xpm
+ Boss4.xpm
+ Boss5.xpm
+ Boss6.xpm
+ Boss7.xpm
+ Enemy1.xpm
+ Enemy2.xpm
+ Enemy3.xpm
+ Enemy4.xpm
+ Enemy5.xpm
+ Enemy6.xpm
+ Enemy7.xpm
+ EnemyBound.xpm
+ EnemyLaser.xpm
+ EnemyMiss.xpm
+ EnemyRing.xpm
+ EnemyShot.xpm
+ ExpLarge.xpm
+ ExpSmall.xpm
+ font1.xpm
+ font2.xpm
+ font3.xpm
+ font4.xpm
+ font5.xpm
+ font6.xpm
+ font.xpm
+ Item.xpm
+ PlayerShot1.xpm
+ PlayerShot2.xpm
+ PlayerShot3.xpm
+ Player.xpm
+ Star1.xpm
+ Star2.xpm
+ Title.xpm
+/var
+/var/games
+/var/games/xsoldier
+ xsoldier.scores

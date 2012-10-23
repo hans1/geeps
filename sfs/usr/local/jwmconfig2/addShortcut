@@ -1,0 +1,78 @@
+#!/bin/sh
+
+####
+#
+# addShortcut: to be used with the 
+# jwmConfigMgr and keyboard scripts
+# 
+# author: thoughtjourney
+# date: 22/08/2005
+#
+# modified by kwiller on 07-May-2006
+# to allow use of multiple mask keys
+#
+#
+####
+
+#----------variables----------->
+TMP1="/tmp/addmask.tmp.$$"
+TMP2="/tmp/maskkey.tmp.$$"
+MASKKEY=
+INSERT=/bindings/a\ 
+CONF_FILE=/root/.jwm/jwmrc-personal
+CONF_FILE2=/root/.jwm/jwmrc-personal2
+
+#-----------add shortcut------->
+
+if [ "$ADDMASK" = "mask (optional)" ]; then
+   MASKKEY=
+else
+  echo "$ADDMASK" > $TMP1
+  sed -e "s#ALT#1#i" \
+      -e "s#CTRL#2#i" \
+      -e "s#HYPER#3#i" \
+      -e "s#META#4#i" \
+      -e "s#SHIFT#5#i" \
+      -e "s#SUPER#6#i" \
+      -e "s#A#1#i" \
+      -e "s#C#2#i" \
+      -e "s#H#3#i" \
+      -e "s#M#4#i" \
+      -e "s#S#5#i" \
+      -e "s#P#6#i" \
+      -e "s#[^123456]##g" \
+      -e "s#1#A#" \
+      -e "s#2#C#" \
+      -e "s#3#H#" \
+      -e "s#4#M#" \
+      -e "s#5#S#" \
+      -e "s#6#P#" $TMP1 > $TMP2
+
+  MASKKEY=`cat $TMP2`
+  rm -f $TMP1
+  rm -f $TMP2
+fi
+
+
+if [ -z $MASKKEY ]; then
+   SED_ADD=\<Key\ key=\"$ADDKEY\"\>$ADDACTION\<\/Key\>
+else
+   SED_ADD=\<Key\ mask=\"$MASKKEY\"\ key=\"$ADDKEY\"\>$ADDACTION\<\/Key\>
+fi
+
+SEDCOMP=$INSERT$SED_ADD
+sed "$SEDCOMP" $CONF_FILE > $CONF_FILE2
+
+#------------confirm------------>
+
+TEST=`grep -c "$SED_ADD" $CONF_FILE2`
+
+if [ $TEST -eq 1 ]; then
+   cp $CONF_FILE2 $CONF_FILE
+   Xdialog --title "Shortcut_Added" --msgbox "The following shortcut has been added\n\n 
+$MASKKEY+$ADDKEY $ADDACTION\n\n" 0 0
+else
+   Xdialog --title "Error" --msgbox "There was an error writing your shortcut to file.\n
+Please try again" 0 0
+fi
+

@@ -1,0 +1,66 @@
+/usr
+/usr/bin
+ abiword
+/usr/lib
+/usr/lib/abiword-2.9
+/usr/lib/abiword-2.9/plugins
+ opendocument.so
+ openxml.so
+/usr/share
+/usr/share/abiword-2.9
+/usr/share/abiword-2.9/mime-info
+ abiword.keys
+/usr/share/abiword-2.9/strings
+ en-AU.strings
+ en-CA.strings
+ en-GB.strings
+ en-IE.strings
+/usr/share/abiword-2.9/templates
+ normal.awt-en_AU
+ normal.awt-en_CA
+ normal.awt-en_GB
+ normal.awt-en_IE
+ normal.awt-en_NZ
+ normal.awt-en_ZA
+/usr/share/abiword-2.9/ui
+ ap_UnixDialog_Annotation.xml
+ ap_UnixDialog_Border_Shading.xml
+ ap_UnixDialog_Break.xml
+ ap_UnixDialog_Field.xml
+ ap_UnixDialog_FormatFootnotes.xml
+ ap_UnixDialog_FormatFrame.xml
+ ap_UnixDialog_FormatTable.xml
+ ap_UnixDialog_FormatTOC.xml
+ ap_UnixDialog_Goto.xml
+ ap_UnixDialog_HdrFtr.xml
+ ap_UnixDialog_Insert_DateTime.xml
+ ap_UnixDialog_InsertTable.xml
+ ap_UnixDialog_Latex.xml
+ ap_UnixDialog_MailMerge.xml
+ ap_UnixDialog_MetaData.xml
+ ap_UnixDialog_New.xml
+ ap_UnixDialog_Options_ColorSel.xml
+ ap_UnixDialog_Options.xml
+ ap_UnixDialog_PageNumbers.xml
+ ap_UnixDialog_PageSetup.xml
+ ap_UnixDialog_Replace.xml
+ ap_UnixDialog_Spell.xml
+ ap_UnixDialog_Styles.xml
+ ap_UnixDialog_Stylist_modal.xml
+ ap_UnixDialog_Stylist.xml
+ ap_UnixDialog_Tab.xml
+ ap_UnixDialog_WordCount.xml
+ xap_UnixDlg_DocComparison.xml
+ xap_UnixDlg_Encoding.xml
+ xap_UnixDlg_History.xml
+ xap_UnixDlg_Image.xml
+ xap_UnixDlg_Language.xml
+ xap_UnixDlg_ListDocuments.xml
+ xap_UnixDlg_Password.xml
+ xap_UnixDlg_PluginManager.xml
+ xap_UnixDlg_WindowMore.xml
+ xap_UnixDlg_Zoom.xml
+/usr/share/applications
+ Abiword-wordprocessor.desktop
+/usr/share/icons
+ abiword_48.png

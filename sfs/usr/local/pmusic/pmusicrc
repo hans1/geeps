@@ -1,0 +1,67 @@
+#Pmusic config
+export VERSION=2.5.3
+export TOOLTIPS=true
+export TRAYAPP=true
+export CONVERT_20=true
+export CONVERT_UNDERSCORE=true
+export THEME="Default"
+export LANGUAGE=auto
+export PMUSIC_PRESET=Manager
+export AUDIO_EDITOR=mhwaveedit
+export BROWSER=defaulthtmlviewer
+export SOUND_DEVICE="auto"
+export SPEAKER=Master
+export HIGH_CPU=false
+export BOUND_ALSA=false
+export GAP=2
+export CD_DEVICE=/dev/cdrom
+export ID3_BROWSER=false
+export ID3_BROWSER_MAX=20
+export ID3_PLAYLIST=true
+export M3U_META_PLAYLIST=true
+export ALBUMART_DL=true
+export METAINFO_RADIO=true
+export TRACKINFO_REFRESH=true
+export LYRICS_LOCAL=false
+export LYRICS_LOCAL_DIR=""
+export ALBUMART_LOCAL=false
+export ALBUMART_LOCAL_DIR=""
+PLAYLIST_NAME[1]="List 1"
+PLAYLIST_NAME[2]="List 2"
+PLAYLIST_NAME[3]="List 3"
+PLAYLIST_NAME[4]="List 4"
+PLAYLIST_NAME[5]="List 5"
+PLAYLIST_NAME[6]="List 6"
+PLAYLIST_NAME[7]="List 7"
+PLAYLIST_NAME[8]="List 8"
+PLAYLIST_NAME[9]="List 9"
+export PLAYLIST_BUTTON2="2"
+export SEARCH_WHILE_TYPING="false"
+export SEARCH_MYMUSIC=true
+export SEARCH_COLLECTIONS=true
+export SEARCH_WEBMUSIC=false
+export SEARCH_RADIOHITS=true
+export SEARCH_RADIO=true
+export SEARCH_FILES=false
+export SEARCHPATH="/mnt [OR] /root"
+export BROWSERDIR="$HOME"
+export PODCAST_MAX_DL=2
+export PODCAST_DIR="/root/my-documents/Podcasts"
+
+
+#The following are not present in preferences gui
+
+export FIRST_RUN=true
+export UPDATE_INTERVAL=1000
+
+#Geometry
+export HEIGHT="500"
+export WIDTH="760"
+export X="20"
+export Y="20"
+#Pmusic C L A S S I C config
+export CLASSIC_SOURCE_WINDOW=true
+export CLASSIC_HEIGHT="500"
+export CLASSIC_WIDTH="450"
+export CLASSIC_X="10"
+export CLASSIC_Y="12"

@@ -1,0 +1,10 @@
+/usr
+/usr/share
+/usr/share/doc
+ xclip.htm
+/usr/X11R7
+/usr/X11R7/bin
+ xclip
+ xclip-copyfile
+ xclip-cutfile
+ xclip-pastefile

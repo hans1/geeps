@@ -1,0 +1,226 @@
+#!/bin/sh
+IFS=$'\n'
+. $APPDIR/func -reset_gtk
+
+export WORKDIR=$HOME/.pmusic/tmp
+export APPDIR=`cat $WORKDIR/APPDIR`
+
+case $1 in
+-bookmark_playing)
+	cut -d'|' -f1 $HOME/.pmusic/nowplaying > $WORKDIR/BOOKMARK_NAME
+	cut -d'|' -f2 $HOME/.pmusic/nowplaying > $WORKDIR/BOOKMARK_PATH
+	;;
+-show_bookmarks)
+  	$APPDIR/func -kill_browser_id3 #kill ongoing process
+	echo -e "  bookmarks|$LOC227" > $WORKDIR/sourcelist
+	#switch coloums
+	cut -d'|' -f1 $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+	cut -d'|' -f2 $HOME/.pmusic/bookmarks > $WORKDIR/tmp1
+	paste -d'|' $WORKDIR/tmp1 $WORKDIR/tmp >> $WORKDIR/sourcelist
+	#---
+	echo true > $WORKDIR/SWITCH_SOURCELIST_UPDATE
+	;;
+-bookmark_rename)
+	TMP="`grep -wFB 1000 "  $BOOKMARK_PATH" $HOME/.pmusic/bookmarks | grep -vFw "  $BOOKMARK_PATH"`"
+	TMP1="`grep -wFA 1000 "  $BOOKMARK_PATH" $HOME/.pmusic/bookmarks | grep -vFw "  $BOOKMARK_PATH"`"
+	echo "$TMP" > $HOME/.pmusic/bookmarks 
+	echo "$BOOKMARK_NAME|  $BOOKMARK_PATH" >> $HOME/.pmusic/bookmarks
+	echo "$TMP1" >> $HOME/.pmusic/bookmarks 
+	;;
+-bookmark_add)
+	if [ ! "$BOOKMARK_NAME" ] || [ ! "$BOOKMARK_PATH" ]; then exit; fi
+	if [ "`echo $BOOKMARK_PATH | grep "$WORKDIR"`" ]; then #trying to bookmark a temporary cd-audio track
+		TXT1="$LOC475"
+		. $APPDIR/box_ok
+		exit
+	fi
+	#add new bookmark
+	if [ $CHK_TIMESTAMP = true ]; then
+		TIME="`cut -d'(' -f3 $WORKDIR/statusbar | cut -d'/' -f1`"
+		echo '['$TIME']'"$BOOKMARK_NAME|  "'['$TIME']'"$BOOKMARK_PATH" >> $HOME/.pmusic/bookmarks
+	else
+		[ ! "`grep -F "$BOOKMARK_PATH" $HOME/.pmusic/bookmarks`" ] && echo "$BOOKMARK_NAME|  $BOOKMARK_PATH" >> $HOME/.pmusic/bookmarks
+	fi
+#	#ensure no empty lines
+#	grep -v "^$" $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+#	mv $WORKDIR/tmp $HOME/.pmusic/bookmarks
+	;;
+-bookmark_move)
+	[ $BUTTON = 3 ]					 	&& exit
+	TMP=($(<"$WORKDIR/PRESS_EVENT"))
+	[ "$TMP" = "$BOOKMARK" ]			&& exit
+	[ "$TMP" = "" ]						&& exit
+	PRESS_EVENT="`grep -Fwm1 $TMP $HOME/.pmusic/bookmarks`"
+	grep -Fv "$PRESS_EVENT" $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+	if [ "$BOOKMARK" = "" ]; then #move to end of list
+		mv -f $WORKDIR/tmp $WORKDIR/tmp1
+		echo "$PRESS_EVENT" >> $WORKDIR/tmp1
+	else #normal move
+		grep -Fm1 -B500 "$BOOKMARK" $WORKDIR/tmp | grep -Fv "$BOOKMARK" > $WORKDIR/tmp1
+		echo "$PRESS_EVENT" >> $WORKDIR/tmp1
+		grep -Fm1 -A500 "$BOOKMARK" $WORKDIR/tmp >> $WORKDIR/tmp1
+	fi
+	mv -f $WORKDIR/tmp1 $HOME/.pmusic/bookmarks
+	;;
+-bookmark_sort_ascending)
+	cat $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+	sort --output=$HOME/.pmusic/bookmarks $WORKDIR/tmp
+	;;
+-bookmark_sort_descending)
+	cat $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+	sort -r --output=$HOME/.pmusic/bookmarks $WORKDIR/tmp
+	;;
+-bookmark_menu)
+	if [ $BUTTON = 3 ]; then
+		[ ! "$BOOKMARK" ] && exit #click on blank area
+		[ "`echo "$BOOKMARK" | grep -E "^\["`" ] && DISABLE_ADD="<visible>disabled</visible>" #timestamp
+		echo -n > $WORKDIR/OUTPUT
+		export gtkdialog_menu='
+<window title="menu" decorated="false" skip_taskbar_hint="true" window_position="2" height-request="100">
+ <vbox>
+  <hbox>
+   <vbox spacing="2">
+    <pixmap height-request="20" icon_size="1"><input file stock="gtk-remove"></input></pixmap>
+    <pixmap height-request="20" icon_size="1"><input file stock="gtk-convert"></input></pixmap>
+    <text height-request="2"><label>""</label></text>
+    <pixmap height-request="20" icon_size="1"><input file stock="gtk-add"></input></pixmap>
+    <pixmap height-request="20" icon_size="1"><input file stock="gtk-media-play"></input></pixmap>
+   </vbox>
+   <vbox spacing="2">
+    <button height-request="20" xalign="0" can-focus="no" relief="2"><label>'$LOC_REMOVE'</label><action>echo '$LOC_REMOVE' > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+    <button height-request="20" xalign="0" can-focus="no" relief="2"><label>'$LOC_RENAME'</label><action>echo '$LOC_RENAME' > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+    <hseparator></hseparator>
+    <button height-request="20" xalign="0" can-focus="no" relief="2">'$DISABLE_ADD'<label>'$LOC471'</label><action>echo '$LOC471' > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+    <button height-request="20" xalign="0" can-focus="no" relief="2"><label>'$LOC_PLAY'</label><action>echo '$LOC_PLAY' > '$WORKDIR'/OUTPUT</action><action>EXIT:exit</action></button>
+   </vbox>
+  </hbox>
+ </vbox>
+ <action signal="focus-out-event">EXIT:exit</action>
+</window>'
+		$GTKDIALOG -p gtkdialog_menu
+		OUTPUT=($(<"$WORKDIR/OUTPUT"))  #send output to stdout
+		case $OUTPUT in
+			"$LOC_REMOVE")
+				grep -vwF "  $BOOKMARK" $HOME/.pmusic/bookmarks > $WORKDIR/tmp
+				mv -f $WORKDIR/tmp $HOME/.pmusic/bookmarks
+			;;
+			"$LOC_PLAY")
+				pmusic -P "$BOOKMARK"
+			;;
+			"$LOC471")
+				pmusic -a "$BOOKMARK"
+			;;
+			"$LOC_RENAME")
+				NAME="`grep -F "$BOOKMARK" $HOME/.pmusic/bookmarks | cut -d'|' -f1`"
+				FRAME="$LOC_RENAME"; IMG="convert"; TXT1="$NAME"; DEFAULT="$NAME"
+				. $APPDIR/box_input
+				if [ $EXIT = "ok" ]; then
+					sed -i "s%$NAME|  $BOOKMARK%$INPUT|  $BOOKMARK%" $HOME/.pmusic/bookmarks
+					
+				fi
+			;;
+		esac
+	fi
+	;;
+-manage_bookmarks)
+	if [ "$2" = "-add_playing" ]; then #the call has defined a bookmark. 'bookmark playing track'
+		cut -d"|" -f1 $HOME/.pmusic/nowplaying > $WORKDIR/BOOKMARK_NAME #$WORKDIR/PLAYLIST doesn't hold complete info about CD-tracks
+		TMP="`cut -d"|" -f2 $HOME/.pmusic/nowplaying`"
+		grep -F "$TMP" $WORKDIR/playlist | cut -d"|" -f4 | cut -d" " -f2- > $WORKDIR/BOOKMARK_PATH
+		VISIBLE_TIMESTAMP=enabled
+	elif [ "$2" = "-add_source" ]; then #the call has defined a bookmark: 'bookmark source content'
+		TMP=($(<"$WORKDIR/filebrowser_dir"))
+		echo "$TMP" > $WORKDIR/BOOKMARK_PATH
+		basename "$TMP" > $WORKDIR/BOOKMARK_NAME
+		VISIBLE_TIMESTAMP=disabled
+	else #show blank: Clicking OK wil not do anything
+		echo -n > $WORKDIR/BOOKMARK_PATH
+		echo -n > $WORKDIR/BOOKMARK_NAME
+		VISIBLE_TIMESTAMP=disabled
+	fi
+
+	S='
+<window title="Pmusic - '$LOC227' '$LOC_SETUP'" icon-name="pmusic">
+<vbox>
+ <vbox>
+  <frame>
+   <hbox>
+    <text width-request="100"><label>'$LOC460'</label></text>
+    <entry tooltip-text="'$LOC466'">
+     <variable>BOOKMARK_PATH</variable>
+     <input>cat '$WORKDIR'/BOOKMARK_PATH</input>
+    </entry>
+    <button>
+     <input file stock="gtk-open"></input>
+     <action>TITLE="- '$LOC309'"; . '$APPDIR'/box_chooser; [ "$EXIT" = "OK" ] && echo -n "$CHOOSER" > '$WORKDIR'/BOOKMARK_PATH</action>
+     <action>refresh:BOOKMARK_PATH</action>
+    </button>
+   </hbox>
+   <hbox>
+    <text width-request="100"><label>'$LOC461'</label></text>
+    <entry activates-default="true" is-focus="true" tooltip-text="'$LOC465'"><variable>BOOKMARK_NAME</variable><input>cat '$WORKDIR'/BOOKMARK_NAME</input></entry>
+    <button tooltip-text="'$LOC411'">
+     <input file stock="gtk-jump-to"></input>
+     <action>cut -d"|" -f1 $HOME/.pmusic/nowplaying > '$WORKDIR'/BOOKMARK_NAME</action>
+     <action>TMP="`cut -d"|" -f2 $HOME/.pmusic/nowplaying`"; grep -F "$TMP" '$WORKDIR'/playlist | cut -d"|" -f4 | cut -d" " -f2- > '$WORKDIR'/BOOKMARK_PATH</action> ##grep in playlist to get full info about CD-track
+     <action>refresh:BOOKMARK_PATH</action>
+     <action>refresh:BOOKMARK_NAME</action>
+     <action>enable:CHK_TIMESTAMP</action>
+    </button>
+   </hbox>
+   <hbox>
+    <checkbox tooltip-text="'$LOC468'">
+     <variable>CHK_TIMESTAMP</variable>
+     <label>'$LOC469'</label>
+     <visible>'$VISIBLE_TIMESTAMP'</visible>
+    </checkbox>
+   </hbox>
+  </frame>
+ </vbox>
+ <tree hover-selection="true" tooltip-text="'$LOC462'" exported_column="1" headers-clickable="false">
+  <label>'$LOC461'|'$LOC460'</label>
+  <variable>BOOKMARK</variable>
+  <input>cat $HOME/.pmusic/bookmarks</input>
+  <width>400</width><height>250</height>
+  <action signal="button-press-event">. '$APPDIR'/func_bookmarks -bookmark_menu</action>
+  <action signal="button-press-event">echo $BOOKMARK > $WORKDIR/PRESS_EVENT</action>
+  <action signal="button-release-event">. '$APPDIR'/func_bookmarks -bookmark_move</action>
+  <action signal="button-release-event">refresh:BOOKMARK_PATH</action>
+  <action signal="button-release-event">refresh:BOOKMARK_NAME</action>
+  <action signal="button-release-event">refresh:BOOKMARK</action>
+ </tree>
+  <hbox>
+
+   <button tooltip-text="'$LOC472'">
+    <input file stock="gtk-sort-ascending"></input>
+    <action>. '$APPDIR'/func_bookmarks -bookmark_sort_ascending</action>
+    <action>refresh:BOOKMARK</action>
+   </button>
+   <button tooltip-text="'$LOC473'">
+    <input file stock="gtk-sort-descending"></input>
+    <action>. '$APPDIR'/func_bookmarks -bookmark_sort_descending</action>
+    <action>refresh:BOOKMARK</action>
+   </button>
+   <text width-request="30"><label>""</label></text>
+   
+   <button cancel></button>
+   <button>
+    <label>'$LOC_APPLY'</label>
+    <input file stock="gtk-apply"></input>
+    <action>. '$APPDIR'/func_bookmarks -bookmark_add</action>
+    <action>refresh:BOOKMARK</action>
+   </button>
+   <button can-default="true" has-default="true" use-stock="true">
+    <label>'$LOC_OK'</label>
+    <input file stock="gtk-ok"></input>
+    <action>. '$APPDIR'/func_bookmarks -bookmark_add</action>
+    <action>exit:EXIT</action>
+   </button>
+  </hbox>
+</vbox>
+</window>'
+	[ $TOOLTIPS = false ] && S="`echo "$S" | sed 's%tooltip-text%tooltipXXXtext%g'`" #deactivate tooltips
+	export Pmusic_bookmarks="`echo "$S" | sed 's/##.*//'`" #I use double hash (##) for comments. --> as #FF0000
+	$GTKDIALOG -p Pmusic_bookmarks
+	;;
+esac

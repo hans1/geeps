@@ -1,0 +1,23 @@
+#!/bin/sh
+#functions for "screeny"
+#set work dir
+APPDIR=$(pwd)
+export APPDIR
+
+case $1 in
+snap_func1)
+{
+WINDOWID="$(xwininfo|grep "Window id"|tr ' ' '\n'|grep "[0-7a-f][0-7a-f]")"
+
+xwd -id "$WINDOWID" | xwdtopnm | pnmtopng > "$CAPTURE"
+}
+;;
+
+snap_func2)
+{
+WINDOWID="-root"
+
+xwd $WINDOWID | xwdtopnm | pnmtopng > "$CAPTURE"
+}
+;;
+esac

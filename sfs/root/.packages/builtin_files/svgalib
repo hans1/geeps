@@ -1,0 +1,52 @@
+/etc
+/etc/vga
+ dvorak-us.keymap
+ libvga.config
+ libvga.et4000
+ null.keymap
+/usr
+/usr/bin
+ dumpreg
+ mode3
+ restorefont
+ restorepalette
+ restoretextmode
+ savetextmode
+ svgakeymap
+ textmode
+/usr/lib
+ lib3dkit.so
+ lib3dkit.so.1.9.25
+ libvgagl.so
+ libvgagl.so.1.9.25
+ libvga.so
+ libvga.so.1.9.25
+/usr/share
+/usr/share/svgalib-demos
+ accel
+ addmodetest
+ bankspeed
+ bg_test
+ buildcsr
+ cursor
+ eventtest
+ forktest
+ fun
+ joytest
+ keytest
+ linearfork
+ linearspeed
+ lineart
+ linuxlogo.bitmap
+ mjoytest
+ mousetest
+ printftest
+ scrolltest
+ speedtest
+ spin
+ svidtune
+ testaccel
+ testgl
+ testlinear
+ vgatest
+ vgatweak

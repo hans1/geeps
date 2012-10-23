@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ sfconvert
+ sfinfo
+/usr/lib
+ libaudiofile.so
+ libaudiofile.so.0
+ libaudiofile.so.0.0.2

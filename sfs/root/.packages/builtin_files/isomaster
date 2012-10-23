@@ -1,0 +1,14 @@
+/usr
+/usr/bin
+ isomaster
+/usr/share
+/usr/share/applications
+ ISOMaster-iso-file-editor.desktop
+/usr/share/isomaster
+/usr/share/isomaster/icons
+ add2-kearone.png
+ delete-kearone.png
+ extract2-kearone.png
+ folder-new-kearone.png
+ go-back-kearone.png
+ isomaster.png

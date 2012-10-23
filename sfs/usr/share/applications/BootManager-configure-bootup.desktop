@@ -1,0 +1,17 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=BootManager configure bootup
+Name[ru]=BootManager конфигурация загрузки
+Name[de]=Boot u. Start Optionen
+Name[es]=BootManager-Configuración de Arranque
+Name[hu_HU]=BootManager Rendszerindítás beállítása
+Name[ja]=BootManager ブートアップの設定
+Name[zh_CN]=BootManager 启动配置工具
+Name[zh_TW]=BootManager 啟動管理工具
+Icon=so.xpm
+Comment=BootManager configure bootup
+Exec=bootmanager
+Terminal=false
+Type=Application
+Categories=X-SystemSchedule
+GenericName=BootManager

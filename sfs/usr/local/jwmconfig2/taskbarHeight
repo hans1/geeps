@@ -1,0 +1,141 @@
+#!/bin/bash
+#
+# Code adapted for Puppy 1.0.9, JWM 1.7
+# by Kwiller on 07-May-2006
+#
+###################
+#v3.99 normal height now 28, changed from 26. changed short 18 -> 20.
+# 23aug2010 shinobar: remove warnings at parsing new config
+
+##-----taskbarHeight----->>
+
+TMP="/tmp/checklist.tmp.$$"
+SHRT="20"
+NORM="28"
+TALL="32"
+XTTL="42"
+CONFIG="/root/.jwmrc-tray"
+CONFIG2="/root/.jwmrc-tray-bak"
+CONF="/root/.jwmrc-tray-temp"
+
+#----Set defaults---->>
+IS_SHRT=off
+IS_NORM=ON
+IS_TALL=off
+IS_XTTL=off
+CRHT="NORMAL"
+
+#----Are current settings non-default---->>
+SET_TALL=`grep -c "height=\"$TALL\"" $CONFIG`
+
+if [ "$SET_TALL" -eq "1" ]; then
+    IS_SHRT=off
+    IS_NORM=off
+    IS_TALL=ON
+    IS_XTTL=off
+    CRHT="TALL"
+else
+    SET_SHRT=`grep -c "height=\"$SHRT\"" $CONFIG`
+
+    if [ "$SET_SHRT" -eq "1" ]; then
+        IS_SHRT=ON
+        IS_NORM=off
+        IS_TALL=off
+        IS_XTTL=off
+        CRHT="SHORT"
+    else
+        SET_XTTL=`grep -c "height=\"$XTTL\"" $CONFIG`
+
+        if [ "$SET_XTTL" -eq "1" ]; then
+            IS_SHRT=off
+            IS_NORM=off
+            IS_TALL=off
+            IS_XTTL=ON
+            CRHT="TALLER"
+        fi
+    fi
+fi
+
+#-----Backup current settings----->>
+cp $CONFIG $CONFIG2
+
+SEDSHRT=s!height=\".*\"!height=\"$SHRT\"!g
+SEDNORM=s!height=\".*\"!height=\"$NORM\"!g
+SEDTALL=s!height=\".*\"!height=\"$TALL\"!g
+SEDXTTL=s!height=\".*\"!height=\"$XTTL\"!g
+
+#-------------gui----------->>
+
+Xdialog --backtitle "JWM Taskbar Configuration" \
+	--title "Taskbar" \
+        --radiolist "Choose a tray height option" 18 46 4 \
+"SHORT"  "About 70% of Normal." $IS_SHRT \
+"NORMAL"  "The default height" $IS_NORM \
+"TALL"  "About 125% of Normal." $IS_TALL \
+"TALLER"  "About 160% of normal" $IS_XTTL 2>$TMP
+
+retval=$?
+
+#--------cancel pressed----->>
+case $retval in
+  1 | 255) exit 0;;
+esac
+
+#---------save changes----->>
+
+HGHT=`cat $TMP`
+
+#-----If there are new settings chosen then make the changes----->>
+if [ "$HGHT" != "$CRHT" ]; then
+  case $HGHT in
+     "SHORT") sed -e "$SEDSHRT" $CONFIG > $CONF
+              ;;
+    "NORMAL") sed -e "$SEDNORM" $CONFIG > $CONF
+              ;;
+      "TALL") sed -e "$SEDTALL" $CONFIG > $CONF
+              ;;
+    "TALLER") sed -e "$SEDXTTL" $CONFIG > $CONF
+              ;;
+  esac
+  mv $CONF $CONFIG
+fi
+
+#------check new configuration----->>
+jwm -p 2>&1 | grep -v 'warning' > $TMP
+
+CHECKCONF=`cat $TMP`
+
+case $HGHT in
+     "SHORT") RES=`grep -c "height=\"$SHRT\"" $CONFIG`
+              ;;
+    "NORMAL") RES=`grep -c "height=\"$NORM\"" $CONFIG`
+              ;;
+      "TALL") RES=`grep -c "height=\"$TALL\"" $CONFIG`
+              ;;
+    "TALLER") RES=`grep -c "height=\"$XTTL\"" $CONFIG`
+              ;;
+esac
+
+#----notify of result----->>
+
+if [ "$RES" -eq "1" ]; then
+  if [ -z $CHECKCONF ]; then 
+    RESTOP="Change Saved"
+    RESMSG="The tray height is set at $HGHT"
+    rm -f $CONFIG2
+  else
+    RESTOP="Change Reversed"
+    RESMSG="New config corrupt. Keeping original"
+    mv $CONFIG2 $CONFIG
+  fi
+else
+  RESTOP="Change Failed"
+  RESMSG="Configuration has not been altered"
+  mv $CONFIG2 $CONFIG
+fi
+
+Xdialog --title "$RESTOP" --msgbox "$RESMSG" 0 0
+
+#--------clean exit------->>
+rm -f $TMP
+exit 0

@@ -1,0 +1,8 @@
+/usr
+/usr/bin
+ idn
+/usr/lib
+ libidn.so
+ libidn.so.11
+ libidn.so.11.6.2
+/usr/share

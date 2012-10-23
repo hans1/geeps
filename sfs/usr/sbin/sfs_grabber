@@ -1,0 +1,58 @@
+#!/bin/sh
+#sfs_grab.. a simple gui frontend for sfs_installation.sh
+#GPL 01micko
+#20101122
+#20110313 added support for shino's sfs load
+ver=0.2
+#check sfs_installation.sh is there 
+[[ ! -x /usr/sbin/sfs_installation.sh ]] && xmessage -bg red -center -timeout 5 "You don't have the required dependency 
+to use this application. Exiting .." && exit
+
+#shino's sfs_load
+SFSLOAD=`which sfs_load`
+
+. /etc/rc.d/PUPSTATE
+case $PUPMODE in
+5) Xdialog -title "Sfs_grabber" -timeout 5 -msgbox "You must install Puppy first to use sfs files" 0 0 && exit
+;; 
+6|7|12|13)
+ if [[ "$SFSLOAD" != "" ]];then GUITEXT="<hbox><text><label>Your sfs will be loaded automatically without a reboot</label></text></hbox>" 
+  else GUITEXT="<hbox><text><label>Your sfs will be loaded and then you will be prompted reboot</label></text></hbox>" 
+ fi
+;;
+2|3|77) GUITEXT="<hbox><text><label>Your sfs will be automatically converted to a pet that you will be prompted to install</label></text></hbox>"
+;;
+esac 
+
+INSTALL(){
+	[ "$GRABSFS" = "" ] && xmessage -bg yellow -center -timeout 5 'Woops! Nothing chosen!' && exit
+	#is it an sfs?
+	ISSFS=`echo $GRABSFS|tail -c4`
+	[[ "$ISSFS" != "sfs" ]] && xmessage -bg hotpink -center -timeout 5 ''"$GRABSFS"' is not an sfs!' && exit
+	#sort out if the file is local or remote, no in sfs_installation.sh
+	exec sfs_installation.sh $GRABSFS &
+}
+export -f INSTALL
+export SFSGRABBER="<window title=\"Sfs_grabber -$ver\">
+ <vbox>
+  <hbox homogeneous=\"true\">
+   <text use-markup=\"true\"><label>\"<b>Copy and paste a weblink or drag a local sfs file to the entry box</b>\"</label></text>
+  </hbox>
+  $GUITEXT
+  <entry tooltip-text=\"By dragging a local sfs file or copying and pasting an sfs file from the web here Puppy will detect where it is and perform the most appropriate action for your type of installation\">
+    <variable>GRABSFS</variable>
+    <action>echo $GRABSFS</action>
+   </entry>
+  <hbox>
+   <button>
+    <input file stock=\"gtk-ok\"></input>
+    <label>\"OK\"</label>
+    <action>INSTALL</action>
+    <action>EXIT:ok</action>
+   </button>
+   <button cancel></button>
+  </hbox>
+ </vbox>
+</window>"
+gtkdialog3 -p SFSGRABBER
+unset SFSGRABBER

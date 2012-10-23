@@ -1,0 +1,27 @@
+#!/bin/bash
+#PupControl 1.8.8
+#Set default apps
+#Copyright 2012 GPL3
+#Roger Grider (radky)
+
+WORKDIR="/usr/local/PupControl"
+
+	cat $WORKDIR/pupcontrol.rc | grep -a BACKUP | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP1.tmp  && chmod 755 /tmp/APP1.tmp && mv -f /tmp/APP1.tmp $WORKDIR/defaultapps/backup
+	cat $WORKDIR/pupcontrol.rc | grep -a CONSOLE | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP2.tmp  && chmod 755 /tmp/APP2.tmp && mv -f /tmp/APP2.tmp $WORKDIR/defaultapps/console
+	cat $WORKDIR/pupcontrol.rc | grep -a FILE_ARCHIVER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP3.tmp  && chmod 755 /tmp/APP3.tmp && mv -f /tmp/APP3.tmp $WORKDIR/defaultapps/archiver
+	cat $WORKDIR/pupcontrol.rc | grep -a FILE_FINDER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP4.tmp  && chmod 755 /tmp/APP4.tmp && mv -f /tmp/APP4.tmp $WORKDIR/defaultapps/filefinder
+	cat $WORKDIR/pupcontrol.rc | grep -a FILE_MANAGER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' | sed 's/mc/xterm -e mc/' | sed 's/rox/rox \//' | sed 's/Thunar/Thunar \//' > /tmp/APP5.tmp  && chmod 755 /tmp/APP5.tmp && mv -f /tmp/APP5.tmp $WORKDIR/defaultapps/filemanager
+	cat $WORKDIR/pupcontrol.rc | grep -a GRUB | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP6.tmp  && chmod 755 /tmp/APP6.tmp && mv -f /tmp/APP6.tmp $WORKDIR/defaultapps/grub
+	cat $WORKDIR/pupcontrol.rc | grep -a NETWORK | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP7.tmp  && chmod 755 /tmp/APP7.tmp && mv -f /tmp/APP7.tmp $WORKDIR/defaultapps/network
+	cat $WORKDIR/pupcontrol.rc | grep -a NOTEBOOK | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP8.tmp  && chmod 755 /tmp/APP8.tmp && mv -f /tmp/APP8.tmp $WORKDIR/defaultapps/notebook
+	cat $WORKDIR/pupcontrol.rc | grep -a ORGANIZER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP9.tmp  && chmod 755 /tmp/APP9.tmp && mv -f /tmp/APP9.tmp $WORKDIR/defaultapps/organizer
+	cat $WORKDIR/pupcontrol.rc | grep -a REMOTE_DESKTOP | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP10.tmp  && chmod 755 /tmp/APP10.tmp && mv -f /tmp/APP10.tmp $WORKDIR/defaultapps/remotedesktop
+	cat $WORKDIR/pupcontrol.rc | grep -a SAMBA | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP11.tmp  && chmod 755 /tmp/APP11.tmp && mv -f /tmp/APP11.tmp $WORKDIR/defaultapps/samba
+	cat $WORKDIR/pupcontrol.rc | grep -a SCANNER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP12.tmp  && chmod 755 /tmp/APP12.tmp && mv -f /tmp/APP12.tmp $WORKDIR/defaultapps/scanner
+	cat $WORKDIR/pupcontrol.rc | grep -a TASK_MANAGER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' | sed 's/htop/rxvt +sb -fn 9x15 -bg black -fg white -title htop -n htop -e htop/' > /tmp/APP13.tmp  && chmod 755 /tmp/APP13.tmp && mv -f /tmp/APP13.tmp $WORKDIR/defaultapps/taskmanager
+	cat $WORKDIR/pupcontrol.rc | grep -a TIME_MANAGER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' | sed 's/lightSwordAlarm/lsalarm/' | sed 's/timetracker/sgtt/' > /tmp/APP14.tmp && chmod 755 /tmp/APP14.tmp && mv -f /tmp/APP14.tmp $WORKDIR/defaultapps/timemanager
+	cat $WORKDIR/pupcontrol.rc | grep -a VPN_CLIENT | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP15.tmp  && chmod 755 /tmp/APP15.tmp && mv -f /tmp/APP15.tmp $WORKDIR/defaultapps/vpnclient
+	cat $WORKDIR/pupcontrol.rc | grep -a WIRELESS | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP16.tmp  && chmod 755 /tmp/APP16.tmp && mv -f /tmp/APP16.tmp $WORKDIR/defaultapps/wireless
+	cat $WORKDIR/pupcontrol.rc | grep -a WALLPAPER | cut -d "=" -f 2 | sed 's/\"//g' | sed '1i\#!/bin/bash' > /tmp/APP17.tmp  && chmod 755 /tmp/APP17.tmp && mv -f /tmp/APP17.tmp $WORKDIR/defaultapps/wallpaper
+
+exec $WORKDIR/PupControl

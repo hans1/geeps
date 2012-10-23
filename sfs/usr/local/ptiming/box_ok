@@ -1,0 +1,23 @@
+#!/bin/bash
+
+[ -z "$IMG" ] && IMG="dialog-error"
+[ -z "$FRAME" ] && FRAME="$LOC_ERROR"
+
+export ok_box="
+<window title=\"pTiming\">
+ <vbox>
+  <frame $FRAME>
+   <pixmap icon_size=\"6\"><input file stock=\"gtk-$IMG\"></input></pixmap>
+   <text use-markup=\"true\"><label>\"$TXT1\"</label></text>
+   <text use-markup=\"true\"><label>\"$TXT2\"</label></text>
+  </frame>
+  <hbox>
+   <button can-default=\"true\" has-default=\"true\" use-stock=\"true\">
+    <input file stock=\"gtk-ok\"></input>
+    <label>$LOC_OK</label>
+   </button>
+  </hbox>
+ </vbox>
+</window>"
+gtkdialog4 -p ok_box --center
+TXT1=""; TXT2=""; IMG=""; FRAME="" #reset to avoid alien values in next box

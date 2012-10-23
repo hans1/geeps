@@ -1,0 +1,6 @@
+/usr
+/usr/lib
+ libdvdread.so
+ libdvdread.so.3
+ libdvdread.so.4
+ libdvdread.so.4.1.2

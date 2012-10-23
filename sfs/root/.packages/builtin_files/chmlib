@@ -1,0 +1,9 @@
+/usr
+/usr/bin
+ chm_http
+ enum_chmLib
+ enumdir_chmLib
+ extract_chmLib
+ test_chmLib
+/usr/lib
+ libchm.so.0.0.0

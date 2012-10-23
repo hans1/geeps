@@ -1,0 +1,7 @@
+/usr
+/usr/bin
+ sqlite3
+/usr/lib
+ libsqlite3.so
+ libsqlite3.so.0
+ libsqlite3.so.0.8.6

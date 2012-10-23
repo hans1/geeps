@@ -1,0 +1,6 @@
+/usr
+/usr/sbin
+ biosdecode
+ dmidecode
+ ownership
+ vpddecode

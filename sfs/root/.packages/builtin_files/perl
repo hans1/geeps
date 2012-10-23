@@ -1,0 +1,11 @@
+/usr
+/usr/bin
+ perl
+/usr/lib
+/usr/lib/perl5
+/usr/lib/perl5/5.12.3
+/usr/lib/perl5/5.12.3/i486-linux-thread-multi
+ perllocal.pod
+ .wh.perllocal.pod.new
+/usr/man
+/usr/man/man1

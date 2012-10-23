@@ -1,0 +1,76 @@
+/etc
+/etc/xdg
+/etc/xdg/menus
+ hierarchy
+ jwm.menu
+ puppy-calculate.menu
+ puppy-desktop.menu
+ puppy-document.menu
+ puppy-filesystem.menu
+ puppy-fun.menu
+ puppy-graphic.menu
+ puppy-internet.menu
+ puppy-multimedia.menu
+ puppy-network.menu
+ puppy-personal.menu
+ puppy-setup.menu
+ puppy-SKELETON.menu
+ puppy-system.menu
+ puppy-utility.menu
+/etc/xdg/templates
+ README.txt
+ _root_.icewm_menu
+/usr
+/usr/bin
+ fvwm-xdgmenu
+ icewm-xdgmenu
+ jwm-xdgmenu
+ wm-xdgmenu
+/usr/share
+/usr/share/desktop-directories
+ Puppy-Calculate.directory
+ Puppy-CalculateSub.directory
+ Puppy-CalculateUtility.directory
+ Puppy-Calculators.directory
+ Puppy-Console.directory
+ Puppy-DesktopApplets.directory
+ Puppy-DesktopCountry.directory
+ Puppy-Desktop.directory
+ Puppy-DesktopSettings.directory
+ Puppy-Document.directory
+ Puppy-DocumentSub.directory
+ Puppy-DocumentTextEditor.directory
+ Puppy-DocumentUtility.directory
+ Puppy-Filesystem.directory
+ Puppy-FilesystemFind.directory
+ Puppy-FilesystemManager.directory
+ Puppy-FilesystemMount.directory
+ Puppy-FilesystemUtility.directory
+ Puppy-Fun.directory
+ Puppy-Graphic.directory
+ Puppy-GraphicEdit.directory
+ Puppy-GraphicSub.directory
+ Puppy-GraphicUtility.directory
+ Puppy-Internet.directory
+ Puppy-MultimediaBurn.directory
+ Puppy-Multimedia.directory
+ Puppy-MultimediaSub.directory
+ Puppy-NetworkDialup.directory
+ Puppy-Network.directory
+ Puppy-NetworkSub.directory
+ Puppy-Personal.directory
+ Puppy-PersonalSub.directory
+ Puppy-PersonalUtility.directory
+ Puppy-RestartWM.directory
+ Puppy-Setup.directory
+ Puppy-SetupEntry.directory
+ Puppy-SetupUtility.directory
+ Puppy-SetupWizard.directory
+ Puppy-SystemConfig.directory
+ Puppy-System.directory
+ Puppy-SystemMemory.directory
+ Puppy-SystemSchedule.directory
+ Puppy-UtilityArchiving.directory
+ Puppy-UtilityConsole.directory
+ Puppy-Utility.directory
+ Puppy-UtilitySub.directory

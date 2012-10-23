@@ -1,0 +1,7 @@
+/usr
+/usr/sbin
+ Floppy_Formatter
+ ufiformat
+/usr/share
+/usr/share/applications
+ Floppy_Formatter.desktop

@@ -1,0 +1,19 @@
+/usr
+/usr/bin
+ programchooser
+/usr/share
+/usr/share/programchooser
+/usr/share/programchooser/locale
+ english.po
+/usr/share/programchooser/locale/.svn
+ entries
+ format
+ lock
+/usr/share/programchooser/locale/.svn/prop-base
+/usr/share/programchooser/locale/.svn/props
+ english.po.svn-work
+/usr/share/programchooser/locale/.svn/text-base
+/usr/share/programchooser/locale/.svn/tmp
+/usr/share/programchooser/locale/.svn/tmp/prop-base
+/usr/share/programchooser/locale/.svn/tmp/props
+/usr/share/programchooser/locale/.svn/tmp/text-base
