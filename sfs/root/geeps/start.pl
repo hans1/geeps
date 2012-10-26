@@ -47,12 +47,12 @@ $slidedeck->pack();
 
 
 
-my $drivedeck = $mw->Canvas(-width => $mw->width, -height => $mw->height - 600, -background => '#ffffff');
+my $drivedeck;
 
 my %drvfnames = (drive => 'hdd_mount1.png', usbdrv => 'hdd_usb.png');
 my %drvs = map { $_ => $mw->Photo(-file => $drvfnames{$_}); } keys %drvfnames;
 sub drive_button {
-	my ($label, $dev, $type, $fs) = @_;
+	my ($dev, $type, $fs, $label) = @_;
 	next unless $drvs{$type};
 
 	my $size = '';
@@ -83,19 +83,32 @@ sub set_drives {
 	}
 	close $f;
 
+	if (@drives == @curdrives) {
+		my $d = 0;
+		for (0..$#drives) {
+			$d += ($drives[$_]->[0] ne $curdrives[$_]->[0]);
+		}
+		return unless $d;
+	}
+	@curdrives = @drives;
+
+	$drivedeck->destroy() if $drivedeck;
+	$drivedeck = $mw->Canvas(-width => $mw->width, -height => $mw->height - 600, -background => '#ffffff');
 	$drivedeck->delete('all');
 	for my $d (@drives) {
 		drive_button(@$d);
 	}
+	$drivedeck->pack();
+
+	$mw->update();
 }
 set_drives();
-
-$drivedeck->pack();
 
 $mw->update();
 
 $mw->bind('all' => '<Key-Escape>' => sub {exit;});
 $mw->bind('all' => '<Key-Left>' => \&prev_slide);
 $mw->bind('all' => '<Key-Right>' => \&next_slide);
+$mw->repeat(500, \&set_drives);
 
 MainLoop;
