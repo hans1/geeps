@@ -6,7 +6,7 @@
  <!-- jwm menu for puppy Linux -->
  <RootMenu label="Menu" labeled="false" height="24" onroot="3">
  
-  <Program label="Start" icon="help24.png">exec urxvt -e sh -c 'echo "The file manager frontend will be here."; read'</Program>
+ <Program label="Start" icon="help24.png">exec sh -c 'cd /root/geeps && ./start.pl'</Program>
   <Program label="Wipe Drive" icon="help24.png">exec urxvt -e sh -c 'echo "What should happen?"; read'</Program>
   <Menu label="Extras" icon="utility24.png" height="16">
    <Program label="SeaMonkey web browser" icon="seamonkey16.xpm">seamonkey</Program>
