@@ -9,7 +9,7 @@ use Tk::widgets qw/JPEG PNG/;
 
 
 my $mw = MainWindow->new(-background => '#ffffff');
-$mw->geometry($mw->screenwidth . 'x' . $mw->screenheight . '+0+0');
+$mw->geometry($mw->screenwidth . 'x' . $mw->screenheight . '-5-20');
 $mw->title("Geeps");
 
 #$mw->FullScreen(1);
