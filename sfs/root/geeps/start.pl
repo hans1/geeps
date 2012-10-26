@@ -54,11 +54,20 @@ my %drvs = map { $_ => $mw->Photo(-file => $drvfnames{$_}); } keys %drvfnames;
 sub drive_button {
 	my ($label, $dev, $type, $fs) = @_;
 	next unless $drvs{$type};
+
+	my $size = '';
+	open my $f, "/root/.pup_event/drive_$dev/AppInfo.xml" or die "$!";
+	while (<$f>) {
+		next unless /<Summary>.*Size: (\S+)</;
+		$size = $1;
+	}
+	close $f;
+
 	my $btn = $drivedeck->Button(
 		-image => $drvs{$type},
 		-command => sub { system("/root/.pup_event/drive_$dev/AppRun $type $fs"); }
 	);
-	$mw->Balloon()->attach($btn, -balloonmsg => "$label\n($type $dev $fs)");
+	$mw->Balloon()->attach($btn, -balloonmsg => "$label ($size)\n($type $dev $fs)");
 	$btn->pack(-side => 'right');
 }
 
