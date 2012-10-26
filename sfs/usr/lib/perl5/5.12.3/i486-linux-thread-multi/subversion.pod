@@ -1,0 +1,22 @@
+=head2 Wed Mar  9 17:17:43 2011: C<Module> L<SVN::_Core|SVN::_Core>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/lib/perl5/vendor_perl/5.12.3>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: >
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
