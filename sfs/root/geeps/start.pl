@@ -52,13 +52,13 @@ my $drivedeck = $mw->Canvas(-width => $mw->width, -height => $mw->height - 600, 
 my %drvfnames = (drive => 'hdd_mount1.png', usbdrv => 'hdd_usb.png');
 my %drvs = map { $_ => $mw->Photo(-file => $drvfnames{$_}); } keys %drvfnames;
 sub drive_button {
-	my ($dev, $type, $fs) = @_;
+	my ($label, $dev, $type, $fs) = @_;
 	next unless $drvs{$type};
 	my $btn = $drivedeck->Button(
 		-image => $drvs{$type},
 		-command => sub { system("/root/.pup_event/drive_$dev/AppRun $type $fs"); }
 	);
-	$mw->Balloon()->attach($btn, -balloonmsg => "$dev $type $fs");
+	$mw->Balloon()->attach($btn, -balloonmsg => "$label\n($type $dev $fs)");
 	$btn->pack(-side => 'right');
 }
 
@@ -69,8 +69,8 @@ sub set_drives {
 	while (<$f>) {
 		chomp;
 		next unless m#pup_event#;
-		my ($type, $fs, $dev) = m#args="(.*?) (.*?)">/root/\.pup_event/drive_(.*?)<#;
-		push(@drives, [$dev, $type, $fs]);
+		my ($label, $type, $fs, $dev) = m#label="(.*?)".*args="(.*?) (.*?)">/root/\.pup_event/drive_(.*?)<#;
+		push(@drives, [$dev, $type, $fs, $label]);
 	}
 	close $f;
 
