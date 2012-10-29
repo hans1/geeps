@@ -5,7 +5,7 @@ use strict;
 use v5.12;
 
 use Tk;
-use Tk::widgets qw/JPEG PNG/;
+use Tk::widgets qw/JPEG PNG Balloon/;
 
 
 
@@ -71,7 +71,7 @@ my %drvfnames = (drive => 'hdd_mount1.png', usbdrv => 'hdd_usb.png');
 my %drvs = map { $_ => $mw->Photo(-file => $drvfnames{$_}); } keys %drvfnames;
 sub drive_button {
 	my ($dev, $type, $fs, $label) = @_;
-	next unless $drvs{$type};
+	return unless $drvs{$type};
 
 	my $size = '';
 	open my $f, "/root/.pup_event/drive_$dev/AppInfo.xml" or die "$!";
