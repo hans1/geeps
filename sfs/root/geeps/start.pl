@@ -125,7 +125,7 @@ set_drives();
 
 $mw->update();
 
-$mw->bind('all' => '<Key-Escape>' => sub {exit;});
+# $mw->bind('all' => '<Key-Escape>' => sub {exit;});
 $mw->bind('all' => '<Key-Left>' => \&prev_slide);
 $mw->bind('all' => '<Key-Right>' => \&next_slide);
 $mw->repeat(500, \&set_drives);
