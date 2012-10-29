@@ -164,6 +164,8 @@ fi
 # rox -p /root/Choices/ROX-Filer/PuppyPin
 #fi
 
+(cd /root/geeps && ./start.pl) &
+
 #exec $CURRENTWM
 #v2.11 GuestToo suggested this improvement...
 which $CURRENTWM && exec $CURRENTWM
