@@ -38,9 +38,9 @@ $menu->place(-anchor => 'nw', -x => 10, -y => $topy);
 
 my $slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff');
 
-$slidedeck->Button(-text => '<-', -background => '#ffffff', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
+$slidedeck->Button(-text => '<-', -background => '#ffffff', -relief => 'flat', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
 
-my $slide = $slidedeck->Canvas(-width => 800, -height => 600);
+my $slide = $slidedeck->Canvas(-width => 800, -height => 600, -borderwidth => 0, -highlightthickness => 0);
 
 my @picfnames = qw(geeps1c8.png geeps2c8.png geeps3c8.png geeps4c8.png);
 my @pics = map { $mw->Photo(-file => $_); } @picfnames;
@@ -59,7 +59,7 @@ sub next_slide {
 }
 set_slide($pici);
 
-$slidedeck->Button(-text => '->', -background => '#ffffff', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
+$slidedeck->Button(-text => '->', -background => '#ffffff', -relief => 'flat', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
 
 $slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
 
@@ -83,6 +83,7 @@ sub drive_button {
 
 	my $btn = $drivedeck->Button(
 		-image => $drvs{$type},
+		-background => '#ffffff', -relief => 'flat', -borderwidth => 0, -highlightthickness => 0,
 		-command => sub { system("/root/.pup_event/drive_$dev/AppRun $type $fs"); }
 	);
 	$mw->Balloon()->attach($btn, -balloonmsg => "$label ($size)\n($type $dev $fs)");
@@ -92,7 +93,7 @@ sub drive_button {
 my @curdrives = ();
 sub set_drives {
 	my @drives = ();
-	open my $f, "/root/Choices/ROX-Filer/PuppyPin"; # or die "$!";
+	open my $f, "/root/Choices/ROX-Filer/PuppyPin" or die "$!";
 	while (<$f>) {
 		chomp;
 		next unless m#pup_event#;
