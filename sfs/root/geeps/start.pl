@@ -25,13 +25,12 @@ my $topy = ($mw->screenheight
 	) / 2 - 300; # centered to that area minus /2 of instructions height
 
 
-my $menu = $mw->Canvas(-width => 200, -background => '#ffffff');
-$menu->Button(-text => 'Wipe drive', -width => 20, -command => sub{})->pack();
-my $extras = $menu->Menubutton(-text => 'Extras', -width => 22, -relief => 'raised');
+my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'raised');
+$menu->command(-label => 'Wipe drive', -command => sub{});
+my $extras = $menu->cascade(-label => 'Extras');
 $extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
 $extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
-$extras->pack();
-$menu->Button(-text => 'Quit', -width => 20, -command => sub { system('wmpoweroff&'); })->pack();
+$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
 
 $menu->place(-anchor => 'nw', -x => 10, -y => $topy);
 
