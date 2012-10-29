@@ -2,6 +2,7 @@
 
 use warnings;
 use strict;
+use v5.12;
 
 use Tk;
 use Tk::widgets qw/JPEG PNG/;
@@ -16,9 +17,26 @@ $mw->title("Geeps");
 #$mw->grabGlobal;
 #$mw->focusForce;
 
+my $topy = ($mw->screenheight
+		+ 10 # top margin
+		- 10 # middle margin
+		- 128 # drivedeck height
+		- 10 # bottom margin
+	) / 2 - 300; # centered to that area minus /2 of instructions height
 
 
-my $slidedeck = $mw->Canvas(-width => $mw->width, -height => 600, -background => '#ffffff');
+my $menu = $mw->Canvas(-width => 200, -background => '#ffffff');
+$menu->Button(-text => 'Wipe drive', -width => 20, -command => sub{})->pack();
+my $extras = $menu->Menubutton(-text => 'Extras', -width => 22, -relief => 'raised');
+$extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
+$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
+$extras->pack();
+$menu->Button(-text => 'Quit', -width => 20, -command => sub { system('wmpoweroff&'); })->pack();
+
+$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
+
+
+my $slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff');
 
 $slidedeck->Button(-text => '<-', -background => '#ffffff', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
 
@@ -43,7 +61,7 @@ set_slide($pici);
 
 $slidedeck->Button(-text => '->', -background => '#ffffff', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
 
-$slidedeck->pack();
+$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
 
 
 
@@ -74,7 +92,7 @@ sub drive_button {
 my @curdrives = ();
 sub set_drives {
 	my @drives = ();
-	open my $f, "/root/Choices/ROX-Filer/PuppyPin" or die "$!";
+	open my $f, "/root/Choices/ROX-Filer/PuppyPin"; # or die "$!";
 	while (<$f>) {
 		chomp;
 		next unless m#pup_event#;
@@ -93,12 +111,12 @@ sub set_drives {
 	@curdrives = @drives;
 
 	$drivedeck->destroy() if $drivedeck;
-	$drivedeck = $mw->Canvas(-width => $mw->width, -height => $mw->height - 600, -background => '#ffffff');
+	$drivedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 128, -background => '#ffffff');
 	$drivedeck->delete('all');
 	for my $d (@drives) {
 		drive_button(@$d);
 	}
-	$drivedeck->pack();
+	$drivedeck->place(-anchor => 's', -x => $mw->screenwidth / 2, -y => $mw->screenheight - 10);
 
 	$mw->update();
 }
