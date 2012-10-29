@@ -35,7 +35,7 @@
   <Option name="panel_is_dock">0</Option>
   <Option name="display_exec_colour">#000060000000</Option>
   <Option name="session_pinboard_name">Default</Option>
-  <Option name="dnd_left_menu">1</Option>
+  <Option name="dnd_left_menu">0</Option>
   <Option name="display_dir_colour">#000000008000</Option>
   <Option name="xattr_ignore">0</Option>
   <Option name="i18n_translation">None</Option>
