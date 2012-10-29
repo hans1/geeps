@@ -17,6 +17,11 @@
 </RootMenu>
 
 <Group>
+<Class>start</Class>
+<Option>layer:3</Option>
+</Group>
+
+<Group>
 <Class>Gaim</Class>
 <Option>sticky</Option>
 </Group>
