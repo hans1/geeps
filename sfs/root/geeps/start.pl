@@ -25,16 +25,6 @@ my $topy = ($mw->screenheight
 	) / 2 - 300; # centered to that area minus /2 of instructions height
 
 
-my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'raised');
-$menu->command(-label => 'Wipe drive', -command => sub{});
-my $extras = $menu->cascade(-label => 'Extras');
-$extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
-$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
-$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
-
-$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
-
-
 my $slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff');
 
 $slidedeck->Button(-text => '<-', -background => '#ffffff', -relief => 'flat', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
@@ -61,6 +51,17 @@ set_slide($pici);
 $slidedeck->Button(-text => '->', -background => '#ffffff', -relief => 'flat', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
 
 $slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+
+
+
+my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'raised');
+$menu->command(-label => 'Wipe drive', -command => sub{});
+my $extras = $menu->cascade(-label => 'Extras');
+$extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
+$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
+$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
+
+$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
 
 
 
