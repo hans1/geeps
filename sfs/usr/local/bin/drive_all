@@ -358,6 +358,11 @@ if [ "$FLAGOPTICAL" = "yes" ];then
  FSTYPE="iso9660"
 fi
 
+EXTRAMOUNTOPT=""
+if [ "$DRV_CATEGORY" != "usbdrv" ]; then
+  EXTRAMOUNTOPT=",ro"
+fi
+
 #if dropped down here, it is likely to be a data partition...
 #if it is a mountable partition then mount and open with rox. If already mntd then open in rox...
 #if [ "$ICONPARTITIONS" = "true" ];then
@@ -368,7 +373,7 @@ if [ "$FSTYPE" != "" ];then
   case $FSTYPE in
    ntfs)
     #'mount' is a script that takes care of mounting ntfs...
-    mount -t ntfs /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
+    mount -t ntfs -o none$EXTRAMOUNTOPT /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
     RETVAL1=$?
     ;;
    vfat)
@@ -381,16 +386,16 @@ if [ "$FSTYPE" != "" ];then
      grep -q -i '852' /etc/codepage && NLS_PARAM=",codepage=852,iocharset=iso8859-2"
     fi
     echo $LANG | grep -q -i '\.utf' && NLS_PARAM="$NLS_PARAM,utf8"
-    mount -t vfat -o shortname=mixed,quiet${NLS_PARAM} /dev/$ONEDRVNAME /mnt/$ONEDRVNAME #v411
+    mount -t vfat -o shortname=mixed,quiet${NLS_PARAM}${EXTRAMOUNTOPT} /dev/$ONEDRVNAME /mnt/$ONEDRVNAME #v411
     RETVAL1=$?
     ;;
    #100127 not certain about this (inserted by shinobar)... 100131 shinobar informs needed for cds created in windows...
    iso9660)
-    mount -t $FSTYPE -o iocharset=utf8 /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
+    mount -t $FSTYPE -o iocharset=utf8$EXTRAMOUNTOPT /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
     RETVAL1=$?
     ;;  
    *)
-    mount -t $FSTYPE /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
+    mount -t $FSTYPE -o none$EXTRAMOUNTOPT /dev/$ONEDRVNAME /mnt/$ONEDRVNAME
     RETVAL1=$?
     ;;
   esac
