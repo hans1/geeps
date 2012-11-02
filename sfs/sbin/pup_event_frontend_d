@@ -369,6 +369,9 @@ create_icon_func() {
   FSTYPE="`echo -n "$ONEDRVINFO" | cut -f 2 -d '|'`"
   SIZE=`echo -n "$ONEDRVINFO" | cut -f 3 -d '|'`
   drvPATTERN='^/dev/'"${ONEDRVNAME}"' ' #important, a space on end!
+  if [ "$FSTYPE" -eq "vfat" ] && [ "`dosfslabel /dev/$ONEDRVNAME`" = "GEEPS" ]; then
+    continue
+  fi
   if [ ! -d /root/.pup_event/drive_${ONEDRVNAME} ];then
    mkdir /root/.pup_event/drive_${ONEDRVNAME}
    cp -af /usr/local/bin/drive_all /root/.pup_event/drive_${ONEDRVNAME}/AppRun
