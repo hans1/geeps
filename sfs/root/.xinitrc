@@ -164,7 +164,7 @@ fi
 # rox -p /root/Choices/ROX-Filer/PuppyPin
 #fi
 
-(cd /root/geeps && ./start.pl) &
+(cd /root/geeps && if ./ula.pl; then ./start.pl; else wmpoweroff; fi) &
 
 #exec $CURRENTWM
 #v2.11 GuestToo suggested this improvement...
