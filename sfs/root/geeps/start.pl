@@ -54,7 +54,7 @@ $slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
 
 
 
-my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'raised');
+my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'flat', -background => '#fdcf59', -height => 2, -width => 12);
 $menu->command(-label => 'Wipe drive', -command => sub{});
 my $extras = $menu->cascade(-label => 'Extras');
 $extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
