@@ -70,7 +70,7 @@ my $drivedeck;
 my %drvfnames = (drive => 'hdd_mount1.png', usbdrv => 'hdd_usb.png');
 my %drvs = map { $_ => $mw->Photo(-file => $drvfnames{$_}); } keys %drvfnames;
 sub drive_button {
-	my ($dev, $type, $fs, $label) = @_;
+	my ($dev, $type, $fs, $label, $mounted) = @_;
 	return unless $drvs{$type};
 
 	my $size = '';
@@ -80,16 +80,20 @@ sub drive_button {
 		$size = $1;
 	}
 	close $f;
+	
+	my $bg = $mounted ? '#ffaaaa' : '#ffffff';
 
 	my $btn = $drivedeck->Button(
 		-image => $drvs{$type},
-		-background => '#ffffff', -relief => 'flat', -borderwidth => 0, -highlightthickness => 0,
+		-background => $bg,
+		-relief => 'flat', -borderwidth => 0, -highlightthickness => 0,
 		-command => sub { system("/root/.pup_event/drive_$dev/AppRun $type $fs"); }
 	);
 	$mw->Balloon()->attach($btn, -balloonmsg => "$label ($size)\n($type $dev $fs)");
 	$btn->pack(-side => 'right');
 }
 
+my %seen_mounted = ();
 my @curdrives = ();
 sub set_drives {
 	my @drives = ();
@@ -98,14 +102,28 @@ sub set_drives {
 		chomp;
 		next unless m#pup_event#;
 		my ($label, $type, $fs, $dev) = m#label="(.*?)".*args="(.*?) (.*?)">/root/\.pup_event/drive_(.*?)<#;
-		push(@drives, [$dev, $type, $fs, $label]);
+		my $mounted = `grep "$dev " /proc/mounts`;
+		if ($mounted) {
+			my $fdev = '/mnt/'.$dev;
+			my $r = system('xprop -name '.$fdev.' >/dev/null 2>&1');
+			if ($r >> 8 != 0) {
+				# file browser window does not exist anymore, auto-unmount
+				if ($seen_mounted{$dev}) {
+					system('umount '.$fdev.' &');
+					$seen_mounted{$dev} = 0;
+				}
+			} else {
+				$seen_mounted{$dev} = 1;
+			}
+		}
+		push(@drives, [$dev, $type, $fs, $label, $mounted]);
 	}
 	close $f;
 
 	if (@drives == @curdrives) {
 		my $d = 0;
 		for (0..$#drives) {
-			$d += ($drives[$_]->[0] ne $curdrives[$_]->[0]);
+			$d += ($drives[$_]->[0] ne $curdrives[$_]->[0] or $drives[$_]->[4] ne $curdrives[$_]->[4]);
 		}
 		return unless $d;
 	}
