@@ -363,6 +363,29 @@ if [ "$DRV_CATEGORY" != "usbdrv" ]; then
   EXTRAMOUNTOPT=",ro"
 fi
 
+openrox()
+{
+  MNTPT="$1"
+  rox -x $MNTPT -d $MNTPT
+  # Preconf position 1
+  if [ ! -s "/tmp/roxwin1" ] || ! xprop -name "`cat /tmp/roxwin1`"; then
+	  WID=`xdotool getactivewindow`
+	  xdotool windowsize $WID 400 700
+	  xdotool windowmove $WID 400 20
+	  echo "$MNTPT" >/tmp/roxwin1
+	  return
+  fi
+  # Preconf position 2
+  if [ ! -s "/tmp/roxwin2" ] || ! xprop -name "`cat /tmp/roxwin2`"; then
+	  WID=`xdotool getactivewindow`
+	  xdotool windowsize $WID 800 300
+	  xdotool windowmove $WID 20 720
+	  echo "$MNTPT" >/tmp/roxwin2
+	  return
+  fi
+  # No preconfigured position
+}
+
 #if dropped down here, it is likely to be a data partition...
 #if it is a mountable partition then mount and open with rox. If already mntd then open in rox...
 #if [ "$ICONPARTITIONS" = "true" ];then
@@ -400,7 +423,8 @@ if [ "$FSTYPE" != "" ];then
     ;;
   esac
   if [ $RETVAL1 -eq 0 ];then
-   exec rox -x /mnt/$ONEDRVNAME -d /mnt/$ONEDRVNAME
+   openrox /mnt/$ONEDRVNAME
+   exit
   else
    #091223 why did it fail?
    dd if=/dev/$ONEDRVNAME of=/dev/null bs=512 count=1 > /dev/null 2>&1
@@ -430,7 +454,8 @@ if [ "$FSTYPE" != "" ];then
    ;;
   esac
   #exec rox -x /mnt/$ONEDRVNAME -d /mnt/$ONEDRVNAME
-  exec rox -x $MNTPT -d $MNTPT
+  openrox $MNTPT
+  exit
  fi
 fi
 
