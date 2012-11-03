@@ -367,22 +367,25 @@ openrox()
 {
   MNTPT="$1"
   rox -x $MNTPT -d $MNTPT
-  xsize="`xprop -root | sed -ne 's/.*GEOMETRY.*= \([0-9]*\),\([0-9]*\)/\1/p'`"
-  ysize="`xprop -root | sed -ne 's/.*GEOMETRY.*= \([0-9]*\),\([0-9]*\)/\2/p'`"
+  xsize="`xprop -root | sed -ne 's/.*GEOMETRY.*= \([0-9]*\), *\([0-9]*\).*/\1/p'`"
+  ysize="`xprop -root | sed -ne 's/.*GEOMETRY.*= \([0-9]*\), *\([0-9]*\).*/\2/p'`"
+  echo $xsize ,, $ysize
   # Preconf position 1
-  if [ ! -s "/tmp/roxwin1" ] || ! xprop -name "`cat /tmp/roxwin1`"; then
+  if [ ! -s "/tmp/roxwin1" ] || ! xprop -id "`cat /tmp/roxwin1`"; then
 	  WID=`xdotool getactivewindow`
-	  xdotool windowsize $WID 300 500
-	  xdotool windowmove $WID $((xsize-300-20)) 20
-	  echo "$MNTPT" >/tmp/roxwin1
+	  xdotool windowmove $WID $((xsize-320)) 20
+	  xdotool windowsize $WID 300 $((ysize-300))
+	  xdotool windowsize $WID 300 $((ysize-300))
+	  echo "$WID" >/tmp/roxwin1
 	  return
   fi
   # Preconf position 2
-  if [ ! -s "/tmp/roxwin2" ] || ! xprop -name "`cat /tmp/roxwin2`"; then
+  if [ ! -s "/tmp/roxwin2" ] || ! xprop -id "`cat /tmp/roxwin2`"; then
 	  WID=`xdotool getactivewindow`
-	  xdotool windowsize $WID 800 250
-	  xdotool windowmove $WID $((xsize-800-20)) 520
-	  echo "$MNTPT" >/tmp/roxwin2
+	  xdotool windowsize $WID 800 220
+	  xdotool windowsize $WID 800 220
+	  xdotool windowmove $WID $((xsize-800-20)) $((ysize-250))
+	  echo "$WID" >/tmp/roxwin2
 	  return
   fi
   # No preconfigured position
