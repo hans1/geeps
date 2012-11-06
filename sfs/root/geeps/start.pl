@@ -8,6 +8,19 @@ use Tk;
 use Tk::widgets qw/JPEG PNG Balloon/;
 
 
+my $mode = 'normal';
+
+sub normal_mode {
+	$mode = 'normal';
+	setup_slidedeck_normal();
+}
+
+sub wipe_mode {
+	$mode = 'wipe';
+	setup_slidedeck_wipe();
+}
+
+
 
 my $mw = MainWindow->new(-background => '#ffffff');
 $mw->geometry($mw->screenwidth . 'x' . $mw->screenheight . '-5-20');
@@ -25,15 +38,12 @@ my $topy = ($mw->screenheight
 	) / 2 - 300; # centered to that area minus /2 of instructions height
 
 
-my $slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff');
-
-$slidedeck->Button(-text => '<-', -background => '#ffffff', -relief => 'flat', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
-
-my $slide = $slidedeck->Canvas(-width => 800, -height => 600, -borderwidth => 0, -highlightthickness => 0);
+my ($slidedeck, $slide);
 
 my @picfnames = qw(geeps1c8.png geeps2c8.png geeps3c8.png geeps4c8.png);
 my @pics = map { $mw->Photo(-file => $_); } @picfnames;
 my $pici = 0;
+
 sub set_slide {
 	my ($i) = @_;
 	$slide->delete('all');
@@ -46,17 +56,41 @@ sub prev_slide {
 sub next_slide {
 	$pici = ($pici + 1) % 4; set_slide($pici);
 }
-set_slide($pici);
 
-$slidedeck->Button(-text => '->', -background => '#ffffff', -relief => 'flat', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
+sub setup_slidedeck_normal {
+	$slidedeck->destroy() if $slidedeck;
+	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff', -highlightthickness => 0);
+	$slidedeck->delete('all');
 
-$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+	$slidedeck->Button(-text => '<-', -background => '#ffffff', -relief => 'flat', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
+	$slide = $slidedeck->Canvas(-width => 800, -height => 600, -borderwidth => 0, -highlightthickness => 0);
+	set_slide($pici);
+
+	$slidedeck->Button(-text => '->', -background => '#ffffff', -relief => 'flat', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
+
+	$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+	$mw->update();
+}
+
+sub setup_slidedeck_wipe {
+	$slidedeck->destroy() if $slidedeck;
+	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff', -highlightthickness => 0);
+	$slidedeck->delete('all');
+	$slidedeck->Label(-text => 'Choose a drive to wipe', -background => '#ffffff', -font => { -size => 24 }, -pady => 80)->pack();
+	$slidedeck->Button(-text => 'Cancel', -background => '#ffffff', -relief => 'flat', -command => \&normal_mode)->pack();
+	$slidedeck->pack();
+
+	$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+	$mw->update();
+}
+
+setup_slidedeck_normal();
 
 
 
 my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'flat', -background => '#fdcf59', -height => 2, -width => 12);
 $menu->command(-label => 'Help', -command => sub { system('seamonkey file:///root/geeps/help0.html&'); });
-$menu->command(-label => 'Wipe drive', -command => sub{});
+$menu->command(-label => 'Wipe drive', -command => sub { wipe_mode(); });
 my $extras = $menu->cascade(-label => 'Extras');
 $extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
 $extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
@@ -88,7 +122,15 @@ sub drive_button {
 		-image => $drvs{$type},
 		-background => $bg,
 		-relief => 'flat', -borderwidth => 0, -highlightthickness => 0,
-		-command => sub { system("/root/.pup_event/drive_$dev/AppRun $type $fs"); }
+		-command => sub {
+			if ($mode eq 'normal') {
+				system("/root/.pup_event/drive_$dev/AppRun $type $fs");
+			} else {
+				system('umount', "/dev/$dev");
+				system('./wipe.pl', "/dev/$dev", $label, $size, $type, $fs);
+				normal_mode();
+			}
+		}
 	);
 	$mw->Balloon()->attach($btn, -balloonmsg => "$label ($size)\n($type $dev $fs)");
 	$btn->pack(-side => 'right');
