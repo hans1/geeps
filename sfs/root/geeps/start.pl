@@ -21,8 +21,9 @@ sub wipe_mode {
 }
 
 
+my $bg = '#a1cee9';
 
-my $mw = MainWindow->new(-background => '#ffffff');
+my $mw = MainWindow->new(-background => $bg);
 $mw->geometry($mw->screenwidth . 'x' . $mw->screenheight . '-5-20');
 $mw->title("Geeps");
 
@@ -36,6 +37,12 @@ my $topy = ($mw->screenheight
 		- 128 # drivedeck height
 		- 10 # bottom margin
 	) / 2 - 300; # centered to that area minus /2 of instructions height
+
+
+my $logo = $mw->Canvas(-width => 184, -height => 209, -background => $bg, -highlightthickness => 0);
+my $logopic = $mw->Photo(-file => "GeepMascott.png");
+$logo->createImage(0, 0, -anchor => 'nw', -image => $logopic);
+$logo->place(-anchor => 'ne', -x => $mw->screenwidth() - 20, -y => $topy);
 
 
 my ($slidedeck, $slide);
@@ -59,7 +66,7 @@ sub next_slide {
 
 sub setup_slidedeck_normal {
 	$slidedeck->destroy() if $slidedeck;
-	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff', -highlightthickness => 0);
+	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => $bg, -highlightthickness => 0);
 	$slidedeck->delete('all');
 
 	$slidedeck->Button(-text => '<-', -background => '#ffffff', -relief => 'flat', -command => \&prev_slide)->pack(-side => 'left', -fill => 'both');
@@ -74,9 +81,9 @@ sub setup_slidedeck_normal {
 
 sub setup_slidedeck_wipe {
 	$slidedeck->destroy() if $slidedeck;
-	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => '#ffffff', -highlightthickness => 0);
+	$slidedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 600, -background => $bg, -highlightthickness => 0);
 	$slidedeck->delete('all');
-	$slidedeck->Label(-text => 'Choose a drive to wipe', -background => '#ffffff', -font => { -size => 24 }, -pady => 80)->pack();
+	$slidedeck->Label(-text => 'Choose a drive to wipe', -background => $bg, -font => { -size => 24 }, -pady => 80)->pack();
 	$slidedeck->Button(-text => 'Cancel', -background => '#ffffff', -relief => 'flat', -command => \&normal_mode)->pack();
 	$slidedeck->pack();
 
@@ -116,11 +123,11 @@ sub drive_button {
 	}
 	close $f;
 	
-	my $bg = $mounted ? '#ffaaaa' : '#ffffff';
+	my $btnbg = $mounted ? '#ffaaaa' : $bg;
 
 	my $btn = $drivedeck->Button(
 		-image => $drvs{$type},
-		-background => $bg,
+		-background => $btnbg,
 		-relief => 'flat', -borderwidth => 0, -highlightthickness => 0,
 		-command => sub {
 			if ($mode eq 'normal') {
@@ -140,7 +147,7 @@ my %seen_mounted = ();
 my @curdrives = ();
 sub set_drives {
 	my @drives = ();
-	open my $f, "/root/Choices/ROX-Filer/PuppyPin" or die "$!";
+	open my $f, "/root/Choices/ROX-Filer/PuppyPin" or warn "$!";
 	while (<$f>) {
 		chomp;
 		next unless m#pup_event#;
@@ -173,7 +180,7 @@ sub set_drives {
 	@curdrives = @drives;
 
 	$drivedeck->destroy() if $drivedeck;
-	$drivedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 128, -background => '#ffffff');
+	$drivedeck = $mw->Canvas(-width => $mw->screenwidth, -height => 128, -background => $bg);
 	$drivedeck->delete('all');
 	for my $d (@drives) {
 		drive_button(@$d);
