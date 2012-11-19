@@ -13,14 +13,16 @@ OF THIS AGREEMENT, CLICK THE "CANCEL" BUTTON AND THE OPERATION PROCESS WILL NOT
 CONTINUE.
 1. License: This Agreement grants you, the Licensee, a limited, non-exclusive,
 global, non-transferable license to use GEEPS.
-2. General Public License/Lesser General Public License. Certain components of
-the Software may be subject to the GNU GPL or LGPL terms and conditions
-available for viewing at and or as otherwise designated. To the extent you
-receive Software under this License which contains components subject to the
-GPL or LGPL terms, you agree to be bound by all the terms and restrictions
-therein including keeping all copyright notices in tact for the duration of
-your use of the Software and modifying and/or redistributing such components
-only in accordance with the terms of the GNU GPL or LGPL terms.
+2. General Public License/Lesser General Public License. Certain components
+of the Software may be subject to the GNU GPL or LGPL terms and conditions
+available for viewing at http://www.gnu.org/copyleft/gpl.html and
+http://www.gnu.org/copyleft/lesser.html or as otherwise designated. To the
+extent you receive Software under this License which contains components
+subject to the GPL or LGPL terms, you agree to be bound by all the terms
+and restrictions therein including keeping all copyright notices in tact
+for the duration of your use of the Software and modifying and/or
+redistributing such components only in accordance with the terms of the
+GNU GPL or LGPL terms.
 3. Restrictions: The Licensee may NOT sublicense, assign, reproduce or
 distribute copies of the Software to others except as otherwise provided
 herein. The Software contains trade secrets. The Licensee may NOT decompile,
