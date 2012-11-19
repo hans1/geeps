@@ -38,7 +38,7 @@ $text->configure(-state => 'disabled');
 
 my $c = $mw->Canvas(-width => 600, -background => $bg, -highlightthickness => 0);
 $c->Button(-text => 'I agree', -background => '#ffffff', -relief => 'flat', -command => sub { exit 0; })->pack(-side=>'left', -padx => 60);
-$c->Button(-text => 'I disagree', -background => '#ffffff', -relief => 'flat', -command => sub { exit 1; })->pack(-side=>'right', -padx => 60);
+$c->Button(-text => 'Cancel', -background => '#ffffff', -relief => 'flat', -command => sub { exit 1; })->pack(-side=>'right', -padx => 60);
 $c->pack();
 
 $mw->update();
