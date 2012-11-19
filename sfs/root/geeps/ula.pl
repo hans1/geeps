@@ -32,7 +32,7 @@ my $text = $mw->Scrolled(
 	-width      => '80',
 	-scrollbars => 'e',
 	-wrap       => 'word'
-)->pack(-pady=>100);
+)->pack(-pady=>50);
 $text->Subwidget->Contents(`cat ULA.txt`);
 $text->configure(-state => 'disabled');
 
