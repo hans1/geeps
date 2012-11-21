@@ -27,7 +27,7 @@ my $text = $mw->Scrolled(
 	'Text',
 	-background => '#ffffff',
 	-foreground => 'black',
-	-height     => '30',
+	-height     => '20',
 	-takefocus  => '0',
 	-width      => '80',
 	-scrollbars => 'e',
