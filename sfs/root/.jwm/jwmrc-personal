@@ -3,7 +3,7 @@
 <JWM>
 
 <!-- Number of virtual desktops -->
-<Desktops width="2" height="1"/>
+<Desktops width="1" height="1"/>
 
 <!-- Double click speed (in milliseconds) -->
 <DoubleClickSpeed>400</DoubleClickSpeed>

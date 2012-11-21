@@ -129,7 +129,7 @@
 
 	<!-- Virtual Desktops -->
 	<!-- Name tags can be contained within Desktops for desktop names. -->
-	<Desktops count="3"/>
+	<Desktops count="1"/>
 
 	<!-- Double click speed (in milliseconds) -->
 	<DoubleClickSpeed>400</DoubleClickSpeed>
