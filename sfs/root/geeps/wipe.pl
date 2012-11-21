@@ -46,24 +46,31 @@ sub wipe {
 		$SIG{INT} = \&cleanup;
 		$SIG{TERM} = \&cleanup;
 
+		my $start_t = time;
+
 		sleep(1);
 		while (waitpid($cpid, WNOHANG) <= 0) {
 			kill(10, $cpid); # SIGUSR1
 			# 1097280+0 records in
 			# 1097280+0 records out
 			# 561807360 bytes (562 MB) copied, 2.7611 s, 203 MB/s
-			<$fh>; <$fh>;
-			my $line = <$fh>;
-			chomp $line;
-			my ($bytes, $mbytes, $time, $speed) = ($line =~ /^(\d+) bytes \(([\d.]+) MB\) copied, ([\d.]+) s, ([\d.]+) MB\/s/);
-			$pgnow = 200 * $bytes / $max;
-			my $remaining = ($max - $bytes) / ($speed * 1048576);
-			my $remainingh = $remaining / 3600;
-			my $remainingm = ($remaining % 3600) / 60;
-			my $remainings = $remaining % 60;
-			my $remtime = sprintf('%d:%02d:%02d', $remainingh, $remainingm, $remainings);
-			$label3->configure(-text => "Wiping drive... $speed MB/s, $remtime remaining");
-			$mw->update();
+			while (my $line = <$fh>) {
+				chomp $line;
+				print STDERR "wipe: dd line: $line\n";
+				my ($bytes) = ($line =~ /^(\d+) bytes.*/);
+				defined $bytes or next;
+				$pgnow = 250 * $bytes / $max;
+				my $bytespersec = $bytes / (time - $start_t);
+				my $mbytespersec = sprintf('%.1f', $bytespersec / 1048576.0);
+				my $remaining = ($max - $bytes) / $bytespersec;
+				my $remainingh = $remaining / 3600;
+				my $remainingm = ($remaining % 3600) / 60;
+				my $remainings = $remaining % 60;
+				my $remtime = sprintf('%d:%02d:%02d', $remainingh, $remainingm, $remainings);
+				$label3->configure(-text => "Wiping drive... $mbytespersec MB/s, $remtime remaining");
+				$mw->update();
+				last; # sleep and waitpid
+			}
 			sleep(1);
 		}
 		$cpid = undef;
