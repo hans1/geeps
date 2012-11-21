@@ -39,7 +39,7 @@ sub wipe {
 		$| = 1;
 		close(STDERR);
 		open(STDERR, ">&STDOUT");
-		exec('dd', 'if=/dev/urandom', 'of='.$dev, 'bs=1048576') or die "$!";
+		exec('dd', 'if=/dev/zero', 'of='.$dev, 'bs=1048576') or die "$!";
 	} else {
 		use POSIX ":sys_wait_h";
 
