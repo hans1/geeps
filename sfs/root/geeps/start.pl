@@ -47,7 +47,7 @@ $logo->place(-anchor => 'ne', -x => $mw->screenwidth() - 20, -y => $topy);
 
 my ($slidedeck, $slide);
 
-my @picfnames = qw(geeps1c8.png geeps2c8.png geeps3c8.png geeps4c8.png);
+my @picfnames = qw(geeps1c8.png geeps2c8.png geeps3c8.png geeps4c8.png geeps5c8.png);
 my @pics = map { $mw->Photo(-file => $_); } @picfnames;
 my $pici = 0;
 
@@ -58,10 +58,10 @@ sub set_slide {
 	$slide->pack(-side => 'left');
 }
 sub prev_slide {
-	$pici = ($pici - 1) % 4; set_slide($pici);
+	$pici = ($pici - 1) % @picfnames; set_slide($pici);
 }
 sub next_slide {
-	$pici = ($pici + 1) % 4; set_slide($pici);
+	$pici = ($pici + 1) % @picfnames; set_slide($pici);
 }
 
 sub setup_slidedeck_normal {
