@@ -155,7 +155,7 @@ sub set_drives {
 		my $mounted = `grep "$dev " /proc/mounts`;
 		if ($mounted) {
 			my $fdev = '/mnt/'.$dev;
-			my $r = system('xwininfo -root -tree | grep -q '.$fdev.'\\\b >/dev/null 2>&1');
+			my $r = system('xwininfo -root -tree 2>&1 | grep '.$fdev.'\\\\b\\\\\\|can.t.query');
 			if ($r >> 8 != 0) {
 				# file browser window does not exist anymore, auto-unmount
 				if ($seen_mounted{$dev}) {
