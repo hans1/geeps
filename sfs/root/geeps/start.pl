@@ -45,7 +45,7 @@ $logo->createImage(0, 0, -anchor => 'nw', -image => $logopic);
 $logo->place(-anchor => 'ne', -x => $mw->screenwidth() - 20, -y => $topy);
 
 
-my ($slidedeck, $slide);
+my ($slidedeck, $slide, $menu);
 
 my @picfnames = qw(geeps1c8.png geeps2c8.png geeps3c8.png geeps4c8.png geeps5c8.png);
 my @pics = map { $mw->Photo(-file => $_); } @picfnames;
@@ -76,6 +76,7 @@ sub setup_slidedeck_normal {
 	$slidedeck->Button(-text => '->', -background => '#ffffff', -relief => 'flat', -command => \&next_slide)->pack(-side => 'left', -fill => 'both');
 
 	$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+	menu_button();
 	$mw->update();
 }
 
@@ -88,22 +89,25 @@ sub setup_slidedeck_wipe {
 	$slidedeck->pack();
 
 	$slidedeck->place(-anchor => 'n', -x => $mw->screenwidth / 2, -y => $topy);
+	menu_button();
 	$mw->update();
 }
 
 setup_slidedeck_normal();
 
 
+sub menu_button {
+	$menu->destroy() if $menu;
+	$menu = $mw->Menubutton(-text => 'Menu', -relief => 'flat', -background => '#fdcf59', -height => 2, -width => 12);
+	$menu->command(-label => 'Help', -command => sub { system('seamonkey file:///root/geeps/help0.html&'); });
+	$menu->command(-label => 'Wipe drive', -command => sub { wipe_mode(); });
+	my $extras = $menu->cascade(-label => 'Extras');
+	$extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
+	$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
+	$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
 
-my $menu = $mw->Menubutton(-text => 'Menu', -relief => 'flat', -background => '#fdcf59', -height => 2, -width => 12);
-$menu->command(-label => 'Help', -command => sub { system('seamonkey file:///root/geeps/help0.html&'); });
-$menu->command(-label => 'Wipe drive', -command => sub { wipe_mode(); });
-my $extras = $menu->cascade(-label => 'Extras');
-$extras->command(-label => 'Web Browser', -command => sub { system('seamonkey&'); });
-$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
-$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
-
-$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
+	$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
+}
 
 
 
