@@ -38,11 +38,15 @@ my $topy = ($mw->screenheight
 		- 10 # bottom margin
 	) / 2 - 300; # centered to that area minus /2 of instructions height
 
+# On purpose, we do not change $stopy so that instruction slides start
+# off the screen where it's mostly whitespace.
+my $stopy = $topy > 0 ? $topy : 0;
+
 
 my $logo = $mw->Canvas(-width => 184, -height => 209, -background => $bg, -highlightthickness => 0);
 my $logopic = $mw->Photo(-file => "GeepMascott.png");
 $logo->createImage(0, 0, -anchor => 'nw', -image => $logopic);
-$logo->place(-anchor => 'ne', -x => $mw->screenwidth() - 20, -y => $topy);
+$logo->place(-anchor => 'ne', -x => $mw->screenwidth() - 20, -y => $stopy);
 
 
 my ($slidedeck, $slide, $menu);
@@ -106,7 +110,7 @@ sub menu_button {
 	$extras->command(-label => 'Terminal', -command => sub { system('urxvt&'); });
 	$menu->command(-label => 'Quit', -command => sub { system('wmpoweroff&'); });
 
-	$menu->place(-anchor => 'nw', -x => 10, -y => $topy);
+	$menu->place(-anchor => 'nw', -x => 10, -y => $stopy);
 }
 
 
